@@ -25,6 +25,7 @@ from .card_resource import (
     write_loader,
 )
 from .const import (
+    DATA_DIAGNOSTICS,
     DOMAIN,
     MAIN_BUNDLE,
     PANEL_COMPONENT,
@@ -33,6 +34,7 @@ from .const import (
     PANEL_URL_PATH,
     URL_BASE,
 )
+from .diagnostics_report import DiagnosticsReporter
 from .license import FIRST_CHECK_DELAY, REFRESH_INTERVAL, async_refresh_quietly
 from .storage import FloorplanData
 from .websocket import async_register_commands
@@ -103,6 +105,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(async_track_time_interval(hass, _check, REFRESH_INTERVAL))
     entry.async_on_unload(async_call_later(hass, random.uniform(*FIRST_CHECK_DELAY), _check))
 
+    # opt-in usage and error reports: inert (nothing is sent) unless the user switched them on
+    reporter = DiagnosticsReporter(hass, data)
+    await reporter.async_load()
+    hass.data[DATA_DIAGNOSTICS] = reporter
+    entry.async_on_unload(reporter.start())
+
     await _async_register_static(hass)
 
     url = await _async_main_url(hass)
@@ -136,6 +144,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     frontend.async_remove_panel(hass, PANEL_URL_PATH)
     frontend.remove_extra_js_url(hass, await _async_main_url(hass))
     hass.data.pop(DOMAIN, None)
+    hass.data.pop(DATA_DIAGNOSTICS, None)
     return True
 
 

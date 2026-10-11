@@ -52,6 +52,8 @@
       };
       let building = params.has("empty") ? { version: 1, floors: [], settings: { wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05 } } : DEMO_BUILDING;
       let revision = 1;
+      // off like on a fresh installation; the screenshots switch it on through the editor
+      const diag = { enabled: false };
       const images = { ...DEMO_PICTURES };
       const listeners = new Set();
       // invented restore points
@@ -152,6 +154,28 @@
               revision += 1;
               for (const cb of listeners) cb({ revision });
               return { revision };
+            // the opt-in reports (only shown with the lab switch): a made-up status and preview
+            case "neonplan3d/diagnostics/client":
+              return { enabled: diag.enabled };
+            case "neonplan3d/diagnostics/get":
+            case "neonplan3d/diagnostics/set":
+            case "neonplan3d/diagnostics/delete": {
+              if (msg.type === "neonplan3d/diagnostics/set") diag.enabled = msg.enabled;
+              if (msg.type === "neonplan3d/diagnostics/delete") diag.enabled = false;
+              return {
+                enabled: diag.enabled,
+                last_daily: null,
+                can_delete: diag.enabled,
+                endpoint: "https://api.mastershort.de/telemetry/v1/report",
+                preview: {
+                  v: 1, id: diag.enabled ? "3f0c9a52-7d1e-4b8a-9c61-2e5f8d4a7b10" : null, kind: "daily", neonplan: "1.17.0", ha: "2026.10.1", python: "3.13", lang: "de",
+                  packs: ["mastershort.pro_energy"], pro: ["energy_pro"],
+                  plan: { floors: building.floors.length, rooms: building.floors.reduce((n, f) => n + f.rooms.length, 0), furniture: building.floors.reduce((n, f) => n + f.furniture.length, 0), devices_linked: building.floors.reduce((n, f) => n + f.placements.length, 0), outdoor: 0, cameras: 1 },
+                  clients: diag.enabled ? [{ device: "tablet", browser: "Silk 120", os: "Android 9", low_end: true, render_scale: 0.75, fps: 24, gpu_tier: "low", views: { "3d": 12, editor: 3 } }] : [],
+                  errors: [],
+                },
+              };
+            }
             case "neonplan3d/history/list":
               return { snapshots: history.map(({ building: b, ...rest }) => ({ ...rest, floors: b.floors.length, rooms: b.floors.reduce((n, f) => n + f.rooms.length, 0), furniture: b.floors.reduce((n, f) => n + f.furniture.length, 0) })).reverse() };
             case "neonplan3d/history/snapshot":

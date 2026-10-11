@@ -289,6 +289,8 @@ export interface ViewerStats {
   /** The low quality level is active (tablet). */
   low: boolean;
   pixelRatio: number;
+  /** The WebGL renderer's name (read once; only its rough class leaves the browser, with opt-in reports). */
+  gpu: string | null;
 }
 
 /** Extra gap between floors in the pulled-apart house view (metres). */
@@ -605,6 +607,7 @@ export class FloorplanViewer {
   /** The next fit keeps the camera (a floor-to-floor switch with keepView). */
   private keepNext = false;
   private fpsStart = 0;
+  private gpuName: string | null | undefined;
 
   constructor(host: HTMLElement, options: ViewerOptions = {}) {
     this.host = host;
@@ -3900,11 +3903,24 @@ export class FloorplanViewer {
         triangles: info.triangles,
         low: this.lowQuality,
         pixelRatio: this.renderer.getPixelRatio(),
+        gpu: (this.gpuName ??= gpuNameOf(this.renderer)),
       });
       this.fpsFrames = 0;
       this.fpsStart = now;
       this.worstFrame = 0;
     }
+  }
+}
+
+/** The GPU's name as WebGL tells it (unmasked where the browser allows), or null. */
+function gpuNameOf(renderer: WebGLRenderer): string | null {
+  try {
+    const gl = renderer.getContext();
+    const ext = gl.getExtension("WEBGL_debug_renderer_info");
+    const name = ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+    return typeof name === "string" ? name : null;
+  } catch {
+    return null;
   }
 }
 

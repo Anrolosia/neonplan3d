@@ -104,6 +104,7 @@ import type { PoolPiece } from "../viewer/pool-water.ts";
 import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HassEntity, HomeAssistant } from "../types.ts";
+import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../diagnostics.ts";
 import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
@@ -223,6 +224,7 @@ export class Fp3dView3d extends LitElement {
   /** The replay's focus counter as last seen (an event was tapped: the view shows where). */
   private seenFocus = 0;
   private unlistenReplay: (() => void) | null = null;
+  private unwatchDiag: (() => void) | null = null;
   /** The last sync showed something that follows the clock (a camera's detection pin). */
   private detecting = false;
   /** How long the last full sync took (ms, smoothed), shown with the stats. */
@@ -507,6 +509,8 @@ export class Fp3dView3d extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.listenReplay();
+    // the opt-in reports sample the frame rate the viewer measures for its stats anyway
+    this.unwatchDiag = watchDiagnostics((on) => this.viewer?.setStats(this.showStats || on));
     if (this.hasUpdated) {
       this.observeStage();
       if (!this.viewer) void this.start();
@@ -518,6 +522,8 @@ export class Fp3dView3d extends LitElement {
     this.stopWalk();
     this.unlistenReplay?.();
     this.unlistenReplay = null;
+    this.unwatchDiag?.();
+    this.unwatchDiag = null;
     this.resizeObs?.disconnect();
     this.resizeObs = null;
     clearInterval(this.alertTimer);
@@ -598,6 +604,7 @@ export class Fp3dView3d extends LitElement {
         // stats can be switched on at any time; they only cause updates while shown
         onStats: (s) => {
           if (this.showStats) this._stats = s;
+          recordFrame(s);
         },
       });
       this.viewer.setWallMode(this.wallMode);
@@ -609,7 +616,8 @@ export class Fp3dView3d extends LitElement {
       this.viewer.setFurnishTypes(this.furnishTypes ?? null);
       this.viewer.setAnchorCallback((i, x, y, on, scale, facing) => this.placeHolo(i, x, y, on, scale, facing));
       this.viewer.setFloorStack(this.floorStack);
-      this.viewer.setStats(this.showStats);
+      this.viewer.setStats(this.showStats || diagnosticsActive());
+      countView("3d");
       this.viewer.setAutoOrbit(this.autoOrbit ? 0.06 : 0);
       this.viewer.setKeepRoof(this.keepRoof);
       this._low = this.viewer.low;
@@ -702,7 +710,7 @@ export class Fp3dView3d extends LitElement {
       // a replay ticks as often as the new quality allows
       this.replay?.setQuality(this.quality, v.low);
     }
-    if (changed.has("showStats")) v.setStats(this.showStats);
+    if (changed.has("showStats")) v.setStats(this.showStats || diagnosticsActive());
     if (changed.has("building")) this.findIndex = null;
   }
 
@@ -2702,6 +2710,7 @@ export class Fp3dView3d extends LitElement {
    * stick move; walls stop you. The house lives on around you: lights, screens, sunlight.
    */
   private async startWalk(): Promise<void> {
+    countView("walk");
     const b = this.building;
     const v = this.viewer;
     if (!b || !v || this._walk) return;

@@ -2,6 +2,7 @@
 
 import type { ReactiveController, ReactiveControllerHost } from "lit";
 import { fetchBuilding, listPacks, saveBuilding, subscribeBuilding } from "./api.ts";
+import { initDiagnostics } from "./diagnostics.ts";
 import { normalizeBuilding, type Building } from "./model.ts";
 import { setPacks, type FurniturePack } from "./packs.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -169,6 +170,8 @@ export class BuildingController implements ReactiveController {
 
   private async start(): Promise<void> {
     if (!this.hass) return;
+    // the opt-in reports: one local call per page to learn whether they are on (see diagnostics.ts)
+    initDiagnostics(this.hass);
     await Promise.all([this.reloadPacks(), this.reload()]);
     if (!this.unsubscribe && this.connected) {
       try {

@@ -3,6 +3,7 @@
 import { formatImperial, lengthUnit, parseLength } from "./units.ts";
 import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import { BuildingController } from "./building-controller.ts";
+import { countView } from "./diagnostics.ts";
 import { loadEditor } from "./load-editor.ts";
 import "./components/room-panel.ts";
 import "./components/view3d.ts";
@@ -196,6 +197,7 @@ export class Floorplan3dPanel extends LitElement {
     this.tt.stop();
     if (mode === "view") void this.data.flush();
     this._mode = mode;
+    countView(mode);
   }
 
   private onRoomTap(e: CustomEvent<{ floorId: string; roomId: string | null }>): void {

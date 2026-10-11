@@ -118,6 +118,7 @@ import { controls, tokens } from "../styles.ts";
 import "./entity-picker.ts";
 import type { HassArea, HassFloor, HomeAssistant } from "../types.ts";
 import { fetchBackup, restoreBackup, type BackupFile } from "../api.ts";
+import { deleteDiagnostics, getDiagnostics, setDiagnostics, type DiagnosticsStatus } from "../api.ts";
 import { load3d } from "../load3d.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
@@ -268,6 +269,10 @@ export class Fp3dEditor extends LitElement {
     _expanded: { state: true },
     _notice: { state: true },
     _history: { state: true },
+    _diag: { state: true },
+    _diagView: { state: true },
+    _diagBusy: { state: true },
+    _diagNote: { state: true },
     _spots: { state: true },
     _outdoorId: { state: true },
     _wallId: { state: true },
@@ -363,6 +368,11 @@ export class Fp3dEditor extends LitElement {
   private declare _notice: string | null;
   /** Restore points, loaded when the backup section is opened. */
   private declare _history: Snapshot[] | null;
+  /** The opt-in reports: their status (null = not loaded, "error" = backend without them). */
+  private declare _diag: DiagnosticsStatus | null | "error";
+  private declare _diagView: boolean;
+  private declare _diagBusy: boolean;
+  private declare _diagNote: string;
   /** Open "place spots" form of the selected room. */
   private declare _outdoorId: string | null;
   /** Selected free-standing wall. */
@@ -505,6 +515,10 @@ export class Fp3dEditor extends LitElement {
     this._expanded = new Set();
     this._notice = null;
     this._history = null;
+    this._diag = null;
+    this._diagView = false;
+    this._diagBusy = false;
+    this._diagNote = "";
     this._spots = null;
     this._outdoorId = null;
     this._wallId = null;
@@ -4682,7 +4696,7 @@ export class Fp3dEditor extends LitElement {
     const floor = this.floor;
     const walls = floor ? generateWalls(floor.rooms, { exterior: this._doc.settings.wall_exterior, interior: this._doc.settings.wall_interior }, floor.walls ?? []) : null;
     return html`
-      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()}
+      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()}
       <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}">
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
@@ -8108,7 +8122,7 @@ export class Fp3dEditor extends LitElement {
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
       ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing}
-      ${admin ? this.renderBackup() : nothing}
+      ${admin ? this.renderBackup() : nothing} ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
   }
 
@@ -9952,6 +9966,79 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
+  private async loadDiagnostics(): Promise<void> {
+    if (!this.hass) return;
+    try {
+      this._diag = await getDiagnostics(this.hass);
+    } catch {
+      this._diag = "error";
+    }
+  }
+
+  /** Switch the reports, delete them; the main bundle's collector hears about it through a window event. */
+  private async changeDiagnostics(action: "on" | "off" | "delete"): Promise<void> {
+    if (!this.hass || this._diagBusy) return;
+    if (action === "delete" && !confirm(this.t("diag_delete_confirm"))) return;
+    this._diagBusy = true;
+    this._diagNote = "";
+    try {
+      this._diag = action === "delete" ? await deleteDiagnostics(this.hass) : await setDiagnostics(this.hass, action === "on");
+      if (action === "delete") this._diagNote = this.t("diag_deleted");
+      window.dispatchEvent(new CustomEvent("neonplan3d-diagnostics", { detail: { enabled: this._diag.enabled } }));
+    } catch {
+      this._diagNote = this.t(action === "delete" ? "diag_delete_failed" : "save_error");
+    }
+    this._diagBusy = false;
+  }
+
+  private renderDiagnostics() {
+    const d = this._diag;
+    const on = d !== null && d !== "error" && d.enabled;
+    return html`<details
+      class="fp3d-section"
+      @toggle=${(e: Event) => {
+        if ((e.target as HTMLDetailsElement).open) void this.loadDiagnostics();
+      }}
+    >
+      <summary>${this.t("diag_title")}</summary>
+      <p class="fp3d-sub">${this.t("diag_intro")}</p>
+      <p class="fp3d-sub"><b>${this.t("diag_sent_head")}</b> ${this.t("diag_sent")}</p>
+      <p class="fp3d-sub"><b>${this.t("diag_never_head")}</b> ${this.t("diag_never")}</p>
+      <p class="fp3d-sub">
+        ${this.t("diag_voluntary")}
+        <a href="https://mastershort.de/datenschutz/" target="_blank" rel="noopener noreferrer">${this.t("diag_privacy")}</a>
+      </p>
+      ${d === null
+        ? html`<p class="fp3d-sub">${this.t("loading")}</p>`
+        : d === "error"
+          ? html`<p class="fp3d-sub">${this.t("diag_unavailable")}</p>`
+          : html`<label class="fp3d-check fp3d-wide"
+                ><input type="checkbox" .checked=${on} ?disabled=${this._diagBusy} @change=${(e: Event) => void this.changeDiagnostics((e.target as HTMLInputElement).checked ? "on" : "off")} />
+                ${this.t("diag_switch")}</label
+              >
+              <div class="fp3d-actions">
+                <button class="fp3d-btn" @click=${() => (this._diagView = true)}>${this.t("diag_view")}</button>
+                <button class="fp3d-btn" ?disabled=${this._diagBusy || (!on && !d.can_delete)} @click=${() => void this.changeDiagnostics("delete")}>${this.t("diag_delete")}</button>
+              </div>`}
+      ${this._diagNote ? html`<p class="fp3d-sub">${this._diagNote}</p>` : nothing}
+    </details>`;
+  }
+
+  /** The exact next report as JSON, over the whole editor. */
+  private renderDiagnosticsView() {
+    const d = this._diag;
+    if (!this._diagView || !d || d === "error") return nothing;
+    const on = d.enabled;
+    return html`<div class="fp3d-wv-veil" @click=${(e: Event) => e.target === e.currentTarget && (this._diagView = false)}>
+      <div class="fp3d-wv fp3d-diag" role="dialog" aria-label=${this.t("diag_view")}>
+        <h4 class="fp3d-lib-head">${this.t("diag_view_head")}</h4>
+        <pre class="fp3d-diag-json">${JSON.stringify(d.preview, null, 2)}</pre>
+        <p class="fp3d-sub">${this.t(on ? "diag_view_hint_on" : "diag_view_hint_off")}</p>
+        <div class="fp3d-actions"><button class="fp3d-btn fp3d-primary" @click=${() => (this._diagView = false)}>${this.t("close")}</button></div>
+      </div>
+    </div>`;
+  }
+
   private async loadHistory(): Promise<void> {
     if (!this.hass) return;
     try {
@@ -10848,6 +10935,21 @@ export class Fp3dEditor extends LitElement {
         font-size: 11px;
         font-weight: 700;
         pointer-events: none;
+      }
+      /* the opt-in reports: the exact JSON they send */
+      .fp3d-wv.fp3d-diag {
+        width: min(640px, 100%);
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
+      }
+      .fp3d-diag-json {
+        margin: 0;
+        overflow: auto;
+        padding: 10px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: pre;
       }
       /* the wall view: a room's wall from the front, furniture on it to slide along and up */
       .fp3d-wv-veil {
