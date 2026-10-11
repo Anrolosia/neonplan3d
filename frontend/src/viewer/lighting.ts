@@ -209,7 +209,8 @@ export function buildLightSurface(
   const doors: LightSurface["doors"] = [];
   for (const o of openings) {
     if (o.opening.type !== "door") continue;
-    const w = walls.find((wall) => onWall(wall, o));
+    // on the wall piece the door's middle lies in: several rooms' walls can share one straight line (#444)
+    const w = walls.find((wall) => onWall(wall, o) && withinWall(wall, o));
     if (!w || !w.roomLeft || !w.roomRight) continue;
     const a = floor.rooms.findIndex((r) => r.id === w.roomLeft);
     const b = floor.rooms.findIndex((r) => r.id === w.roomRight);
@@ -225,6 +226,17 @@ function onWall(w: Wall, o: OpeningInfo): boolean {
   const len = Math.hypot(dx, dz) || 1;
   const off = Math.abs((o.start[0] - w.a[0]) * dz - (o.start[1] - w.a[1]) * dx) / len;
   return off < 0.02 && Math.abs((o.axis[0] * dx + o.axis[1] * dz) / len) > 0.99;
+}
+
+/** The middle of an opening lies within a wall's length (5 cm to spare at its ends). */
+function withinWall(w: Wall, o: OpeningInfo): boolean {
+  const dx = w.b[0] - w.a[0];
+  const dz = w.b[1] - w.a[1];
+  const len = Math.hypot(dx, dz) || 1;
+  const mx = o.start[0] + o.axis[0] * (o.width / 2);
+  const mz = o.start[1] + o.axis[1] * (o.width / 2);
+  const s = ((mx - w.a[0]) * dx + (mz - w.a[1]) * dz) / len;
+  return s > -0.05 && s < len + 0.05;
 }
 
 /** Door and window areas on a wall, along its axis (s from wall.a) and in height. */
