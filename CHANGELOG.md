@@ -4,6 +4,24 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.16.0
+
+### New
+
+- **Thermostats as room temperature:** a room without its own temperature or humidity sensor takes its thermostat's `current_temperature` / `current_humidity` (room cards, heatmap, room panel); thermostats can be chosen as the room's sensor (#478).
+- **Energie Pro:** a side bar in the wall view puts the meter, inverter, home battery and wallbox straight onto the wall shown.
+
+### Fixed
+
+- **Dashboard card after a restart** stayed on "Configuration error" when opened while Home Assistant was starting: the card resource is now a loader in `www` (served from the start) that tries again; the static path is registered in `async_setup` (#461).
+- **Several speakers on one player** (Sonos group, stereo pair) all show playing (#475).
+- **Robot vacuum room:** more cleaning states, the vacuum's own room attribute as a fallback (#470).
+- **Glass card ▶/⏸** send `media_play` / `media_pause`; buttons act on pointer up or click, once (#400).
+- **Light through doors** on a wall line shared by several rooms goes into the right room (#444).
+- **Sun patches** run on into rooms joined without a wall (#455).
+- **Camera wedge** stops at a wall next to the camera (#438).
+- **Drop-down lists** keep the dark look when opened.
+
 ## 1.15.0
 
 ### New
