@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- en Y-stukken",
  "card_group_holes": "Gaten",
  "card_hole_out": "naar buiten",
- "card_hole_in": "naar binnen"
+ "card_hole_in": "naar binnen",
+ "card_next": "volgende stap …",
+ "card_step_hole": "Door een gat",
+ "card_step_fit": "Inbouwen",
+ "card_step_end": "Of naar het eind",
+ "card_lay": "Leggen"
 }

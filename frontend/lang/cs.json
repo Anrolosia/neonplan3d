@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- a Y-kusy",
  "card_group_holes": "Otvory",
  "card_hole_out": "ven",
- "card_hole_in": "dovnitř"
+ "card_hole_in": "dovnitř",
+ "card_next": "další krok …",
+ "card_step_hole": "Otvorem",
+ "card_step_fit": "Vestavět",
+ "card_step_end": "Nebo k cíli",
+ "card_lay": "Položit"
 }

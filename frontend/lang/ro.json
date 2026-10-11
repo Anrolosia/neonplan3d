@@ -1584,5 +1584,10 @@
  "card_group_joints": "Teuri și Y",
  "card_group_holes": "Găuri",
  "card_hole_out": "spre exterior",
- "card_hole_in": "spre interior"
+ "card_hole_in": "spre interior",
+ "card_next": "pasul următor …",
+ "card_step_hole": "Printr-o gaură",
+ "card_step_fit": "Montează",
+ "card_step_end": "Sau până la capăt",
+ "card_lay": "Pune"
 }

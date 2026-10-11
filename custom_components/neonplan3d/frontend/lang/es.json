@@ -1584,5 +1584,10 @@
  "card_group_joints": "Tes y piezas Y",
  "card_group_holes": "Agujeros",
  "card_hole_out": "hacia fuera",
- "card_hole_in": "hacia dentro"
+ "card_hole_in": "hacia dentro",
+ "card_next": "siguiente paso …",
+ "card_step_hole": "Por un agujero",
+ "card_step_fit": "Montar",
+ "card_step_end": "O hasta el final",
+ "card_lay": "Tender"
 }

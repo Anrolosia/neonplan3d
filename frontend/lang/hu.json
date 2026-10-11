@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- és Y-idomok",
  "card_group_holes": "Lyukak",
  "card_hole_out": "kifelé",
- "card_hole_in": "befelé"
+ "card_hole_in": "befelé",
+ "card_next": "következő lépés …",
+ "card_step_hole": "Egy lyukon át",
+ "card_step_fit": "Beépítés",
+ "card_step_end": "Vagy a célig",
+ "card_lay": "Lefektetés"
 }

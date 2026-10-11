@@ -1584,5 +1584,10 @@
  "card_group_joints": "Tés et Y",
  "card_group_holes": "Trous",
  "card_hole_out": "vers l'extérieur",
- "card_hole_in": "vers l'intérieur"
+ "card_hole_in": "vers l'intérieur",
+ "card_next": "étape suivante …",
+ "card_step_hole": "Par un trou",
+ "card_step_fit": "Monter",
+ "card_step_end": "Ou jusqu'au bout",
+ "card_lay": "Poser"
 }

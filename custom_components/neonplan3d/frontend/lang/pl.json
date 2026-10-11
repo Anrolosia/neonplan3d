@@ -1584,5 +1584,10 @@
  "card_group_joints": "Trójniki i Y",
  "card_group_holes": "Otwory",
  "card_hole_out": "na zewnątrz",
- "card_hole_in": "do środka"
+ "card_hole_in": "do środka",
+ "card_next": "następny krok …",
+ "card_step_hole": "Przez otwór",
+ "card_step_fit": "Wbuduj",
+ "card_step_end": "Albo do celu",
+ "card_lay": "Ułóż"
 }

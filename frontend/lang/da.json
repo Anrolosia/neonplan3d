@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- og Y-stykker",
  "card_group_holes": "Huller",
  "card_hole_out": "udad",
- "card_hole_in": "indad"
+ "card_hole_in": "indad",
+ "card_next": "næste trin …",
+ "card_step_hole": "Gennem et hul",
+ "card_step_fit": "Indbyg",
+ "card_step_end": "Eller til enden",
+ "card_lay": "Læg"
 }

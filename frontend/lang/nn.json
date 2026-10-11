@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- og Y-stykke",
  "card_group_holes": "Hol",
  "card_hole_out": "utover",
- "card_hole_in": "innover"
+ "card_hole_in": "innover",
+ "card_next": "neste steg …",
+ "card_step_hole": "Gjennom eit hol",
+ "card_step_fit": "Bygg inn",
+ "card_step_end": "Eller til enden",
+ "card_lay": "Legg"
 }

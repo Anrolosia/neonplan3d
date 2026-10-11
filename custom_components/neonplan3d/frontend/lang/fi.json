@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- ja Y-haarat",
  "card_group_holes": "Reiät",
  "card_hole_out": "ulospäin",
- "card_hole_in": "sisäänpäin"
+ "card_hole_in": "sisäänpäin",
+ "card_next": "seuraava vaihe …",
+ "card_step_hole": "Reiän läpi",
+ "card_step_fit": "Asenna",
+ "card_step_end": "Tai perille",
+ "card_lay": "Asenna putki"
 }

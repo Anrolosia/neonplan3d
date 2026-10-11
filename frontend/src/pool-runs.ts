@@ -163,10 +163,10 @@ export const GROUND_DEPTH = -0.3;
 /**
  * Lays a new connection from its stops: pipes from part to part (through each hole from the side it comes from),
  * level then upright – at the higher end's height inside, under the ground outside – and with two ends a T-piece
- * 1 m before their middle. The water runs from the skimmer or drain towards the pump and out to the inlets: a
- * connection drawn the other way round is turned. Returns the pipes and joints to add.
+ * 1 m before their middle. The water runs from where it comes out (`flow` "source") to where it goes in ("sink"):
+ * a connection built the other way round is turned. Returns the pipes and joints to add.
  */
-export function planConnection(req: ConnectRequest, nodeAt: NodeAt, joints: readonly PoolJoint[], suction: (node: string) => boolean, newId: (kind: string) => string): { pipes: PoolPipe[]; joints: PoolJoint[] } {
+export function planConnection(req: ConnectRequest, nodeAt: NodeAt, joints: readonly PoolJoint[], flow: (node: string) => "source" | "sink" | null, newId: (kind: string) => string): { pipes: PoolPipe[]; joints: PoolJoint[] } {
   const pipes: PoolPipe[] = [];
   const added: PoolJoint[] = [];
   const at = (node: string) => nodeAt(node);
@@ -215,8 +215,11 @@ export function planConnection(req: ConnectRequest, nodeAt: NodeAt, joints: read
     const j = kind === "joint" ? added.find((x) => x.id === id) : undefined;
     return j ? jointPortAt(j, port) : at(n);
   };
-  // the water's way: from a skimmer or drain in, out to the inlets – turned when drawn the other way
-  const turn = req.to.some(suction) && !suction(req.from);
+  // the water's way: out of a part that gives water (skimmer, drain, the pump's pressure side, the filter's
+  // return …) into one that takes it – a connection built from the other side is turned
+  const src = (n: string) => flow(n) === "source";
+  const sink = (n: string) => flow(n) === "sink";
+  const turn = (req.to.some(src) && !src(req.from)) || (sink(req.from) && !req.to.some(sink));
   for (const s of segs) {
     const p = lookup(s.a);
     const q = lookup(s.b);

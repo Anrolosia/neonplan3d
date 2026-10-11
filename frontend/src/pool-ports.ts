@@ -92,3 +92,19 @@ export function jointPortAt(j: PoolJoint, port: PortName | null): { x: number; y
   }
   return { x: j.x, y: j.y, z: j.z };
 }
+
+/**
+ * Which way the water goes at a connection: out of it ("source": the pump's pressure side, the filter's return and
+ * waste, the heat pump's out) or into it ("sink": the suction side, the filter's inlet from the pump, the heat
+ * pump's in). Ports of the pool are decided by their kind (see poolPortFlow); joints and holes pass it on.
+ */
+export function portFlow(port: PortName | null): "source" | "sink" | null {
+  if (port === "pressure" || port === "return" || port === "waste" || port === "out") return "source";
+  if (port === "suction" || port === "pump" || port === "in") return "sink";
+  return null;
+}
+
+/** The pool's own ports: skimmer and drain give water, inlets and the waste drain take it. */
+export function poolPortFlow(kind: string): "source" | "sink" {
+  return kind === "skimmer" || kind === "drain" ? "source" : "sink";
+}

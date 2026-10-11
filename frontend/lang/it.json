@@ -1584,5 +1584,10 @@
  "card_group_joints": "Raccordi a T e Y",
  "card_group_holes": "Fori",
  "card_hole_out": "verso fuori",
- "card_hole_in": "verso dentro"
+ "card_hole_in": "verso dentro",
+ "card_next": "passo successivo …",
+ "card_step_hole": "Attraverso un foro",
+ "card_step_fit": "Montare",
+ "card_step_end": "O fino alla fine",
+ "card_lay": "Posa"
 }

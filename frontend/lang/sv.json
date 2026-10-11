@@ -1584,5 +1584,10 @@
  "card_group_joints": "T- och Y-rör",
  "card_group_holes": "Hål",
  "card_hole_out": "utåt",
- "card_hole_in": "inåt"
+ "card_hole_in": "inåt",
+ "card_next": "nästa steg …",
+ "card_step_hole": "Genom ett hål",
+ "card_step_fit": "Bygg in",
+ "card_step_end": "Eller till slutet",
+ "card_lay": "Lägg"
 }
