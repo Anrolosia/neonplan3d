@@ -23,7 +23,7 @@ import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
-import { isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
+import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
 import { sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
 import { bestFace, clampField, faceAt, faceCompass, fieldFace, fieldModules, GROUND, moveField, pointOnFace, proposeField, proposeGroundField, proposeWindow, proposeWallField, roofFaces, rowCounts, turnGroundField, fieldCenter, wallFaces, windowAsField, windowCorners, onFace, onField, rayOnFace, type RoofFace } from "../solar.ts";
 import type { SurfaceGrab, SurfaceRay } from "../viewer/viewer3d.ts";
@@ -9869,7 +9869,9 @@ export class Fp3dEditor extends LitElement {
       const dc = CLIMATE_CLASSES[key];
       const auto = roomClimateSensors(hass, this.floor ?? null, { ...room, climate: null }, key);
       // the room's own sensors first, then all others; device temperatures (printer, heat pump) last
-      const options = this.entityOptions((id) => numberish(id) && hass.states[id]?.attributes.device_class === dc)
+      // sensors of the kind, and thermostats that report it (#478)
+      const attr = CLIMATE_ATTRS[key];
+      const options = this.entityOptions((id) => (numberish(id) && hass.states[id]?.attributes.device_class === dc) || (!!attr && id.startsWith("climate.") && typeof hass.states[id]?.attributes[attr] === "number"))
         .map((o) => ({ ...o, rank: (entityAreaId(hass, o.id) === room.area_id ? 0 : 1) + (isRoomClimateSensor(hass, o.id) ? 0 : 2) }))
         .sort((a, b) => a.rank - b.rank)
         .map(({ id, label }) => ({ id, label }));

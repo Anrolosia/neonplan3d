@@ -673,3 +673,22 @@ test("a door in a free wall outside every room follows the contact chosen for it
   assert.equal(links.get("d1")?.contact, "binary_sensor.haustuer");
   assert.equal(openingState(hass, links.get("d1")!, "door").open, 1);
 });
+
+test("a room without a temperature sensor takes its thermostat's current temperature and humidity (#478)", () => {
+  const hass = {
+    language: "de",
+    config: { unit_system: { temperature: "°C" } },
+    areas: { bad: { area_id: "bad", name: "Bad" } },
+    devices: { d: { id: "d", area_id: "bad" } },
+    entities: { "climate.bad": { entity_id: "climate.bad", device_id: "d" } },
+    states: { "climate.bad": { entity_id: "climate.bad", state: "heat", attributes: { current_temperature: 21.5, current_humidity: 58, friendly_name: "Bad Thermostat" } } },
+  } as unknown as HomeAssistant;
+  const room: Room = { id: "r", name: "Bad", area_id: "bad", points: [[0, 0], [3, 0], [3, 3], [0, 3]], floor_material: "tiles" };
+  const floor = { ...newFloor("eg", "EG", 0), rooms: [room] };
+  assert.deepEqual(roomClimateSensors(hass, floor, room, "temperature"), ["climate.bad"]);
+  assert.equal(roomClimateValue(hass, floor, room, "temperature"), 21.5);
+  assert.equal(roomClimateValue(hass, floor, room, "humidity"), 58);
+  assert.deepEqual(roomClimateSensors(hass, floor, room, "co2"), []);
+  // chosen by hand works the same
+  assert.equal(roomClimateValue(hass, floor, { ...room, area_id: null, climate: { temperature: "climate.bad" } }, "temperature"), 21.5);
+});

@@ -251,7 +251,27 @@ export function roomClimateSensors(hass: HomeAssistant, floor: Floor | null, roo
   const here = placed.filter((p) => inRoom(p.x, p.z)).map((p) => p.entity_id);
   const elsewhere = new Set(placed.filter((p) => !inRoom(p.x, p.z)).map((p) => p.entity_id));
   const ids = [...new Set([...areaEntities(hass, room.area_id).filter((id) => !elsewhere.has(id)), ...here])];
-  return ids.filter((id) => id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === dc && isRoomClimateSensor(hass, id));
+  const sensors = ids.filter((id) => id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === dc && isRoomClimateSensor(hass, id));
+  if (sensors.length) return sensors;
+  // no sensor of its own: a thermostat of the room tells its temperature (and humidity) too (#478)
+  const attr = CLIMATE_ATTRS[key];
+  return attr ? ids.filter((id) => id.startsWith("climate.") && typeof hass.states[id]?.attributes[attr] === "number") : [];
+}
+
+/** What a thermostat (climate entity) reports of a room's climate. */
+export const CLIMATE_ATTRS: Partial<Record<ClimateKey, string>> = { temperature: "current_temperature", humidity: "current_humidity" };
+
+/** A room climate value of a sensor (its state) or of a thermostat (its current_temperature / current_humidity). */
+export function climateReading(hass: HomeAssistant, id: string, key: ClimateKey): number {
+  const st = hass.states[id];
+  if (id.startsWith("climate.")) {
+    const attr = CLIMATE_ATTRS[key];
+    const v = attr ? Number(st?.attributes[attr]) : Number.NaN;
+    // a thermostat reports in Home Assistant's unit
+    return key === "temperature" ? toCelsius(v, tempUnit(hass)) : v;
+  }
+  const v = Number(st?.state);
+  return key === "temperature" ? toCelsius(v, st?.attributes.unit_of_measurement) : v;
 }
 
 /** Average of a room climate value (null when no sensor reports one). */
@@ -275,10 +295,7 @@ export function fromCelsius(hass: HomeAssistant, celsius: number): number {
 /** Average of the room's climate sensors; temperatures always in °C, whatever unit a sensor reports. */
 export function roomClimateValue(hass: HomeAssistant, floor: Floor | null, room: Room, key: ClimateKey): number | null {
   const values = roomClimateSensors(hass, floor, room, key)
-    .map((id) => {
-      const v = Number(hass.states[id]?.state);
-      return key === "temperature" ? toCelsius(v, hass.states[id]?.attributes.unit_of_measurement) : v;
-    })
+    .map((id) => climateReading(hass, id, key))
     .filter((v) => Number.isFinite(v));
   return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null;
 }
