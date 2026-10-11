@@ -2330,7 +2330,9 @@ export class FloorplanViewer {
     const north = (this.building?.settings.north ?? 0) * DEG;
     // clouds take most of the sunlight
     const cloud = this.weather?.cloud ?? 0;
-    const sig = sun ? `${sun.elevation.toFixed(1)},${sun.azimuth.toFixed(1)},${north},${cloud.toFixed(2)},${[...fv.openings.values()].map((o) => (o.cover ?? 0).toFixed(2)).join(",")}` : "";
+    // rooms joined without a wall share the sunlight too: the zones belong to the patch's signature
+    const zones = lightZonesOf(fv.floor, fv.geo.openRooms);
+    const sig = sun ? `${sun.elevation.toFixed(1)},${sun.azimuth.toFixed(1)},${north},${cloud.toFixed(2)},${[...fv.openings.values()].map((o) => (o.cover ?? 0).toFixed(2)).join(",")},${zones.join(".")}` : "";
     if (sig === fv.sunSig) return;
     fv.sunSig = sig;
     const buf = new GeoBuffer();
@@ -2360,10 +2362,13 @@ export class FloorplanViewer {
         const k = 0.14 * day * Math.min(1, facing * 1.5);
         const near = new Color(1 * k, 0.82 * k, 0.55 * k);
         const far = near.clone().multiplyScalar(0.45);
-        // the patch stays inside the window's room: it is laid in small cells, and only cells whose
-        // centre lies in the room are drawn (so it never crosses walls or leaves the house)
-        const room = fv.floor.rooms.find((r) => r.id === info.opening.room_id);
-        if (!room || room.points.length < 3) continue;
+        // the patch stays inside the window's room – and the rooms joined to it without a wall, like the
+        // lamps' light (#455 reported): it is laid in small cells, and only cells whose centre lies in one
+        // of them are drawn (so it never crosses walls or leaves the house)
+        const ri = fv.floor.rooms.findIndex((r) => r.id === info.opening.room_id);
+        if (ri < 0 || fv.floor.rooms[ri].points.length < 3) continue;
+        const zone = zones[ri];
+        const lit = fv.floor.rooms.filter((r, i) => zones[i] === zone && r.points.length >= 3).map((r) => r.points);
         const rows = Math.max(1, Math.ceil(Math.min(7, top * reach) / 0.25));
         const cols = Math.max(1, Math.ceil(info.width / 0.3));
         for (let i = 0; i < rows; i++) {
@@ -2377,7 +2382,7 @@ export class FloorplanViewer {
             const s0 = (info.width * j) / cols;
             const s1 = (info.width * (j + 1)) / cols;
             const m = at((s0 + s1) / 2, (y0 + y1) / 2);
-            if (!pointInPolygon([m[0], m[2]], room.points)) continue;
+            if (!lit.some((pts) => pointInPolygon([m[0], m[2]], pts))) continue;
             const a = at(s0, y0);
             const b = at(s1, y0);
             const c = at(s1, y1);
