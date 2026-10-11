@@ -964,7 +964,14 @@ export class Fp3dView3d extends LitElement {
       const holoSize = (b.settings.roof.hologram ?? DEFAULT_HOLOGRAM).size;
       const add = (floor: Building["floors"][number], id: string, x: number, z: number, top: number, name: string) => {
         const st = hass.states[id];
-        if (!st || kindOf(id) !== "media" || seenMedia.has(id)) return;
+        if (!st || kindOf(id) !== "media") return;
+        if (seenMedia.has(id)) {
+          // a second speaker linked to the same player (a Sonos group or stereo pair known as one entity): it
+          // plays along – its own rings, a line to the first, the one card stays with the first (#475)
+          const first = sound.find((x) => x.id === id);
+          if (first) sound.push({ ...first, id: `${id}#${sound.filter((x) => x.id.startsWith(`${id}#`)).length + 2}`, floorId: floor.id, x, z, members: [id] });
+          return;
+        }
         seenMedia.add(id);
         // a cloud speaker (Alexa, Google) drops out or reports "idle" for a moment between songs:
         // its last card stands in for a short while instead of blinking away
