@@ -1593,5 +1593,6 @@
  "walk_start": "Omvisning i huset",
  "walk_title": "Omvisning",
  "walk_end": "Avslutt",
- "walk_hint": "Dra: se deg rundt · trykk på gulvet: gå dit · W A S D / piltaster eller spaken: gå · Esc: avslutt"
+ "walk_hint": "Dra: se deg rundt · trykk på gulvet: gå dit · W A S D / piltaster eller spaken: gå · Esc: avslutt",
+ "tt_ev_camera": "Kameraet oppdager bevegelse: {name}"
 }

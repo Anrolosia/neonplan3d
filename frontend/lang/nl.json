@@ -1593,5 +1593,6 @@
  "walk_start": "Rondgang door het huis",
  "walk_title": "Rondgang",
  "walk_end": "Stoppen",
- "walk_hint": "Slepen: rondkijken · op de vloer tikken: erheen lopen · W A S D / pijltjes of de joystick: lopen · Esc: stoppen"
+ "walk_hint": "Slepen: rondkijken · op de vloer tikken: erheen lopen · W A S D / pijltjes of de joystick: lopen · Esc: stoppen",
+ "tt_ev_camera": "Camera ziet beweging: {name}"
 }

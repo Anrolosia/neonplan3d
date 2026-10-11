@@ -1593,5 +1593,6 @@
  "walk_start": "Visite de la maison",
  "walk_title": "Visite",
  "walk_end": "Terminer",
- "walk_hint": "Glisser : regarder · toucher le sol : y aller · Z Q S D / flèches ou le joystick : marcher · Échap : terminer"
+ "walk_hint": "Glisser : regarder · toucher le sol : y aller · Z Q S D / flèches ou le joystick : marcher · Échap : terminer",
+ "tt_ev_camera": "La caméra détecte un mouvement : {name}"
 }

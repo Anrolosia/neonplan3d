@@ -1593,5 +1593,6 @@
  "walk_start": "Rundtur i huset",
  "walk_title": "Rundtur",
  "walk_end": "Afslut",
- "walk_hint": "Træk: se dig omkring · tryk på gulvet: gå derhen · W A S D / piletaster eller pinden: gå · Esc: afslut"
+ "walk_hint": "Træk: se dig omkring · tryk på gulvet: gå derhen · W A S D / piletaster eller pinden: gå · Esc: afslut",
+ "tt_ev_camera": "Kameraet registrerer bevægelse: {name}"
 }

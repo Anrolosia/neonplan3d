@@ -1593,5 +1593,6 @@
  "walk_start": "Sprehod po hiši",
  "walk_title": "Sprehod",
  "walk_end": "Končaj",
- "walk_hint": "Povleci: razgledovanje · tapni tla: pojdi tja · W A S D / puščice ali palica: hoja · Esc: končaj"
+ "walk_hint": "Povleci: razgledovanje · tapni tla: pojdi tja · W A S D / puščice ali palica: hoja · Esc: končaj",
+ "tt_ev_camera": "Kamera zazna gibanje: {name}"
 }

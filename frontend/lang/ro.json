@@ -1593,5 +1593,6 @@
  "walk_start": "Plimbare prin casă",
  "walk_title": "Plimbare",
  "walk_end": "Încheie",
- "walk_hint": "Trage: privește în jur · atinge podeaua: mergi acolo · W A S D / săgeți sau joystickul: mers · Esc: încheie"
+ "walk_hint": "Trage: privește în jur · atinge podeaua: mergi acolo · W A S D / săgeți sau joystickul: mers · Esc: încheie",
+ "tt_ev_camera": "Camera detectează mișcare: {name}"
 }

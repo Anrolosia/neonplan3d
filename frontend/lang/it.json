@@ -1593,5 +1593,6 @@
  "walk_start": "Giro della casa",
  "walk_title": "Giro",
  "walk_end": "Fine",
- "walk_hint": "Trascina: guardati intorno · tocca il pavimento: vai lì · W A S D / frecce o il joystick: cammina · Esc: fine"
+ "walk_hint": "Trascina: guardati intorno · tocca il pavimento: vai lì · W A S D / frecce o il joystick: cammina · Esc: fine",
+ "tt_ev_camera": "La telecamera rileva movimento: {name}"
 }

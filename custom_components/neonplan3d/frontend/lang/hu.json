@@ -1593,5 +1593,6 @@
  "walk_start": "Séta a házban",
  "walk_title": "Séta",
  "walk_end": "Befejezés",
- "walk_hint": "Húzás: körülnézés · koppintás a padlóra: odasétálás · W A S D / nyilak vagy a kar: séta · Esc: befejezés"
+ "walk_hint": "Húzás: körülnézés · koppintás a padlóra: odasétálás · W A S D / nyilak vagy a kar: séta · Esc: befejezés",
+ "tt_ev_camera": "A kamera mozgást észlel: {name}"
 }

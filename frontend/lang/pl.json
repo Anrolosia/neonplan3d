@@ -1593,5 +1593,6 @@
  "walk_start": "Spacer po domu",
  "walk_title": "Spacer",
  "walk_end": "Zakończ",
- "walk_hint": "Przeciągnij: rozglądaj się · dotknij podłogi: idź tam · W A S D / strzałki lub drążek: chodzenie · Esc: zakończ"
+ "walk_hint": "Przeciągnij: rozglądaj się · dotknij podłogi: idź tam · W A S D / strzałki lub drążek: chodzenie · Esc: zakończ",
+ "tt_ev_camera": "Kamera wykrywa ruch: {name}"
 }

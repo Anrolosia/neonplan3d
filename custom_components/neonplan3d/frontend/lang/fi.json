@@ -1593,5 +1593,6 @@
  "walk_start": "Kierros talossa",
  "walk_title": "Kierros",
  "walk_end": "Lopeta",
- "walk_hint": "Vedä: katsele · napauta lattiaa: kävele sinne · W A S D / nuolet tai sauva: kävele · Esc: lopeta"
+ "walk_hint": "Vedä: katsele · napauta lattiaa: kävele sinne · W A S D / nuolet tai sauva: kävele · Esc: lopeta",
+ "tt_ev_camera": "Kamera havaitsee liikettä: {name}"
 }

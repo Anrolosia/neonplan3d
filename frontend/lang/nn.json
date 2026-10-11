@@ -1593,5 +1593,6 @@
  "walk_start": "Omvising i huset",
  "walk_title": "Omvising",
  "walk_end": "Avslutt",
- "walk_hint": "Dra: sjå deg rundt · trykk på golvet: gå dit · W A S D / piltastar eller spaken: gå · Esc: avslutt"
+ "walk_hint": "Dra: sjå deg rundt · trykk på golvet: gå dit · W A S D / piltastar eller spaken: gå · Esc: avslutt",
+ "tt_ev_camera": "Kameraet oppdagar rørsle: {name}"
 }

@@ -1593,5 +1593,6 @@
  "walk_start": "Recorrido por la casa",
  "walk_title": "Recorrido",
  "walk_end": "Terminar",
- "walk_hint": "Arrastrar: mirar · tocar el suelo: ir allí · W A S D / flechas o el joystick: caminar · Esc: terminar"
+ "walk_hint": "Arrastrar: mirar · tocar el suelo: ir allí · W A S D / flechas o el joystick: caminar · Esc: terminar",
+ "tt_ev_camera": "La cámara detecta movimiento: {name}"
 }

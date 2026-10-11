@@ -1593,5 +1593,6 @@
  "walk_start": "Procházka domem",
  "walk_title": "Procházka",
  "walk_end": "Ukončit",
- "walk_hint": "Táhni: rozhlížej se · klepni na podlahu: dojdi tam · W A S D / šipky nebo páčka: chůze · Esc: ukončit"
+ "walk_hint": "Táhni: rozhlížej se · klepni na podlahu: dojdi tam · W A S D / šipky nebo páčka: chůze · Esc: ukončit",
+ "tt_ev_camera": "Kamera zaznamenala pohyb: {name}"
 }
