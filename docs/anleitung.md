@@ -534,7 +534,10 @@ Der **Stern** über der Lupe öffnet das **Zentral-Menü**: Lichter an oder aus 
 
 Die Lupe unten links öffnet **„Wo ist …?“**. Tippe einen Gerätenamen oder Raum. Ein Treffer fliegt die Kamera dorthin, das Gerät blinkt.
 
-**Rundgang:** Der Knopf **🚶 Rundgang** oben rechts startet einen **Rundgang durchs Haus**: Du stehst auf Augenhöhe im gewählten Raum (sonst im größten der gezeigten Etage) und gehst hindurch. **Ziehen** schaut dich um, ein **Tipp auf den Boden** läuft dorthin – auch durch Türen in andere Räume –, **W A S D** oder die **Pfeiltasten** laufen, auf dem Tablet der **Knüppel** unten rechts. Wände halten dich auf, Türen lassen dich durch. Das Haus lebt dabei weiter: Lichter, Fernseher, Sonnenflecken, Glaskarten. Oben steht der Raum, in dem du gerade bist; **✕ Beenden** oder **Esc** führt zurück. In der Karte blendet `walk: false` den Knopf aus.
+**Rundgang:** Der Knopf **🚶 Rundgang** oben rechts startet einen **Rundgang durchs Haus**: Du stehst auf Augenhöhe im gewählten Raum (sonst im größten der gezeigten Etage) und gehst hindurch. **Ziehen** schaut dich um, ein **Tipp auf den Boden** läuft dorthin – auch durch Türen in andere Räume –, **W A S D** oder die **Pfeiltasten** laufen, auf dem Tablet der **Knüppel** unten rechts. Wände halten dich auf, Türen lassen dich durch. Das Haus lebt dabei weiter: Lichter, Fernseher, Sonnenflecken, Glaskarten. Oben steht der Raum, in dem du gerade bist; **✕ Beenden** oder **Esc** führt zurück. In der Karte blendet `walk: false` den Knopf aus. Beim Rundgang zeigen sich nur die Glaskarten des Raums, in dem du stehst.
+
+![Rundgang: Wohnzimmer und Küche auf Augenhöhe](images/walk.jpg)
+
 
 ### 5.6 Heatmap
 

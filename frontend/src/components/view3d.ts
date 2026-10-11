@@ -389,6 +389,8 @@ export class Fp3dView3d extends LitElement {
   private declare _walk: { room: string | null; hint: boolean } | false;
   private walker: { dispose(): void; setStick(v: { x: number; y: number } | null): void } | null = null;
   private walkKeys: ((e: KeyboardEvent) => void) | null = null;
+  /** The outline of the room one walks in (its glass cards show). */
+  private walkRoomPts: [number, number][] | null = null;
   /** Own buttons from the card's YAML (replace the house's buttons when set). */
   declare buttons: CustomButton[] | null;
   private swipeSent = 0;
@@ -1103,8 +1105,12 @@ export class Fp3dView3d extends LitElement {
       v.setPools(pieces);
     } else v.setPools([]);
     v.setSound(sound);
-    v.setAnchors(anchors);
-    if (JSON.stringify(cards) !== JSON.stringify(this._holos)) this._holos = cards;
+    // walking: only the glass cards of the room one stands in (the others would float through the walls)
+    const room = this._walk ? this.walkRoomPts : null;
+    const keep = anchors.map((a) => !this._walk || (!!room && pointInPolygon([a.p[0], a.p[2]], room)));
+    const shownCards = cards.filter((_, i) => keep[i]);
+    v.setAnchors(anchors.filter((_, i) => keep[i]));
+    if (JSON.stringify(shownCards) !== JSON.stringify(this._holos)) this._holos = shownCards;
     // the modules live with their production (at night, and without Pro, they rest)
     v.setSolarLevels(powers && !this.dimmed ? fieldLevels(b, powers) : new Map());
     // the energy cables (Energie Pro) and the pool's pipes share the viewer's flow layer
@@ -2719,7 +2725,9 @@ export class Fp3dView3d extends LitElement {
     this.walker = new mod.WalkCamera(v as never, map, surface, {
       start,
       onRoom: (r) => {
+        this.walkRoomPts = r?.points ?? null;
         if (this._walk) this._walk = { ...this._walk, room: r?.name ?? null };
+        this.syncDevices(true);
       },
     });
     this.walkKeys = (e: KeyboardEvent) => {
@@ -2739,11 +2747,13 @@ export class Fp3dView3d extends LitElement {
     if (this.walkKeys) window.removeEventListener("keydown", this.walkKeys);
     this.walkKeys = null;
     this._walk = false;
+    this.walkRoomPts = null;
     const v = this.viewer;
     if (v) {
       v.setWallMode(this.wallMode);
       v.setFloor(this.floorId, true);
     }
+    this.syncDevices(true);
   }
 
   private renderWalk() {

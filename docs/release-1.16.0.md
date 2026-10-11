@@ -1,3 +1,5 @@
+![NeonPlan 3D 1.16.0: walk through the house – the living room and the kitchen at eye height](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/walk.jpg)
+
 **New: walk through your house.** One tap on **🚶 Walk** and you stand at eye height in your home – look around, tap the floor to walk there, through the doors into the next room. The lights, TVs, sunlight and glass cards live on around you. Plus a round of fixes from your reports.
 
 ### New
@@ -23,6 +25,8 @@
 Settings → System → Updates. HACS only looks for new versions every few hours, so a fresh update may not show there yet. Then: HACS → NeonPlan 3D → ⋮ → **Update information** → **Download**. Restart Home Assistant and reload the page (Ctrl+F5).
 
 ---
+
+![NeonPlan 3D 1.16.0: Rundgang durchs Haus – Wohnzimmer und Küche auf Augenhöhe](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/walk.jpg)
 
 **Neu: der Rundgang durch dein Haus.** Ein Tipp auf **🚶 Rundgang**, und du stehst auf Augenhöhe in deinem Zuhause – umsehen, auf den Boden tippen und hinlaufen, durch die Türen in den nächsten Raum. Lichter, Fernseher, Sonnenlicht und Glaskarten leben um dich herum weiter. Dazu eine Runde Fehlerbehebungen aus euren Meldungen.
 
