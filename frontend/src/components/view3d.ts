@@ -2494,7 +2494,9 @@ export class Fp3dView3d extends LitElement {
       furnitureId: f.id,
       pack: item ? f.type : null,
       lightY: item ? (item.mount === "ceiling" ? base : base + f.h * 0.85) : undefined,
-      effect: !!st && st.state === "on" && typeof st.attributes.effect === "string" && !/^(none|off|solid|static|normal)$/i.test(st.attributes.effect),
+      // a running colour effect – not a "mode" some integrations report as their effect (LocalTuya: "white",
+      // "colour"; others "manual", "default", an empty one)
+      effect: !!st && st.state === "on" && typeof st.attributes.effect === "string" && !/^(none|off|solid|static|normal|white|colou?r|rgb|manual|default|-|)$/i.test(st.attributes.effect.trim()),
       variant: f.variant,
       show: f.marker ?? undefined,
       fromFurniture: true,
