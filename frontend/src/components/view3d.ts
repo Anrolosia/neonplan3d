@@ -1704,6 +1704,7 @@ export class Fp3dView3d extends LitElement {
       void Promise.resolve(hass.callService("media_player", service, { entity_id: m.id, ...data })).catch((err: unknown) => this.serviceFailed(`media_player.${service}`, err));
     // the buttons act when the finger lifts (#400): while a speaker plays the view redraws all the time and
     // some tablets then drop the click; a click without a pointer (keyboard) still works
+    // whichever comes, the lifted finger or the click: the button acts once (some browsers drop one of them)
     const press = {
       down: (e: PointerEvent) => ((e.currentTarget as HTMLElement).dataset.pressed = String(e.pointerId)),
       up: (fn: () => void) => (e: PointerEvent) => {
@@ -1711,12 +1712,18 @@ export class Fp3dView3d extends LitElement {
         if (el.dataset.pressed !== String(e.pointerId)) return;
         delete el.dataset.pressed;
         e.stopPropagation();
+        el.dataset.acted = String(Date.now());
         fn();
       },
       key: (fn: () => void) => (e: MouseEvent) => {
-        if (e.detail === 0) fn();
+        const el = e.currentTarget as HTMLElement;
+        if (Date.now() - Number(el.dataset.acted ?? 0) < 700) return;
+        el.dataset.acted = String(Date.now());
+        fn();
       },
     };
+    // play and pause by their own services: some players (an Echo through Alexa Media Player) ignore play_pause
+    const playPause = () => call(m.playing ? "media_pause" : "media_play");
     // the dragged volume shows at once and is sent while dragging (at most every 350 ms) and on release;
     // it stays until the player reports it (a cloud speaker like an Echo answers late), at most 30 s
     const local = this.mediaVolume.get(m.id);
@@ -1743,7 +1750,7 @@ export class Fp3dView3d extends LitElement {
         ${open && !this.ro
           ? html`<div class="fp3d-holo-media-controls">
                 <button aria-label=${t("previous")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_previous_track"))} @click=${press.key(() => call("media_previous_track"))}>⏮</button>
-                <button aria-label=${t("play_pause")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_play_pause"))} @click=${press.key(() => call("media_play_pause"))}>${m.playing ? "⏸" : "▶"}</button>
+                <button aria-label=${t("play_pause")} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${m.playing ? "⏸" : "▶"}</button>
                 <button aria-label=${t("next")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_next_track"))} @click=${press.key(() => call("media_next_track"))}>⏭</button>
                 <input
                   type="range"
