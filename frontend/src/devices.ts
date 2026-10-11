@@ -317,11 +317,20 @@ export function isStatusSensor(st: HassEntity | undefined): boolean {
   return !!st && st.entity_id.startsWith("sensor.") && st.attributes.device_class === "enum";
 }
 
+/**
+ * A robot vacuum at work: "cleaning", and the states some integrations report instead ("room_cleaning",
+ * "segment_cleaning", "zone_cleaning", "sweeping", "mopping" …) (#470).
+ */
+export function vacuumCleaning(state: string | undefined): boolean {
+  if (!state) return false;
+  return state === "cleaning" || /clean|sweep|mop/.test(state.toLowerCase());
+}
+
 /** "Active" drives the glow of a device marker: light on, cover open, heating, playing, window open … */
 export function isActive(st: HassEntity | undefined): boolean {
   if (!st) return false;
   // a robot vacuum (the pack's robot with its dock): busy while cleaning or on its way back
-  if (st.entity_id.startsWith("vacuum.")) return st.state === "cleaning" || st.state === "returning";
+  if (st.entity_id.startsWith("vacuum.")) return vacuumCleaning(st.state) || st.state === "returning";
   switch (kindOf(st.entity_id)) {
     case "light":
     case "switch":
@@ -1040,7 +1049,13 @@ export function roomKey(name: string): string {
 
 /** The room a robot reports (sensor state, else the vacuum's current_room attribute), matched by room or area name. */
 export function robotRoom<R extends { name: string; area_id?: string | null }>(hass: HomeAssistant, rooms: readonly R[], vacuum: string | null, sensor: string | null): R | null {
-  return roomNamed(hass, rooms, sensor ? hass.states[sensor]?.state : vacuum ? hass.states[vacuum]?.attributes.current_room : undefined);
+  const attrs = vacuum ? hass.states[vacuum]?.attributes : undefined;
+  // the sensor first; when it names no room of the plan, what the vacuum itself says (#470)
+  for (const raw of [sensor ? hass.states[sensor]?.state : undefined, attrs?.current_room, attrs?.room, attrs?.current_segment]) {
+    const room = roomNamed(hass, rooms, raw);
+    if (room) return room;
+  }
+  return null;
 }
 
 /** The room a robot's name for it means ("Küche", "kitchen", the area's id). */

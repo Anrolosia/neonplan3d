@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey } from "./devices.ts";
+import { appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -476,7 +476,13 @@ test("a robot vacuum's current room is found on its device and matched by room o
   assert.equal(robotRoom(hass, rooms, "vacuum.robbi", "sensor.robbi_room")?.id, "c");
   hass.states["sensor.robbi_room"].state = "Keller";
   assert.equal(robotRoom(hass, rooms, "vacuum.robbi", "sensor.robbi_room"), null);
+  // the sensor names no room of the plan: what the vacuum itself says counts (#470)
+  hass.states["vacuum.robbi"].attributes.current_room = "Wohnzimmer";
+  assert.equal(robotRoom(hass, rooms, "vacuum.robbi", "sensor.robbi_room")?.id, "a");
   assert.equal(roomKey("Büro"), roomKey("Buero"));
+  // integrations that report their own cleaning states
+  for (const s of ["cleaning", "room_cleaning", "segment_cleaning", "Sweeping", "mopping"]) assert.equal(vacuumCleaning(s), true, s);
+  for (const s of ["docked", "returning", "idle", undefined]) assert.equal(vacuumCleaning(s), false, String(s));
 });
 
 test("a window marked 'ask first' puts its blind on the confirm list", () => {

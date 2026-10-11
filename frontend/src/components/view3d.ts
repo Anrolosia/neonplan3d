@@ -19,6 +19,7 @@ import { carState, type CarState, roomClimateValue,
   tempUnit,
   robotRoom,
   robotRoomSensor,
+  vacuumCleaning,
   roomNamed,
   carEntities,
   isStatusSensor,
@@ -2297,7 +2298,7 @@ export class Fp3dView3d extends LitElement {
         const entity = this.furnitureLinks.get(f.id)?.entity ?? null;
         const state = entity ? hass.states[entity]?.state : undefined;
         const mode: RobotInfo["mode"] =
-          state === "cleaning" ? "cleaning" : state === "returning" ? "returning" : state === "error" ? "error" : state === "docked" || !state ? "docked" : "idle";
+          vacuumCleaning(state) ? "cleaning" : state === "returning" ? "returning" : state === "error" ? "error" : state === "docked" || !state ? "docked" : "idle";
         // the robot rests in front of its dock, facing away from it
         const a = (f.rotation * Math.PI) / 180;
         const off = f.d * 0.14;
