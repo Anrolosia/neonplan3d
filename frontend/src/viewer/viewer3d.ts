@@ -2421,6 +2421,17 @@ export class FloorplanViewer {
         const y = 0.015;
         // the wedge ends at the first wall in each direction: a camera does not see through walls
         const walls = fv.geo.walls2d;
+        // only the wall the camera hangs on (the nearest) is looked through – a camera just inside an outer wall
+        // looks out through it; any other wall near it, say a garden wall joining at the corner, stops it (#438)
+        const lineDist = (w: (typeof walls)[number]) => {
+          const ex = w.b[0] - w.a[0];
+          const ez = w.b[1] - w.a[1];
+          const l2 = ex * ex + ez * ez || 1;
+          const t = Math.max(0, Math.min(1, ((d.x - w.a[0]) * ex + (d.z - w.a[1]) * ez) / l2));
+          return Math.hypot(d.x - (w.a[0] + ex * t), d.z - (w.a[1] + ez * t));
+        };
+        let mount: (typeof walls)[number] | null = null;
+        for (const w of walls) if (lineDist(w) < 0.45 && (!mount || lineDist(w) < lineDist(mount))) mount = w;
         const reachAt = (t: number): number => {
           const rx = dir[0] * Math.cos(t) - dir[1] * Math.sin(t);
           const rz = dir[1] * Math.cos(t) + dir[0] * Math.sin(t);
@@ -2432,8 +2443,8 @@ export class FloorplanViewer {
             if (Math.abs(den) < 1e-9) continue;
             const s = ((w.a[0] - d.x) * ez - (w.a[1] - d.z) * ex) / den;
             const u = ((w.a[0] - d.x) * rz - (w.a[1] - d.z) * rx) / den;
-            // the wall the camera hangs on (a camera just inside an outer wall looks out through it) does not count
-            if (s > 0.45 && s < best && u >= 0 && u <= 1) best = s;
+            if (w === mount && s <= 0.45) continue;
+            if (s > 0.02 && s < best && u >= 0 && u <= 1) best = s;
           }
           return best;
         };
