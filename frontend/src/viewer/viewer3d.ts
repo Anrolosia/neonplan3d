@@ -53,6 +53,8 @@ import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
+// the walk through the house at eye height (lives with the viewer it drives)
+export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
 
 export type { PipeTube };
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";

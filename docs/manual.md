@@ -532,6 +532,8 @@ The **star** above the magnifier opens the **central menu**: lights on or off an
 
 The magnifier at the bottom left opens **"Where is …?"**. Type a device or room name. A hit flies the camera there and the device flashes.
 
+**Walk:** the button with the walker (above the star) starts a **walk through the house**: you stand at eye height in the chosen room (else the biggest of the floor shown) and walk through it. **Drag** to look around, **tap the floor** to walk there – through doors into other rooms too –, **W A S D** or the **arrow keys** walk, on a tablet the **stick** at the bottom right. Walls stop you, doors let you through. The house lives on around you: lights, TVs, sun patches, glass cards. At the top you see the room you are in; **✕ End** or **Esc** takes you back. In the card, `walk: false` hides the button.
+
 ### 5.6 Heatmap
 
 ![Temperature heatmap](images/view-heat.jpg)

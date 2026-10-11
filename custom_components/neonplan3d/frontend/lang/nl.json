@@ -1589,5 +1589,9 @@
  "card_step_hole": "Door een gat",
  "card_step_fit": "Inbouwen",
  "card_step_end": "Of naar het eind",
- "card_lay": "Leggen"
+ "card_lay": "Leggen",
+ "walk_start": "Rondgang door het huis",
+ "walk_title": "Rondgang",
+ "walk_end": "Stoppen",
+ "walk_hint": "Slepen: rondkijken · op de vloer tikken: erheen lopen · W A S D / pijltjes of de joystick: lopen · Esc: stoppen"
 }

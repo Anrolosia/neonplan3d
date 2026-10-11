@@ -882,6 +882,7 @@ export class Fp3dEditor extends LitElement {
           </div>`}
       ${this.render3dBar()}
       <fp3d-view3d
+              .walkable=${false}
         .hass=${this.hass}
         .building=${this._doc3d}
         .floorId=${this.houseTool ? null : this._floorId}
@@ -5746,6 +5747,7 @@ export class Fp3dEditor extends LitElement {
           <button class="fp3d-wv-side fp3d-wv-right" title=${`${this.t("wall_next")}: ${wallName(rightEdge)}`} @click=${() => go(rightEdge)}>›<small>${wallName(rightEdge)}</small></button>
         ${this._wallView3d
           ? html`<fp3d-view3d
+              .walkable=${false}
               class="fp3d-wv-3d"
               ${ref((el) => el && this.setupWall3d(el as HTMLElement, room, v.edge))}
               .hass=${this.hass}

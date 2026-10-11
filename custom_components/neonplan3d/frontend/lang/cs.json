@@ -1589,5 +1589,9 @@
  "card_step_hole": "Otvorem",
  "card_step_fit": "Vestavět",
  "card_step_end": "Nebo k cíli",
- "card_lay": "Položit"
+ "card_lay": "Položit",
+ "walk_start": "Procházka domem",
+ "walk_title": "Procházka",
+ "walk_end": "Ukončit",
+ "walk_hint": "Táhni: rozhlížej se · klepni na podlahu: dojdi tam · W A S D / šipky nebo páčka: chůze · Esc: ukončit"
 }

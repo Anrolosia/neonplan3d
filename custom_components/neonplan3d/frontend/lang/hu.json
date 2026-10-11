@@ -1589,5 +1589,9 @@
  "card_step_hole": "Egy lyukon át",
  "card_step_fit": "Beépítés",
  "card_step_end": "Vagy a célig",
- "card_lay": "Lefektetés"
+ "card_lay": "Lefektetés",
+ "walk_start": "Séta a házban",
+ "walk_title": "Séta",
+ "walk_end": "Befejezés",
+ "walk_hint": "Húzás: körülnézés · koppintás a padlóra: odasétálás · W A S D / nyilak vagy a kar: séta · Esc: befejezés"
 }

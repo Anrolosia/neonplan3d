@@ -178,6 +178,8 @@ export class Fp3dView3d extends LitElement {
     _blend: { state: true },
     _wallBig: { state: true },
     _find: { state: true },
+    _walk: { state: true },
+    walkable: { attribute: false },
     _central: { state: true },
     _thumbsCompact: { state: true },
     _armed: { state: true },
@@ -381,6 +383,12 @@ export class Fp3dView3d extends LitElement {
   private armTimer: ReturnType<typeof setTimeout> | undefined;
   /** Show the star with the central menu (card option central; default on). */
   declare central: boolean;
+  /** Offer the walk through the house at eye height (card option walk; default on). */
+  declare walkable: boolean;
+  /** The walk: the room one stands in (null between rooms), or false when not walking. */
+  private declare _walk: { room: string | null; hint: boolean } | false;
+  private walker: { dispose(): void; setStick(v: { x: number; y: number } | null): void } | null = null;
+  private walkKeys: ((e: KeyboardEvent) => void) | null = null;
   /** Own buttons from the card's YAML (replace the house's buttons when set). */
   declare buttons: CustomButton[] | null;
   private swipeSent = 0;
@@ -461,6 +469,8 @@ export class Fp3dView3d extends LitElement {
     }
     this._armed = null;
     this.central = true;
+    this.walkable = true;
+    this._walk = false;
     this.buttons = null;
     this._thumbs = [];
     this.floorThumbs = true;
@@ -503,6 +513,7 @@ export class Fp3dView3d extends LitElement {
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
+    this.stopWalk();
     this.unlistenReplay?.();
     this.unlistenReplay = null;
     this.resizeObs?.disconnect();
@@ -2677,6 +2688,115 @@ export class Fp3dView3d extends LitElement {
     </div>`;
   }
 
+  /**
+   * The walk through the house: one stands at eye height in a room of the floor shown (the room chosen, else the
+   * biggest) and walks – dragging looks around, a tap on the floor walks there through the doors, keys or the
+   * stick move; walls stop you. The house lives on around you: lights, screens, sunlight.
+   */
+  private async startWalk(): Promise<void> {
+    const b = this.building;
+    const v = this.viewer;
+    if (!b || !v || this._walk) return;
+    const withRooms = b.floors.filter((f) => f.rooms.some((r) => r.points.length >= 3));
+    const byRoom = this.roomId ? withRooms.find((f) => f.rooms.some((r) => r.id === this.roomId)) : undefined;
+    const floor = byRoom ?? withRooms.find((f) => f.id === this.floorId) ?? [...withRooms].sort((x, y) => Math.abs(x.elevation) - Math.abs(y.elevation))[0];
+    if (!floor) return;
+    const mod = await load3d();
+    this._walk = { room: null, hint: true };
+    await this.updateComplete;
+    const surface = this.renderRoot.querySelector<HTMLElement>(".fp3d-walk-surface");
+    if (!surface) return;
+    // the floor alone, its walls whole (the view's floor and wall mode come back afterwards)
+    v.setFloor(floor.id, false);
+    v.setWallMode("auto");
+    const map = new mod.FloorMap(b, floor);
+    const room = this.roomId ? floor.rooms.find((r) => r.id === this.roomId) : undefined;
+    let start;
+    if (room) {
+      const c = map.freeNear(centroid(room.points));
+      start = { x: c[0], z: c[1], yaw: map.openYaw(c), pitch: -0.05 };
+    }
+    this.walker = new mod.WalkCamera(v as never, map, surface, {
+      start,
+      onRoom: (r) => {
+        if (this._walk) this._walk = { ...this._walk, room: r?.name ?? null };
+      },
+    });
+    this.walkKeys = (e: KeyboardEvent) => {
+      if (e.key === "Escape") this.stopWalk();
+    };
+    window.addEventListener("keydown", this.walkKeys);
+    // the hint fades after a while
+    setTimeout(() => {
+      if (this._walk) this._walk = { ...this._walk, hint: false };
+    }, 9000);
+  }
+
+  private stopWalk(): void {
+    if (!this.walker && !this._walk) return;
+    this.walker?.dispose();
+    this.walker = null;
+    if (this.walkKeys) window.removeEventListener("keydown", this.walkKeys);
+    this.walkKeys = null;
+    this._walk = false;
+    const v = this.viewer;
+    if (v) {
+      v.setWallMode(this.wallMode);
+      v.setFloor(this.floorId, true);
+    }
+  }
+
+  private renderWalk() {
+    if (!this.walkable || this.ro || !this.building || !this.hass) return nothing;
+    const t = (k: I18nKey) => translate(this.hass, k);
+    if (!this._walk)
+      return html`<button class="fp3d-walk-btn" title=${t("walk_start")} aria-label=${t("walk_start")} @click=${() => void this.startWalk()}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8" /><path d="m9 20 2.5-6 2.5 2.5V21M7.5 11l3-3.5 3.5 1.5 2 3.5M11.5 14l1-5" /></svg>
+      </button>`;
+    const w = this._walk;
+    // the stick (tablets): forward and back, turning left and right
+    let stick: { id: number; cx: number; cy: number } | null = null;
+    const knob = (e: PointerEvent, el: HTMLElement) => {
+      if (!stick) return;
+      const r = 44;
+      let dx = e.clientX - stick.cx;
+      let dy = e.clientY - stick.cy;
+      const d = Math.hypot(dx, dy);
+      if (d > r) [dx, dy] = [(dx / d) * r, (dy / d) * r];
+      (el.firstElementChild as HTMLElement).style.transform = `translate(${dx}px, ${dy}px)`;
+      this.walker?.setStick({ x: dx / r, y: dy / r });
+    };
+    return html`<div class="fp3d-walk-surface"></div>
+      <div class="fp3d-walk-top">
+        <span class="fp3d-walk-room">🚶 ${w.room ?? t("walk_title")}</span>
+        <button class="fp3d-walk-exit" @click=${() => this.stopWalk()}>✕ ${t("walk_end")}</button>
+      </div>
+      ${w.hint ? html`<div class="fp3d-walk-hint">${t("walk_hint")}</div>` : nothing}
+      <div
+        class="fp3d-walk-stick"
+        @pointerdown=${(e: PointerEvent) => {
+          const el = e.currentTarget as HTMLElement;
+          const r = el.getBoundingClientRect();
+          stick = { id: e.pointerId, cx: r.left + r.width / 2, cy: r.top + r.height / 2 };
+          el.setPointerCapture(e.pointerId);
+          knob(e, el);
+        }}
+        @pointermove=${(e: PointerEvent) => knob(e, e.currentTarget as HTMLElement)}
+        @pointerup=${(e: PointerEvent) => {
+          stick = null;
+          ((e.currentTarget as HTMLElement).firstElementChild as HTMLElement).style.transform = "";
+          this.walker?.setStick(null);
+        }}
+        @pointercancel=${(e: PointerEvent) => {
+          stick = null;
+          ((e.currentTarget as HTMLElement).firstElementChild as HTMLElement).style.transform = "";
+          this.walker?.setStick(null);
+        }}
+      >
+        <span></span>
+      </div>`;
+  }
+
   private renderFind() {
     const b = this.building;
     if (!b || !this.hass) return nothing;
@@ -3222,7 +3342,7 @@ export class Fp3dView3d extends LitElement {
       style=${style}
     >
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
-      ${this.renderAlerts()} ${this.clean ? nothing : html`${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
+      ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
@@ -3579,6 +3699,96 @@ export class Fp3dView3d extends LitElement {
       }
       .fp3d-thumbs-small .fp3d-thumb {
         width: 104px;
+      }
+      .fp3d-walk-btn {
+        position: absolute;
+        left: 12px;
+        bottom: calc(102px + var(--fp3d-bottom-inset, 0px));
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 13px;
+        background: var(--fp3d-chrome);
+        color: var(--fp3d-text);
+        box-shadow: var(--fp3d-shadow);
+        cursor: pointer;
+      }
+      .fp3d-walk-surface {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        touch-action: none;
+        cursor: grab;
+      }
+      .fp3d-walk-top {
+        position: absolute;
+        z-index: 5;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .fp3d-walk-room,
+      .fp3d-walk-exit,
+      .fp3d-walk-hint {
+        padding: 8px 14px;
+        border-radius: 14px;
+        background: var(--fp3d-chrome);
+        color: var(--fp3d-text);
+        box-shadow: var(--fp3d-shadow);
+        font: inherit;
+        font-weight: 700;
+      }
+      .fp3d-walk-exit {
+        border: 0;
+        cursor: pointer;
+        pointer-events: auto;
+      }
+      .fp3d-walk-hint {
+        position: absolute;
+        z-index: 5;
+        left: 50%;
+        top: 62px;
+        transform: translateX(-50%);
+        max-width: min(560px, calc(100% - 32px));
+        font-weight: 500;
+        font-size: 13px;
+        text-align: center;
+        pointer-events: none;
+      }
+      .fp3d-walk-stick {
+        position: absolute;
+        z-index: 5;
+        right: 18px;
+        bottom: calc(18px + var(--fp3d-bottom-inset, 0px));
+        width: 112px;
+        height: 112px;
+        border-radius: 50%;
+        background: rgba(14, 21, 38, 0.55);
+        border: 1px solid var(--fp3d-line);
+        display: grid;
+        place-items: center;
+        touch-action: none;
+      }
+      .fp3d-walk-stick span {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: var(--fp3d-accent);
+        box-shadow: 0 0 16px rgba(55, 224, 255, 0.5);
+        pointer-events: none;
+      }
+      /* with a mouse the stick is not needed */
+      @media (pointer: fine) {
+        .fp3d-walk-stick {
+          display: none;
+        }
       }
       .fp3d-find-btn {
         position: absolute;

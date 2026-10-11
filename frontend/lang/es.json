@@ -1589,5 +1589,9 @@
  "card_step_hole": "Por un agujero",
  "card_step_fit": "Montar",
  "card_step_end": "O hasta el final",
- "card_lay": "Tender"
+ "card_lay": "Tender",
+ "walk_start": "Recorrido por la casa",
+ "walk_title": "Recorrido",
+ "walk_end": "Terminar",
+ "walk_hint": "Arrastrar: mirar · tocar el suelo: ir allí · W A S D / flechas o el joystick: caminar · Esc: terminar"
 }

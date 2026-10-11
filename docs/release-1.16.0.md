@@ -1,6 +1,8 @@
-A bug-fix round from your reports: the dashboard card after a Home Assistant restart, thermostats as room temperature, Sonos groups, robot vacuums, Echo buttons, and light through doors and windows.
+**New: walk through your house.** One tap on the walker and you stand at eye height in your home – look around, tap the floor to walk there, through the doors into the next room. The lights, TVs, sunlight and glass cards live on around you. Plus a round of fixes from your reports.
 
 ### New
+
+- **Walk through the house:** the walker button (bottom left, above the star) puts you at eye height into the chosen room (else the biggest of the floor shown). Drag to look around, tap the floor to walk there – through doors into other rooms too –, W A S D / arrow keys, or the stick on a tablet. Walls stop you, doors let you through; the room you are in shows at the top, ✕ End or Esc takes you back. Runs on old wall tablets too. In the card, `walk: false` hides the button.
 
 - **Thermostats count as room temperature:** a room without its own temperature or humidity sensor now takes the `current_temperature` / `current_humidity` of its thermostat (climate entity) – in the room cards, the heatmap and the room panel. A thermostat can also be chosen by hand as the room's sensor (#478 by gypais).
 - **Energie Pro – devices straight onto the wall:** in the wall view, a side bar puts the meter, inverter, home battery and wallbox directly onto the wall you are looking at.
@@ -22,9 +24,11 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ---
 
-Eine Fehlerrunde aus euren Meldungen: die Dashboard-Karte nach einem Home-Assistant-Neustart, Thermostate als Raumtemperatur, Sonos-Gruppen, Saugroboter, Echo-Knöpfe und Licht durch Türen und Fenster.
+**Neu: der Rundgang durch dein Haus.** Ein Tipp auf den Wanderer, und du stehst auf Augenhöhe in deinem Zuhause – umsehen, auf den Boden tippen und hinlaufen, durch die Türen in den nächsten Raum. Lichter, Fernseher, Sonnenlicht und Glaskarten leben um dich herum weiter. Dazu eine Runde Fehlerbehebungen aus euren Meldungen.
 
 ### Neu
+
+- **Rundgang durchs Haus:** Der Knopf mit dem Wanderer (unten links, über dem Stern) stellt dich auf Augenhöhe in den gewählten Raum (sonst in den größten der gezeigten Etage). Ziehen schaut dich um, ein Tipp auf den Boden läuft dorthin – auch durch Türen in andere Räume –, W A S D / Pfeiltasten oder auf dem Tablet der Knüppel. Wände halten dich auf, Türen lassen dich durch; oben steht der Raum, in dem du bist, ✕ Beenden oder Esc führt zurück. Läuft auch auf alten Wandtablets. In der Karte blendet `walk: false` den Knopf aus.
 
 - **Thermostate zählen als Raumtemperatur:** Ein Raum ohne eigenen Temperatur- oder Feuchtesensor nimmt jetzt `current_temperature` / `current_humidity` seines Thermostats (Klima-Entität) – in den Raumkarten, der Heatmap und im Raumpanel. Ein Thermostat lässt sich auch von Hand als Sensor des Raums wählen (#478 von gypais).
 - **Energie Pro – Geräte direkt an die Wand:** In der Wandansicht setzt eine Leiste Stromzähler, Wechselrichter, Stromspeicher und Wallbox direkt an die Wand, die du gerade ansiehst.

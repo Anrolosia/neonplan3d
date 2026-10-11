@@ -1589,5 +1589,9 @@
  "card_step_hole": "Skozi luknjo",
  "card_step_fit": "Vgradi",
  "card_step_end": "Ali do cilja",
- "card_lay": "Položi"
+ "card_lay": "Položi",
+ "walk_start": "Sprehod po hiši",
+ "walk_title": "Sprehod",
+ "walk_end": "Končaj",
+ "walk_hint": "Povleci: razgledovanje · tapni tla: pojdi tja · W A S D / puščice ali palica: hoja · Esc: končaj"
 }

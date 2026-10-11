@@ -1589,5 +1589,9 @@
  "card_step_hole": "Attraverso un foro",
  "card_step_fit": "Montare",
  "card_step_end": "O fino alla fine",
- "card_lay": "Posa"
+ "card_lay": "Posa",
+ "walk_start": "Giro della casa",
+ "walk_title": "Giro",
+ "walk_end": "Fine",
+ "walk_hint": "Trascina: guardati intorno · tocca il pavimento: vai lì · W A S D / frecce o il joystick: cammina · Esc: fine"
 }

@@ -1589,5 +1589,9 @@
  "card_step_hole": "Par un trou",
  "card_step_fit": "Monter",
  "card_step_end": "Ou jusqu'au bout",
- "card_lay": "Poser"
+ "card_lay": "Poser",
+ "walk_start": "Visite de la maison",
+ "walk_title": "Visite",
+ "walk_end": "Terminer",
+ "walk_hint": "Glisser : regarder · toucher le sol : y aller · Z Q S D / flèches ou le joystick : marcher · Échap : terminer"
 }

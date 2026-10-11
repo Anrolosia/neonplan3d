@@ -1589,5 +1589,9 @@
  "card_step_hole": "Gennem et hul",
  "card_step_fit": "Indbyg",
  "card_step_end": "Eller til enden",
- "card_lay": "Læg"
+ "card_lay": "Læg",
+ "walk_start": "Rundtur i huset",
+ "walk_title": "Rundtur",
+ "walk_end": "Afslut",
+ "walk_hint": "Træk: se dig omkring · tryk på gulvet: gå derhen · W A S D / piletaster eller pinden: gå · Esc: afslut"
 }

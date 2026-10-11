@@ -331,6 +331,7 @@ clearTimeout(this.cleanTimer);
               .markerMode=${this._config?.markers ?? "important"}
               .markerNames=${this._config?.marker_names === true}
               .central=${this._config?.central !== false}
+              .walkable=${this._config?.walk !== false}
               .buttons=${this._config?.buttons?.map((b, i) => ({ id: `card_${i}`, ...b })) ?? null}
               .heatMode=${heat}
               .theme=${this._config?.theme ?? "neon"}

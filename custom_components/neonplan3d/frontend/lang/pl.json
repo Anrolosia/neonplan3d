@@ -1589,5 +1589,9 @@
  "card_step_hole": "Przez otwór",
  "card_step_fit": "Wbuduj",
  "card_step_end": "Albo do celu",
- "card_lay": "Ułóż"
+ "card_lay": "Ułóż",
+ "walk_start": "Spacer po domu",
+ "walk_title": "Spacer",
+ "walk_end": "Zakończ",
+ "walk_hint": "Przeciągnij: rozglądaj się · dotknij podłogi: idź tam · W A S D / strzałki lub drążek: chodzenie · Esc: zakończ"
 }

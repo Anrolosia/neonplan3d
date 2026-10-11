@@ -1589,5 +1589,9 @@
  "card_step_hole": "Printr-o gaură",
  "card_step_fit": "Montează",
  "card_step_end": "Sau până la capăt",
- "card_lay": "Pune"
+ "card_lay": "Pune",
+ "walk_start": "Plimbare prin casă",
+ "walk_title": "Plimbare",
+ "walk_end": "Încheie",
+ "walk_hint": "Trage: privește în jur · atinge podeaua: mergi acolo · W A S D / săgeți sau joystickul: mers · Esc: încheie"
 }

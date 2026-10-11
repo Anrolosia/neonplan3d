@@ -1589,5 +1589,9 @@
  "card_step_hole": "Gjennom eit hol",
  "card_step_fit": "Bygg inn",
  "card_step_end": "Eller til enden",
- "card_lay": "Legg"
+ "card_lay": "Legg",
+ "walk_start": "Omvising i huset",
+ "walk_title": "Omvising",
+ "walk_end": "Avslutt",
+ "walk_hint": "Dra: sjå deg rundt · trykk på golvet: gå dit · W A S D / piltastar eller spaken: gå · Esc: avslutt"
 }

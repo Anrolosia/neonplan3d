@@ -1589,5 +1589,9 @@
  "card_step_hole": "Reiän läpi",
  "card_step_fit": "Asenna",
  "card_step_end": "Tai perille",
- "card_lay": "Asenna putki"
+ "card_lay": "Asenna putki",
+ "walk_start": "Kierros talossa",
+ "walk_title": "Kierros",
+ "walk_end": "Lopeta",
+ "walk_hint": "Vedä: katsele · napauta lattiaa: kävele sinne · W A S D / nuolet tai sauva: kävele · Esc: lopeta"
 }

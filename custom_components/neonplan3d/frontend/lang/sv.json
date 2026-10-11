@@ -1589,5 +1589,9 @@
  "card_step_hole": "Genom ett hål",
  "card_step_fit": "Bygg in",
  "card_step_end": "Eller till slutet",
- "card_lay": "Lägg"
+ "card_lay": "Lägg",
+ "walk_start": "Rundtur i huset",
+ "walk_title": "Rundtur",
+ "walk_end": "Avsluta",
+ "walk_hint": "Dra: se dig om · tryck på golvet: gå dit · W A S D / piltangenter eller spaken: gå · Esc: avsluta"
 }

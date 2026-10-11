@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- **Walk through the house:** the walker button puts you at eye height into a room; drag to look, tap the floor to walk there (through doors), W A S D / arrows or a touch stick; walls stop you; `walk: false` hides it in the card.
 - **Thermostats as room temperature:** a room without its own temperature or humidity sensor takes its thermostat's `current_temperature` / `current_humidity` (room cards, heatmap, room panel); thermostats can be chosen as the room's sensor (#478).
 - **Energie Pro:** a side bar in the wall view puts the meter, inverter, home battery and wallbox straight onto the wall shown.
 
