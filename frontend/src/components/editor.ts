@@ -6835,6 +6835,17 @@ export class Fp3dEditor extends LitElement {
     });
   }
 
+  /**
+   * The name of a connection: a T- or Y-piece's are lettered (A, B, C – which way the water runs does not matter),
+   * the others say what they are (suction side, return, inside …).
+   */
+  private portText(node: string): string {
+    const { kind, port } = splitNode(node);
+    const letter: Record<string, string> = { in: "A", out1: "B", out2: "C" };
+    if (kind === "joint" && port && letter[port]) return `${this.t("card_port")} ${letter[port]}`;
+    return port ? this.t(`port_${port}` as I18nKey) : "";
+  }
+
   private openCard(pool: string, part: string): void {
     this._card = { pool, part };
     this._cardJoin = null;
@@ -6927,7 +6938,7 @@ export class Fp3dEditor extends LitElement {
     const label = (n: string) => this.poolNodeLabel(a, n);
     const portName = (n: string) => {
       const q = splitNode(n).port;
-      return q ? this.t(`port_${q}` as I18nKey) : this.t("card_port");
+      return q ? this.portText(n) : this.t("card_port");
     };
     const viaText = (v: ConnectVia) => (v.kind === "hole" ? this.t(v.dir === "in" ? "conn_hole_in" : "conn_hole_out", { name: this.jointLabel(a, v.joint) }) : this.t(v.kind === "valve" ? "wall_run_valve" : "wall_run_sight"));
     const close = () => {
@@ -7137,7 +7148,7 @@ export class Fp3dEditor extends LitElement {
         return svg`<g class="fp3d-pc-stub ${lit ? "fp3d-on" : ""}" @click=${() => this.isAdmin && !lit && (this._cardJoin = { port: n, to: "", vias: [] })}>
           <line x1=${centre[0]} y1=${centre[1]} x2=${end[0]} y2=${end[1]} />
           <circle cx=${end[0]} cy=${end[1]} r="7" />
-          <title>${q ? this.t(`port_${q}` as I18nKey) : ""}</title>
+          <title>${q ? this.portText(n) : ""}</title>
         </g>`;
       })}
       ${body}
@@ -7145,7 +7156,7 @@ export class Fp3dEditor extends LitElement {
         const q = splitNode(n).port;
         const end = at[q ?? ""] ?? [180, 70];
         // labels kept inside the drawing (a stub at the edge gets its name pulled in)
-        return q ? svg`<text class="fp3d-pc-label" x=${Math.min(162, Math.max(38, end[0]))} y=${end[1] < 70 ? end[1] + 20 : end[1] - 12}>${this.t(`port_${q}` as I18nKey)}</text>` : nothing;
+        return q ? svg`<text class="fp3d-pc-label" x=${Math.min(162, Math.max(38, end[0]))} y=${end[1] < 70 ? end[1] + 20 : end[1] - 12}>${this.portText(n)}</text>` : nothing;
       })}
     </svg>`;
   }
@@ -7239,7 +7250,7 @@ export class Fp3dEditor extends LitElement {
     if (!node) return this.t("pool_loose_end");
     if (port || kind === "joint") {
       const base = kind === "joint" ? this.jointLabel(a, id) : this.poolNodeLabel(a, `${kind}:${id}`);
-      return port ? `${base} · ${this.t(`port_${port}` as I18nKey)}` : base;
+      return port ? `${base} · ${this.portText(node)}` : base;
     }
     if (node.startsWith("port:")) {
       const ports = a.pool?.ports ?? [];
@@ -7395,7 +7406,7 @@ export class Fp3dEditor extends LitElement {
             <span class="fp3d-ports">${jointPorts(j.kind).map((q) => {
               const n = `joint:${j.id}:${q}`;
               const on = pipes.some((p) => p.from === n || p.to === n || ((j.kind ?? "tee") !== "wall" && (j.kind ?? "tee") !== "floor" && nodePart(p.from) === `joint:${j.id}` && !splitNode(p.from).port && q === "in"));
-              return html`<i class=${on ? "fp3d-on" : ""} title=${this.t(`port_${q}` as I18nKey)}>${this.t(`port_${q}` as I18nKey)}</i>`;
+              return html`<i class=${on ? "fp3d-on" : ""} title=${this.portText(n)}>${this.portText(n)}</i>`;
             })}</span>
             <button class="fp3d-btn fp3d-danger" ?disabled=${!admin} title=${this.t("delete")} @click=${() =>
               this.changePool(a.id, (l) => {
