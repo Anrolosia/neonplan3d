@@ -2751,7 +2751,8 @@ export class Fp3dView3d extends LitElement {
     const t = (k: I18nKey) => translate(this.hass, k);
     if (!this._walk)
       return html`<button class="fp3d-walk-btn" title=${t("walk_start")} aria-label=${t("walk_start")} @click=${() => void this.startWalk()}>
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8" /><path d="m9 20 2.5-6 2.5 2.5V21M7.5 11l3-3.5 3.5 1.5 2 3.5M11.5 14l1-5" /></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4.5" r="1.8" /><path d="m9 20 2.5-6 2.5 2.5V21M7.5 11l3-3.5 3.5 1.5 2 3.5M11.5 14l1-5" /></svg>
+        <span>${t("walk_title")}</span>
       </button>`;
     const w = this._walk;
     // the stick (tablets): forward and back, turning left and right
@@ -3700,15 +3701,21 @@ export class Fp3dView3d extends LitElement {
       .fp3d-thumbs-small .fp3d-thumb {
         width: 104px;
       }
+      /* at the top right, clear of the floor pictures and the switch rows (a card moves it beside its own buttons) */
       .fp3d-walk-btn {
         position: absolute;
-        left: 12px;
-        bottom: calc(102px + var(--fp3d-bottom-inset, 0px));
-        width: 40px;
-        height: 40px;
-        display: grid;
-        place-items: center;
-        border: 0;
+        z-index: 3;
+        top: 12px;
+        right: var(--fp3d-walk-right, 12px);
+        height: 38px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 14px 0 10px;
+        font: inherit;
+        font-weight: 700;
+        font-size: 14px;
+        border: 1px solid rgba(55, 224, 255, 0.45);
         border-radius: 13px;
         background: var(--fp3d-chrome);
         color: var(--fp3d-text);

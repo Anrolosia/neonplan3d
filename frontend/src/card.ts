@@ -484,6 +484,10 @@ clearTimeout(this.cleanTimer);
       .fp3d-card-dash-2 {
         right: 56px;
       }
+      /* the view's walk button steps aside for the card's own buttons at the top right */
+      fp3d-view3d {
+        --fp3d-walk-right: 104px;
+      }
       .fp3d-card-full {
         position: absolute;
         right: 10px;

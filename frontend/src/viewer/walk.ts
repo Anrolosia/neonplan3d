@@ -254,7 +254,7 @@ export class WalkCamera {
   private origNear: number;
   private onRoom: (room: Room | null) => void;
   private roomId: string | null = null;
-  private listeners: [EventTarget, string, EventListener][] = [];
+  private listeners: [EventTarget, string, EventListener, boolean][] = [];
   /** Turning toward the walking direction while a path is followed. */
   private turnTo: number | null = null;
 
@@ -295,7 +295,7 @@ export class WalkCamera {
 
   dispose(): void {
     cancelAnimationFrame(this.raf);
-    for (const [t, type, fn] of this.listeners) t.removeEventListener(type, fn);
+    for (const [t, type, fn, capture] of this.listeners) t.removeEventListener(type, fn, capture);
     this.v.controls.update = this.origUpdate;
     this.v.updateWalls = this.origWalls;
     this.v.camera.fov = this.origFov;
@@ -472,7 +472,7 @@ export class WalkCamera {
   private bind(): void {
     const on = (t: EventTarget, type: string, fn: (e: never) => void, opts?: AddEventListenerOptions) => {
       t.addEventListener(type, fn as EventListener, opts);
-      this.listeners.push([t, type, fn as EventListener]);
+      this.listeners.push([t, type, fn as EventListener, !!opts?.capture]);
     };
     let drag: { x: number; y: number; moved: boolean; id: number } | null = null;
     on(this.surface, "pointerdown", (e: PointerEvent) => {
@@ -520,15 +520,32 @@ export class WalkCamera {
       },
       { passive: false },
     );
-    on(window, "keydown", (e: KeyboardEvent) => {
-      const k = e.key.toLowerCase();
-      if (!["w", "a", "s", "d", "q", "e", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(k)) return;
-      if ((e.target as HTMLElement)?.closest?.("input, textarea, select")) return;
-      e.preventDefault();
-      this.keys.add(k);
-      this.kick();
-    });
-    on(window, "keyup", (e: KeyboardEvent) => this.keys.delete(e.key.toLowerCase()));
+    // the walk's keys come first: the page's own shortcuts on W, A, S, D … stay quiet while walking
+    // (caught on the way down, before anything else hears them)
+    const walkKey = (e: KeyboardEvent) => ["w", "a", "s", "d", "q", "e", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(e.key.toLowerCase());
+    const typing = (e: KeyboardEvent) => !!(e.composedPath()[0] as HTMLElement)?.closest?.("input, textarea, select");
+    on(
+      window,
+      "keydown",
+      (e: KeyboardEvent) => {
+        if (!walkKey(e) || typing(e) || e.ctrlKey || e.metaKey || e.altKey) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        this.keys.add(e.key.toLowerCase());
+        this.kick();
+      },
+      { capture: true },
+    );
+    on(
+      window,
+      "keyup",
+      (e: KeyboardEvent) => {
+        if (!walkKey(e)) return;
+        this.keys.delete(e.key.toLowerCase());
+        e.stopImmediatePropagation();
+      },
+      { capture: true },
+    );
     on(window, "blur", () => this.keys.clear());
   }
 }
