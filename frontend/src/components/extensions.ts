@@ -356,7 +356,7 @@ export class Extensions extends LitElement {
             <div class="fp3d-offer-body">
               <b>${packName(o, this.hass?.language ?? "de")}</b>
               ${o.new ? html`<span class="fp3d-offer-new">${this.t("offers_new")}</span>` : nothing}
-              <span class="fp3d-offer-kind">${this.t(`offers_kind_${o.kind}` as I18nKey)}${o.price ? ` · ${o.price}` : ""}</span>
+              <span class="fp3d-offer-kind">${this.t(`offers_kind_${o.kind}` as I18nKey)}${o.price && o.kind !== "fun" ? ` · ${o.price}` : ""}</span>
               ${o.teaser ? html`<span class="fp3d-sub">${o.teaser}</span>` : nothing}
             </div>
           </a>`,
