@@ -1,7 +1,7 @@
 // Devices of a room: which entities belong to an area, what kind they are, how they are placed and
 // what their state looks like. Pure functions (no Lit, no three.js) so they can be tested directly.
 
-import type { Furniture, EntityRef, Floor, LampMount, Opening, Placement, Room, Vec2 } from "./model.ts";
+import type { Furniture, EntityRef, Floor, LampMount, Opening, Placement, RoofWindow, Room, Vec2 } from "./model.ts";
 import { centroid, pointInPolygon } from "./model.ts";
 import { isRobotVacuum, packScreen } from "./packs.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
@@ -902,7 +902,7 @@ export function appColor(st: HassEntity | undefined): [number, number, number] |
  * with their entities, blinds and contacts of its doors and windows) plus the ones picked for the
  * panel. `more` are the other entities of the room's area, offered on request.
  */
-export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room): { shown: string[]; more: string[] } {
+export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room, roofWindows: readonly RoofWindow[] = []): { shown: string[]; more: string[] } {
   const inRoom = (x: number, z: number) => pointInPolygon([x, z], room.points);
   const furniture = furnitureEntities(hass, [floor]);
   const openings = openingEntities(hass, [floor]);
@@ -913,6 +913,8 @@ export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room)
       const e = openings.get(o.id);
       return e ? [e.cover, e.contact, e.tilt, e.contact2] : [];
     }),
+    // the roof windows over the room (#482)
+    ...roofWindows.flatMap((w) => [w.window, w.cover, w.contact, w.tilt]),
     ...(room.panel ?? []),
   ].filter((id): id is string => !!id && !!hass.states[id]);
   // entities the editor hid for this room stay out of the panel altogether

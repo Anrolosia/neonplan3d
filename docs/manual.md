@@ -413,7 +413,7 @@ A simple house gets a flat or gable roof over the whole top floor under **Settin
 
 Below the roof sections, **+ Roof window** puts a window into a roof face (78 × 118 cm by default). Drag it in the plan, also onto another roof face. Like a window it has a **Blind**, a **Contact** and a **Tilt contact**: open, the sash swings out, hinged at the top; tilted, a little; the blind comes down over the glass from the top.
 
-Every roof window has a **name** (optional), a **blind**, a **contact** and a **tilt contact** – and a **window motor**: Velux, Roto or Fakro report the window's position as a cover, and the sash opens in 3D as far as the motor stands. Open or tilted, the frame glows warm like a wall window's. In a roof section the window cuts a hole into the slope, so the attic looks out through it. When the roof fades out as you zoom in on a floor or a room, the roof windows stay in the slope – open, tilted, with their blind.
+Every roof window has a **name** (optional), a **blind**, a **contact** and a **tilt contact** – and a **window motor**: Velux, Roto or Fakro report the window's position as a cover, and the sash opens in 3D as far as the motor stands. Open or tilted, the frame glows warm like a wall window's. In a roof section the window cuts a hole into the slope, so the attic looks out through it. When the roof fades out as you zoom in on a floor or a room, the roof windows stay in the slope – open, tilted, with their blind. Every roof window belongs to the room below it: tap the room and its blind, contact and window motor are in the room card, and when the sun shines on that roof face, its light falls through the window onto the room's floor (less with the blind down).
 
 ### 4.20 Energy: solar fields
 
