@@ -852,13 +852,25 @@ Die mittlere Kachelreihe zeigt die Pro-Erweiterungen. Aktive tragen ein ✓, ges
 
 Geräte in Packs haben eine kleine Leuchtfläche (Display, Status-LED): Verknüpft mit einem Media-Player, Schalter oder Licht leuchtet sie, solange das Gerät läuft; ein Aquarium leuchtet in der Farbe seines Lichts.
 
-Unten auf der Seite stehen deine installierten Packs mit **Entfernen**. Darunter liegt **Möbel-Packs importieren …** für Pack-Dateien: Schnupper-Packs aus dem Newsletter, Downloads von der Website oder Installationen ohne Internet. Mehrere Dateien lassen sich auf einmal wählen.
+Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Möbel-Packs mit der Zahl ihrer Möbel und Erweiterungen); **Liste zeigen** klappt die Liste mit **Entfernen** auf. Genauso fasst die Shop-Verbindung deine Käufe in einem Balken zusammen – installiert, Updates, noch nicht installiert – mit **Alle installieren/aktualisieren**. Darunter liegt **Möbel-Packs importieren …** für Pack-Dateien: Schnupper-Packs aus dem Newsletter, Downloads von der Website oder Installationen ohne Internet. Mehrere Dateien lassen sich auf einmal wählen.
 
 **Gut zu wissen:**
 
 - Packs sind digital signiert. Nur Packs vom Herausgeber lassen sich importieren, veränderte Dateien werden abgelehnt.
 - Entfernst du ein Pack, bleiben seine Möbel als einfache Kästen im Plan stehen. Importierst du es wieder, sind sie zurück, mit allen Verknüpfungen.
 - Eine neuere Version eines Packs ersetzt die alte, ohne dass im Plan etwas verloren geht.
+
+### 7.4 Fun-Packs
+
+**Fun-Packs** sind kostenlose Extras zum Spaß – ein Dankeschön an alle, die NeonPlan 3D schon unterstützen. Du holst sie dir im Shop für **0 €** (wer mag, gibt freiwillig etwas dazu) und schaltest sie hier unter **🎈 Fun-Packs** ein und aus.
+
+**Haustiere:** Katze, Kaninchen oder Hund – als Dackel, Mops, Terrier, Labrador oder Schäferhund – leben in deinem 3D-Haus. **+ Haustier hinzufügen** legt ein Tier an: Art, Rasse (bei Hunden), Name, Fell und die Etage, auf der es startet. **Haustiere zeigen** schaltet alle auf einmal ein und aus; in der Dashboard-Karte blendet die Option **Haustiere zeigen** (YAML `pets: false`) sie für diese Karte aus, etwa am Wandtablet.
+
+- Die Tiere laufen durch die Türen von Raum zu Raum und **die Treppe hoch und runter** – so sind sie im ganzen Haus unterwegs. Eine Tür, deren Kontakt „zu“ meldet, ist für sie zu; Türen ohne Sensor gelten als offen.
+- Sie ruhen an ihren Lieblingsplätzen: Die Katze läuft vor ein **Sofa, einen Sessel oder ein Bett** und springt von vorne hinauf, der Hund legt sich davor. Aus dem Pack Haustiere mögen Katzen Katzenbett, Katzenhöhle und Kratzbaum, Hunde Hundebett, Hundekorb und Hundehütte; am **Napf**, Futterautomaten und Trinkbrunnen schauen sie kurz vorbei.
+- **Nachts** (die Sonne in Home Assistant ist untergegangen) schlafen sie eingerollt, mit einem kleinen „z Z“.
+- In den **Aquarien** des Packs Haustiere schwimmen bunte **Fische**.
+- Gezeichnet wird nur, solange sich ein Tier bewegt – ruhend kosten sie nichts, auch nicht auf alten Wandtablets.
 
 ---
 
