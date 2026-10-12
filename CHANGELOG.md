@@ -4,12 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
-## Unreleased
+## 1.17.0
 
 ### New
 
 - **Furniture blocks:** Shift + click (or *Select several* on a tablet) and Shift + drag (a frame) select several pieces; move, turn about their centre, copy, fix or delete them together, or **join them into a block** – a click on any part then selects the whole kitchen or wall unit, a double click edits one part alone, *Break up block* undoes it. Blocks move together in 3D beside the plan too. Ctrl+D duplicates the selected furniture.
-- **Wall view:** blocks there too (shift-click or a frame, join, drag the whole block along the wall, *Whole block / This part only*); the side bar **Onto the wall** shows a few categories, a search and recently used pieces instead of a long list – tap a free spot on the wall and it offers only what fits that gap, cabinets built to measure taking its width. The pool parts are gone from the normal wall view. Pieces can be resized in the wall view: handles left/right (width), top and bottom (height), snapping to neighbours, width and height to type in; picture tiles in the side bar, delete button and Del key, blocks in 3D in the room too.
+- **Wall view:** blocks there too (shift-click or a frame, join, drag the whole block along the wall, *Whole block / This part only*); the side bar **Onto the wall** shows a few categories, a search and recently used pieces instead of a long list – tap a free spot on the wall and it offers only what fits that gap, cabinets built to measure taking its width. Pieces can be resized in the wall view: handles left/right (width), top and bottom (height), snapping to neighbours, width and height to type in; picture tiles in the side bar, delete button and Del key, blocks in 3D in the room too.
 - **Time travel for everyone:** out of the supporter beta; what a placed camera detects (motion, person, car) is an event day and night.
 
 ### Fixed

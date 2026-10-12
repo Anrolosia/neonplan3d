@@ -742,7 +742,7 @@ Car Pro lives on the **parking spot**, not on the vehicle furniture. If your car
 
 ![Time travel: the floor at 07:42 with the time bar](images/view-timetravel.jpg)
 
-> **🧪 Supporter beta:** Time travel is the first add-on that comes as a beta with the [Supporter Pass](https://mastershort.de/en/neonplan3d/supporters/) first. Supporters test it early and give feedback in the Discord channel **#beta-feedback** (button **Feedback on Discord** under *Extensions*, or **🧪 BETA** at the top of the time bar). Once it is finished, everyone can buy it on its own in the shop. Until then *Extensions* marks it "Beta · supporters first".
+> **For everyone in the shop:** since 1.17, time travel is sold on its own in the shop; the [Supporter Pass](https://mastershort.de/en/neonplan3d/supporters/) includes it. Thanks to all supporters who tested it in the beta.
 
 Time travel replays the last 24 hours – or, if you like, the last 7 days – in the house, from the history Home Assistant records anyway (the recorder): lights with brightness and colour, doors and windows, blinds, motion, heating, TV and speakers, temperatures, power, weather and the sun's position. Everything stays in Home Assistant, and **nothing is switched** – time travel only shows.
 
@@ -763,7 +763,7 @@ Time travel replays the last 24 hours – or, if you like, the last 7 days – i
 
 On a PC: **space** plays or pauses, the **arrow keys** jump 5 minutes (with Shift one hour).
 
-**Events:** the front door (a door with a contact in an outer wall or with the front door look), garage door and gate, a lock is unlocked, the alarm goes off, smoke, gas, carbon monoxide, water, a power outage (the entity under **Report a power outage with**), a window is open while it rains, motion at night (11 pm to 5 am, motion sensors only – by day motion gets no dot, or the bar would fill up; scrubbing still shows it), the robot vacuum starts and is done, washing machine, dryer and dishwasher are done (the power drops after a run; the power sensor is linked to the item or placed as a device right next to it). The same thing again shortly after counts once. **People are never an event**, and time travel does not show where anyone was.
+**Events:** the front door (a door with a contact in an outer wall or with the front door look), garage door and gate, a lock is unlocked, the alarm goes off, smoke, gas, carbon monoxide, water, a power outage (the entity under **Report a power outage with**), a window is open while it rains, motion at night (11 pm to 5 am, motion sensors only – by day motion gets no dot, or the bar would fill up; scrubbing still shows it), what a **camera placed in the plan** detects (motion, person, car – day and night; the same camera again only after five minutes), the robot vacuum starts and is done, washing machine, dryer and dishwasher are done (the power drops after a run; the power sensor is linked to the item or placed as a device right next to it). The same thing again shortly after counts once. **People are never an event**, and time travel does not show where anyone was.
 
 **View only:** a tap on a device shows its state at that moment ("On · 35 % · since 19:29"). The room panel shows the values of the moment but takes no input. The star menu, scene buttons, swiping, double tap, quick menu, camera wall and the buttons on the glass cards rest until you are live again.
 
