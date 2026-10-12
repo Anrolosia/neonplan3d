@@ -36,9 +36,9 @@ import {
 } from "three";
 import { OrbitControls } from "../viewer/controls.ts";
 import { demoSupporters } from "./demo.ts";
-import type { Building, Floor, Vec2 } from "../model.ts";
+import type { Building, Vec2 } from "../model.ts";
 import { WalkCamera } from "../viewer/walk.ts";
-import { buildHouses, CityMap, cityPlan, HOUSE_D, HOUSE_W, houseInterior, type HouseSpot, WALL_H } from "./houses.ts";
+import { CityMap, cityPlan, farHouse, HOUSE_D, hallModel, houseModel, type HouseSpot, LIFT, roofFade, WALL_H } from "./houses.ts";
 import { cleanData, housePlace, lanternPlace, lighthousePlace, plots, RING_STEP, ringHalf, ringsFor, type Supporter } from "./layout.ts";
 
 /** The shop's list (a JSON file or endpoint); empty until it exists: then the preview shows invented supporters. */
@@ -159,25 +159,6 @@ function sign(text: string, color: string, height: number): Sprite {
   return s;
 }
 
-/** A gable roof over a w × d box of height h (ridge along x), with its edges. */
-function roof(w: number, d: number, h: number, rise: number): BufferGeometry {
-  const x = w / 2 + 0.15;
-  const z = d / 2 + 0.15;
-  const p = [
-    [-x, h, -z], [x, h, -z], [x, h + rise, 0], [-x, h + rise, 0], // back slope
-    [-x, h, z], [x, h, z], [x, h + rise, 0], [-x, h + rise, 0], // front slope
-  ];
-  const pos: number[] = [];
-  const quad = (a: number[], b: number[], c: number[], e: number[]) => pos.push(...a, ...b, ...c, ...a, ...c, ...e);
-  quad(p[0], p[1], p[2], p[3]);
-  quad(p[4], p[7], p[6], p[5]);
-  // the gables
-  pos.push(-x, h, -z, -x, h + rise, 0, -x, h, z, x, h, -z, x, h, z, x, h + rise, 0);
-  const geo = new BufferGeometry();
-  geo.setAttribute("position", new Float32BufferAttribute(pos, 3));
-  return geo;
-}
-
 interface Pick {
   pos: Vector3;
   nr: number;
@@ -244,22 +225,23 @@ async function start(): Promise<void> {
   edgeGeo.setAttribute("position", new Float32BufferAttribute(edges, 3));
   scene.add(new LineSegments(edgeGeo, new LineBasicMaterial({ color: CYAN, transparent: true, opacity: 0.22 })));
 
-  // the town hall: the demo house's ground floor, walls, doors and windows as NeonPlan draws them, its sign above
-  let hallFloor: Floor | null = null;
+  // the town hall: the demo house, both floors and its roof, as NeonPlan draws it, its sign above
+  let demoHouse: Building | null = null;
   try {
-    const demo = (await import(/* @vite-ignore */ new URL("../demo-data.js", import.meta.url).href)) as { DEMO_BUILDING?: Building };
-    hallFloor = demo.DEMO_BUILDING?.floors.find((f) => f.elevation === 0) ?? null;
+    demoHouse = ((await import(/* @vite-ignore */ new URL("../demo-data.js", import.meta.url).href)) as { DEMO_BUILDING?: Building }).DEMO_BUILDING ?? null;
   } catch {
     // no demo house beside the page: the town hall stays a plain block
   }
+  const hall = hallModel(demoHouse, glow);
   const hallSign = sign("NeonPlan 3D", CYAN, 1.6);
-  hallSign.position.set(0, hallFloor ? 5.6 : 8.6, 0);
+  hallSign.position.set(0, hall ? 9.4 : 8.6, 0);
   scene.add(hallSign);
   const hallGlow = new Mesh(new PlaneGeometry(26, 22), new MeshBasicMaterial({ map: glow, color: "#1f6f8a", transparent: true, blending: AdditiveBlending, depthWrite: false }));
   hallGlow.rotation.x = -Math.PI / 2;
   hallGlow.position.y = 0.04;
   scene.add(hallGlow);
-  if (!hallFloor) {
+  if (hall) scene.add(hall.group);
+  else {
     const hallBody = new BoxGeometry(12, 4.2, 9);
     hallBody.translate(0, 2.1, 0);
     scene.add(new Mesh(hallBody, new MeshBasicMaterial({ color: "#0f1a30" })), new LineSegments(new EdgesGeometry(hallBody), new LineBasicMaterial({ color: CYAN })));
@@ -269,7 +251,7 @@ async function start(): Promise<void> {
   // they and the lighthouses' rocks stop the walk
   const blockMat = new MeshBasicMaterial({ color: "#0a1120" });
   const blockEdge = new LineBasicMaterial({ color: "#1d3a66", transparent: true, opacity: 0.6 });
-  const taken = [...[...housePlots.values()].map((j) => ({ ...housePlace(j), r: 5.2 })), ...[...towerPlots.values()].map((j) => ({ ...lighthousePlace(j), r: 7.5 }))];
+  const taken = [...[...housePlots.values()].map((j) => ({ ...housePlace(j), r: 7.5 })), ...[...towerPlots.values()].map((j) => ({ ...lighthousePlace(j), r: 7.5 }))];
   const solids: { id: string; points: Vec2[] }[] = [];
   for (let b = 0; b < rings - 1; b++) {
     const m = ringHalf(b + 1) + RING_STEP / 2;
@@ -294,9 +276,7 @@ async function start(): Promise<void> {
     const p = housePlace(j);
     return { id: String(nr), x: p.x, z: p.z, facing: p.facing, color: byNr.get(nr)!.color ?? CYAN };
   });
-  const plan = cityPlan(hallFloor, spots, solids);
-  const colors = new Map<string, string>(spots.map((h) => [`house_${h.id}`, h.color]));
-  scene.add(buildHouses(plan, colors, glow));
+  const plan = cityPlan(hall?.ground ?? null, spots, solids);
   const walkMap = new CityMap(plan.building, plan.floor);
 
   // ---------------------------------------------------------------- the supporters' lights
@@ -334,31 +314,49 @@ async function start(): Promise<void> {
   });
   scene.add(poles, heads, pools);
 
-  // inside each house its furniture, on top a roof that fades as the camera comes close (to look in from above),
-  // the name sign over the roof, the supporter's colour on the road in front
-  const roofMat = new MeshBasicMaterial({ color: "#16233f", side: DoubleSide, transparent: true });
-  const roofLines: LineBasicMaterial[] = [];
+  // the houses: NeonPlan's house model near the camera (shared by all), a simple block further away; each with the
+  // supporter's colour on a rug and at the door, and the name sign over the roof
+  const model = houseModel(glow);
+  const lods: { at: Vector3; detail: Group; far: Group }[] = [];
   for (const [nr, j] of housePlots) {
     const s = byNr.get(nr)!;
     const c = s.color ?? CYAN;
     const p = housePlace(j);
     const g = new Group();
-    g.add(houseInterior(c, glow));
-    const top = roof(HOUSE_W + 0.25, HOUSE_D + 0.25, WALL_H, 1.5);
-    const line = new LineBasicMaterial({ color: c, transparent: true });
-    roofLines.push(line);
-    g.add(new Mesh(top, roofMat), new LineSegments(new EdgesGeometry(top), line));
-    const plate = sign(s.name ?? nrText(nr), c, 0.75);
-    plate.position.set(0, WALL_H + 2.1, 0);
+    const detail = model.detail.clone();
+    // the supporter's colour: a rug in the living room, the light over the door
+    const rug = new Mesh(new PlaneGeometry(2.2, 1.5).rotateX(-Math.PI / 2), new MeshBasicMaterial({ color: new Color(c).multiplyScalar(0.45) }));
+    rug.position.set(-1.9, 0.025, 0.6);
+    const door = new Mesh(new PlaneGeometry(2.6, 2.6).rotateX(-Math.PI / 2), new MeshBasicMaterial({ map: glow, color: new Color(c).multiplyScalar(0.8), transparent: true, blending: AdditiveBlending, depthWrite: false }));
+    door.position.set(-1.25, 0.03, HOUSE_D / 2 + 0.9);
+    detail.add(rug, door);
+    detail.position.y = LIFT;
+    const far = farHouse(c);
+    far.visible = false;
+    g.add(detail, far);
+    const plate = sign(s.name ?? nrText(nr), c, 0.8);
+    plate.position.set(0, LIFT + WALL_H + 3.4, 0);
     g.add(plate);
-    const pool = new Mesh(new PlaneGeometry(6, 4).rotateX(-Math.PI / 2), new MeshBasicMaterial({ map: glow, color: new Color(c).multiplyScalar(0.5), transparent: true, blending: AdditiveBlending, depthWrite: false }));
-    pool.position.set(0, 0.05, HOUSE_D / 2 + 1.6);
-    g.add(pool);
     g.position.set(p.x, 0, p.z);
     g.rotation.y = p.facing;
     scene.add(g);
+    lods.push({ at: new Vector3(p.x, 1, p.z), detail, far });
     picks.push({ pos: new Vector3(p.x, 2, p.z), nr, radius: 44 });
   }
+  // detail where the camera is: the nearest houses (up to 24, within 110 m) show NeonPlan's model, the rest a block
+  const DETAIL = 24;
+  const NEAR = 110;
+  let lodAt = new Vector3(1e9, 0, 0);
+  const updateLod = () => {
+    if (camera.position.distanceToSquared(lodAt) < 4) return;
+    lodAt = camera.position.clone();
+    const order = lods.map((l) => ({ l, d: l.at.distanceTo(camera.position) })).sort((a, b) => a.d - b.d);
+    order.forEach(({ l, d }, i) => {
+      const near = i < DETAIL && d < NEAR;
+      l.detail.visible = near;
+      l.far.visible = !near;
+    });
+  };
 
   // lighthouses: on the outer corners in a little harbour, the beam sweeping over the town, the name on top
   const beams: Group[] = [];
@@ -520,7 +518,7 @@ async function start(): Promise<void> {
   const walkBtn = ui.querySelector<HTMLButtonElement>(".walk")!;
   const stick = ui.querySelector<HTMLDivElement>(".stick")!;
   const knob = stick.querySelector("b")!;
-  const floorView = { y: 0, floor: plan.floor, mask: { standing: { value: 0 }, glass: { value: 0 } } };
+  const floorView = { y: LIFT, floor: plan.floor, mask: { standing: { value: 0 }, glass: { value: 0 } } };
   const internals = {
     camera,
     controls,
@@ -542,10 +540,13 @@ async function start(): Promise<void> {
   const startWalk = () => {
     card.hidden = true;
     marker.visible = false;
+    // on the square in front of the town hall, looking at it
+    const front = hall ? Math.max(...hall.ground.rooms.flatMap((r) => r.points.map((p) => p[1]))) + 7 : 12;
     walker = new WalkCamera(internals as unknown as ConstructorParameters<typeof WalkCamera>[0], walkMap, renderer.domElement, {
+      start: { x: 0, z: front, yaw: -Math.PI / 2, pitch: -0.08 },
       // stepping into a supporter's house shows whose it is
       onRoom: (r) => {
-        if (r?.id.startsWith("house_")) show(Number(r.id.slice(6)), false);
+        if (r?.id.startsWith("house_")) show(Number(r.id.split("_")[1]), false);
       },
     });
     walkBtn.textContent = T.walkEnd;
@@ -592,6 +593,7 @@ async function start(): Promise<void> {
 
   // only draw while something moves: the camera, a beam, the chosen light's pulse
   let last = 0;
+  let lastFade = -1;
   const frame = (now: number) => {
     requestAnimationFrame(frame);
     const moving = controls.update(now);
@@ -600,13 +602,12 @@ async function start(): Promise<void> {
     for (const b of beams) b.rotation.y += dt * 0.55;
     // the roofs fade as the camera comes close, so one looks into the houses from above (walking: they stay)
     const fade = walker ? 1 : Math.min(1, Math.max(0, (controls.view.radius - 16) / 14));
-    if (Math.abs(roofMat.opacity - fade) > 0.01) {
-      roofMat.opacity = fade;
-      roofMat.depthWrite = fade > 0.9;
-      for (const l of roofLines) l.opacity = fade;
+    if (Math.abs(fade - lastFade) > 0.01) {
+      lastFade = fade;
+      roofFade(fade);
       dirty = true;
     }
-    roofMat.visible = fade > 0.02;
+    updateLod();
     if (chosen !== null && marker.visible) {
       const t = ((now - chosenAt) / 1000) % 1.6;
       (marker.material as MeshBasicMaterial).opacity = 0.9 - t / 2;

@@ -23,12 +23,12 @@ test("lanterns, houses and lighthouses never stand on each other", () => {
   for (let i = 0; i < 400; i++) for (let j = i + 1; j < 400; j++) assert.ok(near(lanterns[i], lanterns[j]) > 2, `${i} ${j}`);
   // a house (3.6 m wide) keeps clear of every lantern and every other house, a lighthouse of everything
   for (const h of houses) {
-    for (const l of lanterns) assert.ok(near(h, l) > 3, "house at a lantern");
-    for (const o of houses) if (o !== h) assert.ok(near(h, o) > 5, "houses overlap");
+    for (const l of lanterns) assert.ok(near(h, l) > 5, "house at a lantern");
+    for (const o of houses) if (o !== h) assert.ok(near(h, o) >= 10, "houses overlap");
   }
   for (const t of towers) {
     for (const l of lanterns) assert.ok(near(t, l) > 3, "lighthouse at a lantern");
-    for (const h of houses) assert.ok(near(t, h) > 5, "lighthouse at a house");
+    for (const h of houses) assert.ok(near(t, h) > 8, "lighthouse at a house");
   }
 });
 

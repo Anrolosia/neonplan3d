@@ -28,7 +28,7 @@ export interface CityData {
 
 /** Ring roads around the town hall: the first at this half size (m), each next one further out. */
 export const RING0 = 12;
-export const RING_STEP = 12;
+export const RING_STEP = 16;
 /** Lanterns stand this far apart along a road, this far outside its middle line. */
 const LANTERN_STEP = 2.2;
 const LANTERN_OUT = 1.4;
@@ -88,7 +88,7 @@ export function ringsFor(n: number): number {
 function bandSlots(b: number): number[] {
   const m = ringHalf(b + 1) + RING_STEP / 2;
   const out: number[] = [];
-  for (let t = 5.5; t <= m - 7 + 1e-9; t += 6) out.push(t, -t);
+  for (let t = 6.5; t <= m - 10.5 + 1e-9; t += 10) out.push(t, -t);
   return out;
 }
 
@@ -119,7 +119,7 @@ export function housePlace(j: number): Place {
 export function lighthousePlace(j: number): Place {
   const k = Math.floor(j / 4) + 1;
   const c = j % 4;
-  const d = ringHalf(k) + 6;
+  const d = ringHalf(k) + RING_STEP / 2;
   const [sx, sz] = [
     [1, -1],
     [1, 1],
