@@ -1644,5 +1644,10 @@
  "pool_valves": "Kulové ventily",
  "pool_valve_shut": "zavřeno",
  "pool_valve_toggle": "Klepnutím přepnete – tak, jak ventil skutečně stojí",
- "pool_joint": "Spojka"
+ "pool_joint": "Spojka",
+ "pool_depth": "Hloubka bazénu (m)",
+ "pool_rim": "Okraj nad trávníkem (m)",
+ "pool_depth_hint": "Hloubka: od okraje ke dnu. Bazén hluboký 1,50 m, který vyčnívá 20 cm: hloubka 1,50, okraj 0,20. Voda stojí 15 cm pod okrajem.",
+ "pool_port_depth": "Hloubka",
+ "pool_port_depth_hint": "Jak hluboko pod hladinou (m): trysky obvykle 0,30, skimmer u hladiny"
 }

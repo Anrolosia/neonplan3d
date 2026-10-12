@@ -1644,5 +1644,10 @@
  "pool_valves": "Palloventtiilit",
  "pool_valve_shut": "kiinni",
  "pool_valve_toggle": "Napauta vaihtaaksesi – kuten venttiili oikeasti on",
- "pool_joint": "Liitos"
+ "pool_joint": "Liitos",
+ "pool_depth": "Altaan syvyys (m)",
+ "pool_rim": "Reuna nurmen yläpuolella (m)",
+ "pool_depth_hint": "Syvyys: reunasta pohjaan. 1,50 m syvä allas, joka nousee 20 cm nurmen yläpuolelle: syvyys 1,50, reuna 0,20. Vesi on 15 cm reunan alapuolella.",
+ "pool_port_depth": "Syvyys",
+ "pool_port_depth_hint": "Kuinka syvällä vesirajan alla (m): suuttimet yleensä 0,30, skimmeri vesirajassa"
 }

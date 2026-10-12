@@ -162,3 +162,20 @@ test("the water's direction: built from a T-piece outside to the filter's return
   // the ball valve sits in the pipe inside the room
   assert.equal(out.pipes[1].fittings?.[0].kind, "valve");
 });
+
+test("a pipe at the bottom drain leaves under the pool's floor and comes up outside the pool", async () => {
+  const { underBasin } = await import("./pool-runs.ts");
+  const floor = { id: "eg", name: "EG", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
+  const area = { id: "p", type: "pool", points: [[0, 0], [8, 0], [8, 4], [0, 4]], depth: 1.5, rim: 0.2, pool: { ports: [{ id: "bd", kind: "drain", x: 4, z: 2 }] } } as unknown as Parameters<typeof underBasin>[2];
+  // the drain at the floor (-1.47), the pipe at -0.3 to a point outside the pool
+  const path = underBasin([[4, -1.47, 2], [4, -0.3, 2], [12, -0.3, 2]], { from: "port:bd", to: "dev:pump" }, area, floor);
+  const low = -1.5 - 0.15;
+  assert.deepEqual(path[1], [4, low, 2]);
+  // under the floor to just past the wall at x = 8, then up to -0.3
+  assert.ok(Math.abs(path[2][0] - 8.08) < 0.01 && path[2][1] === low);
+  assert.ok(Math.abs(path[3][0] - 8.08) < 0.01 && path[3][1] === -0.3);
+  assert.deepEqual(path.at(-1), [12, -0.3, 2]);
+  // a pipe that does not start at the drain stays as it is
+  const same = [[1, 0, 1], [2, 0, 1]] as [number, number, number][];
+  assert.equal(underBasin(same, { from: "port:x", to: "" }, area, floor), same);
+});

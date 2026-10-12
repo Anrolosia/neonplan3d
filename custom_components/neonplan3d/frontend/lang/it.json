@@ -1644,5 +1644,10 @@
  "pool_valves": "Valvole a sfera",
  "pool_valve_shut": "chiusa",
  "pool_valve_toggle": "Tocca per cambiare – come è davvero la valvola",
- "pool_joint": "Raccordo"
+ "pool_joint": "Raccordo",
+ "pool_depth": "Profondità vasca (m)",
+ "pool_rim": "Bordo sopra il prato (m)",
+ "pool_depth_hint": "Profondità: dal bordo al fondo. Una piscina profonda 1,50 m che sporge 20 cm: profondità 1,50, bordo 0,20. L'acqua sta 15 cm sotto il bordo.",
+ "pool_port_depth": "Prof.",
+ "pool_port_depth_hint": "Quanto sotto la linea dell'acqua (m): bocchette di solito 0,30, lo skimmer alla linea dell'acqua"
 }

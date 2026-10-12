@@ -13,7 +13,7 @@
 // open valves. Pure functions, no Home Assistant.
 
 import type { PoolPipe, PoolPort, ValvePosition } from "./model.ts";
-import { pipePath, type NodeAt } from "./geometry/runs.ts";
+import { pipePath, type NodeAt, type P3 } from "./geometry/runs.ts";
 import { nodePart, splitNode } from "./pool-ports.ts";
 
 export type { NodeAt };
@@ -192,10 +192,10 @@ export function waterColor(f: PipeFlow | undefined): [number, number, number] {
 }
 
 /** The pipes as 3D pieces along their paths (see pipePath), coloured by the water. */
-export function pipePieces(pipes: readonly PoolPipe[], flows: ReadonlyMap<string, PipeFlow>, nodeAt: NodeAt): PipePiece[] {
+export function pipePieces(pipes: readonly PoolPipe[], flows: ReadonlyMap<string, PipeFlow>, nodeAt: NodeAt, shape: (path: P3[], p: PoolPipe) => P3[] = (x) => x): PipePiece[] {
   const out: PipePiece[] = [];
   for (const p of pipes) {
-    const pts = pipePath(p, nodeAt);
+    const pts = shape(pipePath(p, nodeAt), p);
     if (pts.length < 2) continue;
     const f = flows.get(p.id);
     const color = waterColor(f);

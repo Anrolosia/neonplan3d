@@ -679,6 +679,10 @@ export interface OutdoorArea {
   pool_shape?: "round" | "oval" | null;
   /** Pool: an above-ground pool (a tub standing on the ground, `height` tall) instead of one let into the ground. */
   above?: boolean;
+  /** Pool: depth of the basin from the rim down to its floor (m); null = 1.5 m, an above-ground pool its wall height. */
+  depth?: number | null;
+  /** Pool in the ground: how far the rim stands above the lawn (m); null = 6 cm. */
+  rim?: number | null;
   /** Pool Pro: the pool's entities (water temperature, heat pump, filter pump, light, pH, chlorine, cover). */
   pool?: PoolLinks | null;
 }
@@ -713,6 +717,8 @@ export interface PoolPort {
   kind: "skimmer" | "drain" | "inlet" | "waste";
   x: number;
   z: number;
+  /** Skimmer and inlet: how far below the water line it sits (m); null = the skimmer at the water line, an inlet 30 cm deep. */
+  depth?: number | null;
 }
 
 /**
@@ -768,10 +774,25 @@ export interface PoolJoint {
 export type ValvePosition = "filter" | "backwash" | "rinse" | "waste" | "recirculate" | "closed";
 export const VALVE_POSITIONS: ValvePosition[] = ["filter", "backwash", "rinse", "waste", "recirculate", "closed"];
 
-/** Height of a pool's water surface in floor coordinates: below the ground, or near the rim of an above-ground pool. */
-export function poolWaterY(floor: Floor, a: OutdoorArea): number {
+/** Top of a pool's rim in floor coordinates: a little (or `rim` metres) above the lawn, or an above-ground pool's wall height. */
+export function poolRimY(floor: Floor, a: OutdoorArea): number {
   const g = groundLevel(floor) + (a.offset ?? 0);
-  return a.above ? g + poolHeight(a) - 0.15 : g + OUTDOOR_TOP.pool;
+  return g + (a.above ? poolHeight(a) : Math.min(2, Math.max(-0.3, a.rim ?? 0.06)));
+}
+
+/** A pool's depth from the rim down to its floor (m): its own, else 1.5 m in the ground or the wall height of an above-ground pool. */
+export function poolDepth(a: OutdoorArea): number {
+  return a.depth && a.depth >= 0.3 ? Math.min(5, a.depth) : a.above ? poolHeight(a) : 1.5;
+}
+
+/** Height of a pool's floor in floor coordinates. */
+export function poolFloorY(floor: Floor, a: OutdoorArea): number {
+  return poolRimY(floor, a) - poolDepth(a);
+}
+
+/** Height of a pool's water surface in floor coordinates: 15 cm below the rim (the middle of the skimmer). */
+export function poolWaterY(floor: Floor, a: OutdoorArea): number {
+  return poolRimY(floor, a) - 0.15;
 }
 
 /** Wall height of an above-ground pool (m). */

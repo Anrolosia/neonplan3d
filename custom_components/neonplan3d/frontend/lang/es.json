@@ -1644,5 +1644,10 @@
  "pool_valves": "Válvulas",
  "pool_valve_shut": "cerrada",
  "pool_valve_toggle": "Toca para cambiar: tal como está la válvula de verdad",
- "pool_joint": "Unión"
+ "pool_joint": "Unión",
+ "pool_depth": "Profundidad del vaso (m)",
+ "pool_rim": "Borde sobre el césped (m)",
+ "pool_depth_hint": "Profundidad: del borde al fondo. Una piscina de 1,50 m que sobresale 20 cm: profundidad 1,50, borde 0,20. El agua queda 15 cm bajo el borde.",
+ "pool_port_depth": "Prof.",
+ "pool_port_depth_hint": "Profundidad bajo la línea de agua (m): boquillas normalmente 0,30, el skimmer en la línea de agua"
 }

@@ -1644,5 +1644,10 @@
  "pool_valves": "Vannes",
  "pool_valve_shut": "fermée",
  "pool_valve_toggle": "Touchez pour changer – comme la vanne est réellement",
- "pool_joint": "Raccord"
+ "pool_joint": "Raccord",
+ "pool_depth": "Profondeur du bassin (m)",
+ "pool_rim": "Bord au-dessus de la pelouse (m)",
+ "pool_depth_hint": "Profondeur : du bord jusqu'au fond. Une piscine de 1,50 m qui dépasse de 20 cm : profondeur 1,50, bord 0,20. L'eau est 15 cm sous le bord.",
+ "pool_port_depth": "Prof.",
+ "pool_port_depth_hint": "Profondeur sous la ligne d'eau (m) : buses souvent 0,30, le skimmer à la ligne d'eau"
 }

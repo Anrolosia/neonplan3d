@@ -31,7 +31,7 @@ import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutag
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
 import { fieldFace, fieldSize } from "../solar.ts";
-import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, type SolarField, POOL_DEVICES } from "../model.ts";
+import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, type PoolPipe, type SolarField, POOL_DEVICES } from "../model.ts";
 
 /** A hologram card: the house's balance on the main plant, one plant (a balcony plant) on its own, or a device. */
 /** The unit a meter counts in (m³ when it does not say). */
@@ -94,11 +94,11 @@ import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
-import { centroid, furnitureFootprint, isLamp, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Furniture, type StartView } from "../model.ts";
+import { centroid, furnitureFootprint, isLamp, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Furniture, type StartView } from "../model.ts";
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
-import { pathLength, pipePath, pointAlong } from "../geometry/runs.ts";
-import { poolNodeAt } from "../pool-runs.ts";
+import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
+import { poolNodeAt, underBasin } from "../pool-runs.ts";
 import type { PipeTube } from "../viewer/viewer3d.ts";
 import type { PoolPiece } from "../viewer/pool-water.ts";
 import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
@@ -1107,6 +1107,7 @@ export class Fp3dView3d extends LitElement {
           y,
           color: glow.color,
           level: this.dimmed ? glow.level * 0.4 : glow.level,
+          floorY: poolFloorY(floor, area),
           flow: !!st.pump?.on,
           heat: !!st.heater?.heating,
           cover: st.cover?.closed ?? 0,
@@ -1436,7 +1437,9 @@ export class Fp3dView3d extends LitElement {
       const ports = links.ports ?? [];
       const flows = poolFlow({ pipes: links.pipes ?? [], ports, devices, pumpOn: pro && !!st.pump?.on, heaterOn: !!st.heater?.on, heating: !!st.heater?.heating });
       const nodeAt = poolNodeAt(b, floor, area);
-      out.push(...pipePieces(links.pipes ?? [], flows, nodeAt));
+      // pipes at the bottom drain run under the pool's floor
+      const shape = (path: P3[], p: PoolPipe) => underBasin(path, p, area, floor);
+      out.push(...pipePieces(links.pipes ?? [], flows, nodeAt, shape));
       // holes through a wall or the floor: a sleeve from the inside to the outside
       for (const j of links.joints ?? []) {
         if (j.kind !== "wall" && j.kind !== "floor") continue;
@@ -1446,7 +1449,7 @@ export class Fp3dView3d extends LitElement {
         tubes.push({ floorId: floor.id, points: [[a.x, top, a.z], [o.x, o.y, o.z]], radius: 0.05, water: null, fittings: [] });
       }
       for (const p of links.pipes ?? []) {
-        const points = pipePath(p, nodeAt);
+        const points = underBasin(pipePath(p, nodeAt), p, area, floor);
         if (points.length < 2) continue;
         const flow = flows.get(p.id);
         const fittings: PipeTube["fittings"] = [];

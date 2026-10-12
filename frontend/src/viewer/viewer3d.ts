@@ -349,6 +349,8 @@ interface FloorMaterials {
   frames: MeshBasicMaterial;
   glass: MeshBasicMaterial;
   blinds: MeshBasicMaterial;
+  /** Pool water: see-through, so the basin shows below it. */
+  water: MeshBasicMaterial;
   flow: MeshBasicMaterial;
   /** Energie Pro: the living overlay of the solar fields on this floor (garden, walls). */
   solarLive: MeshBasicMaterial;
@@ -1758,6 +1760,7 @@ export class FloorplanViewer {
         mask,
       ),
       blinds: themed(makeFoldable(new MeshBasicMaterial({ map: this.blindTexture, vertexColors: true, side: DoubleSide }), mask), this.themeUniform),
+      water: themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false, side: DoubleSide }), this.themeUniform),
       flow: flowMaterial(this.flowTime),
       solarLive: solarLiveMaterial(this.flowTime),
       lamps: themed(new MeshBasicMaterial({ vertexColors: true }), this.themeUniform),
@@ -1857,12 +1860,16 @@ export class FloorplanViewer {
       const glassWalls = new Mesh(geo.walls, materials.glassWall);
       const wallMesh = new Mesh(geo.walls, materials.wall);
       glassWalls.renderOrder = 6;
+      // pool water after the basin, see-through
+      const waterMesh = new Mesh(geo.water, materials.water);
+      waterMesh.renderOrder = 4;
       group.add(
         floorMesh,
         shadowMesh,
         pattern,
         glowMesh,
         wallMesh,
+        waterMesh,
         new LineSegments(geo.lines, materials.lines),
         framesMesh,
         blindsMesh,

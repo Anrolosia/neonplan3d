@@ -1644,5 +1644,10 @@
  "pool_valves": "Kugleventiler",
  "pool_valve_shut": "lukket",
  "pool_valve_toggle": "Tryk for at skifte – som ventilen faktisk står",
- "pool_joint": "Forbindelse"
+ "pool_joint": "Forbindelse",
+ "pool_depth": "Bassindybde (m)",
+ "pool_rim": "Kant over græsset (m)",
+ "pool_depth_hint": "Dybde: fra kanten til bunden. Et 1,50 m dybt bassin, der stikker 20 cm op: dybde 1,50, kant 0,20. Vandet står 15 cm under kanten.",
+ "pool_port_depth": "Dybde",
+ "pool_port_depth_hint": "Hvor dybt under vandlinjen (m): indløb typisk 0,30, skimmeren ved vandlinjen"
 }

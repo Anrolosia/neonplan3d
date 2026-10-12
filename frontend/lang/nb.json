@@ -1644,5 +1644,10 @@
  "pool_valves": "Kuleventiler",
  "pool_valve_shut": "stengt",
  "pool_valve_toggle": "Trykk for å bytte – slik ventilen faktisk står",
- "pool_joint": "Kobling"
+ "pool_joint": "Kobling",
+ "pool_depth": "Bassengdybde (m)",
+ "pool_rim": "Kant over plenen (m)",
+ "pool_depth_hint": "Dybde: fra kanten til bunnen. Et 1,50 m dypt basseng som stikker 20 cm opp: dybde 1,50, kant 0,20. Vannet står 15 cm under kanten.",
+ "pool_port_depth": "Dybde",
+ "pool_port_depth_hint": "Hvor dypt under vannlinjen (m): innløp vanligvis 0,30, skimmeren ved vannlinjen"
 }

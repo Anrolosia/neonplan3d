@@ -1644,5 +1644,10 @@
  "pool_valves": "Kuleventilar",
  "pool_valve_shut": "stengd",
  "pool_valve_toggle": "Trykk for å byte – slik ventilen faktisk står",
- "pool_joint": "Kopling"
+ "pool_joint": "Kopling",
+ "pool_depth": "Bassengdjupn (m)",
+ "pool_rim": "Kant over plenen (m)",
+ "pool_depth_hint": "Djupn: frå kanten til botnen. Eit 1,50 m djupt basseng som stikk 20 cm opp: djupn 1,50, kant 0,20. Vatnet står 15 cm under kanten.",
+ "pool_port_depth": "Djupn",
+ "pool_port_depth_hint": "Kor djupt under vasslinja (m): innløp vanlegvis 0,30, skimmeren ved vasslinja"
 }

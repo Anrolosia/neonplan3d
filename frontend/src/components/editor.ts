@@ -33,6 +33,7 @@ import { type CarLinks, type Background, OUTDOOR_TOP, sidelightLayout, DEFAULT_W
   normalizeBuilding,
   furnitureFootprint,
   type FreeWall,
+  poolDepth,
   poolHeight,
   poolShapePoints,
   POOL_DEVICES,
@@ -8137,6 +8138,19 @@ export class Fp3dEditor extends LitElement {
           (p) => html`<div class="fp3d-pool-row">
             <button class="fp3d-link" title=${this.t("card_open")} @click=${() => this.openCard(a.id, `port:${p.id}`)}>${this.poolNodeLabel(a, `port:${p.id}`)}</button>
             <span class="fp3d-muted">${this.partStatus(a, `port:${p.id}`)[0] ? "✓" : "○"}</span>
+            ${p.kind === "inlet" || p.kind === "skimmer"
+              ? html`<label class="fp3d-pool-depth" title=${this.t("pool_port_depth_hint")}
+                  >${this.t("pool_port_depth")}
+                  <input type="number" step="0.05" min="0" max="3" .value=${String(p.depth ?? (p.kind === "inlet" ? 0.3 : 0))} ?disabled=${!admin} @change=${(e: Event) => {
+                    const v = Number((e.target as HTMLInputElement).value.replace(",", "."));
+                    if (!Number.isFinite(v)) return;
+                    this.change((_, floor) => {
+                      const q = floor.outdoor.find((o) => o.id === a.id)?.pool?.ports?.find((x) => x.id === p.id);
+                      if (q) q.depth = Math.min(3, Math.max(0, round(v)));
+                    });
+                  }} />m</label
+                >`
+              : nothing}
             <button class="fp3d-btn fp3d-danger" ?disabled=${!admin} title=${this.t("delete")} @click=${() => this.deletePoolPort(a.id, p.id)}>✕</button>
           </div>`,
         )}
@@ -8230,7 +8244,10 @@ export class Fp3dEditor extends LitElement {
         ><input type="checkbox" .checked=${!!a.above} ?disabled=${!admin} @change=${(ev: Event) => this.updateOutdoor({ above: (ev.target as HTMLInputElement).checked || undefined })} />
         ${this.t("pool_above")}</label
       >
-      ${a.above ? this.len(this.t("pool_height"), poolHeight(a), (v) => this.updateOutdoor({ height: Math.min(2.5, Math.max(0.4, round(v))) }), 0.05, 0.4) : nothing}`;
+      ${a.above ? this.len(this.t("pool_height"), poolHeight(a), (v) => this.updateOutdoor({ height: Math.min(2.5, Math.max(0.4, round(v))) }), 0.05, 0.4) : nothing}
+      ${this.len(this.t("pool_depth"), poolDepth(a), (v) => this.updateOutdoor({ depth: Math.min(5, Math.max(0.3, round(v))) }), 0.05, 0.3)}
+      ${a.above ? nothing : this.len(this.t("pool_rim"), a.rim ?? 0.06, (v) => this.updateOutdoor({ rim: Math.min(2, Math.max(-0.3, round(v))) }), 0.01, -0.3)}
+      <p class="fp3d-sub fp3d-wide">${this.t("pool_depth_hint")}</p>`;
   }
 
   /** Pool Pro: the pool's entities (each role found by name when left empty), or the teaser without the add-on. */
@@ -12479,6 +12496,17 @@ export class Fp3dEditor extends LitElement {
       .fp3d-wv-fixnote {
         color: #ffb547;
         font-size: 12.5px;
+      }
+      .fp3d-pool-depth {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        color: var(--fp3d-muted);
+      }
+      .fp3d-pool-depth input {
+        width: 58px;
+        padding: 3px 5px;
       }
       .fp3d-wv-marquee {
         fill: rgba(55, 224, 255, 0.08);

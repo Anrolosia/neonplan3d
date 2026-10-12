@@ -1644,5 +1644,10 @@
  "pool_valves": "Kogelkranen",
  "pool_valve_shut": "dicht",
  "pool_valve_toggle": "Tik om te wisselen – zoals de kraan echt staat",
- "pool_joint": "Verbinding"
+ "pool_joint": "Verbinding",
+ "pool_depth": "Diepte van het bad (m)",
+ "pool_rim": "Rand boven het gazon (m)",
+ "pool_depth_hint": "Diepte: van de rand tot de bodem. Een 1,50 m diep zwembad dat 20 cm uitsteekt: diepte 1,50, rand 0,20. Het water staat 15 cm onder de rand.",
+ "pool_port_depth": "Diepte",
+ "pool_port_depth_hint": "Hoe diep onder de waterlijn (m): inlaten meestal 0,30, de skimmer op de waterlijn"
 }

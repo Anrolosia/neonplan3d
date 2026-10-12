@@ -73,6 +73,8 @@ export interface FloorGeometry {
   holes: Vec2[][];
   /** Walls (with folding upper parts) and furniture. */
   walls: BufferGeometry;
+  /** Water surfaces of pools (see-through: the basin shows below). */
+  water: BufferGeometry;
   lines: BufferGeometry;
   /** Multiply layer darkening the floor along walls and under furniture (baked occlusion). */
   shadow: BufferGeometry;
@@ -363,7 +365,8 @@ export function buildFloorGeometry(
 
   // ---------------------------------------------------------------- furniture and shadows
   const shadow = buildShadow(outline.edges, floor.rooms, spans);
-  pushOutdoor(wallBuf, lines, floor);
+  const waterBuf = new GeoBuffer();
+  pushOutdoor(wallBuf, lines, floor, waterBuf);
   for (const s of solar) pushModules(wallBuf, lines, s.face, s.field, floor.elevation);
 
   // lamps are drawn live by the viewer (they glow with their light)
@@ -387,6 +390,7 @@ export function buildFloorGeometry(
     roomTris,
     holes: cutHoles,
     walls: wallBuf.geometry(),
+    water: waterBuf.geometry(),
     lines: lines.geometry(),
     shadow: shadow.geometry(),
     buckets,
