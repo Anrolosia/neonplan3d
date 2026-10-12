@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Sentarse y dormir",
  "wv_cat_light": "Luces",
  "wv_cat_pack": "De tus packs",
- "wv_cat_energy": "Energía"
+ "wv_cat_energy": "Energía",
+ "block_some_fixed": "🔒 Una pieza está fijada: el bloque solo se mueve cuando todas estén liberadas.",
+ "unfix_all": "Liberar todo"
 }

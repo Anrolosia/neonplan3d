@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Siedzenie i spanie",
  "wv_cat_light": "Oświetlenie",
  "wv_cat_pack": "Z twoich pakietów",
- "wv_cat_energy": "Energia"
+ "wv_cat_energy": "Energia",
+ "block_some_fixed": "🔒 Jedna część jest zablokowana – blok da się przesunąć dopiero po odblokowaniu wszystkich.",
+ "unfix_all": "Odblokuj wszystko"
 }

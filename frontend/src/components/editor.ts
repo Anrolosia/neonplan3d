@@ -6013,6 +6013,7 @@ export class Fp3dEditor extends LitElement {
       const p = svgPoint(e);
       (e.currentTarget as Element).closest("svg")!.setPointerCapture(e.pointerId);
       const own = items.filter((i) => ids.includes(i.id));
+      if (ids.length > 1 && ids.some((x) => this.isFixedItem("furniture", x))) return;
       if (ids.length > 1 && own.length) {
         const s0 = Math.min(...own.map((i) => i.s0));
         this.wallDrag = { id, ids, w: Math.max(...own.map((i) => i.s1)) - s0, x: p.x, y: p.y, base: this._doc, s0, y0: 0, lift: own.every((i) => { const m = floor.furniture.find((x) => x.id === i.id); return !!m && canLift(m); }), moved: false };
@@ -6433,7 +6434,9 @@ export class Fp3dEditor extends LitElement {
   private renderWallSetFoot(frame: WallFrame, ids: string[], sp: { s0: number; s1: number; y0: number; y1: number } | null, span: (a: number, b: number) => readonly [number, number]) {
     const block = !this._wallMulti.length;
     const fixed = ids.every((id) => this.isFixedItem("furniture", id));
+    const some = !fixed && ids.some((id) => this.isFixedItem("furniture", id));
     return html`<b>${block ? `▣ ${this.t("block_title")}` : this.t("multi_title", { n: ids.length })}</b>
+      ${some ? html`<span class="fp3d-wv-fixnote">${this.t("block_some_fixed")}</span>` : nothing}
       ${block
         ? html`<div class="fp3d-seg" role="group">
               <button aria-pressed="true">${this.t("wv_block_all")}</button>
@@ -6455,12 +6458,14 @@ export class Fp3dEditor extends LitElement {
             this.moveSetOnWall(frame, ids, frame.rightward ? ds : -ds, null);
           }, 0.01, 0)
         : nothing}
-      <button class="fp3d-btn" @click=${() => {
+      <button class="fp3d-btn ${some ? "fp3d-primary" : ""}" @click=${() => {
         const set = new Set(ids);
+        // partly fixed: everything loose; else all fixed or all loose
+        const lock = !fixed && !some;
         this.change((_, floor) => {
-          for (const m of floor.furniture) if (set.has(m.id)) m.locked = !fixed || null;
+          for (const m of floor.furniture) if (set.has(m.id)) m.locked = lock || null;
         });
-      }}>${fixed ? `🔓 ${this.t("unfix")}` : `🔒 ${this.t("fix")}`}</button>
+      }}>${fixed ? `🔓 ${this.t("unfix")}` : some ? `🔓 ${this.t("unfix_all")}` : `🔒 ${this.t("fix")}`}</button>
       <button class="fp3d-btn fp3d-danger" @click=${() => this.deleteOnWall(ids)}>${this.t("delete")}</button>`;
   }
 
@@ -8374,9 +8379,11 @@ export class Fp3dEditor extends LitElement {
     const items = (this.floor?.furniture ?? []).filter((m) => set.includes(m.id));
     const block = !this._multi.length && !!items[0]?.group;
     const fixed = items.every((m) => this.isFixedItem("furniture", m.id));
+    const some = !fixed && items.some((m) => this.isFixedItem("furniture", m.id));
     return html`<section>
       <div class="fp3d-h3row"><h3>${block ? `▣ ${this.t("block_title")}` : this.t("multi_title", { n: items.length })}</h3></div>
       <p class="fp3d-sub">${this.t(block ? "block_hint" : "multi_hint")}</p>
+      ${some ? html`<p class="fp3d-sub fp3d-wv-fixnote">${this.t("block_some_fixed")}</p>` : nothing}
       <div class="fp3d-block-parts">
         ${items.map(
           (m) => html`<button class="fp3d-chip" title=${this.t("block_part_edit")} @click=${() => {
@@ -8392,7 +8399,7 @@ export class Fp3dEditor extends LitElement {
         <button class="fp3d-btn" @click=${() => this.rotateSelection(-90)}>${this.t("rotate_left")}</button>
         <button class="fp3d-btn" @click=${() => this.rotateSelection(90)}>${this.t("rotate_right")}</button>
         <button class="fp3d-btn" @click=${() => this.duplicateFurniture()}>${this.t("duplicate")}</button>
-        <button class="fp3d-btn" @click=${() => this.lockSelection(!fixed)}>${fixed ? `🔓 ${this.t("unfix")}` : `🔒 ${this.t("fix")}`}</button>
+        <button class="fp3d-btn ${some ? "fp3d-primary" : ""}" @click=${() => this.lockSelection(!fixed && !some)}>${fixed ? `🔓 ${this.t("unfix")}` : some ? `🔓 ${this.t("unfix_all")}` : `🔒 ${this.t("fix")}`}</button>
         <button class="fp3d-btn fp3d-danger" @click=${() => this.deleteFurniture()}>${this.t("delete")}</button>
       </div>
       ${this.renderMultiToggle()}
@@ -12468,6 +12475,10 @@ export class Fp3dEditor extends LitElement {
         text-anchor: middle;
         font-weight: 600;
         pointer-events: none;
+      }
+      .fp3d-wv-fixnote {
+        color: #ffb547;
+        font-size: 12.5px;
       }
       .fp3d-wv-marquee {
         fill: rgba(55, 224, 255, 0.08);

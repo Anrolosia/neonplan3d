@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Sedersi e dormire",
  "wv_cat_light": "Luci",
  "wv_cat_pack": "Dai tuoi pack",
- "wv_cat_energy": "Energia"
+ "wv_cat_energy": "Energia",
+ "block_some_fixed": "🔒 Un pezzo è bloccato: il blocco si sposta solo quando tutti sono sbloccati.",
+ "unfix_all": "Sblocca tutto"
 }

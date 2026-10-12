@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Zitten & liggen",
  "wv_cat_light": "Lampen",
  "wv_cat_pack": "Uit je packs",
- "wv_cat_energy": "Energie"
+ "wv_cat_energy": "Energie",
+ "block_some_fixed": "🔒 Een onderdeel is vastgezet – het blok beweegt pas als alles is losgemaakt.",
+ "unfix_all": "Alles losmaken"
 }

@@ -1638,5 +1638,7 @@
  "wv_cat_living": "S'asseoir & dormir",
  "wv_cat_light": "Luminaires",
  "wv_cat_pack": "De vos packs",
- "wv_cat_energy": "Énergie"
+ "wv_cat_energy": "Énergie",
+ "block_some_fixed": "🔒 Une pièce est verrouillée – le bloc ne bouge que lorsque toutes sont libérées.",
+ "unfix_all": "Tout libérer"
 }

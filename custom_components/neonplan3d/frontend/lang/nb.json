@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Sitte & ligge",
  "wv_cat_light": "Lamper",
  "wv_cat_pack": "Fra pakkene dine",
- "wv_cat_energy": "Energi"
+ "wv_cat_energy": "Energi",
+ "block_some_fixed": "🔒 En del er låst – blokken kan flyttes først når alle deler er løsnet.",
+ "unfix_all": "Løsne alle"
 }

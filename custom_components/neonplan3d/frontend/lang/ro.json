@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Șezut și dormit",
  "wv_cat_light": "Lumini",
  "wv_cat_pack": "Din pachetele tale",
- "wv_cat_energy": "Energie"
+ "wv_cat_energy": "Energie",
+ "block_some_fixed": "🔒 O piesă este fixată – blocul se mută abia când toate sunt eliberate.",
+ "unfix_all": "Eliberează tot"
 }

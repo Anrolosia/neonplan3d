@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Sezení a ležení",
  "wv_cat_light": "Svítidla",
  "wv_cat_pack": "Z vašich balíčků",
- "wv_cat_energy": "Energie"
+ "wv_cat_energy": "Energie",
+ "block_some_fixed": "🔒 Jeden díl je zamčený – blok půjde přesunout, až budou všechny uvolněné.",
+ "unfix_all": "Uvolnit vše"
 }

@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Ülés és fekvés",
  "wv_cat_light": "Lámpák",
  "wv_cat_pack": "A csomagjaidból",
- "wv_cat_energy": "Energia"
+ "wv_cat_energy": "Energia",
+ "block_some_fixed": "🔒 Egy eleme rögzítve van – a blokk csak akkor mozdul, ha mindegyik fel van oldva.",
+ "unfix_all": "Összes feloldása"
 }

@@ -1638,5 +1638,7 @@
  "wv_cat_living": "Sedenje in ležanje",
  "wv_cat_light": "Svetila",
  "wv_cat_pack": "Iz vaših paketov",
- "wv_cat_energy": "Energija"
+ "wv_cat_energy": "Energija",
+ "block_some_fixed": "🔒 En del je zaklenjen – blok se premakne šele, ko so vsi deli sproščeni.",
+ "unfix_all": "Sprosti vse"
 }
