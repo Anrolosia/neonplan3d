@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Din pachetele tale",
  "wv_cat_energy": "Energie",
  "block_some_fixed": "🔒 O piesă este fixată – blocul se mută abia când toate sunt eliberate.",
- "unfix_all": "Eliberează tot"
+ "unfix_all": "Eliberează tot",
+ "pool_valves": "Robineți cu bilă",
+ "pool_valve_shut": "închis",
+ "pool_valve_toggle": "Atinge pentru a schimba – cum stă robinetul de fapt",
+ "pool_joint": "Racord"
 }

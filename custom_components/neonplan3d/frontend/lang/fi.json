@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Paketeistasi",
  "wv_cat_energy": "Energia",
  "block_some_fixed": "🔒 Osa on lukittu – ryhmää voi siirtää vasta, kun kaikki osat on vapautettu.",
- "unfix_all": "Vapauta kaikki"
+ "unfix_all": "Vapauta kaikki",
+ "pool_valves": "Palloventtiilit",
+ "pool_valve_shut": "kiinni",
+ "pool_valve_toggle": "Napauta vaihtaaksesi – kuten venttiili oikeasti on",
+ "pool_joint": "Liitos"
 }

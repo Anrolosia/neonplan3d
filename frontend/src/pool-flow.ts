@@ -125,7 +125,9 @@ export function poolFlow(input: PoolFlowInput): Map<string, PipeFlow> {
       });
       if (TO_WASTE.has(v)) waste = true;
     } else if (next.length > 1) {
-      // a split: through the heat pump while it is on, else the bypass
+      // a split: through the heat pump while it is on, else the bypass – among the ways a closed valve leaves open
+      // (the bypass shut: the water goes through the heat pump anyway, cold while it is off)
+      next = next.filter((p) => !closed(p.to) && !pipeShut(p));
       const viaHeat = next.filter((p) => downstream(p).heat);
       const bypass = next.filter((p) => !downstream(p).heat);
       if (viaHeat.length && bypass.length) next = input.heaterOn ? viaHeat : bypass;

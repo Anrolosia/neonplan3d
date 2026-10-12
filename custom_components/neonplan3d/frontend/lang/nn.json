@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Frå pakkane dine",
  "wv_cat_energy": "Energi",
  "block_some_fixed": "🔒 Ein del er låst – blokka kan flyttast først når alle delar er løyste.",
- "unfix_all": "Løys alle"
+ "unfix_all": "Løys alle",
+ "pool_valves": "Kuleventilar",
+ "pool_valve_shut": "stengd",
+ "pool_valve_toggle": "Trykk for å byte – slik ventilen faktisk står",
+ "pool_joint": "Kopling"
 }

@@ -99,3 +99,10 @@ test("gas and water meters come from the energy dashboard (sensors only)", async
     { gas: "sensor.gaszaehler", water: null },
   );
 });
+
+test("a pump or heat pump linked on its device in the plan counts when the pool names none", async () => {
+  const { poolLinksWithDevices } = await import("./pool.ts");
+  const floors = [{ furniture: [{ type: "pool_pump", entity: "switch.garage_poolpumpe" }, { type: "pool_heat_pump", entity: "none" }] }];
+  assert.deepEqual(poolLinksWithDevices({}, floors), { pump: "switch.garage_poolpumpe", heater: undefined });
+  assert.equal(poolLinksWithDevices({ pump: "switch.other" }, floors).pump, "switch.other");
+});

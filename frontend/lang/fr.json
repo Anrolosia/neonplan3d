@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "De vos packs",
  "wv_cat_energy": "Énergie",
  "block_some_fixed": "🔒 Une pièce est verrouillée – le bloc ne bouge que lorsque toutes sont libérées.",
- "unfix_all": "Tout libérer"
+ "unfix_all": "Tout libérer",
+ "pool_valves": "Vannes",
+ "pool_valve_shut": "fermée",
+ "pool_valve_toggle": "Touchez pour changer – comme la vanne est réellement",
+ "pool_joint": "Raccord"
 }

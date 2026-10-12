@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "De tus packs",
  "wv_cat_energy": "Energía",
  "block_some_fixed": "🔒 Una pieza está fijada: el bloque solo se mueve cuando todas estén liberadas.",
- "unfix_all": "Liberar todo"
+ "unfix_all": "Liberar todo",
+ "pool_valves": "Válvulas",
+ "pool_valve_shut": "cerrada",
+ "pool_valve_toggle": "Toca para cambiar: tal como está la válvula de verdad",
+ "pool_joint": "Unión"
 }

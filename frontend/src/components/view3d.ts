@@ -80,7 +80,7 @@ const GRID_OFF_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="non
 import { STAGE, type Theme } from "../themes.ts";
 import { HEAT_SCALES, heatColor, heatGradient, roomValues, type HeatMode } from "../heatmap.ts";
 import { furnitureName } from "../furniture-names.ts";
-import { fetchImage } from "../api.ts";
+import { fetchImage, saveBuilding } from "../api.ts";
 import { formatNumber, translate, type I18nKey } from "../i18n.ts";
 import { getPacks, mountBase, packItem, packsVersion } from "../packs.ts";
 import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from "../parking.ts";
@@ -95,7 +95,7 @@ import { load3d } from "../load3d.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
 import { centroid, furnitureFootprint, isLamp, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Furniture, type StartView } from "../model.ts";
-import { poolAreas, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
+import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong } from "../geometry/runs.ts";
 import { poolNodeAt } from "../pool-runs.ts";
@@ -1095,7 +1095,7 @@ export class Fp3dView3d extends LitElement {
       const holoSize = (b.settings.roof.hologram ?? DEFAULT_HOLOGRAM).size;
       const pieces: PoolPiece[] = [];
       for (const { floor, area } of poolAreas(b.floors)) {
-        const st = poolState(hass, area.pool);
+        const st = poolState(hass, poolLinksWithDevices(area.pool, b.floors));
         // nothing of the pool found in Home Assistant: the plain water stays, no empty card
         if (!Object.values(st.entities).some(Boolean)) continue;
         const glow = poolWaterGlow(st);
@@ -1432,7 +1432,7 @@ export class Fp3dView3d extends LitElement {
     for (const { floor, area } of poolAreas(b.floors)) {
       const links = area.pool!;
       if (!links.pipes?.length && !links.joints?.length) continue;
-      const st = poolState(hass, links);
+      const st = poolState(hass, poolLinksWithDevices(links, b.floors));
       const ports = links.ports ?? [];
       const flows = poolFlow({ pipes: links.pipes ?? [], ports, devices, pumpOn: pro && !!st.pump?.on, heaterOn: !!st.heater?.on, heating: !!st.heater?.heating });
       const nodeAt = poolNodeAt(b, floor, area);
@@ -1694,6 +1694,7 @@ export class Fp3dView3d extends LitElement {
               )
             : nothing}
           ${open && s.cover ? html`<div class="fp3d-holo-pool-line">${t("pool_cover")}: ${coverText(s.cover)}</div>` : nothing}
+          ${open ? this.renderPoolValves(area) : nothing}
           ${open && !this.ro && (h || s.pump?.switchable || s.light || s.cover)
             ? html`<div class="fp3d-holo-media-controls fp3d-holo-car-controls">
                 ${h && h.kind !== "switch" && target !== null
@@ -1717,6 +1718,74 @@ export class Fp3dView3d extends LitElement {
             : nothing}
         </div>
       </div>`;
+  }
+
+  /**
+   * Pool Pro: the ball valves of the pipes and the filter's six-way valve – set by hand on the card, as they really
+   * stand (Home Assistant does not know them). Only for administrators: it changes the plan.
+   */
+  private renderPoolValves(areaId: string) {
+    const b = this.building;
+    const hass = this.hass;
+    if (!b || !hasFeature("pool") || !hass?.user?.is_admin || this.ro) return nothing;
+    const t = (k: Parameters<typeof translate>[1]) => translate(hass, k);
+    const floor = b.floors.find((f) => f.outdoor.some((o) => o.id === areaId));
+    const links = floor?.outdoor.find((o) => o.id === areaId)?.pool;
+    if (!floor || !links) return nothing;
+    const name = (node: string): string => {
+      const [kind, id] = node.split(":");
+      if (kind === "port") {
+        const port = links.ports?.find((q) => q.id === id);
+        return port ? t(`pool_port_${port.kind}` as Parameters<typeof translate>[1]) : "?";
+      }
+      if (kind === "joint") return links.joints?.find((j) => j.id === id)?.name || t("pool_joint");
+      if (kind === "dev") {
+        const m = floor.furniture.find((f) => f.id === id);
+        return m ? m.name || t(`furn_${m.type}` as Parameters<typeof translate>[1]) : "?";
+      }
+      return "…";
+    };
+    const valves = (links.pipes ?? []).flatMap((pipe) => (pipe.fittings ?? []).filter((f) => f.kind === "valve").map((f) => ({ pipe, f })));
+    const devValves = floor.furniture.filter((m) => m.type === "pool_valve");
+    const filter = floor.furniture.find((m) => m.type === "pool_filter");
+    if (!valves.length && !devValves.length && !filter) return nothing;
+    const save = (mutate: (next: Building) => void) => {
+      const next = structuredClone(b);
+      mutate(next);
+      this.building = next;
+      saveBuilding(hass, next).catch((err) => this.serviceFailed("neonplan3d/building/save", err));
+    };
+    const area = (next: Building) => next.floors.find((f) => f.id === floor.id)!.outdoor.find((o) => o.id === areaId)!.pool!;
+    const chip = (open: boolean, label: string, toggle: () => void) =>
+      html`<button class="fp3d-holo-valve ${open ? "fp3d-holo-on" : ""}" title=${t("pool_valve_toggle")} @click=${toggle}><i>${open ? "●" : "○"}</i>${label}<small>${open ? t("pool_valve_open") : t("pool_valve_shut")}</small></button>`;
+    const POSITIONS = ["filter", "backwash", "rinse", "recirculate", "waste", "closed"] as const;
+    return html`<div class="fp3d-holo-valves">
+      ${filter
+        ? html`<div class="fp3d-holo-pool-line">${t("furn_pool_filter")}</div>
+            <div class="fp3d-holo-valve-pos">
+              ${POSITIONS.map(
+                (v) => html`<button class=${(filter.valve_position ?? "filter") === v ? "fp3d-holo-on" : ""} @click=${() => save((next) => (next.floors.find((f) => f.id === floor.id)!.furniture.find((m) => m.id === filter.id)!.valve_position = v === "filter" ? null : v))}>${t(`valve_${v}` as Parameters<typeof translate>[1])}</button>`,
+              )}
+            </div>`
+        : nothing}
+      ${valves.length || devValves.length ? html`<div class="fp3d-holo-pool-line">${t("pool_valves")}</div>` : nothing}
+      ${valves.map(({ pipe, f }) =>
+        chip(f.open !== false, `${name(pipe.from)} → ${name(pipe.to)}`, () =>
+          save((next) => {
+            const fit = area(next).pipes?.find((q) => q.id === pipe.id)?.fittings?.find((q) => q.id === f.id);
+            if (fit) fit.open = f.open === false;
+          }),
+        ),
+      )}
+      ${devValves.map((m) =>
+        chip(m.valve_open !== false, m.name || t("furn_pool_valve"), () =>
+          save((next) => {
+            const d = next.floors.find((x) => x.id === floor.id)!.furniture.find((q) => q.id === m.id);
+            if (d) d.valve_open = m.valve_open === false;
+          }),
+        ),
+      )}
+    </div>`;
   }
 
   /** A service call from a card was refused: Home Assistant shows the reason as a notice at the bottom. */
@@ -2049,7 +2118,7 @@ export class Fp3dView3d extends LitElement {
     const targets = new Map<string, string>();
     // Pool Pro: what the (first) pool reports, for the devices of its technical room
     const poolFirst = hasFeature("pool") ? poolAreas(b.floors)[0] : undefined;
-    const poolLive = poolFirst ? poolState(hass, poolFirst.area.pool) : null;
+    const poolLive = poolFirst && this.building ? poolState(hass, poolLinksWithDevices(poolFirst.area.pool, this.building.floors)) : poolFirst ? poolState(hass, poolFirst.area.pool) : null;
     for (const floor of b.floors) {
       for (const f of floor.furniture) {
         const linked = this.furnitureLinks.get(f.id);
@@ -4524,6 +4593,48 @@ export class Fp3dView3d extends LitElement {
         margin-top: 5px;
         font-size: 12px;
         opacity: 0.85;
+      }
+      /* Pool Pro: ball valves and the six-way valve, set by hand */
+      .fp3d-holo-valves {
+        display: grid;
+        gap: 4px;
+        margin-top: 4px;
+        max-height: 220px;
+        overflow-y: auto;
+        pointer-events: auto;
+      }
+      .fp3d-holo-valve,
+      .fp3d-holo-valve-pos button {
+        font: inherit;
+        font-size: 11.5px;
+        color: inherit;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(91, 124, 255, 0.35);
+        border-radius: 8px;
+        padding: 4px 8px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .fp3d-holo-valve {
+        display: grid;
+        grid-template-columns: 14px 1fr auto;
+        gap: 6px;
+        align-items: center;
+      }
+      .fp3d-holo-valve i {
+        font-style: normal;
+        color: #ff6b5a;
+      }
+      .fp3d-holo-valve.fp3d-holo-on i {
+        color: #4dff9a;
+      }
+      .fp3d-holo-valve small {
+        opacity: 0.75;
+      }
+      .fp3d-holo-valve-pos {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
       }
       .fp3d-holo-on {
         border-color: var(--fp3d-accent) !important;

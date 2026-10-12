@@ -593,7 +593,7 @@
  "valve_waste": "Vypouštění",
  "valve_recirculate": "Cirkulace",
  "valve_closed": "Zavřeno",
- "pool_valve_open": "otevřený",
+ "pool_valve_open": "otevřeno",
  "pool_pipes": "Potrubí",
  "pool_pipe_draw": "Kreslit potrubí",
  "pool_pipe_draw_hint": "Potrubí spojuje přípojky a zařízení ve směru toku: od skimmeru k čerpadlu, dál k filtru, přes tepelné čerpadlo nebo bypass k tryskám. Na rozbočce teče voda přes tepelné čerpadlo, dokud je zapnuté, jinak přes bypass; zavřený kulový ventil zastaví. Klepnutím na ventil v plánu: otevřít/zavřít.",
@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Z vašich balíčků",
  "wv_cat_energy": "Energie",
  "block_some_fixed": "🔒 Jeden díl je zamčený – blok půjde přesunout, až budou všechny uvolněné.",
- "unfix_all": "Uvolnit vše"
+ "unfix_all": "Uvolnit vše",
+ "pool_valves": "Kulové ventily",
+ "pool_valve_shut": "zavřeno",
+ "pool_valve_toggle": "Klepnutím přepnete – tak, jak ventil skutečně stojí",
+ "pool_joint": "Spojka"
 }

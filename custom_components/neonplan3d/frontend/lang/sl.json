@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Iz vaših paketov",
  "wv_cat_energy": "Energija",
  "block_some_fixed": "🔒 En del je zaklenjen – blok se premakne šele, ko so vsi deli sproščeni.",
- "unfix_all": "Sprosti vse"
+ "unfix_all": "Sprosti vse",
+ "pool_valves": "Krogelni ventili",
+ "pool_valve_shut": "zaprt",
+ "pool_valve_toggle": "Tapnite za preklop – tako, kot ventil res stoji",
+ "pool_joint": "Spoj"
 }

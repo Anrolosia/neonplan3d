@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Fra dine pakker",
  "wv_cat_energy": "Energi",
  "block_some_fixed": "🔒 En del er fastlåst – blokken kan først flyttes, når alle dele er løsnet.",
- "unfix_all": "Løsn alle"
+ "unfix_all": "Løsn alle",
+ "pool_valves": "Kugleventiler",
+ "pool_valve_shut": "lukket",
+ "pool_valve_toggle": "Tryk for at skifte – som ventilen faktisk står",
+ "pool_joint": "Forbindelse"
 }

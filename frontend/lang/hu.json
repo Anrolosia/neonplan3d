@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "A csomagjaidból",
  "wv_cat_energy": "Energia",
  "block_some_fixed": "🔒 Egy eleme rögzítve van – a blokk csak akkor mozdul, ha mindegyik fel van oldva.",
- "unfix_all": "Összes feloldása"
+ "unfix_all": "Összes feloldása",
+ "pool_valves": "Golyóscsapok",
+ "pool_valve_shut": "zárva",
+ "pool_valve_toggle": "Koppintással vált – ahogy a csap valójában áll",
+ "pool_joint": "Csatlakozás"
 }

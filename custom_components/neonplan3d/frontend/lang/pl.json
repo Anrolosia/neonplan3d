@@ -1640,5 +1640,9 @@
  "wv_cat_pack": "Z twoich pakietów",
  "wv_cat_energy": "Energia",
  "block_some_fixed": "🔒 Jedna część jest zablokowana – blok da się przesunąć dopiero po odblokowaniu wszystkich.",
- "unfix_all": "Odblokuj wszystko"
+ "unfix_all": "Odblokuj wszystko",
+ "pool_valves": "Zawory kulowe",
+ "pool_valve_shut": "zamknięty",
+ "pool_valve_toggle": "Stuknij, aby przełączyć – tak, jak zawór naprawdę stoi",
+ "pool_joint": "Złączka"
 }
