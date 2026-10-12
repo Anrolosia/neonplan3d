@@ -442,7 +442,7 @@ export class Fp3dEditor extends LitElement {
   /** The toolbar's wall view button is on: the next tap on a wall in the plan opens it. */
   private declare _wallPick: boolean;
   /** Pool Pro in the wall view: laying a pipe, or placing a ball valve or sight glass on one. */
-  private declare _runMode: "draw" | "valve" | "sight" | "hole_wall" | "hole_floor" | "tee" | "y" | "feed" | null;
+  private declare _runMode: "draw" | "valve" | "sight" | "hole_wall" | "hole_floor" | "tee" | "y" | "feed" | "erase" | null;
   /** Pool Pro, "Technik zeichnen": the wall view draws the technical room (devices, lines from outside, pipes). */
   private declare _techMode: boolean;
   /** The pool line being brought in ("skimmer", "drain", "inlet", "waste"): the next tap on the wall places it. */
@@ -6187,6 +6187,13 @@ export class Fp3dEditor extends LitElement {
         this._wallView = null;
         return;
       }
+      if ((e.key === "Delete" || e.key === "Backspace") && admin && rc && this._runSel && !wset.length && !(e.target as HTMLElement).closest("input, select, textarea")) {
+        e.preventDefault();
+        const id = this._runSel.pipe;
+        this.changePool(rc.pool.id, (l) => (l.pipes = (l.pipes ?? []).filter((y) => y.id !== id)));
+        this._runSel = null;
+        return;
+      }
       if ((e.key === "Delete" || e.key === "Backspace") && admin && wset.length && !(e.target as HTMLElement).closest("input, select, textarea")) {
         e.preventDefault();
         this.deleteOnWall(wset);
@@ -6387,7 +6394,7 @@ export class Fp3dEditor extends LitElement {
               <span>↕</span><b></b>
             </div>`
           : html`<svg
-          class="fp3d-wv-svg ${this._runMode ? "fp3d-wv-drawing" : ""} ${this._runMode === "valve" || this._runMode === "sight" ? "fp3d-wv-fitmode" : ""}"
+          class="fp3d-wv-svg ${this._runMode ? "fp3d-wv-drawing" : ""} ${this._runMode === "valve" || this._runMode === "sight" ? "fp3d-wv-fitmode" : ""} ${this._runMode === "erase" ? "fp3d-wv-fitmode fp3d-wv-erase" : ""}"
           viewBox="${vb.x0} ${vb.y0} ${vb.w} ${vb.h}"
           preserveAspectRatio="xMidYMid meet"
           @wheel=${(e: WheelEvent) => {
@@ -6956,6 +6963,46 @@ export class Fp3dEditor extends LitElement {
     return {};
   }
 
+  /**
+   * The eraser: a ball valve or sight glass under the pointer goes; else the pipe; else a hole, T or Y with every
+   * pipe at it (a hole's way outside too, so its pool line can be brought in anew).
+   */
+  private eraseAt(c: RunCtx, s: number, y: number): void {
+    const near = (a: number, b: number, r: number) => Math.hypot(a - s, b - y) < r;
+    for (const r of c.runs)
+      for (const f of r.fittings)
+        if (near(f.s, f.y, 0.1 * Math.max(1, this.wvScale))) {
+          this.changePool(c.pool.id, (l) => {
+            const q = l.pipes?.find((x) => x.id === r.id);
+            if (q) q.fittings = (q.fittings ?? []).filter((x) => x.id !== f.id);
+          });
+          return;
+        }
+    const nodeAt = poolNodeAt(this._doc, c.floor, c.pool);
+    const joint = (c.pool.pool?.joints ?? []).find((j) => {
+      const node = j.kind === "wall" || j.kind === "floor" ? `joint:${j.id}:inside` : `joint:${j.id}`;
+      const q = nodeAt(node);
+      if (!q) return false;
+      const w = toWall(c.frame, [q.x, q.z]);
+      return w.d > -0.3 && w.d < 1.6 && near(w.s, q.y, 0.1);
+    });
+    if (joint) {
+      const part = `joint:${joint.id}`;
+      this.changePool(c.pool.id, (l) => {
+        l.joints = (l.joints ?? []).filter((j) => j.id !== joint.id);
+        l.pipes = (l.pipes ?? []).filter((x) => nodePart(x.from) !== part && nodePart(x.to) !== part);
+      });
+      this._runSel = null;
+      return;
+    }
+    const hit = this.runPick(c, s, y, true);
+    if (hit.pipe) {
+      const id = hit.pipe.id;
+      this.changePool(c.pool.id, (l) => (l.pipes = (l.pipes ?? []).filter((x) => x.id !== id)));
+      this._runSel = null;
+    }
+  }
+
   /** A press on the wall while laying a pipe or placing a fitting. */
   private runDown(e: PointerEvent, c: RunCtx): void {
     if (!this._runMode || !this.isAdmin) return;
@@ -7017,6 +7064,7 @@ export class Fp3dEditor extends LitElement {
     if (!mode) return;
     if (mode === "hole_wall" || mode === "hole_floor" || mode === "tee" || mode === "y") return this.placeJoint(c, mode, s, y);
     if (mode === "feed") return this.placeFeed(c, s, y);
+    if (mode === "erase") return this.eraseAt(c, s, y);
     const hit = node ? { node } : this.runPick(c, s, y, mode !== "draw");
     if (mode !== "draw") {
       if (hit.pipe) this.addFitting(c, hit.pipe.id, hit.pipe.p, mode);
@@ -7253,12 +7301,22 @@ export class Fp3dEditor extends LitElement {
         <button aria-pressed=${this._runMode === "draw"} @click=${() => {
           this._runMode = "draw";
           this._runSel = null;
-        }}>✏ ${this.t("tech_draw")}</button>
-        <button aria-pressed=${this._runMode !== "draw" && this._runMode !== "feed"} @click=${() => {
+        }}><span>✏</span>${this.t("tech_draw")}</button>
+        <button aria-pressed=${this._runMode !== "draw" && this._runMode !== "feed" && this._runMode !== "erase"} @click=${() => {
           this._runDraft = null;
           this._runMode = null;
-        }}>✋ ${this.t("tech_pick")}</button>
+        }}><span>✋</span>${this.t("tech_pick")}</button>
+        <button aria-pressed=${this._runMode === "erase"} title=${this.t("tech_erase_hint")} @click=${() => {
+          this._runDraft = null;
+          this._runSel = null;
+          this._feedKind = null;
+          this._runMode = this._runMode === "erase" ? "draw" : "erase";
+        }}><span>🧽</span>${this.t("tech_erase")}</button>
       </div>
+      <button class="fp3d-btn fp3d-tech-undo" ?disabled=${!this._canUndo} title="Ctrl+Z" @click=${() => {
+        this._runDraft = null;
+        this.undo();
+      }}>↶ ${this.t("undo")}</button>
       <h4>${this.t("tech_feeds")}</h4>
       ${kinds.map((k) => {
         const done = feedDone(area, k);
@@ -7287,6 +7345,7 @@ export class Fp3dEditor extends LitElement {
     const devs = c.floor.furniture.filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type));
     const box = (n: number | null, text: string) => html`<div class="fp3d-tech-step ${n === null ? "fp3d-done" : ""}"><b>${n === null ? "✓" : this.t("tech_step", { n })}</b>${text}</div>`;
     if (this._runMode === "feed") return box(1, this.t("tech_feed_place"));
+    if (this._runMode === "erase") return html`<div class="fp3d-tech-step fp3d-tech-erasing"><b>🧽 ${this.t("tech_erase")}</b>${this.t("tech_erase_hint")}</div>`;
     if (this._runMode === "valve" || this._runMode === "sight") return box(4, this.t("tech_step_fit"));
     if (this._runDraft) return box(3, this.t("tech_step_drawing"));
     if (!ports.some((q) => q.kind !== "waste")) return box(1, this.t("tech_no_ports"));
@@ -12605,9 +12664,33 @@ export class Fp3dEditor extends LitElement {
       .fp3d-wv-dry line {
         stroke-dasharray: 0.04 0.03;
       }
+      .fp3d-wv-erase {
+        cursor: not-allowed;
+      }
+      .fp3d-wv-erase .fp3d-wv-run:hover line,
+      .fp3d-wv-erase .fp3d-wv-valve:hover circle,
+      .fp3d-wv-erase .fp3d-wv-sight:hover,
+      .fp3d-wv-erase .fp3d-wv-joint:hover circle {
+        stroke: #ff4d6d;
+      }
+      .fp3d-tech-step.fp3d-tech-erasing {
+        border-color: #ff4d6d;
+        background: rgba(255, 77, 109, 0.12);
+      }
+      .fp3d-tech-undo {
+        justify-self: start;
+      }
       .fp3d-tech-kit .fp3d-tech-pen {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .fp3d-tech-kit .fp3d-tech-pen button {
+        display: grid;
+        justify-items: center;
+        gap: 2px;
+        padding: 6px 2px;
+        font-size: 0.82em;
+        white-space: nowrap;
       }
       .fp3d-tech-feed {
         display: flex;
