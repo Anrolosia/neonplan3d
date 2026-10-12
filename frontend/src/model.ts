@@ -516,7 +516,22 @@ export interface MediaPreset {
   content: string;
 }
 
+/** Fun pack "pets": an animal living in the 3D house. */
+export interface Pet {
+  id: string;
+  kind: "cat" | "dog" | "rabbit";
+  name: string;
+  /** Fur colour preset (see PET_FURS). */
+  fur: string;
+  /** The floor it lives on (null: the ground floor). */
+  floor_id?: string | null;
+}
+
+export const PET_FURS = ["orange", "tabby", "black", "white", "grey", "brown", "calico"] as const;
+
 export interface BuildingSettings {
+  /** Fun pack "pets": the animals and whether they are shown. */
+  pets?: { on: boolean; list: Pet[] } | null;
   /** Stations and playlists for the speakers' quick menu (Klang & Kino). */
   media_presets?: MediaPreset[];
   /** Favourites of the house: scenes, scripts, automations, buttons and switches in the central menu of the 3D view (#145). */

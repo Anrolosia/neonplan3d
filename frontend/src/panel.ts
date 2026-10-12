@@ -671,6 +671,8 @@ export class Floorplan3dPanel extends LitElement {
       class="fp3d-body"
       .hass=${this.hass}
       .packs=${this.data.packs}
+      .building=${this.data.building}
+      @building-edit=${(e: CustomEvent<Building>) => this.data.edit(e.detail)}
       @packs-changed=${() => void this.data.reloadPacks()}
       @offers-seen=${() => (this._newOffers = 0)}
     ></fp3d-extensions>`;
