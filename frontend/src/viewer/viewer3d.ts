@@ -2064,6 +2064,8 @@ export class FloorplanViewer {
         lives.push(overlay);
         writeSolarLevels(overlay, this.solarLevels);
       }
+      // roof windows that only show in the roof ride and fade with it
+      if (geo.winRoof?.solid.count) part.add(new Mesh(geo.winRoof.solid.geometry(), winSolid), new LineSegments(geo.winRoof.lines.geometry(), winLines));
       part.renderOrder = 8;
       group.add(part);
       let win: Group | null = null;

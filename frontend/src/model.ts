@@ -473,6 +473,11 @@ export interface RoofWindow {
   name?: string | null;
   /** Fixed: cannot be moved by accident. */
   locked?: boolean;
+  /**
+   * Stays over its room when the roof fades out (zooming in on a floor or a room), open or shut, the blind down or
+   * up (#482). Off (the default): the window shows in the roof only and fades out with it.
+   */
+  float?: boolean;
 }
 
 /** A string of solar modules: one or more fields wired together to one inverter. */
