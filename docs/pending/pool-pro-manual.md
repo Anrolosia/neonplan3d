@@ -50,3 +50,12 @@ Back into 4.17 (before "### 4.18 3D beside") when Pool Pro is released:
 
 
 **Ports at the right height:** the skimmer sits at the water line, inlets as deep as set under **Depth** (0.30 m below the water line by default), the bottom drain on the basin floor – its pipe runs out under the floor and only comes up outside the basin. Inlets and the skimmer sit in the basin wall: their pipe comes in level from outside through the wall, and every inlet has a nozzle pointing into the pool that glows in the water's colour while water flows. For the **heat pump** you choose in the device list where its **connections** are: right, left or back. Ball valves and the six-way valve's position are switched on the pool's glass card (for administrators), the way they really stand. The pump and heat pump may also be linked right on the device in the plan.
+
+
+**Draw the equipment (the technical room):** in the wall view of the wall your system hangs on, switch on **🛠 Pool equipment** at the top. On the left there are three things:
+
+1. **Lines from the pool** – skimmer, bottom drain, inlets and waste drain (backwash). Tap a line, then the spot on the wall where it comes into the room: right at the bottom it comes out of the floor, higher up through the wall. The way outside – under the ground to the skimmer, under the basin to the bottom drain, with a T-piece to several inlets – NeonPlan lays by itself. A tick shows which lines are in.
+2. **Devices** – filter pump, sand filter, heat pump, dosing unit: tap them, they stand at the wall and move like furniture.
+3. **Fittings** – ball valve and sight glass: tap, then tap a pipe.
+
+**Drawing pipes:** with **✏ Draw** you tap a device or a line and drag to the next one (or tap point by point; the line runs level and upright). At its end it turns once into the connection by itself. Dragged onto a pipe it makes a **T-piece**. NeonPlan works out the right connection of a device (suction side, pressure side, return, waste, the heat pump's in and out) and which way the water runs. While you draw, the water already flows in the drawing; the bottom bar says what is missing ("Sand filter · return not connected", "2 loose pipe ends") – or **"All connected – the water flows."** With **✋ Select** you choose a pipe to move its points, delete it or put a valve in.

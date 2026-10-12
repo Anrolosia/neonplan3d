@@ -13,14 +13,15 @@ import { closeGaps, straightenEdges, suggestedThickness } from "../geometry/gaps
 import { clampIntoRoom, keepInRoom, sharedEdge, snapToWall } from "../geometry/snap.ts";
 import { cornerPoint, nearestOnPath, onWall, pipePath, type P3 } from "../geometry/runs.ts";
 import { connectionsAt, laidPipe, planConnection, poolNodeAt, runLead, runsOnWall, splitPipe, type Connection, type ConnectVia, type WallRun } from "../pool-runs.ts";
-import { devicePorts, FILTER_VALVES, jointPorts, nodePart, poolPortFlow, portFlow, splitNode } from "../pool-ports.ts";
+import { devicePorts, FILTER_VALVES, jointPortAt, jointPorts, nodePart, poolPortFlow, portFlow, splitNode, type PortName } from "../pool-ports.ts";
+import { autoPort, feedDone, nodeFlow, orientPipe, sketchIssues } from "../pool-sketch.ts";
 import { holeInRoom } from "../geometry/holes.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, labOn, manualUrl, released, shopUrl } from "../features.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
 import { poolEntities, type PoolEntities } from "../pool.ts";
-import { nearestOnOutline } from "../pool-flow.ts";
+import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
@@ -309,6 +310,8 @@ export class Fp3dEditor extends LitElement {
     _wallPicTick: { state: true },
     _wallPick: { state: true },
     _runMode: { state: true },
+    _techMode: { state: true },
+    _feedKind: { state: true },
     _runDraft: { state: true },
     _runSel: { state: true },
     _conn: { state: true },
@@ -439,7 +442,13 @@ export class Fp3dEditor extends LitElement {
   /** The toolbar's wall view button is on: the next tap on a wall in the plan opens it. */
   private declare _wallPick: boolean;
   /** Pool Pro in the wall view: laying a pipe, or placing a ball valve or sight glass on one. */
-  private declare _runMode: "draw" | "valve" | "sight" | "hole_wall" | "hole_floor" | "tee" | "y" | null;
+  private declare _runMode: "draw" | "valve" | "sight" | "hole_wall" | "hole_floor" | "tee" | "y" | "feed" | null;
+  /** Pool Pro, "Technik zeichnen": the wall view draws the technical room (devices, lines from outside, pipes). */
+  private declare _techMode: boolean;
+  /** The pool line being brought in ("skimmer", "drain", "inlet", "waste"): the next tap on the wall places it. */
+  private declare _feedKind: string | null;
+  /** Where a press in the drawing went down (a drag from there draws a pipe to where it is let go). */
+  private techPress: { s: number; y: number } | null = null;
   /** Pool Pro: the part whose card is open ("dev:<id>", "joint:<id>", "port:<id>") and its pool. */
   private declare _card: { pool: string; part: string } | null;
   /** The card's open connection being joined: its target and stops. */
@@ -581,6 +590,8 @@ export class Fp3dEditor extends LitElement {
     this._wallId = null;
     this._edgeHi = null;
     this._wallView = null;
+    this._techMode = false;
+    this._feedKind = null;
     this._wallSel = null;
     this._wallMulti = [];
     this._wallSingle = false;
@@ -6002,6 +6013,11 @@ export class Fp3dEditor extends LitElement {
     const snaps = (ids: string[]) => [0, L, ...items.filter((i) => !ids.includes(i.id)).flatMap((i) => [i.s0, i.s1]), ...holes.flatMap((o) => [o.s0, o.s1])];
     const down = (e: PointerEvent, id: string) => {
       if (!admin) return;
+      if (rc && this._runMode) {
+        this.techPress = rc.pt(e);
+        this.runDown(e, rc);
+        return;
+      }
       e.stopPropagation();
       this._runSel = null;
       // shift (or "Mehrere auswählen" on a tablet): the piece joins the choice or leaves it
@@ -6203,7 +6219,18 @@ export class Fp3dEditor extends LitElement {
           <b>${this.t("wall_view")} · ${room.name} · ${this.t("wall_n", { a: v.edge + 1, b: ((v.edge + 1) % n) + 1 })} · ${this.m(L, 2)}</b>
           <button class="fp3d-btn" title=${`${this.t("wall_next")}: ${wallName(rightEdge)}`} @click=${() => go(rightEdge)}>›</button>
           <span class="fp3d-wv-grow"></span>
-          ${rc && admin
+          ${admin && hasFeature("pool") && released("pool") && this.runPool
+            ? html`<button class="fp3d-btn ${this._techMode ? "fp3d-primary" : ""}" title=${this.t("tech_mode_hint")} @click=${() => {
+                this._techMode = !this._techMode;
+                this._wallSel = null;
+                this._wallMulti = [];
+                this._runSel = null;
+                this._runDraft = null;
+                this._feedKind = null;
+                this._runMode = this._techMode ? "draw" : null;
+              }}>🛠 ${this.t("tech_mode")}</button>`
+            : nothing}
+          ${rc && admin && !this._techMode
             ? html`<button class="fp3d-btn ${this._runMode === "draw" ? "fp3d-primary" : ""}" @click=${() => {
                 this._wallSel = null;
                 this._runSel = null;
@@ -6270,8 +6297,10 @@ export class Fp3dEditor extends LitElement {
           viewBox="${-0.5} ${-0.35} ${L + 1} ${H + 0.9}"
           preserveAspectRatio="xMidYMid meet"
           @pointerdown=${(e: PointerEvent) => {
-            if (rc && this._runMode) this.runDown(e, rc);
-            else if (this._runSel) this._runSel = null;
+            if (rc && this._runMode) {
+              this.techPress = rc.pt(e);
+              this.runDown(e, rc);
+            } else if (this._runSel) this._runSel = null;
             else wallDown(e);
           }}
           @pointermove=${(e: PointerEvent) => {
@@ -6285,7 +6314,13 @@ export class Fp3dEditor extends LitElement {
               this.requestUpdate();
             }
           }}
-          @pointerup=${() => {
+          @pointerup=${(e: PointerEvent) => {
+            const press = this.techPress;
+            this.techPress = null;
+            if (rc && this._techMode && this._runMode === "draw" && this._runDraft && press) {
+              const q = rc.pt(e);
+              if (Math.hypot(q.s - press.s, q.y - press.y) > 0.12) this.runAt(rc, q.s, q.y, e.altKey, 1, null);
+            }
             up();
             this.runPointUp();
             this.fittingUp(rc);
@@ -6380,7 +6415,9 @@ export class Fp3dEditor extends LitElement {
         </div>
         </div>
         <div class="fp3d-wv-foot">
-          ${rc && (this._runMode || (this._runSel && !sel))
+          ${rc && this._techMode && !this._runDraft && !this._runSel && !sel && (this._runMode === "draw" || this._runMode === "feed")
+            ? html`<span class="fp3d-muted">${this.t(this._runMode === "feed" ? "tech_feed_place" : "tech_start")}</span> ${this.renderTechIssues(rc)}`
+            : rc && (this._runMode || (this._runSel && !sel))
             ? this.renderRunFoot(rc)
             : many && admin
             ? this.renderWallSetFoot(frame, wset, setSpan, span)
@@ -6666,6 +6703,7 @@ export class Fp3dEditor extends LitElement {
     const pool = !!rc;
     const energy = hasFeature("energy_pro");
     if (!pool) return this.isAdmin ? this.renderWallFurniture(frame, room) : nothing;
+    if (this._techMode && rc) return this.renderTechKit(frame, room, rc);
     if (!this.isAdmin || (!pool && !energy)) return nothing;
     const add = (t: string) => html`<button class="fp3d-btn" @click=${() => this.addOnWall(t, frame, room)}>+ ${this.t(`furn_${t}` as I18nKey)}</button>`;
     const fit = (mode: "valve" | "sight", label: I18nKey) =>
@@ -6690,9 +6728,9 @@ export class Fp3dEditor extends LitElement {
     return this.poolArea ?? this.floor?.outdoor.find((o) => o.type === "pool" && o.points.length >= 3);
   }
 
-  /** The pipe tools of the wall view (pool parts, holes, T-pieces): parked – only with the lab switch, while the pool round is rethought. */
+  /** The pipe tools of the wall view: "Technik zeichnen" (Pool Pro) switched on, or the lab switch. */
   private get canLayRuns(): boolean {
-    return labOn() && !!this.runPool;
+    return (labOn() || this._techMode) && !!this.runPool;
   }
 
   private runFrame(key: string): WallFrame | null {
@@ -6752,6 +6790,18 @@ export class Fp3dEditor extends LitElement {
       if (d < 0.12 && (!best || d < best.d)) best = { node, d };
     }
     if (best) return { node: best.node };
+    // drawing the technical room: a press on a device's body ends (or starts) at the device as a whole
+    if (this._techMode && !pipesOnly) {
+      // every pool device up to 1.6 m in front of the wall (a pump stands out into the room), seen from the front
+      const dev = c.floor.furniture.find((f) => {
+        if (!(POOL_DEVICES as readonly string[]).includes(f.type) || f.type === "pool_valve") return false;
+        const w = furnitureFootprint(f).map((q) => toWall(c.frame, q));
+        if (Math.min(...w.map((q) => q.d)) > 1.6 || Math.max(...w.map((q) => q.d)) < -0.3) return false;
+        const y0 = mountBase(c.floor, f);
+        return Math.min(...w.map((q) => q.s)) - 0.03 <= s && s <= Math.max(...w.map((q) => q.s)) + 0.03 && y0 - 0.03 <= y && y <= y0 + f.h + 0.03;
+      });
+      if (dev) return { node: `dev:${dev.id}` };
+    }
     for (const r of c.runs)
       for (const pc of r.pieces) {
         const [vs, vy] = [pc.s1 - pc.s0, pc.y1 - pc.y0];
@@ -6823,6 +6873,7 @@ export class Fp3dEditor extends LitElement {
     const mode = this._runMode;
     if (!mode) return;
     if (mode === "hole_wall" || mode === "hole_floor" || mode === "tee" || mode === "y") return this.placeJoint(c, mode, s, y);
+    if (mode === "feed") return this.placeFeed(c, s, y);
     const hit = node ? { node } : this.runPick(c, s, y, mode !== "draw");
     if (mode !== "draw") {
       if (hit.pipe) this.addFitting(c, hit.pipe.id, hit.pipe.p, mode);
@@ -6885,6 +6936,22 @@ export class Fp3dEditor extends LitElement {
     this._runDraft = null;
     if (!d || !floor) return;
     const pts = [...d.pts, ...extra];
+    // drawing the technical room: into its end the line turns once – level first, then straight up or down into it –
+    // instead of a slanted last piece
+    const frame = this._techMode ? this.runFrame(d.wall) : null;
+    const area0 = this._techMode ? this.floor?.outdoor.find((o) => o.id === d.pool) : undefined;
+    if (frame && area0 && !extra.length && (to || toT)) {
+      const start = pts.length ? pts[pts.length - 1] : (() => {
+        const n = d.from ? poolNodeAt(this._doc, floor, area0)(d.from) : null;
+        return n ? ([n.x, n.y, n.z] as P3) : d.fromT;
+      })();
+      const n = toT ? { x: toT[0], y: toT[1], z: toT[2] } : poolNodeAt(this._doc, floor, area0)(to);
+      if (start && n) {
+        const a = toWall(frame, [start[0], start[2]]);
+        const b = toWall(frame, [n.x, n.z]);
+        if (Math.abs(a.s - b.s) > 0.03 && Math.abs(start[1] - n.y) > 0.03) pts.push(onWall(frame, b.s, start[1], d.d));
+      }
+    }
     if (!pts.length && !toT && (!to || to === d.from) && !d.fromT) return;
     let chosen: string | null = null;
     this.changePool(d.pool, (l, area) => {
@@ -6918,8 +6985,25 @@ export class Fp3dEditor extends LitElement {
         const q = jointPorts(j.kind).find((x) => !taken.has(`joint:${id}:${x}`));
         return q ? `joint:${id}:${q}` : n;
       };
-      const from = d.fromT ? tee(d.fromT) : free(d.from);
-      const end = toT ? tee(toT) : free(to, [from]);
+      let from = d.fromT ? tee(d.fromT) : free(d.from);
+      let end = toT ? tee(toT) : free(to, [from]);
+      // a device as a whole: the connection the line's other end asks for (water in: the suction side …)
+      const devs = floor.furniture.filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type)).map((f) => ({ id: f.id, type: f.type }));
+      const taken = (dev: string) => pipes.flatMap((p) => [p.from, p.to]).filter((n) => nodePart(n) === dev).map((n) => splitNode(n).port).filter((q): q is PortName => !!q);
+      const toWasteNode = (n: string) => {
+        const { kind, id } = splitNode(n);
+        if (kind === "port") return area.pool?.ports?.find((q) => q.id === id)?.kind === "waste";
+        return kind === "joint" && /kanal|waste|abwasser|backwash/i.test(joints.find((j) => j.id === id)?.name ?? "");
+      };
+      const resolve = (n: string, other: string) => {
+        const { kind, id, port } = splitNode(n);
+        if (kind !== "dev" || port) return n;
+        const type = floor.furniture.find((f) => f.id === id)?.type ?? "";
+        const q = autoPort(type, other ? nodeFlow(other, area, devs) : null, toWasteNode(other), taken(`dev:${id}`));
+        return q ? `dev:${id}:${q}` : n;
+      };
+      from = resolve(from, end);
+      end = resolve(end, from);
       const xz = pts.map((q): Vec2 => [round(q[0]), round(q[2])]);
       const hs = pts.map((q) => round(q[1]));
       const ext = d.extend;
@@ -6940,12 +7024,125 @@ export class Fp3dEditor extends LitElement {
         chosen = q.id;
         return;
       }
-      const pipe: PoolPipe = { id: uid("pipe"), from, to: end, floor_id: floor.id, points: xz, heights: hs, height: height ?? hs[hs.length - 1] ?? null };
+      let pipe: PoolPipe = { id: uid("pipe"), from, to: end, floor_id: floor.id, points: xz, heights: hs, height: height ?? hs[hs.length - 1] ?? null };
+      // the water runs from where it comes out to where it goes in, whichever way the line was drawn
+      pipe = orientPipe(pipe, from ? nodeFlow(from, area, devs) : null, end ? nodeFlow(end, area, devs) : null);
       pipes.push(pipe);
       chosen = pipe.id;
     });
-    if (chosen) this._runSel = { pipe: chosen, pt: null };
-    this._runMode = null;
+    if (chosen && !this._techMode) this._runSel = { pipe: chosen, pt: null };
+    // drawing the technical room: the pen stays in the hand
+    this._runMode = this._techMode ? "draw" : null;
+  }
+
+  /**
+   * A line from the pool brought into the room where the wall was tapped: low down it comes out of the floor, higher
+   * up through the wall. The way outside – under the ground to the skimmer, the drain, the inlets (with a T-piece for
+   * several) or the waste drain – is laid by itself; inside it waits for the pipes drawn to it.
+   */
+  private placeFeed(c: RunCtx, s: number, y: number): void {
+    const kind = this._feedKind;
+    const floor = this.floor;
+    this._feedKind = null;
+    this._runMode = "draw";
+    if (!kind || !floor) return;
+    const ss = Math.round(s * 20) / 20;
+    const low = y < 0.25;
+    const face = c.gap - RUN_GAP;
+    const thick = sharedEdge(c.floor, c.room.id, c.frame.a, c.frame.b) ? this._doc.settings.wall_interior : this._doc.settings.wall_exterior;
+    const name = this.t(`feed_${kind}` as I18nKey);
+    const [x, z] = onWallXZ(c.frame, ss, low ? c.gap : face);
+    const hole: PoolJoint = low
+      ? { id: uid("joint"), kind: "floor", x, z, y: 0, name }
+      : { id: uid("joint"), kind: "wall", x, z, y: Math.round(y * 20) / 20, nx: round(c.frame.n[0]), nz: round(c.frame.n[1]), depth: round(thick), name };
+    this.changePool(c.pool.id, (l, area) => {
+      l.joints = [...(l.joints ?? []), hole];
+      // no waste drain yet: one outside, a metre beyond the hole
+      let ports = (l.ports ?? []).filter((q) => q.kind === kind);
+      if (kind === "waste" && !ports.length) {
+        const out = jointPortAt(hole, "outside");
+        const port = { id: uid("port"), kind: "waste" as const, x: round(out.x - c.frame.n[0] * 1), z: round(out.z - c.frame.n[1] * 1) };
+        l.ports = [...(l.ports ?? []), port];
+        ports = [port];
+      }
+      if (!ports.length) return;
+      const nodeAt = poolNodeAt(this._doc, floor, area);
+      const lookup = (n: string) => {
+        const { kind: k, id, port } = splitNode(n);
+        const j = k === "joint" ? (l.joints ?? []).find((q) => q.id === id) : undefined;
+        if (j) return jointPortAt(j, port);
+        const pp = k === "port" ? (l.ports ?? []).find((q) => q.id === id) : undefined;
+        return pp ? (nodeAt(n) ?? { x: pp.x, y: 0.02, z: pp.z }) : nodeAt(n);
+      };
+      const flow = (n: string) => {
+        const { kind: k, id } = splitNode(n);
+        if (k === "port") {
+          const pp = (l.ports ?? []).find((q) => q.id === id);
+          return pp ? poolPortFlow(pp.kind) : null;
+        }
+        return null;
+      };
+      const plan = planConnection({ from: `joint:${hole.id}:outside`, vias: [], to: ports.map((q) => `port:${q.id}`), floorId: floor.id }, lookup, l.joints ?? [], flow, (k) => uid(k));
+      l.joints = [...(l.joints ?? []), ...plan.joints];
+      l.pipes = [...(l.pipes ?? []), ...plan.pipes];
+    });
+  }
+
+  /** The side bar of "Technik zeichnen": devices, the pool's lines to bring in, ball valve and sight glass, what is missing. */
+  private renderTechKit(frame: WallFrame, room: Room, c: RunCtx) {
+    const area = c.pool;
+    const add = (t: string) => html`<button class="fp3d-wv-tile" @click=${() => this.addOnWall(t, frame, room)}>
+      <span class="fp3d-wv-tile-pic">${this.kitPics.get(t) ? html`<img src=${this.kitPics.get(t)} alt="" />` : html`<i></i>`}</span>
+      <span class="fp3d-wv-tile-name">${this.t(`furn_${t}` as I18nKey)}</span>
+    </button>`;
+    void this.askKitPics(["pool_pump", "pool_filter", "pool_heat_pump", "pool_dosing"]);
+    const kinds = ["skimmer", "drain", "inlet", "waste"].filter((k) => k === "waste" || (area.pool?.ports ?? []).some((q) => q.kind === k));
+    const fit = (mode: "valve" | "sight", label: I18nKey) =>
+      html`<button class="fp3d-btn ${this._runMode === mode ? "fp3d-primary" : ""}" title=${this.t("wall_run_fit")} @click=${() => {
+        this._runDraft = null;
+        this._runMode = this._runMode === mode ? "draw" : mode;
+      }}>+ ${this.t(label)}</button>`;
+    return html`<aside class="fp3d-wv-kit fp3d-tech-kit">
+      <div class="fp3d-seg fp3d-tech-pen" role="group">
+        <button aria-pressed=${this._runMode === "draw"} @click=${() => {
+          this._runMode = "draw";
+          this._runSel = null;
+        }}>✏ ${this.t("tech_draw")}</button>
+        <button aria-pressed=${this._runMode !== "draw" && this._runMode !== "feed"} @click=${() => {
+          this._runDraft = null;
+          this._runMode = null;
+        }}>✋ ${this.t("tech_pick")}</button>
+      </div>
+      <h4>${this.t("tech_feeds")}</h4>
+      ${kinds.map((k) => {
+        const done = feedDone(area, k);
+        return html`<button class="fp3d-btn fp3d-tech-feed ${this._feedKind === k ? "fp3d-primary" : ""} ${done ? "fp3d-on" : ""}" ?disabled=${done} @click=${() => {
+          this._runDraft = null;
+          this._feedKind = this._feedKind === k ? null : k;
+          this._runMode = this._feedKind ? "feed" : "draw";
+        }}><i>${k === "waste" ? "🟤" : "〰"}</i>${this.t(`feed_${k}` as I18nKey)}${done ? html`<small>✓</small>` : nothing}</button>`;
+      })}
+      ${!(area.pool?.ports ?? []).some((q) => q.kind !== "waste") ? html`<p class="fp3d-sub">${this.t("tech_no_ports")}</p>` : nothing}
+      <h4>${this.t("tech_devices")}</h4>
+      <div class="fp3d-wv-tiles">${(["pool_pump", "pool_filter", "pool_heat_pump", "pool_dosing"] as const).map(add)}</div>
+      <h4>${this.t("tech_fittings")}</h4>
+      ${fit("valve", "wall_run_valve")} ${fit("sight", "wall_run_sight")}
+      <p class="fp3d-sub">${this.t("tech_hint")}</p>
+    </aside>`;
+  }
+
+  /** "Technik zeichnen": what is still missing, or that the water flows. */
+  private renderTechIssues(c: RunCtx) {
+    const devs = c.floor.furniture.filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type)).map((f) => ({ id: f.id, type: f.type }));
+    const issues = sketchIssues(c.pool, devs);
+    if (!issues.length) return html`<span class="fp3d-tech-ok">✓ ${this.t("tech_ok")}</span>`;
+    const loose = issues.filter((i) => i.kind === "loose").length;
+    const text = [
+      ...(loose ? [this.t("tech_issue_loose", { n: loose })] : []),
+      ...issues.filter((i) => i.kind === "port").map((i) => this.t("tech_issue_port", { name: this.poolNodeLabel(c.pool, i.node) })),
+      ...issues.filter((i) => i.kind === "feed").map((i) => this.t("tech_issue_feed", { name: this.t(`feed_${i.node}` as I18nKey) })),
+    ];
+    return html`<span class="fp3d-tech-issues">⚠ ${text.slice(0, 4).join(" · ")}${text.length > 4 ? " …" : ""}</span>`;
   }
 
   /** A hole through the wall (or the floor in front of it), a T- or Y-piece where the wall was tapped. */
@@ -7231,11 +7428,29 @@ export class Fp3dEditor extends LitElement {
         j.kind === "wall" || j.kind === "floor" ? marker(`joint:${j.id}:inside`, this.jointLabel(c.pool, j.id), "fp3d-wv-hole-mark", j.id) : marker(`joint:${j.id}`, this.jointLabel(c.pool, j.id), "", j.id),
       ),
     ];
+    // drawing the technical room: the water flows in the drawing as if the pump ran (blue, warm after a heating heat
+    // pump, brown to the waste drain); a pipe it does not reach stays grey
+    const wet = this._techMode
+      ? poolFlow({
+          pipes: c.pool.pool?.pipes ?? [],
+          ports: c.pool.pool?.ports ?? [],
+          devices: this._doc.floors.flatMap((f) => f.furniture).filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type)).map((f) => ({ id: f.id, type: f.type as PoolDeviceType, open: f.valve_open !== false, valve: f.valve_position ?? null })),
+          pumpOn: true,
+          heaterOn: false,
+          heating: false,
+        })
+      : null;
+    const wetStyle = (id: string) => {
+      const f = wet?.get(id);
+      if (!f?.active) return "";
+      const [r, g, b] = waterColor(f).map((v) => Math.round(v * 255));
+      return `stroke: rgb(${r}, ${g}, ${b}); stroke-opacity: 0.95`;
+    };
     return svg`<g class="fp3d-wv-runs">
       ${nodes}
       ${c.runs.map(
-        (r) => svg`<g class="fp3d-wv-run ${r.id === sel ? "fp3d-wv-run-sel" : ""}">
-          ${r.pieces.map((pc) => svg`<line class=${pc.y0 < -0.01 && pc.y1 < -0.01 ? "fp3d-wv-under" : ""} x1=${X(pc.s0)} y1=${Y(pc.y0)} x2=${X(pc.s1)} y2=${Y(pc.y1)} @pointerdown=${(e: PointerEvent) => this.runPieceDown(e, c, r, pc.k)} />`)}
+        (r) => svg`<g class="fp3d-wv-run ${r.id === sel ? "fp3d-wv-run-sel" : ""} ${wet && !wet.get(r.id)?.active ? "fp3d-wv-dry" : ""}">
+          ${r.pieces.map((pc) => svg`<line class=${pc.y0 < -0.01 && pc.y1 < -0.01 ? "fp3d-wv-under" : ""} style=${wetStyle(r.id)} x1=${X(pc.s0)} y1=${Y(pc.y0)} x2=${X(pc.s1)} y2=${Y(pc.y1)} @pointerdown=${(e: PointerEvent) => this.runPieceDown(e, c, r, pc.k)} />`)}
           ${r.ends.map((e) => svg`<circle class="fp3d-wv-end" cx=${X(e.s)} cy=${Y(e.y)} r="0.035" />`)}
           ${r.fittings.map((f) =>
             f.kind === "valve"
@@ -12164,6 +12379,36 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-wv-runpt.fp3d-on {
         fill: var(--fp3d-accent);
+      }
+      .fp3d-wv-dry line {
+        stroke-dasharray: 0.04 0.03;
+      }
+      .fp3d-tech-kit .fp3d-tech-pen {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .fp3d-tech-feed {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .fp3d-tech-feed i {
+        font-style: normal;
+      }
+      .fp3d-tech-feed small {
+        margin-left: auto;
+        color: #4dff9a;
+      }
+      .fp3d-tech-feed.fp3d-on {
+        opacity: 0.75;
+      }
+      .fp3d-tech-ok {
+        color: #4dff9a;
+        font-weight: 600;
+      }
+      .fp3d-tech-issues {
+        color: #ffb547;
+        font-size: 12.5px;
       }
       .fp3d-wv-end {
         fill: none;

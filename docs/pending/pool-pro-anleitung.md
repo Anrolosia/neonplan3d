@@ -50,3 +50,12 @@ Zurück nach 4.17 (vor „### 4.18 3D daneben“), wenn Pool Pro freigegeben wir
 
 
 **Anschlüsse in der richtigen Höhe:** Der Skimmer sitzt an der Wasserlinie, Einläufe so tief, wie unter **Tiefe** eingestellt (Standard 0,30 m unter der Wasserlinie), der Bodenablauf auf dem Beckenboden – sein Rohr läuft unter dem Boden hinaus und kommt erst außerhalb des Beckens hoch. Einläufe und Skimmer sitzen in der Beckenwand: Ihr Rohr kommt waagerecht von außen durch die Wand, an jedem Einlauf zeigt eine Düse in den Pool und leuchtet in der Wasserfarbe, solange Wasser fließt. Bei der **Wärmepumpe** wählst du in der Geräteliste, wo ihre **Anschlüsse** sind: rechts, links oder hinten. Kugelhähne und die Stellung des 6-Wege-Ventils stellst du auf der Pool-Glaskarte um (für Admins), so wie sie wirklich stehen. Pumpe und Wärmepumpe können auch direkt am Gerät im Plan verknüpft sein.
+
+
+**Technik zeichnen (der Technikraum):** In der Wandansicht der Wand, an der deine Anlage hängt, schaltest du oben **🛠 Pooltechnik** ein. Links stehen dann drei Dinge:
+
+1. **Leitungen vom Pool** – Skimmer, Bodenablauf, Einläufe und Kanal (Rückspülen). Ein Tipp auf eine Leitung und dann auf die Stelle an der Wand, wo sie in den Raum kommt: ganz unten kommt sie aus dem Boden, höher durch die Wand. Den Weg nach draußen – unter der Erde zum Skimmer, unter dem Becken zum Bodenablauf, mit T-Stück zu mehreren Einläufen – legt NeonPlan selbst an. Ein Häkchen zeigt, welche Leitungen schon drin sind.
+2. **Geräte** – Filterpumpe, Sandfilter, Wärmepumpe, Dosieranlage: antippen, sie stehen an der Wand und lassen sich wie Möbel verschieben.
+3. **Armaturen** – Kugelhahn und Sichtglas: antippen und dann auf ein Rohr tippen.
+
+**Rohre ziehen:** Mit **✏ Zeichnen** tippst du auf ein Gerät oder eine Leitung und ziehst zum nächsten (oder tippst Punkt für Punkt; die Linie läuft waagerecht und senkrecht). Am Ende knickt sie von selbst einmal in den Anschluss. Auf ein Rohr gezogen entsteht ein **T-Stück**. Den richtigen Anschluss am Gerät (Saugseite, Druckseite, Rücklauf, Kanal, Ein- und Ausgang der Wärmepumpe) und die Richtung des Wassers erkennt NeonPlan selbst. Schon beim Zeichnen fließt das Wasser in der Zeichnung; unten steht, was noch fehlt („Sandfilter · Rücklauf nicht verbunden“, „2 lose Rohrenden“) – oder **„Alles verbunden – das Wasser fließt.“** Mit **✋ Auswählen** wählst du ein Rohr, um Punkte zu verschieben, es zu löschen oder einen Hahn einzusetzen.
