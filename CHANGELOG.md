@@ -9,7 +9,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### New
 
 - **Wall view zoom:** mouse wheel towards the pointer, two fingers, ＋ / − / ⤢ and arrows in *Wall from the front*.
-- **Pools with depth:** basin depth and rim above the lawn; see-through water onto the basin's walls and floor.
+- **Pools with depth:** basin depth and rim above the lawn; see-through water onto the basin's walls and floor (when the pool lies in a lawn or other area; without ground around it, it stays flat).
 - **Terrace doors** can open outwards (*Reverse opening direction*), sashes swing outside in 3D (#492).
 
 ### Fixed

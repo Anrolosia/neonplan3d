@@ -785,8 +785,20 @@ export function poolDepth(a: OutdoorArea): number {
   return a.depth && a.depth >= 0.3 ? Math.min(5, a.depth) : a.above ? poolHeight(a) : 1.5;
 }
 
-/** Height of a pool's floor in floor coordinates. */
+/**
+ * Whether a pool lies in the ground: inside a lawn, terrace or other flat area that hides its basin. Without one
+ * nothing covers the basin below the ground (the ground grid is see-through), so it is drawn shallow as before.
+ */
+export function poolSunken(floor: Floor, a: OutdoorArea): boolean {
+  if (a.above) return false;
+  return (floor.outdoor ?? []).some(
+    (b) => b !== a && b.type !== "pool" && !outdoorStanding(b.type) && !b.cut && b.points.length >= 3 && a.points.every((p) => pointInPolygon(p, b.points)),
+  );
+}
+
+/** Height of a pool's floor in floor coordinates (a pool without ground around it: just under its water). */
 export function poolFloorY(floor: Floor, a: OutdoorArea): number {
+  if (!a.above && !poolSunken(floor, a)) return poolWaterY(floor, a) - 0.05;
   return poolRimY(floor, a) - poolDepth(a);
 }
 

@@ -35,6 +35,7 @@ import { type CarLinks, type Background, OUTDOOR_TOP, sidelightLayout, DEFAULT_W
   furnitureFootprint,
   type FreeWall,
   poolDepth,
+  poolSunken,
   poolHeight,
   poolShapePoints,
   POOL_DEVICES,
@@ -8724,7 +8725,8 @@ export class Fp3dEditor extends LitElement {
       ${a.above ? this.len(this.t("pool_height"), poolHeight(a), (v) => this.updateOutdoor({ height: Math.min(2.5, Math.max(0.4, round(v))) }), 0.05, 0.4) : nothing}
       ${this.len(this.t("pool_depth"), poolDepth(a), (v) => this.updateOutdoor({ depth: Math.min(5, Math.max(0.3, round(v))) }), 0.05, 0.3)}
       ${a.above ? nothing : this.len(this.t("pool_rim"), a.rim ?? 0.06, (v) => this.updateOutdoor({ rim: Math.min(2, Math.max(-0.3, round(v))) }), 0.01, -0.3)}
-      <p class="fp3d-sub fp3d-wide">${this.t("pool_depth_hint")}</p>`;
+      <p class="fp3d-sub fp3d-wide">${this.t("pool_depth_hint")}</p>
+      ${!a.above && this.floor && !poolSunken(this.floor, a) ? html`<p class="fp3d-sub fp3d-wide fp3d-warn">${this.t("pool_depth_ground")}</p>` : nothing}`;
   }
 
   /** Pool Pro: the pool's entities (each role found by name when left empty), or the teaser without the add-on. */

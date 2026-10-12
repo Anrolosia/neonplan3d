@@ -96,11 +96,17 @@ test("pool shapes keep inside their box; the water of an above-ground pool sits 
 test("a pool's depth: 1.5 m by default, its own, a rim standing out of the lawn; an above-ground pool's floor on the ground", async () => {
   const { poolDepth, poolFloorY, poolRimY } = await import("./model.ts");
   const floor = newFloor("eg", "EG", 0);
-  const pool = { id: "p", type: "pool" as const, points: [] };
+  const pool = { id: "p", type: "pool" as const, points: [[1, 1], [3, 1], [3, 2]] as [number, number][] };
+  // without ground around it the basin stays shallow (nothing would hide it), just under the water
+  floor.outdoor = [pool];
+  assert.ok(Math.abs(poolFloorY(floor, pool) - (-0.2 + 0.06 - 0.15 - 0.05)) < 1e-9);
+  // in a lawn it has its depth
+  floor.outdoor = [{ id: "l", type: "lawn", points: [[0, 0], [10, 0], [10, 10], [0, 10]] }, pool];
   assert.equal(poolDepth(pool), 1.5);
   assert.ok(Math.abs(poolFloorY(floor, pool) - (-0.2 + 0.06 - 1.5)) < 1e-9);
   // Torsten's pool: 1.50 m deep, 20 cm out of the lawn
   const his = { ...pool, depth: 1.5, rim: 0.2 };
+  floor.outdoor = [floor.outdoor[0], his];
   assert.ok(Math.abs(poolRimY(floor, his) - 0) < 1e-9);
   assert.ok(Math.abs(poolFloorY(floor, his) - -1.5) < 1e-9);
   const tub = { ...pool, above: true, height: 1.2 };

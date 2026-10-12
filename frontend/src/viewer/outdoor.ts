@@ -6,7 +6,7 @@
 
 import { Color } from "three";
 import type { Floor, OutdoorArea, OutdoorType, Vec2 } from "../model.ts";
-import { bounds, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorStanding, pointInPolygon, poolFloorY, poolRimY, poolWaterY, signedArea } from "../model.ts";
+import { bounds, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorStanding, pointInPolygon, poolFloorY, poolRimY, poolSunken, poolWaterY, signedArea } from "../model.ts";
 import { ALWAYS, type GeoBuffer, type LineBuffer, pushPrism, shade, triangulate } from "./geo.ts";
 
 interface Look {
@@ -166,7 +166,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, wat
         }
         // the outside of the basin: a dark block in the earth (seen from the side it reads as a cut through the
         // ground, and the glowing floor no longer seems to float), with its lower edge
-        if (!a.above) {
+        if (!a.above && poolSunken(floor, a)) {
           const earth = new Color(0x0a1322);
           const earthLow = new Color(0x060b16);
           const bottom = fy - 0.2;

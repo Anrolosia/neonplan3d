@@ -3,7 +3,7 @@
 ### New
 
 - **Wall view – zoom:** in *Wall from the front* the mouse wheel zooms towards the pointer, two fingers on a tablet; **＋ / − / ⤢** at the bottom right, arrows move the view while zoomed. Small parts such as connections are easy to hit now.
-- **Pools with depth:** a pool has a **basin depth** (1.50 m unless set) and a **rim above the lawn** – a 1.50 m pool that stands 20 cm out of the lawn: depth 1.50, rim 0.20. In 3D you look through the water onto the basin's walls and floor.
+- **Pools with depth:** a pool has a **basin depth** (1.50 m unless set) and a **rim above the lawn** – a 1.50 m pool that stands 20 cm out of the lawn: depth 1.50, rim 0.20. In 3D you look through the water onto the basin's walls and floor. The depth shows when the pool lies in a lawn, terrace or other area; without ground around it, it stays flat as before.
 - **Terrace doors open outwards:** **⇅ Reverse opening direction** now works for terrace doors too; in 3D the sashes swing outside (#492).
 
 ### Fixed
@@ -24,7 +24,7 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 ### Neu
 
 - **Wandansicht – Zoom:** In *Wand von vorne* zoomt das Mausrad dorthin, wo die Maus steht, am Tablet zwei Finger; **＋ / − / ⤢** unten rechts, vergrößert schieben Pfeile den Ausschnitt. Kleine Teile wie Anschlüsse triffst du so leicht.
-- **Pools mit Tiefe:** Ein Pool hat eine **Beckentiefe** (sonst 1,50 m) und einen **Rand über dem Rasen** – ein 1,50 m tiefer Pool, der 20 cm aus dem Rasen schaut: Tiefe 1,50, Rand 0,20. In 3D siehst du durch das Wasser auf Wände und Boden des Beckens.
+- **Pools mit Tiefe:** Ein Pool hat eine **Beckentiefe** (sonst 1,50 m) und einen **Rand über dem Rasen** – ein 1,50 m tiefer Pool, der 20 cm aus dem Rasen schaut: Tiefe 1,50, Rand 0,20. In 3D siehst du durch das Wasser auf Wände und Boden des Beckens. Die Tiefe zeigt sich, wenn der Pool in einer Rasen-, Terrassen- oder anderen Fläche liegt; ohne Boden drumherum bleibt er flach wie bisher.
 - **Terrassentüren nach außen:** **⇅ Öffnungsrichtung umdrehen** gibt es jetzt auch bei Terrassentüren; in 3D schwingen die Flügel nach draußen (#492).
 
 ### Behoben

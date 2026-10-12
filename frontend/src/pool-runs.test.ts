@@ -167,6 +167,8 @@ test("a pipe at the bottom drain leaves under the pool's floor and comes up outs
   const { underBasin } = await import("./pool-runs.ts");
   const floor = { id: "eg", name: "EG", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
   const area = { id: "p", type: "pool", points: [[0, 0], [8, 0], [8, 4], [0, 4]], depth: 1.5, rim: 0.2, pool: { ports: [{ id: "bd", kind: "drain", x: 4, z: 2 }] } } as unknown as Parameters<typeof underBasin>[2];
+  // the pool lies in a lawn (else it is drawn shallow)
+  (floor as unknown as { outdoor: unknown[] }).outdoor = [{ id: "l", type: "lawn", points: [[-5, -5], [20, -5], [20, 10], [-5, 10]] }, area];
   // the drain at the floor (-1.47), the pipe at -0.3 to a point outside the pool
   const path = underBasin([[4, -1.47, 2], [4, -0.3, 2], [12, -0.3, 2]], { from: "port:bd", to: "dev:pump" }, area, floor);
   const low = -1.5 - 0.15;
