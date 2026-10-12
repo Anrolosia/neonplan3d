@@ -62,8 +62,17 @@ export function underBasin(path: P3[], p: Pick<PoolPipe, "from" | "to">, area: O
     // drop the riser at the port itself (same place in the plan), keep the rest
     let k = 1;
     while (k < pts.length && Math.hypot(pts[k][0] - d[0], pts[k][2] - d[2]) < 0.01) k++;
-    const next = pts[k] ?? pts[pts.length - 1];
-    return [d, out, [out[0], next[1], out[2]], ...pts.slice(k)];
+    // points drawn along the wall itself (or inside the basin) move out with it, onto a line 35 cm behind the wall,
+    // up to the first one already that far out: no zigzag back to the wall
+    const rest = pts.slice(k).map((q) => [...q] as P3);
+    for (let i = 0; i < rest.length - 1; i++) {
+      const behind = (rest[i][0] - d[0]) * n[0] + (rest[i][2] - d[2]) * n[1];
+      if (behind >= 0.35 - 1e-6) break;
+      rest[i][0] += n[0] * (0.35 - behind);
+      rest[i][2] += n[1] * (0.35 - behind);
+    }
+    const next = rest[0] ?? pts[pts.length - 1];
+    return [d, out, [out[0], next[1], out[2]], ...rest];
   };
   const fix = (pts: P3[]): P3[] => {
     if (pts.length < 2) return pts;

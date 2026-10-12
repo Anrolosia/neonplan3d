@@ -193,3 +193,19 @@ test("an inlet's pipe comes straight through the pool wall at its depth, not dow
   assert.deepEqual(path.at(-2), [8.35, -0.45, 2]);
   assert.deepEqual(path.at(-3), [8.35, -0.3, 2]);
 });
+
+test("an inlet pipe drawn along the wall line moves out behind the wall: no zigzag (Torsten's T-piece)", async () => {
+  const { underBasin } = await import("./pool-runs.ts");
+  const floor = { id: "eg", name: "EG", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
+  const area = { id: "p", type: "pool", points: [[3, -7.15], [10.65, -7.15], [10.65, -3.85], [3, -3.85]], pool: { ports: [{ id: "in", kind: "inlet", x: 3, z: -6.55 }] } } as unknown as Parameters<typeof underBasin>[2];
+  // T-piece at x 2.15, the pipe along the wall line x = 3 to the inlet, which sits at -0.59
+  const path = underBasin([[2.15, -0.3, -5.65], [3, -0.3, -5.65], [3, -0.3, -6.55], [3, -0.59, -6.55]], { from: "joint:t:out1", to: "port:in" }, area, floor);
+  const r = (q: number[]) => q.map((v) => Math.round(v * 100) / 100);
+  assert.deepEqual(path.map(r), [
+    [2.15, -0.3, -5.65],
+    [2.65, -0.3, -5.65],
+    [2.65, -0.3, -6.55],
+    [2.65, -0.59, -6.55],
+    [3, -0.59, -6.55],
+  ]);
+});
