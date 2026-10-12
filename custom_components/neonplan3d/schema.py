@@ -691,6 +691,36 @@ SETTINGS_SCHEMA = vol.Schema(
         vol.Optional("weather_effects", default=None): vol.Any(
             None, [vol.In(["rain", "snow", "fog", "clouds", "lightning", "sky"])]
         ),
+        # fun pack "pets": animals that live in the 3D house (switched on and off)
+        vol.Optional("pets", default=None): vol.Any(
+            None,
+            vol.Schema(
+                {
+                    vol.Optional("on", default=True): bool,
+                    vol.Optional("list", default=list): vol.All(
+                        [
+                            vol.Schema(
+                                {
+                                    vol.Required("id"): vol.All(str, vol.Length(min=1, max=64)),
+                                    vol.Required("kind"): vol.In(["cat", "dog", "rabbit"]),
+                                    vol.Optional("name", default=""): vol.All(str, vol.Length(max=30)),
+                                    vol.Optional("fur", default="orange"): vol.All(str, vol.Length(max=20)),
+                                    vol.Optional("breed", default=None): vol.Any(
+                                        None, vol.All(str, vol.Length(max=20))
+                                    ),
+                                    vol.Optional("floor_id", default=None): vol.Any(
+                                        None, vol.All(str, vol.Length(max=64))
+                                    ),
+                                },
+                                extra=vol.ALLOW_EXTRA,
+                            )
+                        ],
+                        vol.Length(max=8),
+                    ),
+                },
+                extra=vol.ALLOW_EXTRA,
+            ),
+        ),
     },
     extra=vol.ALLOW_EXTRA,
 )

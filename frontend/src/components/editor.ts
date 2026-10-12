@@ -18,7 +18,7 @@ import { autoPort, feedDone, nodeFlow, orientPipe, sketchIssues } from "../pool-
 import { holeInRoom } from "../geometry/holes.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, labOn, manualUrl, released, shopUrl } from "../features.ts";
+import { hasFeature, labOn, manualUrl, released, shopUrl, UNRELEASED } from "../features.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
@@ -4984,11 +4984,54 @@ export class Fp3dEditor extends LitElement {
 
   // ------------------------------------------------------------------ rendering
 
+  /** "Later" on the news: gone for this visit of the editor, back the next time. */
+  private newsLater = false;
+
+  /**
+   * News from the shop after an update, once per announcement: a new fun pack to pick up (the pets, a present for the
+   * customers). Shown to admins who bought something and do not have it yet, until "don't show again".
+   */
+  private renderNews() {
+    const news = [{ id: "fun_pets_2026", feature: "fun_pets" as const }];
+    if (this.newsLater || !this.isAdmin) return nothing;
+    const customer = (this.packs ?? []).some((p) => p.licensee);
+    const item = news.find((n) => {
+      if (UNRELEASED.includes(n.feature) || hasFeature(n.feature) || !customer) return false;
+      try {
+        return localStorage.getItem(`neonplan3d.news.${n.id}`) !== "never";
+      } catch {
+        return true;
+      }
+    });
+    if (!item) return nothing;
+    const never = () => {
+      try {
+        localStorage.setItem(`neonplan3d.news.${item.id}`, "never");
+      } catch {
+        // a private window: it only stays away for this visit
+      }
+      this.newsLater = true;
+      this.requestUpdate();
+    };
+    return html`<div class="fp3d-news-veil" @click=${(e: Event) => e.target === e.currentTarget && ((this.newsLater = true), this.requestUpdate())}>
+      <div class="fp3d-news" role="dialog" aria-label=${this.t("news_pets_title")}>
+        <div class="fp3d-news-pic">🐱 🐶 🐰 🐟</div>
+        <h3>${this.t("news_pets_title")}</h3>
+        <p>${this.t("news_pets_text")}</p>
+        <div class="fp3d-news-actions">
+          <a class="fp3d-btn fp3d-primary" href=${shopUrl(this.hass?.language)} target="_blank" rel="noopener" @click=${() => ((this.newsLater = true), this.requestUpdate())}>🎁 ${this.t("news_to_shop")}</a>
+          <button class="fp3d-btn" @click=${() => ((this.newsLater = true), this.requestUpdate())}>${this.t("news_later")}</button>
+          <button class="fp3d-btn" @click=${never}>${this.t("news_never")}</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
   protected render(): TemplateResult {
     const floor = this.floor;
     const walls = floor ? generateWalls(floor.rooms, { exterior: this._doc.settings.wall_exterior, interior: this._doc.settings.wall_interior }, floor.walls ?? []) : null;
     return html`
-      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()}
+      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()} ${this.renderNews()}
       <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}">
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
@@ -13099,6 +13142,41 @@ export class Fp3dEditor extends LitElement {
         position: relative;
         min-height: 0;
         padding: 0 60px;
+      }
+      .fp3d-news-veil {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: rgba(2, 6, 14, 0.55);
+      }
+      .fp3d-news {
+        max-width: 420px;
+        padding: 22px 22px 18px;
+        border-radius: 18px;
+        border: 1px solid var(--fp3d-accent, #22d3ee);
+        background: var(--fp3d-panel, #0d1628);
+        box-shadow: 0 0 40px rgba(34, 211, 238, 0.25);
+        text-align: center;
+      }
+      .fp3d-news-pic {
+        font-size: 34px;
+        letter-spacing: 6px;
+      }
+      .fp3d-news h3 {
+        margin: 10px 0 6px;
+      }
+      .fp3d-news p {
+        margin: 0 0 14px;
+        color: var(--fp3d-muted, #a9b8d4);
+      }
+      .fp3d-news-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
       }
       .fp3d-wv-zoom {
         position: absolute;

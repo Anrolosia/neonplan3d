@@ -92,9 +92,10 @@ import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
+import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
-import { centroid, furnitureFootprint, isLamp, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Furniture, type StartView } from "../model.ts";
+import { centroid, furnitureFootprint, isLamp, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Furniture, type Pet, type StartView } from "../model.ts";
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -182,6 +183,7 @@ export class Fp3dView3d extends LitElement {
     _find: { state: true },
     _walk: { state: true },
     walkable: { attribute: false },
+    petsOn: { attribute: false },
     _central: { state: true },
     _thumbsCompact: { state: true },
     _armed: { state: true },
@@ -390,9 +392,15 @@ export class Fp3dView3d extends LitElement {
   declare central: boolean;
   /** Offer the walk through the house at eye height (card option walk; default on). */
   declare walkable: boolean;
+  /** The card can leave the pets out (card option "pets: false"); the panel always shows them. */
+  declare petsOn: boolean;
   /** The walk: the room one stands in (null between rooms), or false when not walking. */
   private declare _walk: { room: string | null; hint: boolean } | false;
   private walker: { dispose(): void; setStick(v: { x: number; y: number } | null): void } | null = null;
+  /** Fun pack "pets": the animals living in the house (their own bundle), and what they were last given. */
+  private pets: { update(b: Building, pets: readonly Pet[]): void; dispose(): void } | null = null;
+  private petsFor: Building | null = null;
+  private petsLoading = false;
   private walkKeys: ((e: KeyboardEvent) => void) | null = null;
   /** The outline of the room one walks in (its glass cards show). */
   private walkRoomPts: [number, number][] | null = null;
@@ -478,6 +486,7 @@ export class Fp3dView3d extends LitElement {
     this._armed = null;
     this.central = true;
     this.walkable = true;
+    this.petsOn = true;
     this._walk = false;
     this.buttons = null;
     this._thumbs = [];
@@ -524,6 +533,9 @@ export class Fp3dView3d extends LitElement {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this.stopWalk();
+    this.pets?.dispose();
+    this.pets = null;
+    this.petsFor = null;
     this.unlistenReplay?.();
     this.unlistenReplay = null;
     this.unwatchDiag?.();
@@ -634,6 +646,7 @@ export class Fp3dView3d extends LitElement {
       }
       this.scheduleThumbs();
       this.syncDevices(true);
+      void this.syncPets();
       this.viewer.setFloor(this.floorId, false);
       if (this.roomId) this.viewer.selectRoom(this.roomId);
     } catch (err) {
@@ -672,6 +685,7 @@ export class Fp3dView3d extends LitElement {
       v.setBuilding(this.building);
       if (startChanged && this.floorId === null) v.resetView();
     }
+    if (changed.has("building") || changed.has("packs") || changed.has("petsOn")) void this.syncPets();
     if (changed.has("startView") && changed.get("startView") !== undefined) {
       v.setStartView(this.startViewOf());
       if (this.floorId === null) v.resetView();
@@ -2796,6 +2810,58 @@ export class Fp3dView3d extends LitElement {
     return html`<div class="fp3d-scenes">
       ${ids.map((id) => html`<button class="fp3d-chip" aria-pressed=${this._sceneFired === id} @click=${() => this.runScene(id)}>${entityName(this.hass, id, areaName)}</button>`)}
     </div>`;
+  }
+
+  /**
+   * Fun pack "pets": while it is unlocked and switched on, the animals live in the house (their bundle loads then);
+   * a new plan (the floors are built anew) hands them over again.
+   */
+  private async syncPets(): Promise<void> {
+    const b = this.building;
+    const v = this.viewer;
+    const on = b?.settings.pets?.on !== false && this.petsOn !== false;
+    const list = on ? (b?.settings.pets?.list ?? []) : [];
+    // the fun pack also brings fish to the pets pack's aquariums
+    const fish = on && !!b?.floors.some((f) => f.furniture.some((m) => /:aquarium(_large)?$/.test(m.type)));
+    if (!v || !b || !hasFeature("fun_pets") || (!list.length && !fish)) {
+      this.pets?.dispose();
+      this.pets = null;
+      this.petsFor = null;
+      return;
+    }
+    if (this.pets) {
+      if (this.petsFor !== b) {
+        this.petsFor = b;
+        this.pets.update(b, list);
+      }
+      return;
+    }
+    if (this.petsLoading) return;
+    this.petsLoading = true;
+    try {
+      const [fun, mod] = await Promise.all([loadFun(), load3d()]);
+      if (!this.viewer || this.pets) return;
+      this.petsFor = this.building;
+      this.pets = fun.startPets({
+        lib: mod.funLib,
+        FloorMap: mod.FloorMap,
+        viewer: this.viewer as never,
+        building: this.building!,
+        pets: this.building?.settings.pets?.on !== false && this.petsOn !== false ? (this.building?.settings.pets?.list ?? []) : [],
+        night: () => this.hass?.states["sun.sun"]?.state === "below_horizon",
+        base: (floor, f) => mountBase(floor, f),
+        closedDoors: () => {
+          const out = new Set<string>();
+          const states = this.hass?.states ?? {};
+          for (const f of this.building?.floors ?? []) for (const o of f.openings) if (o.type === "door" && o.contact && states[o.contact]?.state === "off") out.add(o.id);
+          return out;
+        },
+      });
+    } catch (err) {
+      console.error("NeonPlan 3D: the pets failed to load", err);
+    } finally {
+      this.petsLoading = false;
+    }
   }
 
   /**

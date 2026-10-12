@@ -8,6 +8,8 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- **Pets (fun pack, a present):** cat, rabbit and five dog breeds walk through the house, take the stairs, rest on sofas and beds, stop at shut doors (contact sensors), sleep at night; fish in the Pets pack's aquariums. Free in the shop for customers; *Extensions → Fun packs*, card option `pets: false`, a one-time note in the editor.
+- **Extensions page:** the shop's packs and the installed packs fold into summary bars (installed, updates, missing) with *Install/update all*.
 - **Wall view zoom:** mouse wheel towards the pointer, two fingers, ＋ / − / ⤢ and arrows in *Wall from the front*.
 - **Pools with depth:** basin depth and rim above the lawn; see-through water onto the basin's walls and floor (when the pool lies in a lawn or other area; without ground around it, it stays flat).
 - **Terrace doors** can open outwards (*Reverse opening direction*), sashes swing outside in 3D (#492).

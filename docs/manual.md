@@ -850,13 +850,25 @@ The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked o
 
 Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 
-At the bottom of the page you find your installed packs with **Remove**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once.
+At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once.
 
 **Good to know:**
 
 - Packs are digitally signed. Only packs from the publisher can be imported, changed files are refused.
 - If you remove a pack, its furniture stays in the plan as plain boxes. Import it again and it is back, with all its links.
 - A newer version of a pack replaces the old one without losing anything in the plan.
+
+### 7.4 Fun packs
+
+**Fun packs** are free extras just for fun – a thank-you to everyone who already supports NeonPlan 3D. Get them in the shop for **0 €** (give something if you like) and switch them on and off here under **🎈 Fun packs**.
+
+**Pets:** a cat, a rabbit or a dog – as a dachshund, pug, terrier, labrador or shepherd – lives in your 3D house. **+ Add a pet** sets one up: kind, breed (for dogs), name, fur and the floor it starts on. **Show the pets** switches all of them on and off; in the dashboard card the option **Show the pets** (YAML `pets: false`) leaves them out of that card, e.g. on the wall tablet.
+
+- The pets walk through the doors from room to room and **up and down the stairs** – they get around the whole house. A door whose contact reports it shut stops them; doors without a sensor count as open.
+- They rest at their favourite places: a cat walks up to a **sofa, an armchair or a bed** and jumps on from the front, a dog lies down in front of it. From the Pets pack, cats like the cat bed, cave and scratching tree, dogs the dog bed, basket and kennel; they drop by the **bowls**, the feeder and the water fountain.
+- **At night** (the sun in Home Assistant has set) they sleep curled up, with a little "z Z".
+- Colourful **fish** swim in the Pets pack's **aquariums**.
+- They are only drawn while one moves – resting, they cost nothing, even on old wall tablets.
 
 ---
 
