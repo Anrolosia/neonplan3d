@@ -19,7 +19,7 @@ import {
 } from "../api.ts";
 import { DISCORD_URL, isBeta, supporterUrl } from "../beta.ts";
 import { FEATURES, FUN, knownFeature, manualUrl, released, shopUrl, unlockedFeatures } from "../features.ts";
-import { PET_FURS, type Building, type Pet } from "../model.ts";
+import { DOG_BREEDS, PET_FURS, type Building, type Pet } from "../model.ts";
 import { translate, type I18nKey } from "../i18n.ts";
 import { packName, type FurniturePack } from "../packs.ts";
 import { controls, tokens } from "../styles.ts";
@@ -152,6 +152,11 @@ export class Extensions extends LitElement {
                         <select aria-label=${this.t("pet_kind")} @change=${(e: Event) => change(pet.id, { kind: (e.target as HTMLSelectElement).value as Pet["kind"] })}>
                           ${(["cat", "dog", "rabbit"] as const).map((k) => html`<option value=${k} ?selected=${pet.kind === k}>${this.t(`pet_kind_${k}`)}</option>`)}
                         </select>
+                        ${pet.kind === "dog"
+                          ? html`<select aria-label=${this.t("pet_breed")} @change=${(e: Event) => change(pet.id, { breed: (e.target as HTMLSelectElement).value })}>
+                              ${DOG_BREEDS.map((r) => html`<option value=${r} ?selected=${(pet.breed ?? "labrador") === r}>${this.t(`pet_breed_${r}`)}</option>`)}
+                            </select>`
+                          : nothing}
                         <input type="text" maxlength="30" .value=${pet.name} placeholder=${this.t("pet_name")} aria-label=${this.t("pet_name")} @change=${(e: Event) => change(pet.id, { name: (e.target as HTMLInputElement).value.trim() })} />
                         <select aria-label=${this.t("pet_fur")} @change=${(e: Event) => change(pet.id, { fur: (e.target as HTMLSelectElement).value })}>
                           ${PET_FURS.map((c) => html`<option value=${c} ?selected=${pet.fur === c}>${this.t(`pet_fur_${c}`)}</option>`)}

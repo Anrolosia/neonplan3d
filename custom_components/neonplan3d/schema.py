@@ -705,6 +705,9 @@ SETTINGS_SCHEMA = vol.Schema(
                                     vol.Required("kind"): vol.In(["cat", "dog", "rabbit"]),
                                     vol.Optional("name", default=""): vol.All(str, vol.Length(max=30)),
                                     vol.Optional("fur", default="orange"): vol.All(str, vol.Length(max=20)),
+                                    vol.Optional("breed", default=None): vol.Any(
+                                        None, vol.All(str, vol.Length(max=20))
+                                    ),
                                     vol.Optional("floor_id", default=None): vol.Any(
                                         None, vol.All(str, vol.Length(max=64))
                                     ),

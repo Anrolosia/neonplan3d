@@ -523,11 +523,15 @@ export interface Pet {
   name: string;
   /** Fur colour preset (see PET_FURS). */
   fur: string;
+  /** A dog's breed (see DOG_BREEDS; null: labrador). */
+  breed?: string | null;
   /** The floor it lives on (null: the ground floor). */
   floor_id?: string | null;
 }
 
-export const PET_FURS = ["orange", "tabby", "black", "white", "grey", "brown", "calico"] as const;
+export const PET_FURS = ["orange", "tabby", "black", "white", "grey", "brown", "calico", "golden", "cream"] as const;
+/** Dog breeds, small to large. */
+export const DOG_BREEDS = ["dachshund", "pug", "terrier", "labrador", "shepherd"] as const;
 
 export interface BuildingSettings {
   /** Fun pack "pets": the animals and whether they are shown. */

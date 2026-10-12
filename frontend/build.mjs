@@ -92,8 +92,9 @@ function copyFonts() {
 // editor 730 KB, card editor 205 KB on 2026-10-10 for the parts' cards (connections, drawings, joining) and their texts
 // editor 760 KB, card editor 210 KB on 2026-10-12 for furniture blocks, the wall view side bar and "Technik zeichnen"
 // main 530 KB on 2026-10-11 for the walk through the house (its controls and texts; the walking itself lives in the 3D bundle)
+// card editor 215 KB on 2026-10-12 (it carries the German and English texts, now with the pets)
 // main 540 KB on 2026-10-12 for the fun packs' switch (pets: the loader, settings and texts; the animals live in their own bundle)
-const BUDGET = { "neonplan3d.js": 540 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 760 * 1024, "neonplan3d-editor.js": 760 * 1024, "neonplan3d-card-editor.js": 210 * 1024 };
+const BUDGET = { "neonplan3d.js": 540 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 760 * 1024, "neonplan3d-editor.js": 760 * 1024, "neonplan3d-card-editor.js": 215 * 1024 };
 
 copyFonts();
 if (watch) {
