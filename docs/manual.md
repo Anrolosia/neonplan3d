@@ -252,6 +252,15 @@ The **Furniture** tool opens the library with more than 50 built-in models in th
 
 ![A selected item](images/editor-furniture.jpg)
 
+**Furniture blocks** (a kitchen, a wall unit): place the pieces one by one as they fit, then join them into a block.
+
+- **Shift + click** adds a piece to the selection or takes it out again, **Shift + drag** over an empty spot draws a frame – everything whose centre lies inside is selected. On a tablet without a Shift key, switch on **Select several** in the furniture form: a tap then adds and a drag draws the frame.
+- Several selected pieces move, turn (**R**, ↺/↻ 90° – about their common centre), copy (**Ctrl+D**), fix or delete together. **Join into a block** makes them a lasting block (orange frame labelled "Furniture block").
+- From then on, a click on any part selects the **whole block**; dragging moves it, in **3D beside** too. Edit a **single part** with a **double click** (double tap on a tablet) or by its name in the list on the right – a wall cabinet 2 cm higher, say. **Select the whole block** goes back, **Break up block** makes single pieces again.
+- In the wall view every part stays on its own – that is where you line up the parts of a block to the centimetre.
+
+![A furniture block: the kitchen](images/editor-block.jpg)
+
 ### 4.9 Furnishing rooms
 
 ![A room with a set](images/editor-package.jpg)

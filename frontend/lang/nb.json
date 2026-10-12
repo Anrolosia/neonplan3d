@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Slette alle rapporter fra denne installasjonen på serveren og slutte å sende?",
  "diag_deleted": "Slettet. Sendingen er slått av; slår du den på igjen, får du en ny ID.",
  "diag_delete_failed": "Kunne ikke nå NeonPlan-serveren. Prøv igjen senere.",
- "diag_unavailable": "Denne innstillingen er tilgjengelig etter en omstart av Home Assistant."
+ "diag_unavailable": "Denne innstillingen er tilgjengelig etter en omstart av Home Assistant.",
+ "block_title": "Møbelblokk",
+ "multi_title": "{n} møbler valgt",
+ "block_hint": "Et klikk velger hele blokken, dra for å flytte den. En enkelt del: trykk to ganger på den eller velg navnet nedenfor.",
+ "multi_hint": "Shift + klikk legger til eller fjerner møbler, Shift + dra over tomt område tegner en ramme. Flytt, drei eller kopier dem samlet, eller slå dem sammen til en blokk.",
+ "block_part_edit": "Rediger bare denne delen",
+ "block_break": "Løs opp blokken",
+ "block_make": "Slå sammen til en blokk",
+ "multi_mode": "Velg flere (trykk legger til, dra tegner en ramme)",
+ "block_part": "Del av en blokk.",
+ "block_select": "Velg hele blokken",
+ "block_delete": "Slette {n} møbler?",
+ "block_delete_fixed": "Slette {n} møbler? Noen av dem er låst."
 }

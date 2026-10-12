@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Radera alla rapporter från den här installationen på servern och sluta skicka?",
  "diag_deleted": "Raderat. Sändningen är avstängd; slår du på den igen får du ett nytt id.",
  "diag_delete_failed": "NeonPlan-servern gick inte att nå. Försök igen senare.",
- "diag_unavailable": "Den här inställningen finns efter en omstart av Home Assistant."
+ "diag_unavailable": "Den här inställningen finns efter en omstart av Home Assistant.",
+ "block_title": "Möbelblock",
+ "multi_title": "{n} möbler markerade",
+ "block_hint": "Ett klick markerar hela blocket, dra för att flytta det. En enskild del: tryck två gånger på den eller välj dess namn nedan.",
+ "multi_hint": "Skift + klick lägger till eller tar bort möbler, Skift + dra över tom yta ritar en ram. Flytta, vrid eller kopiera dem tillsammans, eller slå ihop dem till ett block.",
+ "block_part_edit": "Redigera bara den här delen",
+ "block_break": "Lös upp blocket",
+ "block_make": "Slå ihop till ett block",
+ "multi_mode": "Markera flera (tryck lägger till, dra ritar en ram)",
+ "block_part": "Del av ett block.",
+ "block_select": "Markera hela blocket",
+ "block_delete": "Ta bort {n} möbler?",
+ "block_delete_fixed": "Ta bort {n} möbler? Några av dem är låsta."
 }

@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Törlöd a szerveren ennek a telepítésnek az összes jelentését, és leállítod a küldést?",
  "diag_deleted": "Törölve. A küldés ki van kapcsolva; ha újra bekapcsolod, új azonosítót kapsz.",
  "diag_delete_failed": "A NeonPlan szervere nem érhető el. Próbáld újra később.",
- "diag_unavailable": "Ez a beállítás a Home Assistant újraindítása után érhető el."
+ "diag_unavailable": "Ez a beállítás a Home Assistant újraindítása után érhető el.",
+ "block_title": "Bútorblokk",
+ "multi_title": "{n} bútor kijelölve",
+ "block_hint": "Egy kattintás az egész blokkot jelöli ki, húzással mozgatható. Egyetlen elem: koppints rá kétszer, vagy válaszd a nevét lent.",
+ "multi_hint": "Shift + kattintás hozzáad vagy elvesz bútort, Shift + húzás üres területen keretet rajzol. Együtt mozgathatók, forgathatók, másolhatók vagy blokká egyesíthetők.",
+ "block_part_edit": "Csak ezt az elemet szerkeszt",
+ "block_break": "Blokk felbontása",
+ "block_make": "Egyesítés blokká",
+ "multi_mode": "Több kijelölése (koppintás hozzáad, húzás keretet rajzol)",
+ "block_part": "Egy blokk része.",
+ "block_select": "Az egész blokk kijelölése",
+ "block_delete": "{n} bútor törlése?",
+ "block_delete_fixed": "{n} bútor törlése? Némelyik rögzítve van."
 }

@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Eliminare dal server tutti i rapporti di questa installazione e interrompere l'invio?",
  "diag_deleted": "Eliminato. L'invio è disattivato; se lo riattivi, riceverai un nuovo ID.",
  "diag_delete_failed": "Impossibile raggiungere il server di NeonPlan. Riprova più tardi.",
- "diag_unavailable": "Questa impostazione è disponibile dopo un riavvio di Home Assistant."
+ "diag_unavailable": "Questa impostazione è disponibile dopo un riavvio di Home Assistant.",
+ "block_title": "Blocco di mobili",
+ "multi_title": "{n} mobili selezionati",
+ "block_hint": "Un clic seleziona l'intero blocco, trascinare lo sposta. Un solo pezzo: toccalo due volte o scegli il suo nome qui sotto.",
+ "multi_hint": "Maiusc + clic aggiunge o toglie mobili, Maiusc + trascinare su un'area vuota disegna una cornice. Spostali, ruotali o copiali insieme, oppure uniscili in un blocco.",
+ "block_part_edit": "Modifica solo questo pezzo",
+ "block_break": "Sciogli il blocco",
+ "block_make": "Unisci in un blocco",
+ "multi_mode": "Selezione multipla (un tocco aggiunge, trascinare disegna una cornice)",
+ "block_part": "Parte di un blocco.",
+ "block_select": "Seleziona l'intero blocco",
+ "block_delete": "Eliminare {n} mobili?",
+ "block_delete_fixed": "Eliminare {n} mobili? Alcuni sono bloccati."
 }

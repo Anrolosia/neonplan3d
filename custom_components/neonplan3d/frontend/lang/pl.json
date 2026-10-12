@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Usunąć z serwera wszystkie raporty tej instalacji i zakończyć wysyłanie?",
  "diag_deleted": "Usunięto. Wysyłanie jest wyłączone; po ponownym włączeniu dostaniesz nowy identyfikator.",
  "diag_delete_failed": "Nie udało się połączyć z serwerem NeonPlan. Spróbuj ponownie później.",
- "diag_unavailable": "To ustawienie będzie dostępne po ponownym uruchomieniu Home Assistant."
+ "diag_unavailable": "To ustawienie będzie dostępne po ponownym uruchomieniu Home Assistant.",
+ "block_title": "Blok mebli",
+ "multi_title": "Zaznaczono mebli: {n}",
+ "block_hint": "Jedno kliknięcie zaznacza cały blok, przeciąganie go przesuwa. Pojedyncza część: stuknij ją dwa razy lub wybierz jej nazwę poniżej.",
+ "multi_hint": "Shift + kliknięcie dodaje lub usuwa meble, Shift + przeciąganie po pustym miejscu rysuje ramkę. Przesuwaj, obracaj lub kopiuj je razem albo połącz je w blok.",
+ "block_part_edit": "Edytuj tylko tę część",
+ "block_break": "Rozbij blok",
+ "block_make": "Połącz w blok",
+ "multi_mode": "Zaznacz kilka (stuknięcie dodaje, przeciąganie rysuje ramkę)",
+ "block_part": "Część bloku.",
+ "block_select": "Zaznacz cały blok",
+ "block_delete": "Usunąć mebli: {n}?",
+ "block_delete_fixed": "Usunąć mebli: {n}? Niektóre są zablokowane."
 }

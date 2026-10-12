@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Smazat na serveru všechny zprávy této instalace a přestat odesílat?",
  "diag_deleted": "Smazáno. Odesílání je vypnuté; když ho znovu zapneš, dostaneš nové ID.",
  "diag_delete_failed": "Server NeonPlan nebyl dostupný. Zkus to prosím později.",
- "diag_unavailable": "Toto nastavení bude k dispozici po restartu Home Assistantu."
+ "diag_unavailable": "Toto nastavení bude k dispozici po restartu Home Assistantu.",
+ "block_title": "Blok nábytku",
+ "multi_title": "Vybráno {n} kusů nábytku",
+ "block_hint": "Jedno kliknutí vybere celý blok, tažením ho přesunete. Jednotlivý díl: klepněte na něj dvakrát nebo vyberte jeho název níže.",
+ "multi_hint": "Shift + kliknutí přidá nebo odebere nábytek, Shift + tažení přes volné místo nakreslí rámeček. Přesouvejte, otáčejte nebo kopírujte je společně, nebo je spojte do bloku.",
+ "block_part_edit": "Upravit jen tento díl",
+ "block_break": "Zrušit blok",
+ "block_make": "Spojit do bloku",
+ "multi_mode": "Vybrat více (klepnutí přidá, tažení nakreslí rámeček)",
+ "block_part": "Součást bloku.",
+ "block_select": "Vybrat celý blok",
+ "block_delete": "Smazat {n} kusů nábytku?",
+ "block_delete_fixed": "Smazat {n} kusů nábytku? Některé jsou zamčené."
 }

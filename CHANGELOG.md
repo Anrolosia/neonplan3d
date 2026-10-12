@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## Unreleased
+
+### New
+
+- **Furniture blocks:** Shift + click (or *Select several* on a tablet) and Shift + drag (a frame) select several pieces; move, turn about their centre, copy, fix or delete them together, or **join them into a block** – a click on any part then selects the whole kitchen or wall unit, a double click edits one part alone, *Break up block* undoes it. Blocks move together in 3D beside the plan too. Ctrl+D duplicates the selected furniture.
+- **Time travel for everyone:** out of the supporter beta; what a placed camera detects (motion, person, car) is an event day and night.
+
+### Fixed
+
+- **Lights:** effect names that are a light's mode (white, colour, rgb, manual, default) no longer start the colour effect in 3D (LocalTuya bulbs).
+
 ## 1.16.0
 
 ### New

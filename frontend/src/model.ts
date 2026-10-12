@@ -132,6 +132,8 @@ export interface ScreenPicture {
 export interface Furniture {
   /** Fixed against moving by accident. */
   locked?: boolean | null;
+  /** Furniture block: items with the same group id are selected, moved and turned together (a kitchen, a wall unit). */
+  group?: string | null;
   /** Pool Pro, sand filter: the six-way valve's position (null = filter). */
   valve_position?: ValvePosition | null;
   /** Pool Pro, ball valve: closed stops the water (null / true = open). */

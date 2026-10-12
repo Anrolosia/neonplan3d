@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Slette alle rapportar frå denne installasjonen på tenaren og slutte å sende?",
  "diag_deleted": "Sletta. Sendinga er slått av; slår du henne på att, får du ein ny ID.",
  "diag_delete_failed": "Fekk ikkje kontakt med NeonPlan-tenaren. Prøv att seinare.",
- "diag_unavailable": "Denne innstillinga er tilgjengeleg etter ein omstart av Home Assistant."
+ "diag_unavailable": "Denne innstillinga er tilgjengeleg etter ein omstart av Home Assistant.",
+ "block_title": "Møbelblokk",
+ "multi_title": "{n} møblar valde",
+ "block_hint": "Eitt klikk vel heile blokka, dra for å flytte ho. Ein enkelt del: trykk to gonger på han eller vel namnet nedanfor.",
+ "multi_hint": "Shift + klikk legg til eller fjernar møblar, Shift + dra over tomt område teiknar ei ramme. Flytt, drei eller kopier dei saman, eller slå dei saman til ei blokk.",
+ "block_part_edit": "Rediger berre denne delen",
+ "block_break": "Løys opp blokka",
+ "block_make": "Slå saman til ei blokk",
+ "multi_mode": "Vel fleire (trykk legg til, dra teiknar ei ramme)",
+ "block_part": "Del av ei blokk.",
+ "block_select": "Vel heile blokka",
+ "block_delete": "Slette {n} møblar?",
+ "block_delete_fixed": "Slette {n} møblar? Nokre av dei er låste."
 }

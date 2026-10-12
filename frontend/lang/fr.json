@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Supprimer sur le serveur tous les rapports de cette installation et arrêter l'envoi ?",
  "diag_deleted": "Supprimé. L'envoi est désactivé ; si tu le réactives, tu obtiens un nouvel identifiant.",
  "diag_delete_failed": "Le serveur NeonPlan n'a pas pu être joint. Réessaie plus tard.",
- "diag_unavailable": "Ce réglage est disponible après un redémarrage de Home Assistant."
+ "diag_unavailable": "Ce réglage est disponible après un redémarrage de Home Assistant.",
+ "block_title": "Bloc de meubles",
+ "multi_title": "{n} meubles sélectionnés",
+ "block_hint": "Un clic sélectionne tout le bloc, glisser le déplace. Une seule pièce : appuyez deux fois ou choisissez son nom ci-dessous.",
+ "multi_hint": "Maj + clic ajoute ou retire des meubles, Maj + glisser sur une zone vide trace un cadre. Déplacez, tournez ou copiez-les ensemble, ou regroupez-les en bloc.",
+ "block_part_edit": "Modifier seulement cette pièce",
+ "block_break": "Dissocier le bloc",
+ "block_make": "Regrouper en bloc",
+ "multi_mode": "Sélection multiple (un appui ajoute, glisser trace un cadre)",
+ "block_part": "Fait partie d'un bloc.",
+ "block_select": "Sélectionner tout le bloc",
+ "block_delete": "Supprimer {n} meubles ?",
+ "block_delete_fixed": "Supprimer {n} meubles ? Certains sont verrouillés."
 }

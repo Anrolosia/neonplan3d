@@ -64,3 +64,10 @@ def test_length_units_follow_home_assistant_unless_set() -> None:
     base = {"wall_exterior": 0.3, "wall_interior": 0.12, "grid": 0.05}
     assert SETTINGS_SCHEMA(base)["units"] is None
     assert SETTINGS_SCHEMA({**base, "units": "imperial"})["units"] == "imperial"
+
+
+def test_furniture_block() -> None:
+    """Furniture blocks: items with the same group id move together; none by default."""
+    item = {"id": "f1", "type": "kitchen", "x": 0, "z": 0, "rotation": 0, "w": 0.6, "d": 0.6, "h": 0.9, "variant": None}
+    assert FURNITURE_SCHEMA(item)["group"] is None
+    assert FURNITURE_SCHEMA({**item, "group": "block_1"})["group"] == "block_1"

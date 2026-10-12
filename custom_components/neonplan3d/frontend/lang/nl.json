@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Alle rapporten van deze installatie op de server verwijderen en het versturen uitschakelen?",
  "diag_deleted": "Verwijderd. Versturen staat uit; als je het weer inschakelt, krijg je een nieuwe ID.",
  "diag_delete_failed": "De NeonPlan-server was niet bereikbaar. Probeer het later opnieuw.",
- "diag_unavailable": "Deze instelling is beschikbaar na een herstart van Home Assistant."
+ "diag_unavailable": "Deze instelling is beschikbaar na een herstart van Home Assistant.",
+ "block_title": "Meubelblok",
+ "multi_title": "{n} meubels geselecteerd",
+ "block_hint": "Eén klik selecteert het hele blok, slepen verplaatst het. Eén onderdeel apart: tik er twee keer op of kies de naam hieronder.",
+ "multi_hint": "Shift + klik voegt meubels toe of haalt ze weg, Shift + slepen over een lege plek trekt een kader. Samen verplaatsen, draaien, kopiëren of tot een blok samenvoegen.",
+ "block_part_edit": "Alleen dit onderdeel bewerken",
+ "block_break": "Blok opheffen",
+ "block_make": "Samenvoegen tot blok",
+ "multi_mode": "Meerdere selecteren (tikken voegt toe, slepen trekt een kader)",
+ "block_part": "Onderdeel van een blok.",
+ "block_select": "Hele blok selecteren",
+ "block_delete": "{n} meubels verwijderen?",
+ "block_delete_fixed": "{n} meubels verwijderen? Sommige zijn vastgezet."
 }

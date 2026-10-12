@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Ștergi de pe server toate rapoartele acestei instalări și oprești trimiterea?",
  "diag_deleted": "Șters. Trimiterea este dezactivată; dacă o reactivezi, primești un ID nou.",
  "diag_delete_failed": "Serverul NeonPlan nu a putut fi contactat. Încearcă din nou mai târziu.",
- "diag_unavailable": "Această setare este disponibilă după o repornire a Home Assistant."
+ "diag_unavailable": "Această setare este disponibilă după o repornire a Home Assistant.",
+ "block_title": "Bloc de mobilier",
+ "multi_title": "{n} piese de mobilier selectate",
+ "block_hint": "Un clic selectează tot blocul, tragerea îl mută. O singură piesă: atinge-o de două ori sau alege-i numele mai jos.",
+ "multi_hint": "Shift + clic adaugă sau scoate piese, Shift + tragere pe o zonă liberă desenează un cadru. Mută-le, rotește-le sau copiază-le împreună ori unește-le într-un bloc.",
+ "block_part_edit": "Editează doar această piesă",
+ "block_break": "Desfă blocul",
+ "block_make": "Unește într-un bloc",
+ "multi_mode": "Selectează mai multe (o atingere adaugă, tragerea desenează un cadru)",
+ "block_part": "Parte dintr-un bloc.",
+ "block_select": "Selectează tot blocul",
+ "block_delete": "Ștergi {n} piese de mobilier?",
+ "block_delete_fixed": "Ștergi {n} piese de mobilier? Unele sunt fixate."
 }

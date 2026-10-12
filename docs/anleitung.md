@@ -254,6 +254,15 @@ Das Werkzeug **Möbel** öffnet rechts die Bibliothek mit über 50 eingebauten M
 
 ![Ein Möbel ausgewählt](images/editor-furniture.jpg)
 
+**Möbel-Blöcke** (eine Küche, eine Schrankwand): Stell die Möbel einzeln, wie es passt, und fass sie dann zu einem Block zusammen.
+
+- **Umschalt + Klick** nimmt ein Möbel zur Auswahl dazu oder wieder heraus, **Umschalt + Ziehen** über eine freie Stelle zieht einen Rahmen – alles, dessen Mitte im Rahmen liegt, ist ausgewählt. Am Tablet ohne Umschalttaste: **Mehrere auswählen** im Möbelformular einschalten, dann nimmt Tippen dazu und Ziehen zieht den Rahmen.
+- Mehrere ausgewählte Möbel verschiebst, drehst (**R**, ↺/↻ 90° – um ihre gemeinsame Mitte), kopierst (**Strg+D**), fixierst oder löschst du zusammen. **Als Block zusammenfassen** macht daraus einen dauerhaften Block (oranger Rahmen mit „Möbel-Block“).
+- Ein Klick auf irgendein Teil wählt danach den **ganzen Block**; Ziehen verschiebt ihn, auch in **3D daneben**. Ein **einzelnes Teil** bearbeitest du per **Doppelklick** (am Tablet zweimal antippen) oder über seinen Namen in der Liste rechts – etwa einen Oberschrank 2 cm höher. **Ganzen Block wählen** führt zurück, **Block auflösen** macht wieder Einzelmöbel daraus.
+- In der Wandansicht bleibt jedes Teil einzeln – dort richtest du die Teile eines Blocks zentimetergenau aus.
+
+![Ein Möbel-Block: die Küche](images/editor-block.jpg)
+
 ### 4.9 Räume einrichten
 
 ![Ein Raum mit Paket](images/editor-package.jpg)

@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "¿Eliminar del servidor todos los informes de esta instalación y dejar de enviar?",
  "diag_deleted": "Eliminado. El envío está desactivado; si lo vuelves a activar, obtendrás un identificador nuevo.",
  "diag_delete_failed": "No se pudo contactar con el servidor de NeonPlan. Inténtalo más tarde.",
- "diag_unavailable": "Este ajuste estará disponible tras reiniciar Home Assistant."
+ "diag_unavailable": "Este ajuste estará disponible tras reiniciar Home Assistant.",
+ "block_title": "Bloque de muebles",
+ "multi_title": "{n} muebles seleccionados",
+ "block_hint": "Un clic selecciona todo el bloque, arrastrar lo mueve. Una sola pieza: tócala dos veces o elige su nombre abajo.",
+ "multi_hint": "Mayús + clic añade o quita muebles, Mayús + arrastrar en una zona vacía dibuja un marco. Muévelos, gíralos o cópialos juntos, o únelos en un bloque.",
+ "block_part_edit": "Editar solo esta pieza",
+ "block_break": "Deshacer bloque",
+ "block_make": "Unir en un bloque",
+ "multi_mode": "Seleccionar varios (tocar añade, arrastrar dibuja un marco)",
+ "block_part": "Parte de un bloque.",
+ "block_select": "Seleccionar todo el bloque",
+ "block_delete": "¿Eliminar {n} muebles?",
+ "block_delete_fixed": "¿Eliminar {n} muebles? Algunos están fijados."
 }

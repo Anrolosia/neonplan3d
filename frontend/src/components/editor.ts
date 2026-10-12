@@ -138,6 +138,8 @@ type Drag =
   | { kind: "device"; entityId: string; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
   | { kind: "opening"; id: string; startScreen: [number, number]; base: Building; moved: boolean }
   | { kind: "furniture"; id: string; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
+  | { kind: "furnset"; ids: string[]; start: Vec2; startScreen: [number, number]; base: Building; moved: boolean }
+  | { kind: "marquee"; start: Vec2; end: Vec2; add: boolean }
   | { kind: "rotate"; id: string; base: Building; moved: boolean }
   | { kind: "aim"; entityId: string; base: Building; moved: boolean }
   | { kind: "resize"; id: string; corner: [1 | -1, 1 | -1]; base: Building; moved: boolean }
@@ -171,7 +173,7 @@ interface Guides {
 }
 
 /** Drags that change the document live (restored when cancelled, recorded in the history when done). */
-const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", "rotate", "resize", "outdoor", "roofmove", "roofcorner", "roofvertex", "outvertex", "outbox", "pipept", "poolport", "pooldev", "pooljoint", "solarmove", "solarturn", "cablept", "holopt", "bgmove", "bgscale", "bgrotate"]);
+const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", "furnset", "rotate", "resize", "outdoor", "roofmove", "roofcorner", "roofvertex", "outvertex", "outbox", "pipept", "poolport", "pooldev", "pooljoint", "solarmove", "solarturn", "cablept", "holopt", "bgmove", "bgscale", "bgrotate"]);
 
 const HISTORY = 100;
 const SNAP_PX = 10;
@@ -255,6 +257,9 @@ export class Fp3dEditor extends LitElement {
     _vertex: { state: true },
     _openingId: { state: true },
     _furnitureId: { state: true },
+    _multi: { state: true },
+    _single: { state: true },
+    _multiMode: { state: true },
     _deviceId: { state: true },
     _deviceQuery: { state: true },
     _devSource: { state: true },
@@ -341,6 +346,14 @@ export class Fp3dEditor extends LitElement {
   private declare _vertex: number | null;
   private declare _openingId: string | null;
   private declare _furnitureId: string | null;
+  /** Several furniture items selected together (shift-click, a frame); empty = the usual single selection. */
+  private declare _multi: string[];
+  /** One part of a furniture block is edited on its own (double-click), not the whole block. */
+  private declare _single: boolean;
+  /** Touch: taps add items to the selection, a drag on empty ground draws a frame. */
+  private declare _multiMode: boolean;
+  /** The last tap on a furniture item, for the double-tap into a block. */
+  private lastFurnTap: { id: string; t: number } | null = null;
   private declare _deviceId: string | null;
   private declare _deviceQuery: string;
   /** Which devices the room form lists: its own area, other areas, or entities without an area. */
@@ -495,6 +508,9 @@ export class Fp3dEditor extends LitElement {
     this._vertex = null;
     this._openingId = null;
     this._furnitureId = null;
+    this._multi = [];
+    this._single = false;
+    this._multiMode = false;
     this._deviceId = null;
     this._deviceQuery = "";
     this._devSource = "area";
@@ -702,6 +718,20 @@ export class Fp3dEditor extends LitElement {
   private onFurnitureMoved3d(e: CustomEvent<{ id: string; x: number; z: number }>): void {
     const { id, x, z } = e.detail;
     const wall = this._doc.settings.wall_interior;
+    // a part of a block (or of a multi selection) takes the others along by the same step
+    const sel = this._furnitureId ? this.selection() : [];
+    const together = sel.includes(id) && sel.length > 1 ? sel : [];
+    if (together.length) {
+      const f = this.floor?.furniture.find((m) => m.id === id);
+      if (!f || together.some((x2) => this.isFixedItem("furniture", x2))) return;
+      const dx = round(x - f.x);
+      const dz = round(z - f.z);
+      const ids = new Set(together);
+      this.change((_, floor) => {
+        for (const m of floor.furniture) if (ids.has(m.id)) Object.assign(m, { x: round(m.x + dx), z: round(m.z + dz) });
+      });
+      return;
+    }
     this.change((doc) => {
       for (const floor of doc.floors) {
         const f = floor.furniture.find((m) => m.id === id);
@@ -1197,6 +1227,7 @@ export class Fp3dEditor extends LitElement {
     else if (d.kind === "device" || d.kind === "aim") target = ["device", d.entityId];
     else if (d.kind === "opening") target = ["opening", d.id];
     else if (d.kind === "furniture" || d.kind === "rotate" || d.kind === "resize") target = ["furniture", d.id];
+    else if (d.kind === "furnset") target = ["furniture", d.ids.find((id) => this.isFixedItem("furniture", id)) ?? d.ids[0]];
     else if (d.kind === "wallmove") target = ["wall", d.id];
     else if (d.kind === "outdoor") target = ["outdoor", d.id];
     if (!target || !this.isFixedItem(...target)) return;
@@ -1440,6 +1471,15 @@ export class Fp3dEditor extends LitElement {
       if (!this.placeOpening(this._openingPreset, local)) this.drag = { kind: "pan", last: local };
       return;
     }
+    if (this.isAdmin && (this._tool === "select" || this._tool === "furniture") && (e.shiftKey || this._multiMode)) {
+      // several furniture items: shift-click (or the multi mode on touch) adds or removes one, a drag draws a frame
+      const fEl = target.closest("[data-furniture]");
+      if (fEl) {
+        this.toggleMulti(fEl.getAttribute("data-furniture")!);
+        this.drag = null;
+      } else this.drag = { kind: "marquee", start: world, end: world, add: true };
+      return;
+    }
     const deviceEl = target.closest("[data-device]");
     if (deviceEl && this.isAdmin) {
       this.drag = { kind: "device", entityId: deviceEl.getAttribute("data-device")!, start: world, startScreen: local, base: this._doc, moved: false };
@@ -1471,8 +1511,23 @@ export class Fp3dEditor extends LitElement {
     const furnitureEl = target.closest("[data-furniture]");
     if (furnitureEl && !target.closest("[data-vertex], [data-mid]")) {
       const id = furnitureEl.getAttribute("data-furniture")!;
-      this.selectItem("furniture", id);
-      this.drag = this.isAdmin ? { kind: "furniture", id, start: world, startScreen: local, base: this._doc, moved: false } : { kind: "pan", last: local };
+      const now = Date.now();
+      const twice = this.lastFurnTap?.id === id && now - this.lastFurnTap.t < 400;
+      this.lastFurnTap = { id, t: now };
+      const f = this.floor.furniture.find((m) => m.id === id);
+      if (twice && f?.group) {
+        // a double tap into a block: this one part alone
+        this.selectItem("furniture", id);
+        this._single = true;
+      } else if (!this.selection().includes(id) || this._single) {
+        this.selectItem("furniture", id);
+      }
+      const set = this.selection();
+      this.drag = !this.isAdmin
+        ? { kind: "pan", last: local }
+        : set.length > 1
+          ? { kind: "furnset", ids: set, start: world, startScreen: local, base: this._doc, moved: false }
+          : { kind: "furniture", id, start: world, startScreen: local, base: this._doc, moved: false };
       return;
     }
     const vertexEl = target.closest("[data-vertex]");
@@ -2013,6 +2068,27 @@ export class Fp3dEditor extends LitElement {
         this.change((_, floor) => Object.assign(floor.furniture.find((q) => q.id === drag.id)!, { x, z, rotation }), drag.base, false);
         break;
       }
+      case "furnset": {
+        // the whole selection by the same step (on the grid; Alt: by the centimetre), no wall snap – it keeps its shape
+        if (!drag.moved && Math.hypot(local[0] - drag.startScreen[0], local[1] - drag.startScreen[1]) < 5) return;
+        drag.moved = true;
+        const g = e.altKey ? 0.01 : this._doc.settings.grid;
+        const dx = round(Math.round((world[0] - drag.start[0]) / g) * g);
+        const dz = round(Math.round((world[1] - drag.start[1]) / g) * g);
+        const ids = new Set(drag.ids);
+        this.change(
+          (_, floor) => {
+            for (const m of floor.furniture) if (ids.has(m.id)) Object.assign(m, { x: round(m.x + dx), z: round(m.z + dz) });
+          },
+          drag.base,
+          false,
+        );
+        break;
+      }
+      case "marquee":
+        drag.end = world;
+        this.requestUpdate();
+        break;
       case "outdoor": {
         if (!drag.moved && Math.hypot(local[0] - drag.startScreen[0], local[1] - drag.startScreen[1]) < 5) return;
         drag.moved = true;
@@ -2125,8 +2201,17 @@ export class Fp3dEditor extends LitElement {
         if (this._tool === "measure") this._draft = [this.snap(this.toWorld(...local), undefined, e.altKey)];
         else this.addDraftPoint(this.snap(this.toWorld(...local), undefined, e.altKey), local);
         break;
+      case "marquee": {
+        // everything whose centre lies in the frame joins the selection
+        const [x0, x1] = [Math.min(drag.start[0], drag.end[0]), Math.max(drag.start[0], drag.end[0])];
+        const [z0, z1] = [Math.min(drag.start[1], drag.end[1]), Math.max(drag.start[1], drag.end[1])];
+        const hit = (this.floor?.furniture ?? []).filter((m) => m.x >= x0 && m.x <= x1 && m.z >= z0 && m.z <= z1).map((m) => m.id);
+        if (hit.length) this.setMulti([...new Set([...this.selection(), ...this.withGroups(hit)])]);
+        break;
+      }
       case "opening":
       case "furniture":
+      case "furnset":
       case "rotate":
       case "aim":
       case "resize":
@@ -2510,7 +2595,8 @@ export class Fp3dEditor extends LitElement {
       this.redo();
     } else if (mod && e.key.toLowerCase() === "d") {
       e.preventDefault();
-      this.duplicateRoom();
+      if (this._furnitureId) this.duplicateFurniture();
+      else this.duplicateRoom();
     } else if (e.key === "Delete" || (e.key === "Backspace" && (this._tool === "select" || this._tool === "furniture"))) {
       if (this._deviceId) this.deleteItem("device", this._deviceId);
       else if (this._outdoorId) this.deleteOutdoor();
@@ -2521,6 +2607,8 @@ export class Fp3dEditor extends LitElement {
       else this.deleteRoom();
     } else if (e.key.toLowerCase() === "l" && !mod && this._tool === "roof" && this.roofSection && !this._doc.settings.lock_plan) {
       this.updateRoofSection({ locked: !this.roofSection.locked });
+    } else if (e.key.toLowerCase() === "l" && !mod && this._furnitureId && this.selection().length > 1) {
+      this.lockSelection(!this.selection().every((id) => this.isFixedItem("furniture", id)));
     } else if (e.key.toLowerCase() === "l" && !mod && (this._furnitureId || this._deviceId)) {
       const s = this.selectedFix!;
       this.toggleFixed(s.kind, s.id);
@@ -2562,11 +2650,19 @@ export class Fp3dEditor extends LitElement {
     const floor = this.floor;
     if (!floor || !this.isAdmin) return false;
     const fix = this.selectedFix;
-    if (fix && this.isFixedItem(fix.kind, fix.id)) {
+    const set = this._furnitureId ? this.selection() : [];
+    if ((fix && this.isFixedItem(fix.kind, fix.id)) || set.some((id) => this.isFixedItem("furniture", id))) {
       this._fixedHint = true;
       return true;
     }
     const mv = (p: Vec2): Vec2 => [round(p[0] + dx), round(p[1] + dz)];
+    if (set.length > 1) {
+      const ids = new Set(set);
+      this.change((_, f) => {
+        for (const m of f.furniture) if (ids.has(m.id)) [m.x, m.z] = mv([m.x, m.z]);
+      });
+      return true;
+    }
     if (this._deviceId) {
       const id = this._deviceId;
       if (!floor.placements.some((p) => p.entity_id === id)) return false;
@@ -4134,6 +4230,8 @@ export class Fp3dEditor extends LitElement {
     this._roomId = kind === "room" ? id : this._roomId;
     this._openingId = kind === "opening" ? id : null;
     this._furnitureId = kind === "furniture" ? id : null;
+    this._multi = [];
+    this._single = false;
     this._deviceId = kind === "device" ? id : null;
     if (kind === "device" && id) {
       const pl = this.floor?.placements.find((x) => x.entity_id === id);
@@ -4384,12 +4482,24 @@ export class Fp3dEditor extends LitElement {
   private rotateFurniture(delta: number): void {
     const f = this.furnitureItem;
     if (!f || !this.isAdmin) return;
+    const set = this.selection();
+    if (set.length > 1) return this.rotateSelection(delta);
     this.updateFurniture({ rotation: (((f.rotation + delta) % 360) + 360) % 360 });
   }
 
   private deleteFurniture(): void {
     const id = this._furnitureId;
-    if (!id || !this.isAdmin || !this.confirmFixedDelete("furniture", id)) return;
+    if (!id || !this.isAdmin) return;
+    const set = this.selection();
+    if (set.length > 1) {
+      const fixed = set.some((x) => this.isFixedItem("furniture", x));
+      if (!confirm(this.t(fixed ? "block_delete_fixed" : "block_delete", { n: set.length }))) return;
+      const ids = new Set(set);
+      this.change((_, floor) => (floor.furniture = floor.furniture.filter((f) => !ids.has(f.id))));
+      this.selectItem("room", this._roomId);
+      return;
+    }
+    if (!this.confirmFixedDelete("furniture", id)) return;
     this.change((_, floor) => (floor.furniture = floor.furniture.filter((f) => f.id !== id)));
     this._furnitureId = null;
   }
@@ -4397,9 +4507,112 @@ export class Fp3dEditor extends LitElement {
   private duplicateFurniture(): void {
     const f = this.furnitureItem;
     if (!f || !this.isAdmin) return;
-    const copy = { ...structuredClone(f), id: uid("furniture"), x: round(f.x + 0.3), z: round(f.z + 0.3) };
+    const set = this.selection();
+    if (set.length > 1) {
+      // the copy of a block is a block of its own
+      const items = this.floor!.furniture.filter((m) => set.includes(m.id));
+      const blocks = new Map<string, string>();
+      const copies = items.map((m) => ({ ...structuredClone(m), id: uid("furniture"), x: round(m.x + 0.3), z: round(m.z + 0.3), group: m.group ? (blocks.get(m.group) ?? blocks.set(m.group, uid("block")).get(m.group)!) : null, locked: null }));
+      this.change((_, floor) => floor.furniture.push(...copies));
+      this.setMulti(copies.map((c) => c.id));
+      return;
+    }
+    const copy = { ...structuredClone(f), id: uid("furniture"), x: round(f.x + 0.3), z: round(f.z + 0.3), group: this._single ? f.group : null };
     this.change((_, floor) => floor.furniture.push(copy));
     this.selectItem("furniture", copy.id);
+  }
+
+  // ------------------------------------------------------------------ furniture blocks and multi selection
+
+  /** The furniture moved together: the multi selection, else the selected item's block (unless one part is edited alone), else the item. */
+  private selection(): string[] {
+    if (this._multi.length) return this._multi;
+    const f = this.furnitureItem;
+    if (!f) return [];
+    if (f.group && !this._single) return (this.floor?.furniture ?? []).filter((m) => m.group === f.group).map((m) => m.id);
+    return [f.id];
+  }
+
+  /** Ids with every other part of their blocks. */
+  private withGroups(ids: string[]): string[] {
+    const groups = new Set((this.floor?.furniture ?? []).filter((m) => ids.includes(m.id) && m.group).map((m) => m.group));
+    return [...new Set([...ids, ...(this.floor?.furniture ?? []).filter((m) => m.group && groups.has(m.group)).map((m) => m.id)])];
+  }
+
+  private setMulti(ids: string[]): void {
+    if (!ids.length) return this.selectItem("room", this._roomId);
+    this.selectItem("furniture", ids[0]);
+    // one item (or exactly one block) needs no multi selection
+    const block = this.selection();
+    if (ids.length > 1 && !(ids.length === block.length && ids.every((id) => block.includes(id)))) this._multi = ids;
+  }
+
+  /** Shift-click: an item (with its block) joins the selection or leaves it. */
+  private toggleMulti(id: string): void {
+    const cur = this._furnitureId ? this.selection() : [];
+    const part = this.withGroups([id]);
+    const next = cur.includes(id) ? cur.filter((x) => !part.includes(x)) : [...new Set([...cur, ...part])];
+    this.setMulti(next);
+  }
+
+  /** The selection's centre (middle of its items' extent). */
+  private selectionCentre(ids: string[]): Vec2 {
+    const items = (this.floor?.furniture ?? []).filter((m) => ids.includes(m.id));
+    const xs = items.map((m) => m.x);
+    const zs = items.map((m) => m.z);
+    return [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...zs) + Math.max(...zs)) / 2];
+  }
+
+  /** Turns the whole selection about its centre (positions and each item's own turn). */
+  private rotateSelection(delta: number): void {
+    const set = this.selection();
+    if (set.some((id) => this.isFixedItem("furniture", id))) {
+      this._fixedHint = true;
+      return;
+    }
+    const [cx, cz] = this.selectionCentre(set);
+    const a = (delta * Math.PI) / 180;
+    const c = Math.round(Math.cos(a) * 1e6) / 1e6;
+    const s = Math.round(Math.sin(a) * 1e6) / 1e6;
+    const ids = new Set(set);
+    this.change((_, floor) => {
+      for (const m of floor.furniture) {
+        if (!ids.has(m.id)) continue;
+        const dx = m.x - cx;
+        const dz = m.z - cz;
+        // the plan turns clockwise for a positive angle (x right, z down)
+        Object.assign(m, { x: round(cx + dx * c - dz * s), z: round(cz + dx * s + dz * c), rotation: (((m.rotation + delta) % 360) + 360) % 360 });
+      }
+    });
+  }
+
+  /** "Als Block zusammenfassen": the selection becomes one block. */
+  private groupSelection(): void {
+    const ids = new Set(this.selection());
+    if (ids.size < 2) return;
+    const gid = uid("block");
+    this.change((_, floor) => {
+      for (const m of floor.furniture) if (ids.has(m.id)) m.group = gid;
+    });
+    this._multi = [];
+    this._single = false;
+  }
+
+  /** "Block auflösen": every part on its own again (the parts stay selected). */
+  private ungroupSelection(): void {
+    const set = this.selection();
+    const ids = new Set(set);
+    this.change((_, floor) => {
+      for (const m of floor.furniture) if (ids.has(m.id)) m.group = null;
+    });
+    if (set.length > 1) this._multi = set;
+  }
+
+  private lockSelection(on: boolean): void {
+    const ids = new Set(this.selection());
+    this.change((_, floor) => {
+      for (const m of floor.furniture) if (ids.has(m.id)) m.locked = on || null;
+    });
   }
 
   /** Place entities in the selected room; an entity already placed elsewhere moves here. */
@@ -7572,8 +7785,11 @@ export class Fp3dEditor extends LitElement {
 
   private renderFurniture(floor: Floor) {
     const k = this._view.scale;
-    return svg`<g>${floor.furniture.map((f) => {
-      const sel = f.id === this._furnitureId;
+    const set = this._furnitureId ? this.selection() : [];
+    const many = set.length > 1;
+    return svg`<g>${this.renderSelectionFrame(floor, set)}${floor.furniture.map((f) => {
+      const member = set.includes(f.id);
+      const sel = f.id === this._furnitureId && !many;
       const [cx, cy] = this.toScreen([f.x, f.z]);
       const big = Math.min(f.w, f.d) * k > 44;
       // the handle sits in front of the item; dragging it turns the item
@@ -7582,7 +7798,7 @@ export class Fp3dEditor extends LitElement {
       const [hx, hy] = this.toScreen([f.x - Math.sin(a) * reach, f.z + Math.cos(a) * reach]);
       const [fx, fy] = this.toScreen([f.x - Math.sin(a) * (f.d / 2), f.z + Math.cos(a) * (f.d / 2)]);
       const lit = isLamp(f.type) && !!f.entity && f.entity !== "none" && this.hass?.states[f.entity]?.state === "on";
-      return svg`<g data-furniture=${f.id} class=${`fp3d-furn${sel ? " fp3d-furn-sel" : ""}${lit ? " fp3d-furn-lit" : ""}${(ENERGY_DEVICES as readonly string[]).includes(f.type) ? " fp3d-energy-item" : ""}`}>
+      return svg`<g data-furniture=${f.id} class=${`fp3d-furn${sel || member ? " fp3d-furn-sel" : ""}${lit ? " fp3d-furn-lit" : ""}${(ENERGY_DEVICES as readonly string[]).includes(f.type) ? " fp3d-energy-item" : ""}`}>
         <g transform="translate(${cx} ${cy}) rotate(${f.rotation}) scale(${f.mirror ? -k : k} ${k})">
           <rect class="fp3d-furn-body" x=${-f.w / 2} y=${-f.d / 2} width=${f.w} height=${f.d} />
           <g class="fp3d-furn-sym">${furnitureSymbol(f.type, f.w, f.d)}</g>
@@ -7616,6 +7832,58 @@ export class Fp3dEditor extends LitElement {
           </g>`
         : nothing}`;
     })}</g>`;
+  }
+
+  /** A dashed frame around several selected items (a block or a multi selection), and the frame being drawn. */
+  private renderSelectionFrame(floor: Floor, set: string[]) {
+    const d = this.drag;
+    const drawing = d?.kind === "marquee" ? svg`<rect class="fp3d-marquee" x=${Math.min(...[d.start, d.end].map((p) => this.toScreen(p)[0]))} y=${Math.min(...[d.start, d.end].map((p) => this.toScreen(p)[1]))} width=${Math.abs(this.toScreen(d.end)[0] - this.toScreen(d.start)[0])} height=${Math.abs(this.toScreen(d.end)[1] - this.toScreen(d.start)[1])} />` : nothing;
+    if (set.length < 2) return drawing;
+    const pts = floor.furniture.filter((m) => set.includes(m.id)).flatMap((m) => furnitureFootprint(m));
+    if (!pts.length) return drawing;
+    const [x0, y0] = this.toScreen([Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1]))]);
+    const [x1, y1] = this.toScreen([Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))]);
+    const block = !this._multi.length;
+    return svg`${drawing}<g class=${`fp3d-selframe${block ? " fp3d-selframe-block" : ""}`}>
+      <rect x=${x0 - 6} y=${y0 - 6} width=${x1 - x0 + 12} height=${y1 - y0 + 12} rx="6" />
+      <text x=${x0 - 4} y=${y0 - 12}>${block ? `▣ ${this.t("block_title")} · ${set.length}` : this.t("multi_title", { n: set.length })}</text>
+    </g>`;
+  }
+
+  /** Side panel for several items: a block (or a multi selection that can become one). */
+  private renderBlockForm() {
+    const set = this.selection();
+    const items = (this.floor?.furniture ?? []).filter((m) => set.includes(m.id));
+    const block = !this._multi.length && !!items[0]?.group;
+    const fixed = items.every((m) => this.isFixedItem("furniture", m.id));
+    return html`<section>
+      <div class="fp3d-h3row"><h3>${block ? `▣ ${this.t("block_title")}` : this.t("multi_title", { n: items.length })}</h3></div>
+      <p class="fp3d-sub">${this.t(block ? "block_hint" : "multi_hint")}</p>
+      <div class="fp3d-block-parts">
+        ${items.map(
+          (m) => html`<button class="fp3d-chip" title=${this.t("block_part_edit")} @click=${() => {
+            this.selectItem("furniture", m.id);
+            this._single = !!m.group;
+          }}>${m.name || furnitureName(this.hass, m.type)}</button>`,
+        )}
+      </div>
+      <div class="fp3d-actions">
+        ${block
+          ? html`<button class="fp3d-btn" @click=${() => this.ungroupSelection()}>${this.t("block_break")}</button>`
+          : html`<button class="fp3d-btn fp3d-primary" @click=${() => this.groupSelection()}>▣ ${this.t("block_make")}</button>`}
+        <button class="fp3d-btn" @click=${() => this.rotateSelection(-90)}>${this.t("rotate_left")}</button>
+        <button class="fp3d-btn" @click=${() => this.rotateSelection(90)}>${this.t("rotate_right")}</button>
+        <button class="fp3d-btn" @click=${() => this.duplicateFurniture()}>${this.t("duplicate")}</button>
+        <button class="fp3d-btn" @click=${() => this.lockSelection(!fixed)}>${fixed ? `🔓 ${this.t("unfix")}` : `🔒 ${this.t("fix")}`}</button>
+        <button class="fp3d-btn fp3d-danger" @click=${() => this.deleteFurniture()}>${this.t("delete")}</button>
+      </div>
+      ${this.renderMultiToggle()}
+    </section>`;
+  }
+
+  /** Touch has no shift key: this switch makes taps add items and a drag on empty ground draw a frame. */
+  private renderMultiToggle() {
+    return html`<label class="fp3d-check fp3d-multi-toggle"><input type="checkbox" .checked=${this._multiMode} @change=${(e: Event) => (this._multiMode = (e.target as HTMLInputElement).checked)} /> ${this.t("multi_mode")}</label>`;
   }
 
   private renderOpenings(floor: Floor, walls: Wall[]) {
@@ -8593,9 +8861,16 @@ export class Fp3dEditor extends LitElement {
   }
 
   private renderFurnitureForm(f: Furniture) {
+    if (this.selection().length > 1) return this.renderBlockForm();
     const admin = this.isAdmin;
     return html`<section>
       <div class="fp3d-h3row"><h3>${f.name || this.t("furniture")}</h3>${this.fixButton("furniture", f.id)}</div>
+      ${f.group
+        ? html`<p class="fp3d-sub fp3d-block-note">▣ ${this.t("block_part")} <button class="fp3d-link" @click=${() => {
+            this._single = false;
+            this.requestUpdate();
+          }}>${this.t("block_select")}</button></p>`
+        : nothing}
       <div class="fp3d-form">
         <label class="fp3d-field fp3d-wide"
           >${this.t("furn_name")}
@@ -8696,7 +8971,8 @@ export class Fp3dEditor extends LitElement {
             ${f.entity && f.entity !== "none" && f.type !== "parking" ? html`<button class="fp3d-btn" title=${this.t("as_device_hint")} @click=${() => this.furnitureToDevice(f)}>${this.t("as_device")}</button>` : nothing}
             <button class="fp3d-btn" @click=${() => this.duplicateFurniture()}>${this.t("duplicate")}</button>
             <button class="fp3d-btn fp3d-danger" @click=${() => this.deleteFurniture()}>${this.t("delete")}</button>
-          </div>`
+          </div>
+          ${this.renderMultiToggle()}`
         : nothing}
     </section>`;
   }
@@ -12375,6 +12651,48 @@ export class Fp3dEditor extends LitElement {
         fill: rgba(55, 224, 255, 0.16);
         stroke: var(--fp3d-accent);
         stroke-width: 2;
+      }
+      /* furniture blocks and multi selections: a dashed frame with its name, the frame being drawn */
+      .fp3d-selframe rect {
+        fill: none;
+        stroke: var(--fp3d-accent);
+        stroke-width: 1.5;
+        stroke-dasharray: 6 4;
+        pointer-events: none;
+      }
+      .fp3d-selframe-block rect {
+        stroke: #ffb547;
+      }
+      .fp3d-selframe text {
+        fill: var(--fp3d-accent);
+        font-size: 11px;
+        font-weight: 600;
+        pointer-events: none;
+      }
+      .fp3d-selframe-block text {
+        fill: #ffb547;
+      }
+      .fp3d-marquee {
+        fill: rgba(55, 224, 255, 0.08);
+        stroke: var(--fp3d-accent);
+        stroke-width: 1;
+        stroke-dasharray: 4 3;
+        pointer-events: none;
+      }
+      .fp3d-block-parts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 6px 0 10px;
+      }
+      .fp3d-block-note {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .fp3d-multi-toggle {
+        margin-top: 8px;
       }
       .fp3d-open {
         cursor: grab;

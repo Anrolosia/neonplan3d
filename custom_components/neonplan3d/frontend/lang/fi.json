@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Poistetaanko palvelimelta kaikki tämän asennuksen raportit ja lopetetaan lähettäminen?",
  "diag_deleted": "Poistettu. Lähettäminen on pois päältä; jos otat sen uudelleen käyttöön, saat uuden tunnisteen.",
  "diag_delete_failed": "NeonPlan-palvelimeen ei saatu yhteyttä. Yritä myöhemmin uudelleen.",
- "diag_unavailable": "Tämä asetus on käytettävissä Home Assistantin uudelleenkäynnistyksen jälkeen."
+ "diag_unavailable": "Tämä asetus on käytettävissä Home Assistantin uudelleenkäynnistyksen jälkeen.",
+ "block_title": "Huonekaluryhmä",
+ "multi_title": "{n} huonekalua valittu",
+ "block_hint": "Yksi napsautus valitsee koko ryhmän, vetämällä sen voi siirtää. Yksittäinen osa: napauta sitä kahdesti tai valitse sen nimi alta.",
+ "multi_hint": "Vaihto + napsautus lisää tai poistaa huonekaluja, Vaihto + veto tyhjällä alueella piirtää kehyksen. Siirrä, käännä tai kopioi ne yhdessä tai yhdistä ne ryhmäksi.",
+ "block_part_edit": "Muokkaa vain tätä osaa",
+ "block_break": "Pura ryhmä",
+ "block_make": "Yhdistä ryhmäksi",
+ "multi_mode": "Valitse useita (napautus lisää, veto piirtää kehyksen)",
+ "block_part": "Osa ryhmää.",
+ "block_select": "Valitse koko ryhmä",
+ "block_delete": "Poistetaanko {n} huonekalua?",
+ "block_delete_fixed": "Poistetaanko {n} huonekalua? Osa niistä on lukittu."
 }

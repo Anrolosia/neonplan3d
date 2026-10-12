@@ -1612,5 +1612,17 @@
  "diag_delete_confirm": "Izbrišem na strežniku vsa poročila te namestitve in ustavim pošiljanje?",
  "diag_deleted": "Izbrisano. Pošiljanje je izklopljeno; če ga spet vklopiš, dobiš nov ID.",
  "diag_delete_failed": "Strežnika NeonPlan ni bilo mogoče doseči. Poskusi znova pozneje.",
- "diag_unavailable": "Ta nastavitev je na voljo po ponovnem zagonu Home Assistanta."
+ "diag_unavailable": "Ta nastavitev je na voljo po ponovnem zagonu Home Assistanta.",
+ "block_title": "Pohištveni blok",
+ "multi_title": "Izbranih kosov pohištva: {n}",
+ "block_hint": "En klik izbere celoten blok, z vlečenjem ga premaknete. En sam del: tapnite ga dvakrat ali spodaj izberite njegovo ime.",
+ "multi_hint": "Shift + klik doda ali odstrani pohištvo, Shift + vlečenje po prazni površini nariše okvir. Premikajte, vrtite ali kopirajte jih skupaj ali jih združite v blok.",
+ "block_part_edit": "Uredi samo ta del",
+ "block_break": "Razdruži blok",
+ "block_make": "Združi v blok",
+ "multi_mode": "Izberi več (tap doda, vlečenje nariše okvir)",
+ "block_part": "Del bloka.",
+ "block_select": "Izberi celoten blok",
+ "block_delete": "Izbrišem {n} kosov pohištva?",
+ "block_delete_fixed": "Izbrišem {n} kosov pohištva? Nekateri so zaklenjeni."
 }
