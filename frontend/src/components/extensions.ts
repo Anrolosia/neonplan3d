@@ -123,7 +123,8 @@ export class Extensions extends LitElement {
    * their names, kinds and fur.
    */
   private renderFun(unlocked: Set<string>) {
-    const shown = FUN.filter((f) => released(f));
+    // unlocked by an installed pack (this page's own list), or shown to test with the lab switch
+    const shown = FUN.filter((f) => unlocked.has(f) || released(f));
     if (!shown.length) return nothing;
     const pets = this.building?.settings.pets ?? null;
     const list = pets?.list ?? [];
@@ -579,6 +580,15 @@ export class Extensions extends LitElement {
         gap: 6px;
         align-items: center;
         margin-top: 6px;
+      }
+      .fp3d-pet-row input[type="text"],
+      .fp3d-pet-row select {
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--fp3d-line, rgba(120, 190, 255, 0.25));
+        background: rgba(4, 8, 18, 0.6);
+        color: inherit;
+        font: inherit;
       }
       .fp3d-pet-row input[type="text"] {
         flex: 1;

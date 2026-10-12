@@ -242,7 +242,7 @@ var Ln=globalThis,Wn=Ln.ShadowRoot&&(Ln.ShadyCSS===void 0||Ln.ShadyCSS.nativeSha
         </div>
       </section>
       ${this.renderFun(e)} ${this.renderPacks()}
-    </div>`}editBuilding(e){if(!this.building)return;let t=structuredClone(this.building);e(t),this.dispatchEvent(new CustomEvent("building-edit",{detail:t,bubbles:!0,composed:!0}))}renderFun(e){let t=To.filter(d=>He(d));if(!t.length)return y;let n=this.building?.settings.pets??null,i=n?.list??[],o=n?.on!==!1,s=(this.building?.floors??[]).filter(d=>d.rooms.length),r=d=>this.editBuilding(h=>{let c={on:h.settings.pets?.on!==!1,list:[...h.settings.pets?.list??[]]};d(c),h.settings.pets=c}),a=(d,h)=>r(c=>c.list=c.list.map(u=>u.id===d?{...u,...h}:u));return g`<section class="fp3d-ext-card">
+    </div>`}editBuilding(e){if(!this.building)return;let t=structuredClone(this.building);e(t),this.dispatchEvent(new CustomEvent("building-edit",{detail:t,bubbles:!0,composed:!0}))}renderFun(e){let t=To.filter(d=>e.has(d)||He(d));if(!t.length)return y;let n=this.building?.settings.pets??null,i=n?.list??[],o=n?.on!==!1,s=(this.building?.floors??[]).filter(d=>d.rooms.length),r=d=>this.editBuilding(h=>{let c={on:h.settings.pets?.on!==!1,list:[...h.settings.pets?.list??[]]};d(c),h.settings.pets=c}),a=(d,h)=>r(c=>c.list=c.list.map(u=>u.id===d?{...u,...h}:u));return g`<section class="fp3d-ext-card">
       <h3>🎈 ${this.t("fun_title")}</h3>
       <p class="fp3d-sub">${this.t("fun_intro")}</p>
       ${t.map(d=>e.has(d)?g`<div class="fp3d-ext-feature fp3d-ext-on">
@@ -504,6 +504,15 @@ var Ln=globalThis,Wn=Ln.ShadowRoot&&(Ln.ShadyCSS===void 0||Ln.ShadyCSS.nativeSha
         gap: 6px;
         align-items: center;
         margin-top: 6px;
+      }
+      .fp3d-pet-row input[type="text"],
+      .fp3d-pet-row select {
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--fp3d-line, rgba(120, 190, 255, 0.25));
+        background: rgba(4, 8, 18, 0.6);
+        color: inherit;
+        font: inherit;
       }
       .fp3d-pet-row input[type="text"] {
         flex: 1;
