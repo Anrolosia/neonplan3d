@@ -449,6 +449,14 @@ export class Fp3dEditor extends LitElement {
   private declare _feedKind: string | null;
   /** Where a press in the drawing went down (a drag from there draws a pipe to where it is let go). */
   private techPress: { s: number; y: number } | null = null;
+  /** The zoomed part of the 2D wall view (svg units), per wall; null: the whole wall. */
+  private wvZoom: { key: string; k: number; x0: number; y0: number } | null = null;
+  /** Touch points on the 2D wall view, and a two-finger zoom under way. */
+  private wvTouch = new Map<number, { x: number; y: number }>();
+  private wvPinch: { d: number; mx: number; my: number; k: number; x0: number; y0: number } | null = null;
+  /** A touch while drawing waits for its release (a second finger makes it a zoom instead of a point). */
+  private wvTap: { s: number; y: number } | null = null;
+  private wvScale = 1;
   /** The wall about to be picked opens straight in "Technik zeichnen" (asked from the pool tool). */
   private techPick = false;
   /** Pool Pro: the part whose card is open ("dev:<id>", "joint:<id>", "port:<id>") and its pool. */
@@ -6221,7 +6229,52 @@ export class Fp3dEditor extends LitElement {
     const go = (edge: number) => this.openWallView(room.id, edge);
     void this._wallPicTick;
     void this.askWallPics(frame, items.map((i) => floor.furniture.find((m) => m.id === i.id)).filter((m): m is Furniture => !!m));
-    const fs = Math.max(0.09, Math.min(0.16, L / 40));
+    // zoom: the part of the wall shown (the whole wall plus a margin at k = 1)
+    const zkey = `${room.id}:${v.edge}`;
+    const z = this.wvZoom?.key === zkey ? this.wvZoom : null;
+    const W0 = L + 1;
+    const H0 = H + 0.9;
+    const clampZ = (k: number, x0: number, y0: number) => {
+      const kk = Math.min(8, Math.max(1, k));
+      const w = W0 / kk;
+      const h = H0 / kk;
+      return { k: kk, w, h, x0: Math.min(-0.5 + W0 - w, Math.max(-0.5, x0)), y0: Math.min(-0.35 + H0 - h, Math.max(-0.35, y0)) };
+    };
+    const vb = clampZ(z?.k ?? 1, z?.x0 ?? -0.5, z?.y0 ?? -0.35);
+    const setZoom = (k: number, x0: number, y0: number) => {
+      const c = clampZ(k, x0, y0);
+      this.wvZoom = c.k <= 1.001 ? null : { key: zkey, k: c.k, x0: c.x0, y0: c.y0 };
+      this.requestUpdate();
+    };
+    // the point (svg units) under the pointer stays where it is
+    const zoomAt = (px: number, py: number, k: number) => {
+      const kk = Math.min(8, Math.max(1, k));
+      setZoom(kk, px - ((px - vb.x0) * vb.k) / kk, py - ((py - vb.y0) * vb.k) / kk);
+    };
+    const pinchMove = (el: SVGSVGElement) => {
+      const pz = this.wvPinch!;
+      const [a, b] = [...this.wvTouch.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      const mx = (a.x + b.x) / 2;
+      const my = (a.y + b.y) / 2;
+      const r = el.getBoundingClientRect();
+      // screen pixels per svg unit at the start (the view keeps its aspect: the smaller scale fits)
+      const W = W0 / pz.k;
+      const Hh = H0 / pz.k;
+      const scale = Math.min(r.width / W, r.height / Hh);
+      const ox = r.left + (r.width - W * scale) / 2;
+      const oy = r.top + (r.height - Hh * scale) / 2;
+      const sx = pz.x0 + (pz.mx - ox) / scale;
+      const sy = pz.y0 + (pz.my - oy) / scale;
+      const k = Math.min(8, Math.max(1, (pz.k * d) / Math.max(1, pz.d)));
+      const s2 = scale * (k / pz.k);
+      const ox2 = r.left + (r.width - (W0 / k) * s2) / 2;
+      const oy2 = r.top + (r.height - (H0 / k) * s2) / 2;
+      setZoom(k, sx - (mx - ox2) / s2, sy - (my - oy2) / s2);
+    };
+    // labels, markers and fittings grow slower than the wall when zoomed
+    this.wvScale = 1 / Math.sqrt(vb.k);
+    const fs = Math.max(0.09, Math.min(0.16, L / 40)) * this.wvScale;
     // Pool Pro: the pipes on this wall
     const pool = this.canLayRuns ? this.runPool : undefined;
     const rc: RunCtx | null = (this.runCtx3d = pool
@@ -6277,6 +6330,19 @@ export class Fp3dEditor extends LitElement {
         <div class="fp3d-wv-stage">
           <button class="fp3d-wv-side fp3d-wv-left" title=${`${this.t("wall_prev")}: ${wallName(leftEdge)}`} @click=${() => go(leftEdge)}>‹<small>${wallName(leftEdge)}</small></button>
           <button class="fp3d-wv-side fp3d-wv-right" title=${`${this.t("wall_next")}: ${wallName(rightEdge)}`} @click=${() => go(rightEdge)}>›<small>${wallName(rightEdge)}</small></button>
+          ${this._wallView3d
+            ? nothing
+            : html`<div class="fp3d-wv-zoom" title=${this.t("wall_zoom_hint")}>
+                <button class="fp3d-btn" aria-label="+" @click=${() => zoomAt(vb.x0 + vb.w / 2, vb.y0 + vb.h / 2, vb.k * 1.6)}>＋</button>
+                <button class="fp3d-btn" aria-label="−" ?disabled=${vb.k <= 1.001} @click=${() => zoomAt(vb.x0 + vb.w / 2, vb.y0 + vb.h / 2, vb.k / 1.6)}>−</button>
+                <button class="fp3d-btn" title=${this.t("wall_zoom_all")} ?disabled=${vb.k <= 1.001} @click=${() => setZoom(1, -0.5, -0.35)}>⤢</button>
+                ${vb.k > 1.001
+                  ? html`<button class="fp3d-btn" aria-label="←" @click=${() => setZoom(vb.k, vb.x0 - vb.w * 0.3, vb.y0)}>←</button>
+                      <button class="fp3d-btn" aria-label="→" @click=${() => setZoom(vb.k, vb.x0 + vb.w * 0.3, vb.y0)}>→</button>
+                      <button class="fp3d-btn" aria-label="↑" @click=${() => setZoom(vb.k, vb.x0, vb.y0 - vb.h * 0.3)}>↑</button>
+                      <button class="fp3d-btn" aria-label="↓" @click=${() => setZoom(vb.k, vb.x0, vb.y0 + vb.h * 0.3)}>↓</button>`
+                  : nothing}
+              </div>`}
         ${this._wallView3d
           ? html`<fp3d-view3d
               .walkable=${false}
@@ -6322,9 +6388,41 @@ export class Fp3dEditor extends LitElement {
             </div>`
           : html`<svg
           class="fp3d-wv-svg ${this._runMode ? "fp3d-wv-drawing" : ""} ${this._runMode === "valve" || this._runMode === "sight" ? "fp3d-wv-fitmode" : ""}"
-          viewBox="${-0.5} ${-0.35} ${L + 1} ${H + 0.9}"
+          viewBox="${vb.x0} ${vb.y0} ${vb.w} ${vb.h}"
           preserveAspectRatio="xMidYMid meet"
+          @wheel=${(e: WheelEvent) => {
+            e.preventDefault();
+            const el = e.currentTarget as SVGSVGElement;
+            const pt = el.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            const q = pt.matrixTransform(el.getScreenCTM()!.inverse());
+            zoomAt(q.x, q.y, vb.k * Math.exp(-e.deltaY * 0.0015));
+          }}
           @pointerdown=${(e: PointerEvent) => {
+            if (e.pointerType === "touch") {
+              this.wvTouch.set(e.pointerId, { x: e.clientX, y: e.clientY });
+              if (this.wvTouch.size === 2) {
+                // a second finger: zoom and pan instead of what the first one began
+                const [a, b] = [...this.wvTouch.values()];
+                this.wvPinch = { d: Math.hypot(a.x - b.x, a.y - b.y), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2, k: vb.k, x0: vb.x0, y0: vb.y0 };
+                this.wvTap = null;
+                this.techPress = null;
+                up();
+                this.runPointUp();
+                this.fitDrag = null;
+                this.jointDrag = null;
+                return;
+              }
+              if (this.wvPinch) return;
+              if (rc && this._runMode && this.isAdmin) {
+                e.stopPropagation();
+                const q = rc.pt(e);
+                this.wvTap = q;
+                this.techPress = q;
+                return;
+              }
+            }
             if (rc && this._runMode) {
               this.techPress = rc.pt(e);
               this.runDown(e, rc);
@@ -6332,6 +6430,11 @@ export class Fp3dEditor extends LitElement {
             else wallDown(e);
           }}
           @pointermove=${(e: PointerEvent) => {
+            if (this.wvTouch.has(e.pointerId)) this.wvTouch.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            if (this.wvPinch) {
+              if (this.wvTouch.size === 2) pinchMove(e.currentTarget as SVGSVGElement);
+              return;
+            }
             move(e);
             if (rc && this.jointDrag) this.jointMove(e, rc);
             else if (rc && this.fitDrag) this.fittingMove(e, rc);
@@ -6343,6 +6446,14 @@ export class Fp3dEditor extends LitElement {
             }
           }}
           @pointerup=${(e: PointerEvent) => {
+            this.wvTouch.delete(e.pointerId);
+            if (this.wvPinch) {
+              if (!this.wvTouch.size) this.wvPinch = null;
+              return;
+            }
+            const tap = this.wvTap;
+            this.wvTap = null;
+            if (tap && rc && this._runMode) this.runAt(rc, tap.s, tap.y, false, 1, null);
             const press = this.techPress;
             this.techPress = null;
             if (rc && this._techMode && this._runMode === "draw" && this._runDraft && press) {
@@ -6357,7 +6468,11 @@ export class Fp3dEditor extends LitElement {
             if (jd?.moved) this.pushHistory(jd.base);
             else if (jd && rc) this.openCard(rc.pool.id, `joint:${jd.id}`);
           }}
-          @pointercancel=${() => {
+          @pointercancel=${(e: PointerEvent) => {
+            this.wvTouch.delete(e.pointerId);
+            if (!this.wvTouch.size) this.wvPinch = null;
+            this.wvTap = null;
+            this.techPress = null;
             up();
             this.runPointUp();
             this.fitDrag = null;
@@ -7482,7 +7597,7 @@ export class Fp3dEditor extends LitElement {
       const w = q && toWall(c.frame, [q.x, q.z]);
       return q && w && w.d > -0.6 && w.d < 1.6 && w.s > -0.2 && w.s < c.L + 0.2
         ? [
-            svg`<g class="fp3d-wv-node ${cls} ${joint ? "fp3d-wv-joint" : ""}" transform="translate(${X(w.s)} ${Y(q.y)})" @pointerdown=${(e: PointerEvent) => joint && this.jointDown(e, joint, w.d)}>
+            svg`<g class="fp3d-wv-node ${cls} ${joint ? "fp3d-wv-joint" : ""}" transform="translate(${X(w.s)} ${Y(q.y)}) scale(${this.wvScale})" @pointerdown=${(e: PointerEvent) => joint && this.jointDown(e, joint, w.d)}>
               <circle r="0.05" /><text y="0.11">${text}</text><title>${this.poolNodeLabel(c.pool, node)}</title>
             </g>`,
           ]
@@ -7524,7 +7639,7 @@ export class Fp3dEditor extends LitElement {
           ${r.ends.map((e) => svg`<circle class="fp3d-wv-end" cx=${X(e.s)} cy=${Y(e.y)} r="0.035" />`)}
           ${r.fittings.map((f) =>
             f.kind === "valve"
-              ? svg`<g class="fp3d-wv-valve ${f.open ? "" : "fp3d-wv-shut"}" transform="translate(${X(f.s)} ${Y(f.y)})" @pointerdown=${(e: PointerEvent) => this.fittingDown(e, c, r.id, f.id)}>
+              ? svg`<g class="fp3d-wv-valve ${f.open ? "" : "fp3d-wv-shut"}" transform="translate(${X(f.s)} ${Y(f.y)}) scale(${this.wvScale})" @pointerdown=${(e: PointerEvent) => this.fittingDown(e, c, r.id, f.id)}>
                   <circle r="0.05" /><line x1="0" y1="0" x2=${f.open ? 0.11 : 0} y2=${f.open ? 0 : -0.11} />
                 </g>`
               : svg`<rect class="fp3d-wv-sight" x=${X(f.s) - 0.06} y=${Y(f.y) - 0.035} width="0.12" height="0.07" rx="0.02" @pointerdown=${(e: PointerEvent) => this.fittingDown(e, c, r.id, f.id)} />`,
@@ -12888,6 +13003,18 @@ export class Fp3dEditor extends LitElement {
         position: relative;
         min-height: 0;
         padding: 0 60px;
+      }
+      .fp3d-wv-zoom {
+        position: absolute;
+        right: 64px;
+        bottom: 6px;
+        z-index: 1;
+        display: flex;
+        gap: 4px;
+      }
+      .fp3d-wv-zoom .fp3d-btn {
+        min-width: 34px;
+        padding: 4px 8px;
       }
       .fp3d-wv-side {
         position: absolute;
