@@ -9797,7 +9797,7 @@ export class Fp3dEditor extends LitElement {
             <button class="fp3d-btn" title=${this.t("flip_hinge_hint")} @click=${() => this.updateOpening({ hinge: o.hinge === "left" ? "right" : "left" })}>
               ⇆ ${this.t(o.leaves === 2 ? "flip_main_leaf" : "flip_hinge")}
             </button>
-            ${door
+            ${door || (window && o.sill < 0.1)
               ? html`<button class="fp3d-btn" title=${this.t("flip_swing_hint")} @click=${() => this.updateOpening({ swing: o.swing === "out" ? "in" : "out" })}>
                   ⇅ ${this.t("flip_swing")}
                 </button>`

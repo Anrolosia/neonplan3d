@@ -212,7 +212,7 @@ var Tn=globalThis,Ln=Tn.ShadowRoot&&(Tn.ShadyCSS===void 0||Tn.ShadyCSS.nativeSha
         color: var(--fp3d-muted);
         cursor: default;
       }
-    `]};customElements.get("fp3d-entity-picker")||customElements.define("fp3d-entity-picker",ts);var dc=new URL(import.meta.url),cc=new URL("./neonplan3d-3d.js?v=3b28ceca26da",dc).href,yl;function zi(){return yl??=import(cc),yl}function bt(l,e){if(!Bt(e))return Oe(l,`furn_${e}`);let t=me(e);return t?Ze(t,l?.language??navigator.language):Oe(l,"pack_missing_item")}var ns=class extends Le{static properties={hass:{attribute:!1},packs:{attribute:!1},_packMsg:{state:!0},_license:{state:!0},_licenseKey:{state:!0},_licenseBusy:{state:!0},_licenseMsg:{state:!0}};licenseLoading=!1;freshUpdates=null;constructor(){super(),this._packMsg=null,this._license=null,this._licenseKey="",this._licenseBusy=null,this._licenseMsg=null}get isAdmin(){return this.hass?.user?.is_admin??!1}t(e,t){return Oe(this.hass,e,t)}render(){let e=Ro(this.packs??[]);return b`<div class="fp3d-ext">
+    `]};customElements.get("fp3d-entity-picker")||customElements.define("fp3d-entity-picker",ts);var dc=new URL(import.meta.url),cc=new URL("./neonplan3d-3d.js?v=a907ca8210d2",dc).href,yl;function zi(){return yl??=import(cc),yl}function bt(l,e){if(!Bt(e))return Oe(l,`furn_${e}`);let t=me(e);return t?Ze(t,l?.language??navigator.language):Oe(l,"pack_missing_item")}var ns=class extends Le{static properties={hass:{attribute:!1},packs:{attribute:!1},_packMsg:{state:!0},_license:{state:!0},_licenseKey:{state:!0},_licenseBusy:{state:!0},_licenseMsg:{state:!0}};licenseLoading=!1;freshUpdates=null;constructor(){super(),this._packMsg=null,this._license=null,this._licenseKey="",this._licenseBusy=null,this._licenseMsg=null}get isAdmin(){return this.hass?.user?.is_admin??!1}t(e,t){return Oe(this.hass,e,t)}render(){let e=Ro(this.packs??[]);return b`<div class="fp3d-ext">
       <header class="fp3d-ext-head">
         <h2>${this.t("ext_title")}</h2>
         <p class="fp3d-sub">${this.t("ext_intro")}</p>
@@ -2058,7 +2058,7 @@ var Tn=globalThis,Ln=Tn.ShadowRoot&&(Tn.ShadyCSS===void 0||Tn.ShadyCSS.nativeSha
             <button class="fp3d-btn" title=${this.t("flip_hinge_hint")} @click=${()=>this.updateOpening({hinge:e.hinge==="left"?"right":"left"})}>
               ⇆ ${this.t(e.leaves===2?"flip_main_leaf":"flip_hinge")}
             </button>
-            ${f?b`<button class="fp3d-btn" title=${this.t("flip_swing_hint")} @click=${()=>this.updateOpening({swing:e.swing==="out"?"in":"out"})}>
+            ${f||n&&e.sill<.1?b`<button class="fp3d-btn" title=${this.t("flip_swing_hint")} @click=${()=>this.updateOpening({swing:e.swing==="out"?"in":"out"})}>
                   ⇅ ${this.t("flip_swing")}
                 </button>`:y}
           </div>`:y}
