@@ -8174,6 +8174,10 @@ export class Fp3dEditor extends LitElement {
                   <select ?disabled=${!admin} title=${this.t("pool_valve_position")} @change=${(e: Event) => this.setPoolDevice(f.id, { valve_position: (e.target as HTMLSelectElement).value as ValvePosition })}>
                   ${VALVE_POSITIONS.map((v) => html`<option value=${v} ?selected=${(f.valve_position ?? "filter") === v}>${this.t(`valve_${v}` as I18nKey)}</option>`)}
                 </select>`
+              : f.type === "pool_heat_pump"
+                ? html`<select ?disabled=${!admin} title=${this.t("hp_ports")} @change=${(e: Event) => this.setPoolDevice(f.id, { variant: (e.target as HTMLSelectElement).value === "right" ? null : (e.target as HTMLSelectElement).value })}>
+                    ${(["right", "left", "back"] as const).map((v) => html`<option value=${v} ?selected=${(f.variant ?? "right") === v}>${this.t("hp_ports")}: ${this.t(`hp_side_${v}` as I18nKey)}</option>`)}
+                  </select>`
               : f.type === "pool_valve"
                 ? html`<label class="fp3d-check"
                     ><input type="checkbox" .checked=${f.valve_open !== false} ?disabled=${!admin} @change=${(e: Event) => this.setPoolDevice(f.id, { valve_open: (e.target as HTMLInputElement).checked ? null : false })} />

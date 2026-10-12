@@ -1649,5 +1649,9 @@
  "pool_rim": "Kant over plenen (m)",
  "pool_depth_hint": "Dybde: fra kanten til bunnen. Et 1,50 m dypt basseng som stikker 20 cm opp: dybde 1,50, kant 0,20. Vannet står 15 cm under kanten.",
  "pool_port_depth": "Dybde",
- "pool_port_depth_hint": "Hvor dypt under vannlinjen (m): innløp vanligvis 0,30, skimmeren ved vannlinjen"
+ "pool_port_depth_hint": "Hvor dypt under vannlinjen (m): innløp vanligvis 0,30, skimmeren ved vannlinjen",
+ "hp_ports": "Tilkoblinger",
+ "hp_side_right": "høyre",
+ "hp_side_left": "venstre",
+ "hp_side_back": "bak"
 }

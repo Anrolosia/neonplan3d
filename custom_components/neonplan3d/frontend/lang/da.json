@@ -1649,5 +1649,9 @@
  "pool_rim": "Kant over græsset (m)",
  "pool_depth_hint": "Dybde: fra kanten til bunden. Et 1,50 m dybt bassin, der stikker 20 cm op: dybde 1,50, kant 0,20. Vandet står 15 cm under kanten.",
  "pool_port_depth": "Dybde",
- "pool_port_depth_hint": "Hvor dybt under vandlinjen (m): indløb typisk 0,30, skimmeren ved vandlinjen"
+ "pool_port_depth_hint": "Hvor dybt under vandlinjen (m): indløb typisk 0,30, skimmeren ved vandlinjen",
+ "hp_ports": "Tilslutninger",
+ "hp_side_right": "højre",
+ "hp_side_left": "venstre",
+ "hp_side_back": "bagpå"
 }

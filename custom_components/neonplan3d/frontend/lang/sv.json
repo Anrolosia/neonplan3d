@@ -1649,5 +1649,9 @@
  "pool_rim": "Kant över gräsmattan (m)",
  "pool_depth_hint": "Djup: från kanten till botten. En 1,50 m djup pool som sticker upp 20 cm: djup 1,50, kant 0,20. Vattnet står 15 cm under kanten.",
  "pool_port_depth": "Djup",
- "pool_port_depth_hint": "Hur djupt under vattenlinjen (m): inlopp oftast 0,30, skimmern vid vattenlinjen"
+ "pool_port_depth_hint": "Hur djupt under vattenlinjen (m): inlopp oftast 0,30, skimmern vid vattenlinjen",
+ "hp_ports": "Anslutningar",
+ "hp_side_right": "höger",
+ "hp_side_left": "vänster",
+ "hp_side_back": "bak"
 }

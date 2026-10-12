@@ -1649,5 +1649,9 @@
  "pool_rim": "Marginea deasupra gazonului (m)",
  "pool_depth_hint": "Adâncime: de la margine până la fund. O piscină adâncă de 1,50 m care iese 20 cm: adâncime 1,50, margine 0,20. Apa stă la 15 cm sub margine.",
  "pool_port_depth": "Adânc.",
- "pool_port_depth_hint": "Cât de adânc sub linia apei (m): duzele de obicei 0,30, skimmerul la linia apei"
+ "pool_port_depth_hint": "Cât de adânc sub linia apei (m): duzele de obicei 0,30, skimmerul la linia apei",
+ "hp_ports": "Racorduri",
+ "hp_side_right": "dreapta",
+ "hp_side_left": "stânga",
+ "hp_side_back": "spate"
 }

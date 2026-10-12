@@ -1649,5 +1649,9 @@
  "pool_rim": "Okraj nad trávníkem (m)",
  "pool_depth_hint": "Hloubka: od okraje ke dnu. Bazén hluboký 1,50 m, který vyčnívá 20 cm: hloubka 1,50, okraj 0,20. Voda stojí 15 cm pod okrajem.",
  "pool_port_depth": "Hloubka",
- "pool_port_depth_hint": "Jak hluboko pod hladinou (m): trysky obvykle 0,30, skimmer u hladiny"
+ "pool_port_depth_hint": "Jak hluboko pod hladinou (m): trysky obvykle 0,30, skimmer u hladiny",
+ "hp_ports": "Přípojky",
+ "hp_side_right": "vpravo",
+ "hp_side_left": "vlevo",
+ "hp_side_back": "vzadu"
 }

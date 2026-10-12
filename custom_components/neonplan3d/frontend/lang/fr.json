@@ -1649,5 +1649,9 @@
  "pool_rim": "Bord au-dessus de la pelouse (m)",
  "pool_depth_hint": "Profondeur : du bord jusqu'au fond. Une piscine de 1,50 m qui dépasse de 20 cm : profondeur 1,50, bord 0,20. L'eau est 15 cm sous le bord.",
  "pool_port_depth": "Prof.",
- "pool_port_depth_hint": "Profondeur sous la ligne d'eau (m) : buses souvent 0,30, le skimmer à la ligne d'eau"
+ "pool_port_depth_hint": "Profondeur sous la ligne d'eau (m) : buses souvent 0,30, le skimmer à la ligne d'eau",
+ "hp_ports": "Raccords",
+ "hp_side_right": "droite",
+ "hp_side_left": "gauche",
+ "hp_side_back": "arrière"
 }

@@ -1649,5 +1649,9 @@
  "pool_rim": "Rob nad travo (m)",
  "pool_depth_hint": "Globina: od roba do dna. Bazen, globok 1,50 m, ki gleda 20 cm iz trave: globina 1,50, rob 0,20. Voda stoji 15 cm pod robom.",
  "pool_port_depth": "Globina",
- "pool_port_depth_hint": "Kako globoko pod gladino (m): šobe običajno 0,30, skimmer na gladini"
+ "pool_port_depth_hint": "Kako globoko pod gladino (m): šobe običajno 0,30, skimmer na gladini",
+ "hp_ports": "Priključki",
+ "hp_side_right": "desno",
+ "hp_side_left": "levo",
+ "hp_side_back": "zadaj"
 }

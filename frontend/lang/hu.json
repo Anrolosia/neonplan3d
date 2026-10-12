@@ -1649,5 +1649,9 @@
  "pool_rim": "Perem a gyep felett (m)",
  "pool_depth_hint": "Mélység: a peremtől az aljáig. Egy 1,50 m mély medence, amely 20 cm-re kilóg: mélység 1,50, perem 0,20. A víz 15 cm-rel a perem alatt áll.",
  "pool_port_depth": "Mélység",
- "pool_port_depth_hint": "Milyen mélyen a vízvonal alatt (m): befúvók általában 0,30, a skimmer a vízvonalon"
+ "pool_port_depth_hint": "Milyen mélyen a vízvonal alatt (m): befúvók általában 0,30, a skimmer a vízvonalon",
+ "hp_ports": "Csatlakozók",
+ "hp_side_right": "jobb",
+ "hp_side_left": "bal",
+ "hp_side_back": "hátul"
 }

@@ -1649,5 +1649,9 @@
  "pool_rim": "Krawędź nad trawnikiem (m)",
  "pool_depth_hint": "Głębokość: od krawędzi do dna. Basen głęboki na 1,50 m wystający 20 cm: głębokość 1,50, krawędź 0,20. Woda stoi 15 cm poniżej krawędzi.",
  "pool_port_depth": "Głęb.",
- "pool_port_depth_hint": "Jak głęboko pod linią wody (m): dysze zwykle 0,30, skimmer na linii wody"
+ "pool_port_depth_hint": "Jak głęboko pod linią wody (m): dysze zwykle 0,30, skimmer na linii wody",
+ "hp_ports": "Przyłącza",
+ "hp_side_right": "z prawej",
+ "hp_side_left": "z lewej",
+ "hp_side_back": "z tyłu"
 }
