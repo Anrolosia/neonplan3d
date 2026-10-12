@@ -1624,5 +1624,19 @@
  "block_part": "Del bloka.",
  "block_select": "Izberi celoten blok",
  "block_delete": "Izbrišem {n} kosov pohištva?",
- "block_delete_fixed": "Izbrišem {n} kosov pohištva? Nekateri so zaklenjeni."
+ "block_delete_fixed": "Izbrišem {n} kosov pohištva? Nekateri so zaklenjeni.",
+ "wv_block_all": "Celoten blok",
+ "wv_block_one": "Samo ta del",
+ "wv_gap": "Vrzel: {w} – to gre noter:",
+ "wv_gap_hint": "Tapnite prosto mesto na steni: tu se prikaže, kar gre noter.",
+ "wv_kit_title": "Na steno",
+ "wv_recent": "Nazadnje uporabljeno",
+ "wv_none_fits": "V to vrzel ne gre nič.",
+ "wv_cat_base": "Spodnje omarice in komode",
+ "wv_cat_hang": "Viseče",
+ "wv_cat_tall": "Visoke omare",
+ "wv_cat_living": "Sedenje in ležanje",
+ "wv_cat_light": "Svetila",
+ "wv_cat_pack": "Iz vaših paketov",
+ "wv_cat_energy": "Energija"
 }

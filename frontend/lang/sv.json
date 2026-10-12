@@ -1624,5 +1624,19 @@
  "block_part": "Del av ett block.",
  "block_select": "Markera hela blocket",
  "block_delete": "Ta bort {n} möbler?",
- "block_delete_fixed": "Ta bort {n} möbler? Några av dem är låsta."
+ "block_delete_fixed": "Ta bort {n} möbler? Några av dem är låsta.",
+ "wv_block_all": "Hela blocket",
+ "wv_block_one": "Bara den här delen",
+ "wv_gap": "Lucka: {w} – det här passar:",
+ "wv_gap_hint": "Tryck på en ledig plats på väggen: här visas det som passar.",
+ "wv_kit_title": "På väggen",
+ "wv_recent": "Senast använda",
+ "wv_none_fits": "Inget passar i den här luckan.",
+ "wv_cat_base": "Underskåp & skänkar",
+ "wv_cat_hang": "Hängande",
+ "wv_cat_tall": "Höga skåp",
+ "wv_cat_living": "Sitta & ligga",
+ "wv_cat_light": "Lampor",
+ "wv_cat_pack": "Från dina paket",
+ "wv_cat_energy": "Energi"
 }

@@ -1624,5 +1624,19 @@
  "block_part": "Del af en blok.",
  "block_select": "Vælg hele blokken",
  "block_delete": "Slet {n} møbler?",
- "block_delete_fixed": "Slet {n} møbler? Nogle af dem er fastlåst."
+ "block_delete_fixed": "Slet {n} møbler? Nogle af dem er fastlåst.",
+ "wv_block_all": "Hele blokken",
+ "wv_block_one": "Kun denne del",
+ "wv_gap": "Plads: {w} – dette passer:",
+ "wv_gap_hint": "Tryk på et frit sted på væggen: her vises, hvad der passer.",
+ "wv_kit_title": "På væggen",
+ "wv_recent": "Senest brugt",
+ "wv_none_fits": "Intet passer i denne plads.",
+ "wv_cat_base": "Underskabe & skænke",
+ "wv_cat_hang": "Hængende",
+ "wv_cat_tall": "Høje skabe",
+ "wv_cat_living": "Sidde & ligge",
+ "wv_cat_light": "Lamper",
+ "wv_cat_pack": "Fra dine pakker",
+ "wv_cat_energy": "Energi"
 }

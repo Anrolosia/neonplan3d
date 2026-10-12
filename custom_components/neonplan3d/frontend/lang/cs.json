@@ -1624,5 +1624,19 @@
  "block_part": "Součást bloku.",
  "block_select": "Vybrat celý blok",
  "block_delete": "Smazat {n} kusů nábytku?",
- "block_delete_fixed": "Smazat {n} kusů nábytku? Některé jsou zamčené."
+ "block_delete_fixed": "Smazat {n} kusů nábytku? Některé jsou zamčené.",
+ "wv_block_all": "Celý blok",
+ "wv_block_one": "Jen tento díl",
+ "wv_gap": "Mezera: {w} – sem se vejde:",
+ "wv_gap_hint": "Klepněte na volné místo na stěně: zde se objeví, co se tam vejde.",
+ "wv_kit_title": "Na stěnu",
+ "wv_recent": "Naposledy použité",
+ "wv_none_fits": "Do této mezery se nic nevejde.",
+ "wv_cat_base": "Spodní skříňky a komody",
+ "wv_cat_hang": "Závěsné",
+ "wv_cat_tall": "Vysoké skříně",
+ "wv_cat_living": "Sezení a ležení",
+ "wv_cat_light": "Svítidla",
+ "wv_cat_pack": "Z vašich balíčků",
+ "wv_cat_energy": "Energie"
 }

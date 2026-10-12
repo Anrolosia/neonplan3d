@@ -1624,5 +1624,19 @@
  "block_part": "Del av ei blokk.",
  "block_select": "Vel heile blokka",
  "block_delete": "Slette {n} møblar?",
- "block_delete_fixed": "Slette {n} møblar? Nokre av dei er låste."
+ "block_delete_fixed": "Slette {n} møblar? Nokre av dei er låste.",
+ "wv_block_all": "Heile blokka",
+ "wv_block_one": "Berre denne delen",
+ "wv_gap": "Luke: {w} – dette passar:",
+ "wv_gap_hint": "Trykk på ein ledig stad på veggen: her kjem det som passar.",
+ "wv_kit_title": "På veggen",
+ "wv_recent": "Sist brukt",
+ "wv_none_fits": "Ingenting passar i denne luka.",
+ "wv_cat_base": "Underskåp & skjenkar",
+ "wv_cat_hang": "Hengjande",
+ "wv_cat_tall": "Høgskåp",
+ "wv_cat_living": "Sitje & liggje",
+ "wv_cat_light": "Lamper",
+ "wv_cat_pack": "Frå pakkane dine",
+ "wv_cat_energy": "Energi"
 }

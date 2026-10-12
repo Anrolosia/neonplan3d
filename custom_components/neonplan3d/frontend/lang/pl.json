@@ -1624,5 +1624,19 @@
  "block_part": "Część bloku.",
  "block_select": "Zaznacz cały blok",
  "block_delete": "Usunąć mebli: {n}?",
- "block_delete_fixed": "Usunąć mebli: {n}? Niektóre są zablokowane."
+ "block_delete_fixed": "Usunąć mebli: {n}? Niektóre są zablokowane.",
+ "wv_block_all": "Cały blok",
+ "wv_block_one": "Tylko ta część",
+ "wv_gap": "Luka: {w} – to się zmieści:",
+ "wv_gap_hint": "Stuknij wolne miejsce na ścianie: tu pojawi się, co się zmieści.",
+ "wv_kit_title": "Na ścianę",
+ "wv_recent": "Ostatnio używane",
+ "wv_none_fits": "Nic nie zmieści się w tej luce.",
+ "wv_cat_base": "Szafki dolne i komody",
+ "wv_cat_hang": "Wiszące",
+ "wv_cat_tall": "Szafy wysokie",
+ "wv_cat_living": "Siedzenie i spanie",
+ "wv_cat_light": "Oświetlenie",
+ "wv_cat_pack": "Z twoich pakietów",
+ "wv_cat_energy": "Energia"
 }

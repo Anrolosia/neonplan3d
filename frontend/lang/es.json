@@ -1624,5 +1624,19 @@
  "block_part": "Parte de un bloque.",
  "block_select": "Seleccionar todo el bloque",
  "block_delete": "¿Eliminar {n} muebles?",
- "block_delete_fixed": "¿Eliminar {n} muebles? Algunos están fijados."
+ "block_delete_fixed": "¿Eliminar {n} muebles? Algunos están fijados.",
+ "wv_block_all": "Bloque entero",
+ "wv_block_one": "Solo esta pieza",
+ "wv_gap": "Hueco: {w} – esto cabe:",
+ "wv_gap_hint": "Toca un lugar libre de la pared: aquí aparece lo que cabe.",
+ "wv_kit_title": "A la pared",
+ "wv_recent": "Usados recientemente",
+ "wv_none_fits": "Nada cabe en este hueco.",
+ "wv_cat_base": "Muebles bajos y aparadores",
+ "wv_cat_hang": "Colgados",
+ "wv_cat_tall": "Armarios altos",
+ "wv_cat_living": "Sentarse y dormir",
+ "wv_cat_light": "Luces",
+ "wv_cat_pack": "De tus packs",
+ "wv_cat_energy": "Energía"
 }

@@ -1624,5 +1624,19 @@
  "block_part": "Onderdeel van een blok.",
  "block_select": "Hele blok selecteren",
  "block_delete": "{n} meubels verwijderen?",
- "block_delete_fixed": "{n} meubels verwijderen? Sommige zijn vastgezet."
+ "block_delete_fixed": "{n} meubels verwijderen? Sommige zijn vastgezet.",
+ "wv_block_all": "Hele blok",
+ "wv_block_one": "Alleen dit onderdeel",
+ "wv_gap": "Ruimte: {w} – dit past erin:",
+ "wv_gap_hint": "Tik op een vrije plek aan de muur: hier verschijnt wat erin past.",
+ "wv_kit_title": "Aan de muur",
+ "wv_recent": "Laatst gebruikt",
+ "wv_none_fits": "Niets past in deze ruimte.",
+ "wv_cat_base": "Onderkasten & dressoirs",
+ "wv_cat_hang": "Hangend",
+ "wv_cat_tall": "Hoge kasten",
+ "wv_cat_living": "Zitten & liggen",
+ "wv_cat_light": "Lampen",
+ "wv_cat_pack": "Uit je packs",
+ "wv_cat_energy": "Energie"
 }

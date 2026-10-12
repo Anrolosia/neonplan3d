@@ -1624,5 +1624,19 @@
  "block_part": "Osa ryhmää.",
  "block_select": "Valitse koko ryhmä",
  "block_delete": "Poistetaanko {n} huonekalua?",
- "block_delete_fixed": "Poistetaanko {n} huonekalua? Osa niistä on lukittu."
+ "block_delete_fixed": "Poistetaanko {n} huonekalua? Osa niistä on lukittu.",
+ "wv_block_all": "Koko ryhmä",
+ "wv_block_one": "Vain tämä osa",
+ "wv_gap": "Rako: {w} – tähän mahtuu:",
+ "wv_gap_hint": "Napauta vapaata kohtaa seinällä: tähän tulee, mikä sinne mahtuu.",
+ "wv_kit_title": "Seinälle",
+ "wv_recent": "Viimeksi käytetyt",
+ "wv_none_fits": "Mikään ei mahdu tähän rakoon.",
+ "wv_cat_base": "Alakaapit ja senkit",
+ "wv_cat_hang": "Ripustettavat",
+ "wv_cat_tall": "Korkeat kaapit",
+ "wv_cat_living": "Istuminen ja makuu",
+ "wv_cat_light": "Valaisimet",
+ "wv_cat_pack": "Paketeistasi",
+ "wv_cat_energy": "Energia"
 }

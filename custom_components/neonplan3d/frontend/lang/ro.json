@@ -1624,5 +1624,19 @@
  "block_part": "Parte dintr-un bloc.",
  "block_select": "Selectează tot blocul",
  "block_delete": "Ștergi {n} piese de mobilier?",
- "block_delete_fixed": "Ștergi {n} piese de mobilier? Unele sunt fixate."
+ "block_delete_fixed": "Ștergi {n} piese de mobilier? Unele sunt fixate.",
+ "wv_block_all": "Tot blocul",
+ "wv_block_one": "Doar această piesă",
+ "wv_gap": "Spațiu: {w} – încape aici:",
+ "wv_gap_hint": "Atinge un loc liber pe perete: aici apare ce încape.",
+ "wv_kit_title": "Pe perete",
+ "wv_recent": "Folosite recent",
+ "wv_none_fits": "Nimic nu încape în acest spațiu.",
+ "wv_cat_base": "Corpuri joase și comode",
+ "wv_cat_hang": "Suspendate",
+ "wv_cat_tall": "Dulapuri înalte",
+ "wv_cat_living": "Șezut și dormit",
+ "wv_cat_light": "Lumini",
+ "wv_cat_pack": "Din pachetele tale",
+ "wv_cat_energy": "Energie"
 }

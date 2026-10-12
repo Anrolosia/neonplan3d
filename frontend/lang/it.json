@@ -1624,5 +1624,19 @@
  "block_part": "Parte di un blocco.",
  "block_select": "Seleziona l'intero blocco",
  "block_delete": "Eliminare {n} mobili?",
- "block_delete_fixed": "Eliminare {n} mobili? Alcuni sono bloccati."
+ "block_delete_fixed": "Eliminare {n} mobili? Alcuni sono bloccati.",
+ "wv_block_all": "Blocco intero",
+ "wv_block_one": "Solo questo pezzo",
+ "wv_gap": "Spazio: {w} – questo ci sta:",
+ "wv_gap_hint": "Tocca un punto libero della parete: qui appare ciò che ci sta.",
+ "wv_kit_title": "Alla parete",
+ "wv_recent": "Usati di recente",
+ "wv_none_fits": "Niente ci sta in questo spazio.",
+ "wv_cat_base": "Basi e madie",
+ "wv_cat_hang": "Pensili",
+ "wv_cat_tall": "Colonne",
+ "wv_cat_living": "Sedersi e dormire",
+ "wv_cat_light": "Luci",
+ "wv_cat_pack": "Dai tuoi pack",
+ "wv_cat_energy": "Energia"
 }

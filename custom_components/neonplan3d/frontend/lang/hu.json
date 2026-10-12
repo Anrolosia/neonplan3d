@@ -1624,5 +1624,19 @@
  "block_part": "Egy blokk része.",
  "block_select": "Az egész blokk kijelölése",
  "block_delete": "{n} bútor törlése?",
- "block_delete_fixed": "{n} bútor törlése? Némelyik rögzítve van."
+ "block_delete_fixed": "{n} bútor törlése? Némelyik rögzítve van.",
+ "wv_block_all": "Egész blokk",
+ "wv_block_one": "Csak ez az elem",
+ "wv_gap": "Hely: {w} – ez fér el:",
+ "wv_gap_hint": "Koppints egy szabad helyre a falon: itt jelenik meg, ami belefér.",
+ "wv_kit_title": "A falra",
+ "wv_recent": "Legutóbb használt",
+ "wv_none_fits": "Semmi sem fér ebbe a helyre.",
+ "wv_cat_base": "Alsószekrények és komódok",
+ "wv_cat_hang": "Függő",
+ "wv_cat_tall": "Magas szekrények",
+ "wv_cat_living": "Ülés és fekvés",
+ "wv_cat_light": "Lámpák",
+ "wv_cat_pack": "A csomagjaidból",
+ "wv_cat_energy": "Energia"
 }

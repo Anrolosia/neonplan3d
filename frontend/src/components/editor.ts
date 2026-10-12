@@ -176,6 +176,21 @@ interface Guides {
 const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", "furnset", "rotate", "resize", "outdoor", "roofmove", "roofcorner", "roofvertex", "outvertex", "outbox", "pipept", "poolport", "pooldev", "pooljoint", "solarmove", "solarturn", "cablept", "holopt", "bgmove", "bgscale", "bgrotate"]);
 
 const HISTORY = 100;
+
+/** Wall view side bar: what stands or hangs at a wall, by kind. */
+const WALL_CATS: Record<string, string[]> = {
+  base: ["kitchen", "sink", "stove", "dishwasher", "sideboard", "dresser", "tv_board", "nightstand", "washbasin", "washer", "dryer", "worktop", "desk"],
+  hang: ["kitchen_wall", "tv_wall", "shelf", "lamp_wall", "radiator", "led_strip"],
+  tall: ["kitchen_tall", "fridge", "wardrobe", "tall_cabinet", "shelf", "coat_rack"],
+  living: ["sofa", "armchair", "bed", "bunk_bed", "bench", "corner_bench", "plant"],
+  light: ["lamp_wall", "lamp_floor", "led_strip", "lamp_table"],
+};
+/** Hanging pieces (they go into a gap high on the wall). */
+const HANGING = new Set(["kitchen_wall", "tv_wall", "lamp_wall", "shelf", "led_strip"]);
+/** Cabinets built to measure: in a gap they take its width. */
+const WALL_FIT = new Set(["kitchen", "kitchen_wall", "kitchen_tall", "sideboard", "dresser", "tv_board", "worktop", "wardrobe", "tall_cabinet", "shelf", "desk"]);
+/** The narrowest a fitted piece may become (a 29 cm desk is no desk). */
+const WALL_FIT_MIN: Record<string, number> = { kitchen: 0.15, kitchen_wall: 0.2, kitchen_tall: 0.3, sideboard: 0.4, dresser: 0.4, tv_board: 0.6, worktop: 0.1, wardrobe: 0.4, tall_cabinet: 0.3, shelf: 0.25, desk: 0.6 };
 const SNAP_PX = 10;
 const round = (v: number) => Math.round(v * 1000) / 1000;
 
@@ -284,6 +299,12 @@ export class Fp3dEditor extends LitElement {
     _edgeHi: { state: true },
     _wallView: { state: true },
     _wallSel: { state: true },
+    _wallMulti: { state: true },
+    _wallSingle: { state: true },
+    _wallGap: { state: true },
+    _wallCat: { state: true },
+    _wallQuery: { state: true },
+    _wallFrame: { state: true },
     _wallPicTick: { state: true },
     _wallPick: { state: true },
     _runMode: { state: true },
@@ -396,6 +417,17 @@ export class Fp3dEditor extends LitElement {
   /** The wall view: a room's wall seen from the front (what stands and hangs on it), and the piece chosen in it. */
   private declare _wallView: { roomId: string; edge: number } | null;
   private declare _wallSel: string | null;
+  /** Wall view: several pieces chosen together (shift-click, a frame); empty = the usual single choice. */
+  private declare _wallMulti: string[];
+  /** Wall view: one part of a block moved on its own ("Nur dieses Teil"). */
+  private declare _wallSingle: boolean;
+  /** Wall view: the free stretch of wall tapped (from s0 to s1 along the wall; low = standing pieces, else hanging). */
+  private declare _wallGap: { s0: number; s1: number; low: boolean } | null;
+  /** Wall view side bar: the category shown and the search text. */
+  private declare _wallCat: string | null;
+  private declare _wallQuery: string;
+  /** Wall view: the frame being drawn (view coordinates). */
+  private declare _wallFrame: { x0: number; y0: number; x1: number; y1: number } | null;
   private declare _wallPicTick: number;
   /** The toolbar's wall view button is on: the next tap on a wall in the plan opens it. */
   private declare _wallPick: boolean;
@@ -429,7 +461,7 @@ export class Fp3dEditor extends LitElement {
   /** The height handle over the chosen piece in the 3D wall view (screen position, height text), and a lift in progress. */
   private liftRaf = 0;
   private lift: { id: string; y: number; startY: number; perPx: number; base: Building; top: number; moved: boolean } | null = null;
-  private wallDrag: { id: string; x: number; y: number; base: Building; s0: number; y0: number; lift: boolean; moved: boolean } | null = null;
+  private wallDrag: { id: string; ids?: string[]; w?: number; x: number; y: number; base: Building; s0: number; y0: number; lift: boolean; moved: boolean } | null = null;
   /** Front pictures of the pieces in the wall view, by type, size and turn (null: none to draw); asked for once. */
   private wallPics = new Map<string, { url: string; x0: number; x1: number; y0: number; y1: number } | null>();
   private wallPicsAsked = new Set<string>();
@@ -541,6 +573,12 @@ export class Fp3dEditor extends LitElement {
     this._edgeHi = null;
     this._wallView = null;
     this._wallSel = null;
+    this._wallMulti = [];
+    this._wallSingle = false;
+    this._wallGap = null;
+    this._wallCat = null;
+    this._wallQuery = "";
+    this._wallFrame = null;
     this._wallPicTick = 0;
     this._wallPick = false;
     this._runMode = null;
@@ -719,7 +757,7 @@ export class Fp3dEditor extends LitElement {
     const { id, x, z } = e.detail;
     const wall = this._doc.settings.wall_interior;
     // a part of a block (or of a multi selection) takes the others along by the same step
-    const sel = this._furnitureId ? this.selection() : [];
+    const sel = this._wallView ? this.wallSelection() : this._furnitureId ? this.selection() : [];
     const together = sel.includes(id) && sel.length > 1 ? sel : [];
     if (together.length) {
       const f = this.floor?.furniture.find((m) => m.id === id);
@@ -5520,7 +5558,72 @@ export class Fp3dEditor extends LitElement {
   private openWallView(roomId: string, edge: number, select: string | null = null): void {
     this._wallView = { roomId, edge };
     this._wallSel = select;
+    this._wallMulti = [];
+    this._wallSingle = false;
+    this._wallGap = null;
+    this._wallFrame = null;
     this.wallDrag = null;
+  }
+
+  /** The pieces the wall view moves together: the multi choice, else the chosen piece's block (unless one part alone), else the piece. */
+  private wallSelection(): string[] {
+    if (this._wallMulti.length) return this._wallMulti;
+    const f = this._wallSel ? this.floor?.furniture.find((m) => m.id === this._wallSel) : undefined;
+    if (!f) return [];
+    if (f.group && !this._wallSingle) return (this.floor?.furniture ?? []).filter((m) => m.group === f.group).map((m) => m.id);
+    return [f.id];
+  }
+
+  /** Wall view: a piece (with its block) joins the choice or leaves it. */
+  private wallToggle(id: string): void {
+    const cur = this.wallSelection();
+    const part = this.withGroups([id]);
+    const next = cur.includes(id) ? cur.filter((x) => !part.includes(x)) : [...new Set([...cur, ...part])];
+    this.wallChoose(next, id);
+  }
+
+  /** Wall view: choose these pieces (one, one block, or several). */
+  private wallChoose(ids: string[], lead: string | null = ids[0] ?? null): void {
+    this._wallSingle = false;
+    this._wallSel = ids.length ? (lead && ids.includes(lead) ? lead : ids[0]) : null;
+    this._wallMulti = [];
+    const block = this.wallSelection();
+    if (ids.length > 1 && !(ids.length === block.length && ids.every((x) => block.includes(x)))) this._wallMulti = ids;
+    this._wallGap = null;
+  }
+
+  /** Several pieces in the wall view moved together: along the wall by ds and up or down by dy. */
+  private moveSetOnWall(frame: WallFrame, ids: string[], ds: number, dy: number | null, base: Building = this._doc, history = true): void {
+    const set = new Set(ids);
+    this.change(
+      (_, floor) => {
+        for (const m of floor.furniture) {
+          if (!set.has(m.id)) continue;
+          Object.assign(m, slideAlong(frame, m, ds));
+          if (dy !== null && canLift(m)) m.mount_y = Math.round(Math.min(MAX_MOUNT_Y, Math.max(0, mountBase(floor, m) + dy)) * 1000) / 1000;
+        }
+      },
+      base,
+      history,
+    );
+  }
+
+  /** The free stretch of wall around s (metres along the wall) at height y: between the nearest pieces and openings left and right. */
+  private wallGapAt(frame: WallFrame, floor: Floor, room: Room, s: number, y: number): { s0: number; s1: number; low: boolean } | null {
+    const low = y < 1.2;
+    const L = frame.length;
+    const busy = [
+      ...furnitureOnWall(frame, floor, room)
+        .filter((i) => (low ? i.y0 < 1.0 : i.y1 > 1.2))
+        .map((i) => [i.s0, i.s1]),
+      ...openingsOnWall(frame, floor)
+        .filter((o) => (low ? o.y0 < 0.9 : o.y1 > 1.2))
+        .map((o) => [o.s0, o.s1]),
+    ];
+    if (busy.some(([a, b]) => s > a && s < b)) return null;
+    const s0 = Math.max(0, ...busy.filter(([, b]) => b <= s).map(([, b]) => b));
+    const s1 = Math.min(L, ...busy.filter(([a]) => a >= s).map(([a]) => a));
+    return s1 - s0 >= 0.1 ? { s0: Math.round(s0 * 1000) / 1000, s1: Math.round(s1 * 1000) / 1000, low } : null;
   }
 
   /** The wall a piece of furniture stands or hangs at: the nearest edge of the room it is in. */
@@ -5832,6 +5935,11 @@ export class Fp3dEditor extends LitElement {
         })())
       : null;
     const lift = !!selF && canLift(selF);
+    // several pieces (a block, a multi choice): moved together, framed in orange
+    const wset = this.wallSelection();
+    const many = wset.length > 1;
+    const setItems = items.filter((i) => wset.includes(i.id));
+    const setSpan = setItems.length ? { s0: Math.min(...setItems.map((i) => i.s0)), s1: Math.max(...setItems.map((i) => i.s1)), y0: Math.min(...setItems.map((i) => i.y0)), y1: Math.max(...setItems.map((i) => i.y1)) } : null;
     const text = (t: number) => this.m(t, 2);
     const svgPoint = (e: PointerEvent) => {
       const el = (e.currentTarget as Element).closest("svg") as SVGSVGElement;
@@ -5841,19 +5949,52 @@ export class Fp3dEditor extends LitElement {
       return pt.matrixTransform(el.getScreenCTM()!.inverse());
     };
     // edges to snap to while dragging: the wall's ends and the sides of the other pieces and openings
-    const snaps = (id: string) => [0, L, ...items.filter((i) => i.id !== id).flatMap((i) => [i.s0, i.s1]), ...holes.flatMap((o) => [o.s0, o.s1])];
+    const snaps = (ids: string[]) => [0, L, ...items.filter((i) => !ids.includes(i.id)).flatMap((i) => [i.s0, i.s1]), ...holes.flatMap((o) => [o.s0, o.s1])];
     const down = (e: PointerEvent, id: string) => {
       if (!admin) return;
       e.stopPropagation();
-      const it = items.find((i) => i.id === id)!;
-      const m = floor.furniture.find((x) => x.id === id);
+      this._runSel = null;
+      // shift (or "Mehrere auswählen" on a tablet): the piece joins the choice or leaves it
+      if (e.shiftKey || this._multiMode) {
+        this.wallToggle(id);
+        return;
+      }
+      if (!this.wallSelection().includes(id) || this._wallSingle) this.wallChoose([id]);
+      const ids = this.wallSelection();
       const p = svgPoint(e);
       (e.currentTarget as Element).closest("svg")!.setPointerCapture(e.pointerId);
+      const own = items.filter((i) => ids.includes(i.id));
+      if (ids.length > 1 && own.length) {
+        const s0 = Math.min(...own.map((i) => i.s0));
+        this.wallDrag = { id, ids, w: Math.max(...own.map((i) => i.s1)) - s0, x: p.x, y: p.y, base: this._doc, s0, y0: 0, lift: own.every((i) => { const m = floor.furniture.find((x) => x.id === i.id); return !!m && canLift(m); }), moved: false };
+        return;
+      }
+      const it = items.find((i) => i.id === id)!;
+      const m = floor.furniture.find((x) => x.id === id);
       this.wallDrag = { id, x: p.x, y: p.y, base: this._doc, s0: it.s0, y0: it.y0, lift: !!m && canLift(m), moved: false };
-      this._wallSel = id;
-      this._runSel = null;
+    };
+    // the bare wall: a tap finds the free stretch there (the side bar then offers what fits), shift + drag draws a frame
+    const wallDown = (e: PointerEvent) => {
+      if (!admin || this._runMode) return;
+      const p = svgPoint(e);
+      if (e.shiftKey || this._multiMode) {
+        (e.currentTarget as Element).closest("svg")!.setPointerCapture(e.pointerId);
+        this._wallFrame = { x0: p.x, y0: p.y, x1: p.x, y1: p.y };
+        return;
+      }
+      this._wallSel = null;
+      this._wallMulti = [];
+      this._wallSingle = false;
+      const sAt = frame.rightward ? p.x : L - p.x;
+      this._wallGap = sAt >= 0 && sAt <= L && p.y >= 0 && p.y <= H ? this.wallGapAt(frame, floor, room, sAt, H - p.y) : null;
     };
     const move = (e: PointerEvent) => {
+      const fr = this._wallFrame;
+      if (fr) {
+        const p = svgPoint(e);
+        this._wallFrame = { ...fr, x1: p.x, y1: p.y };
+        return;
+      }
       const d = this.wallDrag;
       if (!d) return;
       const p = svgPoint(e);
@@ -5862,20 +6003,41 @@ export class Fp3dEditor extends LitElement {
       if (!d.moved && Math.hypot(dxView, dy) < 0.02) return;
       d.moved = true;
       const it = items.find((i) => i.id === d.id);
-      const w = it ? it.s1 - it.s0 : 0;
+      const w = d.ids ? (d.w ?? 0) : it ? it.s1 - it.s0 : 0;
       let s0 = d.s0 + (frame.rightward ? dxView : -dxView);
       s0 = Math.round(s0 * 100) / 100;
-      // a side within 4 cm of an edge snaps to it (Alt moves freely)
+      // a side within 4 cm of an edge snaps to it (Alt moves freely); a block snaps with its outer sides
       if (!e.altKey) {
-        for (const edge of snaps(d.id)) {
+        for (const edge of snaps(d.ids ?? [d.id])) {
           if (Math.abs(s0 - edge) < 0.04) s0 = edge;
           else if (Math.abs(s0 + w - edge) < 0.04) s0 = edge - w;
         }
+      }
+      if (d.ids) {
+        this.moveSetOnWall(frame, d.ids, s0 - d.s0, d.lift ? Math.round(dy * 100) / 100 : null, d.base, false);
+        return;
       }
       const y0 = d.lift ? Math.round((d.y0 + dy) * 100) / 100 : null;
       this.moveOnWall(frame, d.id, s0 - d.s0, y0, d.base, false);
     };
     const up = () => {
+      const fr = this._wallFrame;
+      if (fr) {
+        // every piece whose middle lies in the frame joins the choice
+        this._wallFrame = null;
+        const [x0, x1] = [Math.min(fr.x0, fr.x1), Math.max(fr.x0, fr.x1)];
+        const [y0, y1] = [Math.min(fr.y0, fr.y1), Math.max(fr.y0, fr.y1)];
+        const hit = items
+          .filter((i) => {
+            const [x, w] = span(i.s0, i.s1);
+            const cx = x + w / 2;
+            const cy = Y((i.y0 + i.y1) / 2);
+            return cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+          })
+          .map((i) => i.id);
+        if (hit.length) this.wallChoose([...new Set([...this.wallSelection(), ...this.withGroups(hit)])]);
+        return;
+      }
       const d = this.wallDrag;
       this.wallDrag = null;
       if (d?.moved) this.pushHistory(d.base);
@@ -5904,11 +6066,14 @@ export class Fp3dEditor extends LitElement {
       const right = e.key === "ArrowRight" ? step : e.key === "ArrowLeft" ? -step : 0;
       const ds = frame.rightward ? right : -right;
       const dy = e.key === "ArrowUp" ? step : e.key === "ArrowDown" ? -step : 0;
+      if (many) return this.moveSetOnWall(frame, wset, ds, dy || null);
       this.moveOnWall(frame, sel.id, ds, lift && dy ? sel.y0 + dy : null);
     };
     // the chosen piece: its distances to the wall's ends and to the floor
-    const dims = sel
+    const dimOf = many && setSpan ? setSpan : sel;
+    const dims = dimOf
       ? (() => {
+          const sel = dimOf;
           const [x, w] = span(sel.s0, sel.s1);
           const yb = Y(sel.y0);
           const dimY = Math.min(H + 0.25, Y(0) + 0.25);
@@ -6014,6 +6179,7 @@ export class Fp3dEditor extends LitElement {
           @pointerdown=${(e: PointerEvent) => {
             if (rc && this._runMode) this.runDown(e, rc);
             else if (this._runSel) this._runSel = null;
+            else wallDown(e);
           }}
           @pointermove=${(e: PointerEvent) => {
             move(e);
@@ -6058,7 +6224,14 @@ export class Fp3dEditor extends LitElement {
             const h = it.y1 - it.y0;
             const pic = this.wallPics.get(this.wallPicKey(frame, m));
             const xc = X(toWall(frame, [m.x, m.z]).s);
-            return svg`<g class="fp3d-wv-item ${pic ? "fp3d-wv-pic" : ""} ${it.id === this._wallSel ? "fp3d-wv-sel" : ""}" @pointerdown=${(e: PointerEvent) => down(e, it.id)} @dblclick=${() => {
+            return svg`<g class="fp3d-wv-item ${pic ? "fp3d-wv-pic" : ""} ${it.id === this._wallSel || wset.includes(it.id) ? "fp3d-wv-sel" : ""}" @pointerdown=${(e: PointerEvent) => down(e, it.id)} @dblclick=${() => {
+              // a part of a block: this part alone; a single piece: open it in the plan
+              const m2 = floor.furniture.find((q) => q.id === it.id);
+              if (m2?.group && !this._wallSingle) {
+                this.wallChoose([it.id]);
+                this._wallSingle = true;
+                return;
+              }
               this._wallView = null;
               this.selectItem("furniture", it.id);
             }}>
@@ -6068,6 +6241,23 @@ export class Fp3dEditor extends LitElement {
             </g>`;
           })}
           ${dims}
+          ${many && setSpan
+            ? (() => {
+                const [x, w] = span(setSpan.s0, setSpan.s1);
+                const block = !this._wallMulti.length;
+                return svg`<g class=${`fp3d-wv-setframe${block ? " fp3d-wv-setblock" : ""}`}><rect x=${x - 0.03} y=${Y(setSpan.y1) - 0.03} width=${w + 0.06} height=${setSpan.y1 - setSpan.y0 + 0.06} /><text x=${x} y=${Y(setSpan.y1) - 0.07} style="font-size:${fs * 0.85}px">${block ? `▣ ${this.t("block_title")} · ${wset.length}` : this.t("multi_title", { n: wset.length })}</text></g>`;
+              })()
+            : nothing}
+          ${this._wallGap
+            ? (() => {
+                const g = this._wallGap;
+                const [x, w] = span(g.s0, g.s1);
+                const top = g.low ? Math.min(H, 0.9) : Math.min(H, 2.2);
+                const bottom = g.low ? 0 : 1.3;
+                return svg`<g class="fp3d-wv-gap"><rect x=${x} y=${Y(top)} width=${w} height=${top - bottom} /><text x=${x + w / 2} y=${Y((top + bottom) / 2)} style="font-size:${fs}px">${text(w)}</text></g>`;
+              })()
+            : nothing}
+          ${this._wallFrame ? svg`<rect class="fp3d-wv-marquee" x=${Math.min(this._wallFrame.x0, this._wallFrame.x1)} y=${Math.min(this._wallFrame.y0, this._wallFrame.y1)} width=${Math.abs(this._wallFrame.x1 - this._wallFrame.x0)} height=${Math.abs(this._wallFrame.y1 - this._wallFrame.y0)} />` : nothing}
           <line class="fp3d-wv-floor" x1="-0.3" x2=${L + 0.3} y1=${H} y2=${H} />
           ${rc ? this.renderRuns(rc, X, Y) : nothing}
         </svg>`}
@@ -6076,9 +6266,17 @@ export class Fp3dEditor extends LitElement {
         <div class="fp3d-wv-foot">
           ${rc && (this._runMode || (this._runSel && !sel))
             ? this.renderRunFoot(rc)
+            : many && setSpan && admin
+            ? this.renderWallSetFoot(frame, wset, setSpan, span)
             : sel && selF
             ? html`<b>${selF.name || furnitureName(this.hass, selF.type)}</b>
                 ${this.fixButton("furniture", sel.id)}
+                ${selF.group && admin
+                  ? html`<button class="fp3d-btn" title=${this.t("block_select")} @click=${() => {
+                      this._wallSingle = false;
+                      this.requestUpdate();
+                    }}>▣ ${this.t("wv_block_all")}</button>`
+                  : nothing}
                 ${rc && (POOL_DEVICES as readonly string[]).includes(selF.type)
                   ? html`<button class="fp3d-btn fp3d-primary" @click=${() => this.openCard(rc.pool.id, `dev:${selF.id}`)}>${this.t("card_open")}</button>`
                   : nothing}
@@ -6101,9 +6299,65 @@ export class Fp3dEditor extends LitElement {
                   this.selectItem("furniture", sel.id);
                 }}>${this.t("wall_view_form")}</button>`
             : html`<span class="fp3d-muted">${this._wallView3d ? this.t("wall_view_hint_3d") : items.length ? this.t("wall_view_hint") : this.t("wall_view_empty")}</span>`}
+          ${admin && !this._wallView3d ? this.renderMultiToggle() : nothing}
         </div>
       </div>
     </div>`;
+  }
+
+  /** The wall view's bottom bar for several pieces: join or break up, the whole block or this part, distance, fix, delete. */
+  private renderWallSetFoot(frame: WallFrame, ids: string[], sp: { s0: number; s1: number; y0: number; y1: number }, span: (a: number, b: number) => readonly [number, number]) {
+    const block = !this._wallMulti.length;
+    const fixed = ids.every((id) => this.isFixedItem("furniture", id));
+    return html`<b>${block ? `▣ ${this.t("block_title")}` : this.t("multi_title", { n: ids.length })}</b>
+      ${block
+        ? html`<div class="fp3d-seg" role="group">
+              <button aria-pressed="true">${this.t("wv_block_all")}</button>
+              <button aria-pressed="false" @click=${() => (this._wallSingle = true)}>${this.t("wv_block_one")}</button>
+            </div>
+            <button class="fp3d-btn" @click=${() => {
+              const sel = this._wallSel;
+              this._wallMulti = ids;
+              this.ungroupSelectionOf(ids);
+              this._wallSel = sel;
+            }}>${this.t("block_break")}</button>`
+        : html`<button class="fp3d-btn fp3d-primary" @click=${() => {
+            this.groupIds(ids);
+            this._wallMulti = [];
+          }}>▣ ${this.t("block_make")}</button>`}
+      ${this.len(this.t("wall_view_left"), Math.round(span(sp.s0, sp.s1)[0] * 1000) / 1000, (val) => {
+        const ds = val - span(sp.s0, sp.s1)[0];
+        this.moveSetOnWall(frame, ids, frame.rightward ? ds : -ds, null);
+      }, 0.01, 0)}
+      <button class="fp3d-btn" @click=${() => {
+        const set = new Set(ids);
+        this.change((_, floor) => {
+          for (const m of floor.furniture) if (set.has(m.id)) m.locked = !fixed || null;
+        });
+      }}>${fixed ? `🔓 ${this.t("unfix")}` : `🔒 ${this.t("fix")}`}</button>
+      <button class="fp3d-btn fp3d-danger" @click=${() => {
+        if (!confirm(this.t(ids.some((id) => this.isFixedItem("furniture", id)) ? "block_delete_fixed" : "block_delete", { n: ids.length }))) return;
+        const set = new Set(ids);
+        this.change((_, floor) => (floor.furniture = floor.furniture.filter((m) => !set.has(m.id))));
+        this._wallSel = null;
+        this._wallMulti = [];
+      }}>${this.t("delete")}</button>`;
+  }
+
+  /** Joins these pieces into one block. */
+  private groupIds(ids: string[]): void {
+    const set = new Set(ids);
+    const gid = uid("block");
+    this.change((_, floor) => {
+      for (const m of floor.furniture) if (set.has(m.id)) m.group = gid;
+    });
+  }
+
+  private ungroupSelectionOf(ids: string[]): void {
+    const set = new Set(ids);
+    this.change((_, floor) => {
+      for (const m of floor.furniture) if (set.has(m.id)) m.group = null;
+    });
   }
 
   // ------------------------------------------------------------------ pipes on walls (Pool Pro)
@@ -6115,6 +6369,9 @@ export class Fp3dEditor extends LitElement {
   private addOnWall(type: string, frame: WallFrame, room: Room): void {
     const floor = this.floor;
     if (!floor || !this.isAdmin) return;
+    this.rememberWallType(type);
+    const gap = this._wallGap;
+    if (gap) return this.addIntoGap(type, frame, room, gap);
     const [w, d, h] = furnitureSize(type);
     const taken = [
       ...furnitureOnWall(frame, floor, room).map((i) => [i.s0, i.s1]),
@@ -6138,10 +6395,113 @@ export class Fp3dEditor extends LitElement {
     this._wallSel = item.id;
   }
 
+  /** A piece into the tapped stretch of wall: at its left end, as wide as the gap when the piece is a cabinet that can be (and is too wide). */
+  private addIntoGap(type: string, frame: WallFrame, room: Room, gap: { s0: number; s1: number; low: boolean }): void {
+    const floor = this.floor!;
+    const gw = gap.s1 - gap.s0;
+    let [w, d, h] = furnitureSize(type);
+    if (WALL_FIT.has(type) && (w > gw + 0.005 || gw - w < 0.1)) w = Math.round(gw * 1000) / 1000;
+    const face = sharedEdge(floor, room.id, frame.a, frame.b) ? this._doc.settings.wall_interior / 2 : 0;
+    const sMid = gap.s0 + Math.min(w, gw) / 2;
+    const [x, z] = fromWall(frame, sMid, face + d / 2 + 0.01);
+    const rotation = Math.round((((Math.atan2(-frame.n[0], frame.n[1]) * 180) / Math.PI) % 360 + 360) % 360);
+    const item: Furniture = { id: uid("furniture"), type, x: round(x), z: round(z), rotation, w, d, h, variant: null };
+    this.change((_, f) => f.furniture.push(item));
+    this._wallGap = null;
+    this._wallSel = item.id;
+    this._wallMulti = [];
+  }
+
+  private rememberWallType(type: string): void {
+    try {
+      const list = JSON.parse(localStorage.getItem("neonplan3d.wallRecent") ?? "[]") as string[];
+      localStorage.setItem("neonplan3d.wallRecent", JSON.stringify([type, ...list.filter((t) => t !== type)].slice(0, 6)));
+    } catch {
+      // no storage
+    }
+  }
+
+  private wallRecent(): string[] {
+    try {
+      const list = JSON.parse(localStorage.getItem("neonplan3d.wallRecent") ?? "[]");
+      return Array.isArray(list) ? list.filter((t): t is string => typeof t === "string" && (FURNITURE_TYPES.includes(t as never) || !!packItem(t))) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * The wall view's side bar: a few category symbols, a search and the recently used – no long list. A tapped gap
+   * in the wall narrows it to what fits there (best fit first); a cabinet too wide for the gap is fitted to it.
+   */
+  private renderWallFurniture(frame: WallFrame, room: Room) {
+    const lang = this.hass?.language ?? "en";
+    const gap = this._wallGap;
+    const gw = gap ? gap.s1 - gap.s0 : 0;
+    const q = fold(this._wallQuery.trim());
+    const cat = this._wallCat;
+    const packItems = (this.packs ?? []).flatMap((p) => p.items.filter((it) => !it.light && !it.vehicle && !it.hole && it.mount !== "ceiling").map((it) => ({ type: packType(p.id, it.id), label: packItemName(it, lang), search: `${Object.values(it.name).join(" ")} ${p.name}`, wall: it.mount === "wall" })));
+    const label = (t: string) => this.t(`furn_${t}` as I18nKey);
+    let pool: { type: string; label: string; search: string; wall?: boolean }[] = [];
+    if (cat === "pack") pool = packItems;
+    else if (cat === "energy") pool = (["meter", "inverter", "home_battery", "wallbox"] as const).map((t) => ({ type: t, label: label(t), search: "" }));
+    else if (cat) pool = (WALL_CATS[cat] ?? []).map((t) => ({ type: t, label: label(t), search: translate(EN_HASS, `furn_${t}` as I18nKey) }));
+    else if (q || gap) pool = [...Object.values(WALL_CATS).flat().filter((t, i, a) => a.indexOf(t) === i).map((t) => ({ type: t, label: label(t), search: translate(EN_HASS, `furn_${t}` as I18nKey) })), ...packItems];
+    const words = q.split(/\s+/).filter(Boolean);
+    let hits = words.length ? pool.filter((it) => words.every((w) => fold(`${it.label} ${it.search} ${it.type.replace(/[_:.]/g, " ")}`).includes(w))) : pool;
+    // a gap: standing or hanging pieces that fit (or can be fitted), the closest width first
+    if (gap) {
+      const hanging = (t: string, wall?: boolean) => wall || HANGING.has(t);
+      hits = hits
+        .filter((it) => hanging(it.type, it.wall) === !gap.low)
+        .filter((it) => furnitureSize(it.type)[0] <= gw + 0.01 || (WALL_FIT.has(it.type) && gw >= (WALL_FIT_MIN[it.type] ?? 0.2)))
+        // what fills the gap best first: cabinets built to measure fill it completely, then the closest widths;
+        // the built-in pieces before pack items of the same fill
+        .sort((a, b) => {
+          const fill = (t: string) => (WALL_FIT.has(t) ? 1 : Math.min(1, furnitureSize(t)[0] / gw));
+          return fill(b.type) - fill(a.type) || Number(a.type.startsWith("pack:")) - Number(b.type.startsWith("pack:"));
+        });
+    }
+    const recent = !cat && !q && !gap ? this.wallRecent() : [];
+    const cats: [string, string][] = [
+      ["base", "▭"],
+      ["hang", "▔"],
+      ["tall", "▯"],
+      ["living", "🛋"],
+      ["light", "💡"],
+      ...((this.packs ?? []).some((p) => p.items.length) ? ([["pack", "🧩"]] as [string, string][]) : []),
+      ...(hasFeature("energy_pro") ? ([["energy", "⚡"]] as [string, string][]) : []),
+    ];
+    const item = (t: string, name: string) => {
+      const w = furnitureSize(t)[0];
+      const fitted = gap && WALL_FIT.has(t) && (w > gw + 0.005 || gw - w < 0.1);
+      return html`<button class="fp3d-btn fp3d-wv-pick" title=${name} @click=${() => this.addOnWall(t, frame, room)}>
+        <span>${name}</span><small>${fitted ? `↔ ${this.m(gw, 2)}` : this.m(w, 2)}</small>
+      </button>`;
+    };
+    return html`<aside class="fp3d-wv-kit">
+      <h4>${this.t("wv_kit_title")}</h4>
+      <div class="fp3d-wv-cats">
+        ${cats.map(([k, icon]) => html`<button class="fp3d-btn ${cat === k ? "fp3d-primary" : ""}" title=${this.t(`wv_cat_${k}` as I18nKey)} @click=${() => (this._wallCat = cat === k ? null : k)}>${icon}</button>`)}
+      </div>
+      <input class="fp3d-search" type="search" placeholder=${this.t("furniture_search")} .value=${this._wallQuery} @input=${(e: Event) => (this._wallQuery = (e.target as HTMLInputElement).value)} />
+      ${gap
+        ? html`<p class="fp3d-sub fp3d-wv-gapnote">${this.t("wv_gap", { w: this.m(gw, 2) })} <button class="fp3d-link" @click=${() => (this._wallGap = null)}>✕</button></p>`
+        : !cat && !q
+          ? html`<p class="fp3d-sub">${this.t("wv_gap_hint")}</p>`
+          : nothing}
+      ${cat ? html`<h4>${this.t(`wv_cat_${cat}` as I18nKey)}</h4>` : nothing}
+      ${recent.length ? html`<h4>${this.t("wv_recent")}</h4>${recent.map((t) => item(t, packItem(t) ? packItemName(packItem(t)!, lang) : label(t)))}` : nothing}
+      ${(cat || q || gap) && !hits.length ? html`<p class="fp3d-sub">${this.t(gap ? "wv_none_fits" : "furniture_search_none")}</p>` : nothing}
+      ${hits.slice(0, 40).map((it) => item(it.type, it.label))}
+    </aside>`;
+  }
+
   /** The wall view's side bar: pool devices, ball valves and sight glasses (Pool Pro), energy devices (Energie Pro). */
   private renderWallKit(frame: WallFrame, room: Room, rc: RunCtx | null) {
     const pool = !!rc;
     const energy = hasFeature("energy_pro");
+    if (!pool) return this.isAdmin ? this.renderWallFurniture(frame, room) : nothing;
     if (!this.isAdmin || (!pool && !energy)) return nothing;
     const add = (t: string) => html`<button class="fp3d-btn" @click=${() => this.addOnWall(t, frame, room)}>+ ${this.t(`furn_${t}` as I18nKey)}</button>`;
     const fit = (mode: "valve" | "sight", label: I18nKey) =>
@@ -11798,6 +12158,73 @@ export class Fp3dEditor extends LitElement {
       .fp3d-wv-kit .fp3d-btn {
         justify-content: flex-start;
         text-align: left;
+      }
+      .fp3d-wv-cats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+      }
+      .fp3d-wv-kit .fp3d-wv-cats .fp3d-btn {
+        justify-content: center;
+        padding: 6px 0;
+        font-size: 16px;
+      }
+      .fp3d-wv-kit .fp3d-search {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .fp3d-wv-kit .fp3d-wv-pick {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        height: auto;
+        min-height: 32px;
+        line-height: 1.2;
+        font-size: 12.5px;
+      }
+      .fp3d-wv-pick small {
+        color: var(--fp3d-muted);
+        white-space: nowrap;
+      }
+      .fp3d-wv-gapnote {
+        color: var(--fp3d-accent);
+      }
+      .fp3d-wv-setframe rect {
+        fill: none;
+        stroke: var(--fp3d-accent);
+        stroke-width: 0.012;
+        stroke-dasharray: 0.05 0.03;
+        pointer-events: none;
+      }
+      .fp3d-wv-setblock rect {
+        stroke: #ffb547;
+      }
+      .fp3d-wv-setframe text {
+        fill: var(--fp3d-accent);
+        pointer-events: none;
+      }
+      .fp3d-wv-setblock text {
+        fill: #ffb547;
+      }
+      .fp3d-wv-gap rect {
+        fill: rgba(55, 224, 255, 0.1);
+        stroke: var(--fp3d-accent);
+        stroke-width: 0.01;
+        stroke-dasharray: 0.04 0.03;
+        pointer-events: none;
+      }
+      .fp3d-wv-gap text {
+        fill: var(--fp3d-accent);
+        text-anchor: middle;
+        pointer-events: none;
+      }
+      .fp3d-wv-marquee {
+        fill: rgba(55, 224, 255, 0.08);
+        stroke: var(--fp3d-accent);
+        stroke-width: 0.008;
+        stroke-dasharray: 0.03 0.02;
+        pointer-events: none;
       }
       @media (max-width: 700px) {
         .fp3d-wv-body {

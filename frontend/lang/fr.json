@@ -1624,5 +1624,19 @@
  "block_part": "Fait partie d'un bloc.",
  "block_select": "Sélectionner tout le bloc",
  "block_delete": "Supprimer {n} meubles ?",
- "block_delete_fixed": "Supprimer {n} meubles ? Certains sont verrouillés."
+ "block_delete_fixed": "Supprimer {n} meubles ? Certains sont verrouillés.",
+ "wv_block_all": "Bloc entier",
+ "wv_block_one": "Cette pièce seule",
+ "wv_gap": "Espace : {w} – ceci y entre :",
+ "wv_gap_hint": "Touchez un endroit libre du mur : ce qui y entre s'affiche ici.",
+ "wv_kit_title": "Au mur",
+ "wv_recent": "Utilisés récemment",
+ "wv_none_fits": "Rien n'entre dans cet espace.",
+ "wv_cat_base": "Meubles bas & bahuts",
+ "wv_cat_hang": "Suspendus",
+ "wv_cat_tall": "Armoires hautes",
+ "wv_cat_living": "S'asseoir & dormir",
+ "wv_cat_light": "Luminaires",
+ "wv_cat_pack": "De vos packs",
+ "wv_cat_energy": "Énergie"
 }
