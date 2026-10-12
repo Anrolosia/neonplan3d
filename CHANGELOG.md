@@ -4,6 +4,21 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.17.1
+
+### New
+
+- **Wall view zoom:** mouse wheel towards the pointer, two fingers, ＋ / − / ⤢ and arrows in *Wall from the front*.
+- **Pools with depth:** basin depth and rim above the lawn; see-through water onto the basin's walls and floor.
+- **Terrace doors** can open outwards (*Reverse opening direction*), sashes swing outside in 3D (#492).
+
+### Fixed
+
+- **Robot vacuum with dock** (Smart Home pack): current-room sensor, auto link and driving in 3D like the built-in robot (#470, #490).
+- **Smoke detectors** take binary sensors; other items alarm-class binary sensors (#490).
+- **Roof windows** stay in the slope when the roof fades over a floor or room; closed rim between roof and frame (#482, #490).
+- **Wall view:** Del no longer reaches the item chosen in the plan behind it.
+
 ## 1.17.0
 
 ### New
