@@ -164,6 +164,33 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, wat
           buf.tri([q[0], fy, q[1]], [q[0], rim, q[1]], [p[0], rim, p[1]], deepC, sideC, sideC, undefined, ALWAYS);
           buf.tri([q[0], fy, q[1]], [p[0], rim, p[1]], [p[0], fy, p[1]], deepC, sideC, deepC, undefined, ALWAYS);
         }
+        // the outside of the basin: a dark block in the earth (seen from the side it reads as a cut through the
+        // ground, and the glowing floor no longer seems to float), with its lower edge
+        if (!a.above) {
+          const earth = new Color(0x0a1322);
+          const earthLow = new Color(0x060b16);
+          const bottom = fy - 0.2;
+          const top = Math.min(g, rim);
+          for (let i = 0; i < poly.length; i++) {
+            const p = poly[i];
+            const q = poly[(i + 1) % poly.length];
+            buf.tri([p[0], bottom, p[1]], [p[0], top, p[1]], [q[0], top, q[1]], earthLow, earth, earth, undefined, ALWAYS);
+            buf.tri([p[0], bottom, p[1]], [q[0], top, q[1]], [q[0], bottom, q[1]], earthLow, earth, earthLow, undefined, ALWAYS);
+          }
+          for (const [i, j, k] of triangulate(poly)) {
+            const p = poly[i];
+            const q = poly[j];
+            const r = poly[k];
+            buf.tri([p[0], bottom, p[1]], [q[0], bottom, q[1]], [r[0], bottom, r[1]], earthLow, earthLow, earthLow, undefined, ALWAYS);
+          }
+          if (a.outline !== false)
+            for (let i = 0; i < poly.length; i++) {
+              const p = poly[i];
+              const q = poly[(i + 1) % poly.length];
+              lines.seg([p[0], bottom, p[1]], [q[0], bottom, q[1]], shade(look.edge, look.edgeAlpha * 0.35), ALWAYS);
+              lines.seg([p[0], bottom, p[1]], [p[0], top, p[1]], shade(look.edge, look.edgeAlpha * 0.25), ALWAYS);
+            }
+        }
         // the part of the wall above the lawn (an above-ground pool, or a rim that stands out)
         if (rim > g + 0.02) {
           const wall = new Color(0x1f3150);
