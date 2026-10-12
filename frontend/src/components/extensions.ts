@@ -35,6 +35,7 @@ export class Extensions extends LitElement {
     _licenseKey: { state: true },
     _licenseBusy: { state: true },
     _licenseMsg: { state: true },
+    _open: { state: true },
   };
 
   declare hass: HomeAssistant | undefined;
@@ -48,6 +49,8 @@ export class Extensions extends LitElement {
   /** What runs right now: "activate", "refresh", "remove" or a pack id being installed. */
   private declare _licenseBusy: string | null;
   private declare _licenseMsg: { ok: boolean; text: string } | null;
+  /** Long lists opened by the viewer (the shop's packs, the installed packs); closed, a bar sums them up. */
+  private declare _open: Set<string>;
   private licenseLoading = false;
   /** Updates not seen before this visit (kept while the page is open). */
   private freshUpdates: import("../api.ts").PackUpdate[] | null = null;
@@ -59,6 +62,44 @@ export class Extensions extends LitElement {
     this._licenseKey = "";
     this._licenseBusy = null;
     this._licenseMsg = null;
+    let open: string[] = [];
+    try {
+      open = JSON.parse(localStorage.getItem("neonplan3d.ext.open") ?? "[]") as string[];
+    } catch {
+      // nothing remembered
+    }
+    this._open = new Set(open);
+  }
+
+  private toggleOpen(key: string): void {
+    const next = new Set(this._open);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    this._open = next;
+    try {
+      localStorage.setItem("neonplan3d.ext.open", JSON.stringify([...next]));
+    } catch {
+      // a private window: it stays open for this visit only
+    }
+  }
+
+  /**
+   * A list summed up in one bar: how many are there (installed), have an update, are still to get – the parts of the
+   * bar in their colours, the numbers beside it, a tap opens the list.
+   */
+  private summaryBar(key: string, parts: { n: number; label: string; tone: "ok" | "update" | "missing" }[]) {
+    const total = parts.reduce((s, p) => s + p.n, 0);
+    const open = this._open.has(key);
+    return html`<button class="fp3d-sum" aria-expanded=${open} @click=${() => this.toggleOpen(key)}>
+      <span class="fp3d-sum-bar">
+        ${parts.filter((p) => p.n > 0).map((p) => html`<i class="fp3d-sum-${p.tone}" style="flex:${p.n}"></i>`)}
+      </span>
+      <span class="fp3d-sum-text">
+        ${parts.filter((p) => p.n > 0 || p.tone === "ok").map((p) => html`<b class="fp3d-sum-${p.tone}-text">${p.n}</b> ${p.label}`)}
+        ${total ? nothing : html`<span class="fp3d-sub">–</span>`}
+      </span>
+      <span class="fp3d-sum-caret">${open ? "▾" : "▸"} ${this.t(open ? "ext_hide_list" : "ext_show_list")}</span>
+    </button>`;
   }
 
   private get isAdmin(): boolean {
@@ -367,6 +408,24 @@ export class Extensions extends LitElement {
             </div>
             ${lic.error ? html`<p class="fp3d-sub fp3d-pack-error">${this.t(`license_error_${lic.error}` as I18nKey)}</p>` : nothing}
             ${lic.packs.length
+              ? (() => {
+                  const updates = lic.packs.filter((p) => p.installed !== null && p.installed < p.release);
+                  const missing = lic.packs.filter((p) => p.installed === null);
+                  return html`${this.summaryBar("shop", [
+                      { n: lic.packs.length - updates.length - missing.length, label: this.t("ext_sum_installed"), tone: "ok" },
+                      { n: updates.length, label: this.t("ext_sum_updates"), tone: "update" },
+                      { n: missing.length, label: this.t("ext_sum_missing"), tone: "missing" },
+                    ])}
+                    ${updates.length + missing.length
+                      ? html`<button class="fp3d-btn fp3d-primary fp3d-sum-all" ?disabled=${!!busy} @click=${async () => {
+                          for (const p of [...updates, ...missing]) await this.installFromShop(p);
+                        }}>${busy ? "…" : this.t("ext_sum_all", { n: updates.length + missing.length })}</button>`
+                      : nothing}`;
+                })()
+              : nothing}
+            ${lic.packs.length && !this._open.has("shop")
+              ? nothing
+              : lic.packs.length
               ? lic.packs.map((p) => {
                   const state = p.installed === null ? "install" : p.installed < p.release ? "update" : "installed";
                   return html`<div class="fp3d-pack">
@@ -406,9 +465,15 @@ export class Extensions extends LitElement {
 
   private renderPacks() {
     const packs = this.packs ?? [];
+    const items = packs.reduce((s, p) => s + p.items.length, 0);
+    const pro = packs.filter((p) => p.features?.length).length;
     return html`<section class="fp3d-ext-card">
       <h3>${this.t("packs")}</h3>
-      ${packs.map(
+      ${this.summaryBar("packs", [
+        { n: packs.length - pro, label: this.t("ext_sum_packs", { items }), tone: "ok" },
+        { n: pro, label: this.t("ext_sum_feature_packs"), tone: "missing" },
+      ])}
+      ${(this._open.has("packs") ? packs : []).map(
         (p) => html`<div class="fp3d-pack">
           <div>
             <b>${packName(p, this.hass?.language ?? "de")}</b>
@@ -464,6 +529,62 @@ export class Extensions extends LitElement {
     tokens,
     controls,
     css`
+      .fp3d-sum {
+        display: grid;
+        gap: 6px;
+        width: 100%;
+        margin: 4px 0 8px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--fp3d-line, rgba(120, 190, 255, 0.22));
+        background: rgba(4, 8, 18, 0.35);
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+      }
+      .fp3d-sum-bar {
+        display: flex;
+        gap: 2px;
+        height: 8px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(120, 190, 255, 0.12);
+      }
+      .fp3d-sum-bar i {
+        display: block;
+      }
+      .fp3d-sum-ok {
+        background: #34d399;
+      }
+      .fp3d-sum-update {
+        background: #fbbf24;
+      }
+      .fp3d-sum-missing {
+        background: #60a5fa;
+      }
+      .fp3d-sum-text {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 14px;
+        font-size: 0.92em;
+      }
+      .fp3d-sum-ok-text {
+        color: #34d399;
+      }
+      .fp3d-sum-update-text {
+        color: #fbbf24;
+      }
+      .fp3d-sum-missing-text {
+        color: #60a5fa;
+      }
+      .fp3d-sum-caret {
+        color: var(--fp3d-muted, #8ea3c4);
+        font-size: 0.85em;
+      }
+      .fp3d-sum-all {
+        margin-bottom: 8px;
+      }
       .fp3d-updates {
         border-color: color-mix(in srgb, var(--fp3d-accent) 60%, transparent);
         background: color-mix(in srgb, var(--fp3d-accent) 8%, transparent);
