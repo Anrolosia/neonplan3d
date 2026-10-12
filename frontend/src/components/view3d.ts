@@ -2810,8 +2810,11 @@ export class Fp3dView3d extends LitElement {
   private async syncPets(): Promise<void> {
     const b = this.building;
     const v = this.viewer;
-    const list = b?.settings.pets?.on !== false ? (b?.settings.pets?.list ?? []) : [];
-    if (!v || !b || !hasFeature("fun_pets") || !list.length) {
+    const on = b?.settings.pets?.on !== false;
+    const list = on ? (b?.settings.pets?.list ?? []) : [];
+    // the fun pack also brings fish to the pets pack's aquariums
+    const fish = on && !!b?.floors.some((f) => f.furniture.some((m) => /:aquarium(_large)?$/.test(m.type)));
+    if (!v || !b || !hasFeature("fun_pets") || (!list.length && !fish)) {
       this.pets?.dispose();
       this.pets = null;
       this.petsFor = null;
@@ -2835,8 +2838,9 @@ export class Fp3dView3d extends LitElement {
         FloorMap: mod.FloorMap,
         viewer: this.viewer as never,
         building: this.building!,
-        pets: this.building?.settings.pets?.list ?? [],
+        pets: this.building?.settings.pets?.on !== false ? (this.building?.settings.pets?.list ?? []) : [],
         night: () => this.hass?.states["sun.sun"]?.state === "below_horizon",
+        base: (floor, f) => mountBase(floor, f),
       });
     } catch (err) {
       console.error("NeonPlan 3D: the pets failed to load", err);

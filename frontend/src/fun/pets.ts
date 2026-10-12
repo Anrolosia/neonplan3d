@@ -26,6 +26,8 @@ export interface PetsContext {
   pets: readonly Pet[];
   /** Whether it is night (the sun below the horizon). */
   night: () => boolean;
+  /** Height of an item's bottom on its floor (an aquarium on a sideboard). */
+  base: (floor: Floor, f: Furniture) => number;
 }
 
 export interface PetsController {
@@ -340,6 +342,21 @@ function stairWay(item: string, w: number, d: number): [number, number, number][
     const a1 = (210 * Math.PI) / 180;
     return [[Math.cos(a0) * 1.0, Math.sin(a0) * 1.0, 0], ...way, [Math.cos(a1) * 1.0, Math.sin(a1) * 1.0, 1]];
   }
+  if (item === "winder_bottom") {
+    // on from the right side, round the inner corner over the winders, then straight up
+    const zt = d / 2 - w;
+    const turn: [number, number, number][] = [0.25, 0.5, 0.75].map((k) => {
+      const phi = (k * Math.PI) / 2;
+      return [w / 2 - Math.sin(phi) * (w / 2), zt + Math.cos(phi) * (w / 2), (k * 3) / 14];
+    });
+    return [[w / 2 + out, zt + w / 2, 0], [w / 2, zt + w / 2, 0], ...turn, [0, zt, 3 / 14], [0, -d / 2, 1], [0, -d / 2 - out, 1]];
+  }
+  if (item === "corner_bottom") {
+    // up the side steps onto the landing, round the corner, straight up on the left
+    const xs = -w / 2 + 0.5;
+    const zl = d / 2 - 0.5;
+    return [[w / 2 + out, zl, 0], [w / 2, zl, 0], [xs + 0.3, zl, 3 / 14], [xs, zl, 4 / 14], [xs, d / 2 - 1, 4 / 14], [xs, -d / 2, 1], [xs, -d / 2 - out, 1]];
+  }
   if (item === "stairs" || item === "straight" || item === "floating" || item === "space_saver") return [[0, d / 2 + out, 0], [0, d / 2, 0], [0, -d / 2, 1], [0, -d / 2 - out, 1]];
   return null;
 }
@@ -380,6 +397,21 @@ function stairLinks(b: Building): Link[] {
 }
 
 type Mode = "walk" | "rest" | "sleep" | "stand" | "climb";
+
+/** The water of the pets pack's aquariums: its share of the item's width, depth and height (bottom, top). */
+const TANKS: Record<string, { w: number; d: number; y0: number; y1: number; fish: number }> = {
+  aquarium: { w: 0.78 / 0.8, d: 0.33 / 0.35, y0: 0.08 / 0.5, y1: 0.4 / 0.5, fish: 4 },
+  aquarium_large: { w: 1.18 / 1.2, d: 0.43 / 0.45, y0: 0.84 / 1.4, y1: 1.24 / 1.4, fish: 7 },
+};
+const FISH_COLORS = ["#ff8c3a", "#ffd23f", "#3fe0ff", "#ff5d8f", "#9b7bff", "#7dff9b", "#ff6a3d"];
+
+interface Fish {
+  g: THREE.Group;
+  y: number;
+  amp: number;
+  speed: number;
+  phase: number;
+}
 
 interface Animal {
   pet: Pet;
@@ -425,6 +457,9 @@ export function startPets(ctx: PetsContext): PetsController {
   let timer: ReturnType<typeof setTimeout> | undefined;
   let last = 0;
   let links: Link[] = [];
+  let tanks: THREE.Group[] = [];
+  let fishes: Fish[] = [];
+  let fishTimer: ReturnType<typeof setInterval> | undefined;
   /** Per floor: its walk map, the rooms and the favourite places of each kind (made once per plan). */
   let floors = new Map<string, { floor: Floor; map: FloorMap; rooms: Floor["rooms"]; spots: Map<Pet["kind"], Spot[]> }>();
   let plan: Building = ctx.building;
@@ -676,11 +711,72 @@ export function startPets(ctx: PetsContext): PetsController {
     }
   };
 
+  /**
+   * Fish in the pets pack's aquariums: small, bright fish swimming to and fro behind the front glass (and the back),
+   * as one sees them through it – the water itself is drawn solid. They move a few times a second only.
+   */
+  const buildFish = (b: Building) => {
+    const S = shapes(lib);
+    for (const floor of b.floors) {
+      const fv = viewer.floorMap.get(floor.id);
+      if (!fv) continue;
+      for (const f of floor.furniture) {
+        const spec = TANKS[itemOf(f.type)];
+        if (!spec) continue;
+        const tank = new lib.Group();
+        tank.position.set(f.x, ctx.base(floor, f), f.z);
+        tank.rotation.y = (-f.rotation * Math.PI) / 180;
+        const halfW = (f.w * spec.w) / 2;
+        const y0 = f.h * spec.y0;
+        const y1 = f.h * spec.y1;
+        for (let i = 0; i < spec.fish; i++) {
+          const color = FISH_COLORS[(i * 3 + Math.round(f.x * 7)) % FISH_COLORS.length];
+          const mat = new lib.MeshBasicMaterial({ color, vertexColors: true });
+          const size = 0.035 + ((i * 37) % 10) / 400;
+          for (const side of [1, -1]) {
+            const g = new lib.Group();
+            const body = new lib.Mesh(S.ball, mat);
+            body.scale.set(size * 1.8, size, 0.004);
+            const tail = new lib.Mesh(S.ball, mat);
+            tail.scale.set(size * 0.7, size * 0.9, 0.004);
+            tail.position.x = -size * 1.15;
+            g.add(body, tail);
+            g.position.z = side * ((f.d * spec.d) / 2 + 0.004);
+            tank.add(g);
+            fishes.push({ g, y: y0 + ((i + 0.5) / spec.fish) * (y1 - y0), amp: halfW - size * 2, speed: 0.25 + ((i * 53) % 10) / 30, phase: i * 1.7 + (side > 0 ? 0 : 0.6) });
+          }
+        }
+        fv.group.add(tank);
+        tanks.push(tank);
+      }
+    }
+    const swim = () => {
+      if (document.hidden) return;
+      const t = performance.now() / 1000;
+      for (const fi of fishes) {
+        const s = Math.sin(t * fi.speed + fi.phase);
+        fi.g.position.x = fi.amp * s;
+        fi.g.position.y = fi.y + Math.sin(t * fi.speed * 2.3 + fi.phase) * 0.012;
+        // facing the way it swims
+        fi.g.scale.x = Math.cos(t * fi.speed + fi.phase) >= 0 ? 1 : -1;
+      }
+      viewer.invalidate();
+    };
+    if (fishes.length) {
+      swim();
+      fishTimer = setInterval(swim, 160);
+    }
+  };
+
   const clear = () => {
     cancelAnimationFrame(raf);
     clearTimeout(timer);
+    clearInterval(fishTimer);
     for (const a of animals) a.model.root.removeFromParent();
+    for (const t of tanks) t.removeFromParent();
     animals = [];
+    tanks = [];
+    fishes = [];
   };
 
   const update = (b: Building, pets: readonly Pet[]) => {
@@ -723,6 +819,7 @@ export function startPets(ctx: PetsContext): PetsController {
       pose(a);
       animals.push(a);
     }
+    buildFish(b);
     last = 0;
     viewer.invalidate();
     if (animals.length) raf = requestAnimationFrame(tick);
