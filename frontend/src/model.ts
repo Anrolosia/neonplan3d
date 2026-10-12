@@ -530,6 +530,12 @@ export interface Pet {
 }
 
 export const PET_FURS = ["orange", "tabby", "black", "white", "grey", "brown", "calico", "golden", "cream"] as const;
+/** The furs each kind comes in (the first is the default). */
+export const PET_FURS_OF: Record<Pet["kind"], readonly string[]> = {
+  cat: ["orange", "tabby", "black", "white", "grey", "calico", "cream"],
+  dog: ["golden", "cream", "brown", "black", "white", "grey"],
+  rabbit: ["white", "grey", "brown", "black", "cream"],
+};
 /** Dog breeds, small to large. */
 export const DOG_BREEDS = ["dachshund", "pug", "terrier", "labrador", "shepherd"] as const;
 

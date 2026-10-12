@@ -19,7 +19,7 @@ import {
 } from "../api.ts";
 import { DISCORD_URL, isBeta, supporterUrl } from "../beta.ts";
 import { FEATURES, FUN, knownFeature, manualUrl, released, shopUrl, unlockedFeatures } from "../features.ts";
-import { DOG_BREEDS, PET_FURS, type Building, type Pet } from "../model.ts";
+import { DOG_BREEDS, PET_FURS_OF, type Building, type Pet } from "../model.ts";
 import { translate, type I18nKey } from "../i18n.ts";
 import { packName, type FurniturePack } from "../packs.ts";
 import { controls, tokens } from "../styles.ts";
@@ -129,7 +129,8 @@ export class Extensions extends LitElement {
     const pets = this.building?.settings.pets ?? null;
     const list = pets?.list ?? [];
     const on = pets?.on !== false;
-    const floors = (this.building?.floors ?? []).filter((f) => f.rooms.length);
+    // the floors to live on, lowest first (a pet without a floor lives on the lowest)
+    const floors = (this.building?.floors ?? []).filter((f) => f.rooms.length).sort((a, b) => a.elevation - b.elevation);
     const set = (fn: (p: { on: boolean; list: Pet[] }) => void) =>
       this.editBuilding((b) => {
         const p = { on: b.settings.pets?.on !== false, list: [...(b.settings.pets?.list ?? [])] };
@@ -149,7 +150,15 @@ export class Extensions extends LitElement {
                 ? html`<label class="fp3d-check"><input type="checkbox" .checked=${on} @change=${(e: Event) => set((p) => (p.on = (e.target as HTMLInputElement).checked))} /> ${this.t("pets_show")}</label>
                     ${list.map(
                       (pet) => html`<div class="fp3d-pet-row">
-                        <select aria-label=${this.t("pet_kind")} @change=${(e: Event) => change(pet.id, { kind: (e.target as HTMLSelectElement).value as Pet["kind"] })}>
+                        <select
+                          aria-label=${this.t("pet_kind")}
+                          @change=${(e: Event) => {
+                            // another kind: a fur it comes in, a dog a breed
+                            const kind = (e.target as HTMLSelectElement).value as Pet["kind"];
+                            const furs = PET_FURS_OF[kind];
+                            change(pet.id, { kind, fur: furs.includes(pet.fur) ? pet.fur : furs[0], breed: kind === "dog" ? (pet.breed ?? "labrador") : null });
+                          }}
+                        >
                           ${(["cat", "dog", "rabbit"] as const).map((k) => html`<option value=${k} ?selected=${pet.kind === k}>${this.t(`pet_kind_${k}`)}</option>`)}
                         </select>
                         ${pet.kind === "dog"
@@ -159,12 +168,11 @@ export class Extensions extends LitElement {
                           : nothing}
                         <input type="text" maxlength="30" .value=${pet.name} placeholder=${this.t("pet_name")} aria-label=${this.t("pet_name")} @change=${(e: Event) => change(pet.id, { name: (e.target as HTMLInputElement).value.trim() })} />
                         <select aria-label=${this.t("pet_fur")} @change=${(e: Event) => change(pet.id, { fur: (e.target as HTMLSelectElement).value })}>
-                          ${PET_FURS.map((c) => html`<option value=${c} ?selected=${pet.fur === c}>${this.t(`pet_fur_${c}`)}</option>`)}
+                          ${PET_FURS_OF[pet.kind].map((c) => html`<option value=${c} ?selected=${pet.fur === c}>${this.t(`pet_fur_${c}` as I18nKey)}</option>`)}
                         </select>
                         ${floors.length > 1
-                          ? html`<select aria-label=${this.t("pet_floor")} @change=${(e: Event) => change(pet.id, { floor_id: (e.target as HTMLSelectElement).value || null })}>
-                              <option value="" ?selected=${!pet.floor_id}>${this.t("pet_floor_auto")}</option>
-                              ${floors.map((fl) => html`<option value=${fl.id} ?selected=${pet.floor_id === fl.id}>${fl.name}</option>`)}
+                          ? html`<select title=${this.t("pet_floor")} aria-label=${this.t("pet_floor")} @change=${(e: Event) => change(pet.id, { floor_id: (e.target as HTMLSelectElement).value || null })}>
+                              ${floors.map((fl, i) => html`<option value=${i === 0 ? "" : fl.id} ?selected=${(pet.floor_id ?? floors[0].id) === fl.id}>🏠 ${fl.name}</option>`)}
                             </select>`
                           : nothing}
                         <button class="fp3d-btn" title=${this.t("delete")} @click=${() => set((p) => (p.list = p.list.filter((x) => x.id !== pet.id)))}>✕</button>
@@ -172,7 +180,7 @@ export class Extensions extends LitElement {
                     )}
                     ${list.length < 8
                       ? html`<button class="fp3d-btn" @click=${() =>
-                          set((p) => p.list.push({ id: `pet_${Date.now().toString(36)}`, kind: "cat", name: "", fur: PET_FURS[p.list.length % PET_FURS.length] }))}>+ ${this.t("pet_add")}</button>`
+                          set((p) => p.list.push({ id: `pet_${Date.now().toString(36)}`, kind: "cat", name: "", fur: PET_FURS_OF.cat[p.list.length % PET_FURS_OF.cat.length] }))}>+ ${this.t("pet_add")}</button>`
                       : nothing}`
                 : nothing}
             </div>`
