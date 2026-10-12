@@ -375,6 +375,12 @@ export class Fp3dEditor extends LitElement {
   private declare _multiMode: boolean;
   /** The last tap on a furniture item, for the double-tap into a block. */
   private lastFurnTap: { id: string; t: number } | null = null;
+  /** Whether Shift is held (the 3D views report taps without their keys). */
+  private shiftHeld = false;
+  private readonly onShift = (e: KeyboardEvent) => (this.shiftHeld = e.shiftKey);
+  /** Library pictures for the wall view's side bar (type -> image). */
+  private kitPics = new Map<string, string>();
+  private kitPicsAsked = new Set<string>();
   private declare _deviceId: string | null;
   private declare _deviceQuery: string;
   /** Which devices the room form lists: its own area, other areas, or entities without an area. */
@@ -672,11 +678,13 @@ export class Fp3dEditor extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("keydown", this.onKey);
+    window.addEventListener("keyup", this.onShift);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("keydown", this.onKey);
+    window.removeEventListener("keyup", this.onShift);
     this.resizeObserver?.disconnect();
   }
 
@@ -2620,6 +2628,7 @@ export class Fp3dEditor extends LitElement {
   // ------------------------------------------------------------------ keyboard
 
   private readonly onKey = (e: KeyboardEvent) => {
+    this.shiftHeld = e.shiftKey;
     const path = e.composedPath();
     if (path.some((el) => el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) return;
     if (!this.isConnected || !this.offsetParent) return;
@@ -6054,6 +6063,11 @@ export class Fp3dEditor extends LitElement {
         this._wallView = null;
         return;
       }
+      if ((e.key === "Delete" || e.key === "Backspace") && admin && wset.length && !(e.target as HTMLElement).closest("input, select, textarea")) {
+        e.preventDefault();
+        this.deleteOnWall(wset);
+        return;
+      }
       if (!sel && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
         e.preventDefault();
         go(e.key === "ArrowLeft" ? leftEdge : rightEdge);
@@ -6158,6 +6172,7 @@ export class Fp3dEditor extends LitElement {
               ?furnish=${admin}
               .furnishTypes=${null}
               .selectedFurniture=${this._wallSel}
+              .selectedSet=${wset}
               .quality=${"auto"}
               .floorThumbs=${false}
               .roomLabels=${false}
@@ -6166,7 +6181,14 @@ export class Fp3dEditor extends LitElement {
               .alerts=${false}
               .scenes=${false}
               .central=${false}
-              @furniture-select=${(e: CustomEvent<{ id: string | null }>) => (this._wallSel = e.detail.id)}
+              @furniture-select=${(e: CustomEvent<{ id: string | null }>) => {
+                const id = e.detail.id;
+                // shift (or "Mehrere auswählen"): the piece joins the choice; a piece of the chosen set keeps the set
+                if (id && (this.shiftHeld || this._multiMode)) this.wallToggle(id);
+                else if (!id) this.wallChoose([]);
+                else if (!this.wallSelection().includes(id) || this._wallSingle) this.wallChoose([id]);
+                else this._wallSel = id;
+              }}
               @furniture-move=${this.onFurnitureMoved3d}
             ></fp3d-view3d>
             <div class="fp3d-wv-lift" hidden title=${this.t("wall_view_lift")} @pointerdown=${(e: PointerEvent) => this.liftDown(e)} @pointermove=${(e: PointerEvent) => this.liftMove(e)} @pointerup=${() => this.liftUp()} @pointercancel=${() => this.liftUp()}>
@@ -6266,7 +6288,7 @@ export class Fp3dEditor extends LitElement {
         <div class="fp3d-wv-foot">
           ${rc && (this._runMode || (this._runSel && !sel))
             ? this.renderRunFoot(rc)
-            : many && setSpan && admin
+            : many && admin
             ? this.renderWallSetFoot(frame, wset, setSpan, span)
             : sel && selF
             ? html`<b>${selF.name || furnitureName(this.hass, selF.type)}</b>
@@ -6297,16 +6319,17 @@ export class Fp3dEditor extends LitElement {
                 <button class="fp3d-btn" @click=${() => {
                   this._wallView = null;
                   this.selectItem("furniture", sel.id);
-                }}>${this.t("wall_view_form")}</button>`
+                }}>${this.t("wall_view_form")}</button>
+                ${admin ? html`<button class="fp3d-btn fp3d-danger" @click=${() => this.deleteOnWall([sel.id])}>${this.t("delete")}</button>` : nothing}`
             : html`<span class="fp3d-muted">${this._wallView3d ? this.t("wall_view_hint_3d") : items.length ? this.t("wall_view_hint") : this.t("wall_view_empty")}</span>`}
-          ${admin && !this._wallView3d ? this.renderMultiToggle() : nothing}
+          ${admin ? this.renderMultiToggle() : nothing}
         </div>
       </div>
     </div>`;
   }
 
   /** The wall view's bottom bar for several pieces: join or break up, the whole block or this part, distance, fix, delete. */
-  private renderWallSetFoot(frame: WallFrame, ids: string[], sp: { s0: number; s1: number; y0: number; y1: number }, span: (a: number, b: number) => readonly [number, number]) {
+  private renderWallSetFoot(frame: WallFrame, ids: string[], sp: { s0: number; s1: number; y0: number; y1: number } | null, span: (a: number, b: number) => readonly [number, number]) {
     const block = !this._wallMulti.length;
     const fixed = ids.every((id) => this.isFixedItem("furniture", id));
     return html`<b>${block ? `▣ ${this.t("block_title")}` : this.t("multi_title", { n: ids.length })}</b>
@@ -6325,23 +6348,32 @@ export class Fp3dEditor extends LitElement {
             this.groupIds(ids);
             this._wallMulti = [];
           }}>▣ ${this.t("block_make")}</button>`}
-      ${this.len(this.t("wall_view_left"), Math.round(span(sp.s0, sp.s1)[0] * 1000) / 1000, (val) => {
-        const ds = val - span(sp.s0, sp.s1)[0];
-        this.moveSetOnWall(frame, ids, frame.rightward ? ds : -ds, null);
-      }, 0.01, 0)}
+      ${sp
+        ? this.len(this.t("wall_view_left"), Math.round(span(sp.s0, sp.s1)[0] * 1000) / 1000, (val) => {
+            const ds = val - span(sp.s0, sp.s1)[0];
+            this.moveSetOnWall(frame, ids, frame.rightward ? ds : -ds, null);
+          }, 0.01, 0)
+        : nothing}
       <button class="fp3d-btn" @click=${() => {
         const set = new Set(ids);
         this.change((_, floor) => {
           for (const m of floor.furniture) if (set.has(m.id)) m.locked = !fixed || null;
         });
       }}>${fixed ? `🔓 ${this.t("unfix")}` : `🔒 ${this.t("fix")}`}</button>
-      <button class="fp3d-btn fp3d-danger" @click=${() => {
-        if (!confirm(this.t(ids.some((id) => this.isFixedItem("furniture", id)) ? "block_delete_fixed" : "block_delete", { n: ids.length }))) return;
-        const set = new Set(ids);
-        this.change((_, floor) => (floor.furniture = floor.furniture.filter((m) => !set.has(m.id))));
-        this._wallSel = null;
-        this._wallMulti = [];
-      }}>${this.t("delete")}</button>`;
+      <button class="fp3d-btn fp3d-danger" @click=${() => this.deleteOnWall(ids)}>${this.t("delete")}</button>`;
+  }
+
+  /** Deletes the chosen pieces of the wall view (several or a fixed one only after asking). */
+  private deleteOnWall(ids: string[]): void {
+    if (!ids.length || !this.isAdmin) return;
+    if (ids.length > 1) {
+      if (!confirm(this.t(ids.some((id) => this.isFixedItem("furniture", id)) ? "block_delete_fixed" : "block_delete", { n: ids.length }))) return;
+    } else if (!this.confirmFixedDelete("furniture", ids[0])) return;
+    const set = new Set(ids);
+    this.change((_, floor) => (floor.furniture = floor.furniture.filter((m) => !set.has(m.id))));
+    this._wallSel = null;
+    this._wallMulti = [];
+    this._wallSingle = false;
   }
 
   /** Joins these pieces into one block. */
@@ -6447,6 +6479,8 @@ export class Fp3dEditor extends LitElement {
     else if (cat === "energy") pool = (["meter", "inverter", "home_battery", "wallbox"] as const).map((t) => ({ type: t, label: label(t), search: "" }));
     else if (cat) pool = (WALL_CATS[cat] ?? []).map((t) => ({ type: t, label: label(t), search: translate(EN_HASS, `furn_${t}` as I18nKey) }));
     else if (q || gap) pool = [...Object.values(WALL_CATS).flat().filter((t, i, a) => a.indexOf(t) === i).map((t) => ({ type: t, label: label(t), search: translate(EN_HASS, `furn_${t}` as I18nKey) })), ...packItems];
+    // nothing chosen yet and nothing used before: the base cabinets as a start, so the bar is never empty
+    else if (!this.wallRecent().length) pool = WALL_CATS.base.map((t) => ({ type: t, label: label(t), search: "" }));
     const words = q.split(/\s+/).filter(Boolean);
     let hits = words.length ? pool.filter((it) => words.every((w) => fold(`${it.label} ${it.search} ${it.type.replace(/[_:.]/g, " ")}`).includes(w))) : pool;
     // a gap: standing or hanging pieces that fit (or can be fitted), the closest width first
@@ -6472,17 +6506,23 @@ export class Fp3dEditor extends LitElement {
       ...((this.packs ?? []).some((p) => p.items.length) ? ([["pack", "🧩"]] as [string, string][]) : []),
       ...(hasFeature("energy_pro") ? ([["energy", "⚡"]] as [string, string][]) : []),
     ];
+    const shown = [...recent, ...hits.slice(0, 40).map((h) => h.type)];
+    void this.askKitPics(shown);
+    void this._wallPicTick;
     const item = (t: string, name: string) => {
       const w = furnitureSize(t)[0];
       const fitted = gap && WALL_FIT.has(t) && (w > gw + 0.005 || gw - w < 0.1);
-      return html`<button class="fp3d-btn fp3d-wv-pick" title=${name} @click=${() => this.addOnWall(t, frame, room)}>
-        <span>${name}</span><small>${fitted ? `↔ ${this.m(gw, 2)}` : this.m(w, 2)}</small>
+      const pic = this.kitPics.get(t);
+      return html`<button class="fp3d-wv-tile" title=${name} @click=${() => this.addOnWall(t, frame, room)}>
+        <span class="fp3d-wv-tile-pic">${pic ? html`<img src=${pic} alt="" />` : html`<i></i>`}</span>
+        <span class="fp3d-wv-tile-name">${name}</span>
+        <small class=${fitted ? "fp3d-wv-fit" : ""}>${fitted ? `↔ ${this.m(gw, 2)}` : this.m(w, 2)}</small>
       </button>`;
     };
     return html`<aside class="fp3d-wv-kit">
       <h4>${this.t("wv_kit_title")}</h4>
       <div class="fp3d-wv-cats">
-        ${cats.map(([k, icon]) => html`<button class="fp3d-btn ${cat === k ? "fp3d-primary" : ""}" title=${this.t(`wv_cat_${k}` as I18nKey)} @click=${() => (this._wallCat = cat === k ? null : k)}>${icon}</button>`)}
+        ${cats.map(([k, icon]) => html`<button class="fp3d-wv-cat ${cat === k ? "fp3d-on" : ""}" title=${this.t(`wv_cat_${k}` as I18nKey)} @click=${() => (this._wallCat = cat === k ? null : k)}><span>${icon}</span>${this.t(`wv_cat_${k}` as I18nKey)}</button>`)}
       </div>
       <input class="fp3d-search" type="search" placeholder=${this.t("furniture_search")} .value=${this._wallQuery} @input=${(e: Event) => (this._wallQuery = (e.target as HTMLInputElement).value)} />
       ${gap
@@ -6491,10 +6531,27 @@ export class Fp3dEditor extends LitElement {
           ? html`<p class="fp3d-sub">${this.t("wv_gap_hint")}</p>`
           : nothing}
       ${cat ? html`<h4>${this.t(`wv_cat_${cat}` as I18nKey)}</h4>` : nothing}
-      ${recent.length ? html`<h4>${this.t("wv_recent")}</h4>${recent.map((t) => item(t, packItem(t) ? packItemName(packItem(t)!, lang) : label(t)))}` : nothing}
+      ${recent.length ? html`<h4>${this.t("wv_recent")}</h4><div class="fp3d-wv-tiles">${recent.map((t) => item(t, packItem(t) ? packItemName(packItem(t)!, lang) : label(t)))}</div>` : nothing}
       ${(cat || q || gap) && !hits.length ? html`<p class="fp3d-sub">${this.t(gap ? "wv_none_fits" : "furniture_search_none")}</p>` : nothing}
-      ${hits.slice(0, 40).map((it) => item(it.type, it.label))}
+      <div class="fp3d-wv-tiles">${hits.slice(0, 40).map((it) => item(it.type, it.label))}</div>
     </aside>`;
+  }
+
+  /** Draws the side bar's pictures with the 3D bundle (once per type). */
+  private async askKitPics(types: string[]): Promise<void> {
+    const missing = types.filter((t) => !this.kitPicsAsked.has(t));
+    if (!missing.length) return;
+    for (const t of missing) this.kitPicsAsked.add(t);
+    try {
+      const mod = await load3d();
+      for (const t of missing) {
+        const [w, d, h] = furnitureSize(t);
+        this.kitPics.set(t, mod.furniturePreview({ type: t, w, d, h, variant: null, lamp: LAMP_MODEL[t] ?? null }, 120, this.packs ?? []));
+      }
+    } catch {
+      // no 3D: names only
+    }
+    this._wallPicTick++;
   }
 
   /** The wall view's side bar: pool devices, ball valves and sight glasses (Pool Pro), energy devices (Energie Pro). */
@@ -12141,7 +12198,7 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-wv-kit {
         flex: none;
-        width: 150px;
+        width: 236px;
         display: flex;
         flex-direction: column;
         gap: 6px;
@@ -12161,13 +12218,90 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-wv-cats {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: 1fr 1fr;
         gap: 4px;
       }
-      .fp3d-wv-kit .fp3d-wv-cats .fp3d-btn {
-        justify-content: center;
-        padding: 6px 0;
-        font-size: 16px;
+      .fp3d-wv-cat {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 8px;
+        border-radius: 10px;
+        border: 1px solid var(--fp3d-line, rgba(91, 124, 255, 0.25));
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--fp3d-text, #d6ecff);
+        font: inherit;
+        font-size: 12px;
+        text-align: left;
+        cursor: pointer;
+        line-height: 1.15;
+      }
+      .fp3d-wv-cat span {
+        font-size: 15px;
+        width: 18px;
+        text-align: center;
+        flex: none;
+      }
+      .fp3d-wv-cat.fp3d-on {
+        border-color: var(--fp3d-accent);
+        background: rgba(55, 224, 255, 0.14);
+        color: #fff;
+      }
+      .fp3d-wv-tiles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .fp3d-wv-tile {
+        display: grid;
+        grid-template-rows: auto auto auto;
+        justify-items: center;
+        gap: 2px;
+        padding: 6px 4px;
+        border-radius: 12px;
+        border: 1px solid var(--fp3d-line, rgba(91, 124, 255, 0.25));
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--fp3d-text, #d6ecff);
+        font: inherit;
+        cursor: pointer;
+        text-align: center;
+      }
+      .fp3d-wv-tile:hover {
+        border-color: var(--fp3d-accent);
+        background: rgba(55, 224, 255, 0.08);
+      }
+      .fp3d-wv-tile-pic {
+        width: 72px;
+        height: 60px;
+        display: grid;
+        place-items: center;
+      }
+      .fp3d-wv-tile-pic img {
+        max-width: 72px;
+        max-height: 60px;
+      }
+      .fp3d-wv-tile-pic i {
+        width: 36px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px dashed var(--fp3d-muted);
+        opacity: 0.4;
+      }
+      .fp3d-wv-tile-name {
+        font-size: 11.5px;
+        font-weight: 600;
+        line-height: 1.15;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .fp3d-wv-tile small {
+        font-size: 10.5px;
+        color: var(--fp3d-muted);
+      }
+      .fp3d-wv-tile small.fp3d-wv-fit {
+        color: var(--fp3d-accent);
       }
       .fp3d-wv-kit .fp3d-search {
         width: 100%;

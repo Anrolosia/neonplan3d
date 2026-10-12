@@ -157,6 +157,7 @@ export class Fp3dView3d extends LitElement {
     _flash: { state: true },
     _proHint: { state: true },
     selectedFurniture: { attribute: false },
+    selectedSet: { attribute: false },
     selectedDevice: { attribute: false },
     _sky: { state: true },
     quality: { attribute: false },
@@ -277,6 +278,8 @@ export class Fp3dView3d extends LitElement {
   private trailRows: Record<string, HistoryRow[]> = {};
   private trailTimer: ReturnType<typeof setInterval> | undefined;
   declare selectedFurniture: string | null;
+  /** Further chosen pieces (a block): outlined too. */
+  declare selectedSet: string[];
   declare selectedDevice: string | null;
   /** How much daylight there is (0 = night, 1 = day), from sun.sun. */
   private declare _sky: number;
@@ -446,6 +449,7 @@ export class Fp3dView3d extends LitElement {
     this.showEnergy = true;
     this.flows = null;
     this.selectedFurniture = null;
+    this.selectedSet = [];
     this.selectedDevice = null;
     this._sky = 0;
     this.quality = "auto";
@@ -697,6 +701,7 @@ export class Fp3dView3d extends LitElement {
       this.syncDevices(true);
     }
     if (changed.has("selectedFurniture")) v.selectFurniture(this.selectedFurniture);
+    if (changed.has("selectedSet")) v.selectFurnitureSet(this.selectedSet ?? []);
     if (changed.has("selectedDevice")) v.setSelectedDevice(this.selectedDevice);
     if (changed.has("trail") || changed.has("replay")) this.watchTrail();
     if (changed.has("replay")) {

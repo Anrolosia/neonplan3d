@@ -588,6 +588,7 @@ export class FloorplanViewer {
     screen?: { x0: number; y0: number; fx: number; fz: number; right: [number, number]; fwd: [number, number]; perPx: number; gain: number };
   } | null = null;
   private ghost: LineSegments | null = null;
+  private selectedSet: string[] = [];
   private theme: Theme = "neon";
   private readonly themeUniform: ThemeUniform = { value: 0 };
   private sun: SunState | null = null;
@@ -1114,6 +1115,13 @@ export class FloorplanViewer {
   selectFurniture(id: string | null): void {
     if (id && this.selectedDevice) this.selectDevice(null);
     this.selectedFurniture = id;
+    this.updateGhost();
+    this.invalidate();
+  }
+
+  /** Further pieces chosen with it (a block, a multi choice): each gets a wireframe box too. */
+  selectFurnitureSet(ids: readonly string[]): void {
+    this.selectedSet = [...ids];
     this.updateGhost();
     this.invalidate();
   }
@@ -3255,10 +3263,25 @@ export class FloorplanViewer {
       this.scene.remove(this.ghost);
       this.ghost = null;
     }
-    const id = this.selectedFurniture;
-    const fv = id ? this.floors.find((f) => f.floor.furniture.some((m) => m.id === id)) : undefined;
-    const f = fv?.floor.furniture.find((m) => m.id === id);
-    if (!fv || !f) return;
+    const ids = [...new Set([...(this.selectedFurniture ? [this.selectedFurniture] : []), ...this.selectedSet])];
+    const lines = new LineBuffer();
+    let at: FloorView | undefined;
+    for (const id of ids) {
+      const fv = this.floors.find((q) => q.floor.furniture.some((m) => m.id === id));
+      const f = fv?.floor.furniture.find((m) => m.id === id);
+      if (!fv || !f) continue;
+      at ??= fv;
+      this.ghostBox(lines, fv, f, id === this.selectedFurniture ? new Color(0.25, 0.9, 1) : new Color(1, 0.71, 0.28));
+    }
+    if (!at) return;
+    this.ghost = new LineSegments(lines.geometry(), new LineBasicMaterial({ vertexColors: true, depthTest: false, transparent: true }));
+    this.ghost.position.y = at.floor.elevation + at.y;
+    this.ghost.renderOrder = 20;
+    this.scene.add(this.ghost);
+  }
+
+  /** The wireframe box of one piece (its front edge brighter at floor level). */
+  private ghostBox(lines: LineBuffer, fv: FloorView, f: Furniture, color: Color): void {
     const x = this.grab?.id === f.id ? this.grab.x : f.x;
     const z = this.grab?.id === f.id ? this.grab.z : f.z;
     const H = fv.floor.height;
@@ -3276,14 +3299,12 @@ export class FloorplanViewer {
     const c = Math.cos(a);
     const sn = Math.sin(a);
     const corner = (lx: number, lz: number, y: number) => [x + lx * c - lz * sn, y, z + lx * sn + lz * c];
-    const lines = new LineBuffer();
     const pts = [
       [-f.w / 2, -f.d / 2],
       [f.w / 2, -f.d / 2],
       [f.w / 2, f.d / 2],
       [-f.w / 2, f.d / 2],
     ];
-    const color = new Color(0.25, 0.9, 1);
     for (let i = 0; i < 4; i++) {
       const [ax, az] = pts[i];
       const [bx, bz] = pts[(i + 1) % 4];
@@ -3293,10 +3314,6 @@ export class FloorplanViewer {
     }
     // the front edge a little brighter at floor level, so the direction is clear
     lines.seg(corner(-f.w / 2, f.d / 2 + 0.03, y0 + 0.02), corner(f.w / 2, f.d / 2 + 0.03, y0 + 0.02), new Color(1, 1, 1));
-    this.ghost = new LineSegments(lines.geometry(), new LineBasicMaterial({ vertexColors: true, depthTest: false, transparent: true }));
-    this.ghost.position.y = fv.floor.elevation + fv.y;
-    this.ghost.renderOrder = 20;
-    this.scene.add(this.ghost);
   }
 
   private onHold(x: number, y: number): void {
