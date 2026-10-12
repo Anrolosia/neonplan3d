@@ -2019,8 +2019,10 @@ export class Fp3dView3d extends LitElement {
     const fresh = this.ro ? [] : alerts.filter((_, i) => !this.seenAlerts.has(keys[i]));
     if (!this.ro) this.seenAlerts = new Set(keys);
     if (keys.join() !== this._alerts.map((a) => `${a.kind}:${a.entity}`).join()) this._alerts = alerts;
-    if (alerts.length && !this.alertTimer && !this.ro) this.alertTimer = setInterval(() => !document.hidden && this.applyTint(), this._low ? 200 : 100);
-    if ((!alerts.length || this.ro) && this.alertTimer) {
+    // only warnings that light rooms pulse (a pool's frost warning shows at the top and needs no timer)
+    const pulsing = alerts.some((a) => !a.kind.startsWith("pool_"));
+    if (pulsing && !this.alertTimer && !this.ro) this.alertTimer = setInterval(() => !document.hidden && this.applyTint(), this._low ? 200 : 100);
+    if ((!pulsing || this.ro) && this.alertTimer) {
       clearInterval(this.alertTimer);
       this.alertTimer = undefined;
     }
@@ -2110,9 +2112,12 @@ export class Fp3dView3d extends LitElement {
       tint ??= new Map();
       const k = this.ro ? 1 : 0.55 + 0.45 * Math.sin(performance.now() / 160);
       for (const a of this._alerts) {
+        // a pool's warning (frost, pH, chlorine) is outside: it shows at the top only, the rooms stay calm
+        if (a.kind.startsWith("pool_")) continue;
         const c = alertColor(a.kind).map((x) => x * k) as [number, number, number];
         if (a.roomId) tint.set(a.roomId, c);
-        else for (const f of b.floors) for (const r of f.rooms) tint.set(r.id, c);
+        // a warning of one floor lights that floor's rooms; the house (alarm, power outage) all of them
+        else for (const f of b.floors) if (!a.floorId || f.id === a.floorId) for (const r of f.rooms) tint.set(r.id, c);
       }
     }
     if (this.roomFlash && performance.now() < this.roomFlash.until) {
