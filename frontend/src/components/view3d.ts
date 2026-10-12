@@ -2846,6 +2846,12 @@ export class Fp3dView3d extends LitElement {
         pets: this.building?.settings.pets?.on !== false ? (this.building?.settings.pets?.list ?? []) : [],
         night: () => this.hass?.states["sun.sun"]?.state === "below_horizon",
         base: (floor, f) => mountBase(floor, f),
+        closedDoors: () => {
+          const out = new Set<string>();
+          const states = this.hass?.states ?? {};
+          for (const f of this.building?.floors ?? []) for (const o of f.openings) if (o.type === "door" && o.contact && states[o.contact]?.state === "off") out.add(o.id);
+          return out;
+        },
       });
     } catch (err) {
       console.error("NeonPlan 3D: the pets failed to load", err);

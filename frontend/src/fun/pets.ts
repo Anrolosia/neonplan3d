@@ -28,6 +28,8 @@ export interface PetsContext {
   night: () => boolean;
   /** Height of an item's bottom on its floor (an aquarium on a sideboard). */
   base: (floor: Floor, f: Furniture) => number;
+  /** Doors their contact reports shut: the pets go round them (doors without a sensor count as open). */
+  closedDoors?: () => ReadonlySet<string>;
 }
 
 export interface PetsController {
@@ -270,8 +272,19 @@ const CAT_HOME = /^(cat_bed|cat_cave|cat_tree)$/;
 const DOG_HOME = /^(dog_bed|dog_basket|dog_house)$/;
 const BOWLS = /^(bowls|pet_feeder|water_fountain)$/;
 
+/** Whether a point lies in a polygon (even-odd). */
+function pointIn(p: Vec2, poly: readonly Vec2[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, zi] = poly[i];
+    const [xj, zj] = poly[j];
+    if (zi > p[1] !== zj > p[1] && p[0] < ((xj - xi) * (p[1] - zi)) / (zj - zi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
 /** Favourite places on a floor, only the ones of its kind (an aquarium or a cage never is one). */
-function spotsFor(floor: Floor, kind: Pet["kind"]): Spot[] {
+function spotsFor(floor: Floor, kind: Pet["kind"], map: FloorMap): Spot[] {
   const out: Spot[] = [];
   const along = (f: Furniture, k: number): Vec2 => {
     const a = (f.rotation * Math.PI) / 180;
@@ -292,12 +305,33 @@ function spotsFor(floor: Floor, kind: Pet["kind"]): Spot[] {
     } else if (BOWLS.test(t) && kind !== "rabbit") out.push({ p: along(f, f.d / 2 + 0.25), y: 0, approach: null, face: facing(f) + Math.PI, sleep: false, visit: true });
     else if ((SOFA.test(t) || BED.test(t)) && !t.includes("bunk") && !t.startsWith("dog") && !t.startsWith("cat")) {
       const bed = BED.test(t) || t === "sofa_bed";
-      const front = along(f, f.d / 2 + 0.35);
+      // which side is the front: some models are built the other way round – the front is the side that lies
+      // free in the room (the back usually stands at a wall), else the side towards the room's middle
+      const free = (s: number) => {
+        const q = along(f, s * (f.d / 2 + 0.35));
+        return !map.blocked(q) && !!map.roomAt(q);
+      };
+      let side = 1;
+      if (!free(1) && free(-1)) side = -1;
+      else if (free(1) === free(-1)) {
+        const room = floor.rooms.find((r) => r.points.length >= 3 && r.points.length && pointIn([f.x, f.z], r.points));
+        if (room) {
+          const cx = room.points.reduce((s, p) => s + p[0], 0) / room.points.length;
+          const cz = room.points.reduce((s, p) => s + p[1], 0) / room.points.length;
+          const d = (s: number) => {
+            const q = along(f, s);
+            return Math.hypot(q[0] - cx, q[1] - cz);
+          };
+          if (d(-1) < d(1)) side = -1;
+        }
+      }
+      const front = along(f, side * (f.d / 2 + 0.35));
+      const face = facing(f) + (side < 0 ? Math.PI : 0);
       if (kind === "cat") {
-        // on the seat (a little to the front of the middle, not the back rest), at seat height
-        const seat = bed ? Math.min(0.56, f.h * 0.62) : Math.min(0.46, f.h * 0.55);
-        out.push({ p: along(f, bed ? 0 : f.d * 0.12), y: seat, approach: front, face: facing(f), sleep: bed });
-      } else out.push({ p: front, y: 0, approach: null, face: facing(f), sleep: bed });
+        // on the seat (a little to the front of the middle, not the back rest), a little above it rather than in it
+        const seat = bed ? Math.min(0.58, f.h * 0.64) : Math.min(0.5, f.h * 0.58);
+        out.push({ p: along(f, bed ? 0 : side * f.d * 0.12), y: seat, approach: front, face, sleep: bed });
+      } else out.push({ p: front, y: 0, approach: null, face, sleep: bed });
     } else if (t === "rug") out.push({ p: [f.x, f.z], y: 0.01, approach: null, face: null, sleep: false });
   }
   return out;
@@ -468,7 +502,10 @@ export function startPets(ctx: PetsContext): PetsController {
     let info = floors.get(id);
     if (!info) {
       const floor = plan.floors.find((f) => f.id === id)!;
-      info = { floor, map: new ctx.FloorMap(plan, floor), rooms: floor.rooms.filter((r) => r.points.length >= 3), spots: new Map() };
+      // shut doors are walls for the pets
+      const shut = ctx.closedDoors?.() ?? new Set<string>();
+      const walkable = shut.size ? { ...floor, openings: floor.openings.filter((o) => !shut.has(o.id)) } : floor;
+      info = { floor, map: new ctx.FloorMap(plan, walkable), rooms: floor.rooms.filter((r) => r.points.length >= 3), spots: new Map() };
       floors.set(id, info);
     }
     return info;
@@ -481,7 +518,7 @@ export function startPets(ctx: PetsContext): PetsController {
     a.map = info.map;
     a.rooms = info.rooms;
     let spots = info.spots.get(a.pet.kind);
-    if (!spots) info.spots.set(a.pet.kind, (spots = spotsFor(info.floor, a.pet.kind)));
+    if (!spots) info.spots.set(a.pet.kind, (spots = spotsFor(info.floor, a.pet.kind, info.map)));
     a.spots = spots;
     viewer.floorMap.get(id)?.group.add(a.model.root);
   };
@@ -503,8 +540,19 @@ export function startPets(ctx: PetsContext): PetsController {
     return a.map.freeNear([(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...zs) + Math.max(...zs)) / 2]);
   };
 
+  let doorSig = "";
+  /** A door opened or shut since: the floors' maps are made again (lazily), each pet takes its floor's new map. */
+  const checkDoors = () => {
+    const sig = [...(ctx.closedDoors?.() ?? [])].sort().join(",");
+    if (sig === doorSig) return;
+    doorSig = sig;
+    floors = new Map();
+    for (const x of animals) if (!x.climb) toFloor(x, x.floorId);
+  };
+
   /** What next: at night to a sleeping place, by day to a favourite place or anywhere; then rest there a while. */
   const decide = (a: Animal, now: number) => {
+    checkDoors();
     const night = ctx.night();
     const sleepers = a.spots.filter((s) => s.sleep);
     const choices: Spot[] = night && sleepers.length ? sleepers : a.spots;
