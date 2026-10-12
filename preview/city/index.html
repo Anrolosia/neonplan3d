@@ -155,6 +155,23 @@
         cursor: pointer;
         backdrop-filter: blur(10px);
       }
+      .portal {
+        position: absolute;
+        left: 50%;
+        bottom: 84px;
+        transform: translateX(-50%);
+        padding: 12px 20px;
+        border-radius: 999px;
+        border: 1px solid #fbbf24;
+        background: rgba(40, 28, 6, 0.85);
+        color: #fde68a;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .portal[hidden] {
+        display: none;
+      }
       .stick {
         position: absolute;
         left: 20px;

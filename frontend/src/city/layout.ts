@@ -88,7 +88,7 @@ export function ringsFor(n: number): number {
 function bandSlots(b: number): number[] {
   const m = ringHalf(b + 1) + RING_STEP / 2;
   const out: number[] = [];
-  for (let t = 6.5; t <= m - 10.5 + 1e-9; t += 10) out.push(t, -t);
+  for (let t = 6.5; t <= m - 13 + 1e-9; t += 10) out.push(t, -t);
   return out;
 }
 
@@ -126,7 +126,8 @@ export function lighthousePlace(j: number): Place {
     [-1, 1],
     [-1, -1],
   ][c];
-  return { x: sx * d, z: sz * d, ring: k, facing: Math.atan2(sx, sz) };
+  // turned so the plot's +x +z diagonal points out of the town
+  return { x: sx * d, z: sz * d, ring: k, facing: [Math.PI / 2, 0, -Math.PI / 2, Math.PI][c] };
 }
 
 /** Plots of houses (spotlight) and lighthouses: the shop's plot numbers, else in the order of the supporters' numbers. */

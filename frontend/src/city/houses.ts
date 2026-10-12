@@ -15,8 +15,8 @@ import { FloorMap } from "../viewer/walk.ts";
 
 /** Wall height of the supporters' houses (m). */
 export const WALL_H = 2.5;
-const EXT = 0.24;
-const INT = 0.12;
+export const EXT = 0.24;
+export const INT = 0.12;
 /** NeonPlan's ground lies 20 cm under a ground floor; the town's ground is at 0, so buildings stand 20 cm up. */
 export const LIFT = 0.2;
 
@@ -32,18 +32,18 @@ export interface HouseSpot {
   color: string;
 }
 
-const opening = (id: string, room: string, edge: number, offset: number, width: number, type: "door" | "window", sill: number, height: number): Opening =>
+export const opening = (id: string, room: string, edge: number, offset: number, width: number, type: "door" | "window", sill: number, height: number): Opening =>
   ({ id, room_id: room, edge, offset, width, type, sill, height, hinge: "left", leaves: 1, swing: "in", style: null, cover: null, contact: null, contact2: null, tilt: null }) as unknown as Opening;
 
-const room = (id: string, points: Vec2[], material = "wood"): Room => ({ id, name: id, area_id: null, points, floor_material: material }) as Room;
+export const room = (id: string, points: Vec2[], material = "wood"): Room => ({ id, name: id, area_id: null, points, floor_material: material }) as Room;
 
-const item = (id: string, type: FurnitureType, x: number, z: number, rotation = 0, size?: [number, number, number]): Furniture => {
+export const item = (id: string, type: FurnitureType, x: number, z: number, rotation = 0, size?: [number, number, number]): Furniture => {
   const [w, d, h] = size ?? FURNITURE_SIZE[type];
   return { id, type, x, z, rotation, w, d, h, variant: null, entity: null, power: null } as Furniture;
 };
 
-const area = (id: string, type: OutdoorArea["type"], points: Vec2[], extra: Partial<OutdoorArea> = {}): OutdoorArea => ({ id, type, points, ...extra }) as OutdoorArea;
-const box = (x0: number, z0: number, x1: number, z1: number): Vec2[] => [
+export const area = (id: string, type: OutdoorArea["type"], points: Vec2[], extra: Partial<OutdoorArea> = {}): OutdoorArea => ({ id, type, points, ...extra }) as OutdoorArea;
+export const box = (x0: number, z0: number, x1: number, z1: number): Vec2[] => [
   [x0, z0],
   [x1, z0],
   [x1, z1],
@@ -133,7 +133,7 @@ export function roofFade(o: number): void {
  * One floor as NeonPlan's 3D view builds it (walls, floor, furniture, garden, doors and windows), with the rooms lit
  * warm from inside and the lamps glowing. In floor coordinates; the caller lifts it onto its level.
  */
-function floorModel(floor: Floor, glow: Texture, b?: Building): Group {
+export function floorModel(floor: Floor, glow: Texture, b?: Building): Group {
   const g = new Group();
   const sloped = b ? (b.settings.roof?.sections ?? []).some((s) => sectionCutsBelow(s, floor.elevation + floor.height)) : false;
   const roofUnder =
@@ -180,7 +180,7 @@ function floorModel(floor: Floor, glow: Texture, b?: Building): Group {
 }
 
 /** The roof of a building (NeonPlan's gable roof with its gables), in building coordinates. */
-function roofModel(b: Building): Group {
+export function roofModel(b: Building): Group {
   const g = new Group();
   for (const part of buildRoof(b)) {
     const m = new Group();
@@ -269,7 +269,7 @@ export interface CityPlan {
   floor: Floor;
 }
 
-const rot = (x: number, z: number, f: number, at: Vec2): Vec2 => [
+export const rot = (x: number, z: number, f: number, at: Vec2): Vec2 => [
   Math.round((at[0] + x * Math.cos(f) + z * Math.sin(f)) * 1000) / 1000,
   Math.round((at[1] - x * Math.sin(f) + z * Math.cos(f)) * 1000) / 1000,
 ];
@@ -278,9 +278,9 @@ const rot = (x: number, z: number, f: number, at: Vec2): Vec2 => [
  * The walk's plan of the town: the town hall's ground floor, every house's rooms and doors (turned onto its plot),
  * and solid shapes for the lighthouses' rocks and the dark blocks.
  */
-export function cityPlan(hall: Floor | null, houses: readonly HouseSpot[], solids: readonly { id: string; points: Vec2[] }[]): CityPlan {
-  const rooms: Room[] = [];
-  const openings: Opening[] = [];
+export function cityPlan(hall: Floor | null, houses: readonly HouseSpot[], solids: readonly { id: string; points: Vec2[] }[], extra: { rooms: Room[]; openings: Opening[] } = { rooms: [], openings: [] }): CityPlan {
+  const rooms: Room[] = [...extra.rooms];
+  const openings: Opening[] = [...extra.openings];
   const walls: NonNullable<Floor["walls"]> = [];
   if (hall) {
     for (const r of hall.rooms) rooms.push({ ...r, id: `hall_${r.id}` });

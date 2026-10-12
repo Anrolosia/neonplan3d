@@ -8,11 +8,8 @@ import {
   BoxGeometry,
   BufferGeometry,
   CanvasTexture,
-  CircleGeometry,
   Color,
-  ConeGeometry,
   CylinderGeometry,
-  DoubleSide,
   EdgesGeometry,
   Float32BufferAttribute,
   FogExp2,
@@ -39,6 +36,7 @@ import { demoSupporters } from "./demo.ts";
 import type { Building, Vec2 } from "../model.ts";
 import { WalkCamera } from "../viewer/walk.ts";
 import { CityMap, cityPlan, farHouse, HOUSE_D, hallModel, houseModel, type HouseSpot, LIFT, roofFade, WALL_H } from "./houses.ts";
+import { buildTop, type TopKind } from "./estates.ts";
 import { cleanData, housePlace, lanternPlace, lighthousePlace, plots, RING_STEP, ringHalf, ringsFor, type Supporter } from "./layout.ts";
 
 /** The shop's list (a JSON file or endpoint); empty until it exists: then the preview shows invented supporters. */
@@ -62,6 +60,11 @@ const T = de
       walk: "🚶 Rundgang",
       walkEnd: "✕ Rundgang beenden",
       walkHint: "Ziehen: umsehen · Tippen: hingehen · W A S D oder der Knopf links unten: gehen",
+      up: "⬆ Treppe hoch",
+      down: "⬇ Nach unten",
+      lift_up: "🛗 Aufzug zum Penthouse",
+      lift_down: "🛗 Aufzug nach unten",
+      tower_up: "⬆ Auf den Leuchtturm",
     }
   : {
       title: "Supporter city",
@@ -76,6 +79,11 @@ const T = de
       walk: "🚶 Walk",
       walkEnd: "✕ End the walk",
       walkHint: "Drag: look around · Tap: walk there · W A S D or the stick at the bottom left: walk",
+      up: "⬆ Upstairs",
+      down: "⬇ Go down",
+      lift_up: "🛗 Lift to the penthouse",
+      lift_down: "🛗 Lift down",
+      tower_up: "⬆ Up the lighthouse",
     };
 
 async function load(): Promise<{ list: Supporter[]; demo: boolean }> {
@@ -266,18 +274,25 @@ async function start(): Promise<void> {
         solids.push({ id: `block_${solids.length}`, points: [[x - 1.5, z - 1.5], [x + 1.5, z - 1.5], [x + 1.5, z + 1.5], [x - 1.5, z + 1.5]] });
       }
   }
-  for (const [nr, j] of towerPlots) {
+  // the top level: a lighthouse estate or a high-rise with a penthouse (both to choose from; ?top= shows one kind)
+  const forced = params.get("top");
+  const tops = [...towerPlots].map(([nr, j]) => {
+    const s = byNr.get(nr)!;
     const p = lighthousePlace(j);
-    solids.push({ id: `rock_${nr}`, points: Array.from({ length: 8 }, (_, i): Vec2 => [p.x + Math.cos((i / 8) * Math.PI * 2) * 2.3, p.z + Math.sin((i / 8) * Math.PI * 2) * 2.3]) });
-  }
+    const kind: TopKind = forced === "estate" || forced === "tower" ? forced : j % 2 === 0 ? "estate" : "tower";
+    return { nr, top: buildTop(kind, nr, p.facing, [p.x, p.z], s.color ?? CYAN, s.name ?? nrText(nr), glow, sign) };
+  });
 
   // the houses of the supporters with a house: one plan with the town hall, drawn like NeonPlan houses
   const spots: HouseSpot[] = [...housePlots].map(([nr, j]) => {
     const p = housePlace(j);
     return { id: String(nr), x: p.x, z: p.z, facing: p.facing, color: byNr.get(nr)!.color ?? CYAN };
   });
-  const plan = cityPlan(hall?.ground ?? null, spots, solids);
+  const plan = cityPlan(hall?.ground ?? null, spots, solids, { rooms: tops.flatMap((t) => t.top.rooms), openings: tops.flatMap((t) => t.top.openings) });
   const walkMap = new CityMap(plan.building, plan.floor);
+  // the levels above the ground (villa upstairs, lighthouse gallery, penthouse) and the ways between them
+  const levels = new Map(tops.flatMap((t) => t.top.levels).map((l) => [l.id, { ...l, map: new CityMap(plan.building, l.floor) }]));
+  const portals = tops.flatMap((t) => t.top.portals);
 
   // ---------------------------------------------------------------- the supporters' lights
   const picks: Pick[] = [];
@@ -358,55 +373,12 @@ async function start(): Promise<void> {
     });
   };
 
-  // lighthouses: on the outer corners in a little harbour, the beam sweeping over the town, the name on top
+  // the top level's buildings, their beams turned by the frame
   const beams: Group[] = [];
-  for (const [nr, j] of towerPlots) {
-    const s = byNr.get(nr)!;
-    const c = s.color ?? CYAN;
-    const p = lighthousePlace(j);
-    const g = new Group();
-    const water = new Mesh(new CircleGeometry(4.6, 32).rotateX(-Math.PI / 2), new MeshBasicMaterial({ color: "#0b3a5a" }));
-    water.position.y = 0.03;
-    const shore = new Mesh(new RingGeometry(4.5, 4.75, 40).rotateX(-Math.PI / 2), new MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0.45 }));
-    shore.position.y = 0.04;
-    const rock = new Mesh(new CylinderGeometry(1.9, 2.3, 0.8, 16), new MeshBasicMaterial({ color: "#1a2438" }));
-    rock.position.y = 0.4;
-    const tower = new Mesh(new CylinderGeometry(0.85, 1.35, 8, 16), new MeshBasicMaterial({ color: "#9fb0cc" }));
-    tower.position.y = 4.8;
-    g.add(water, shore, rock, tower);
-    for (const y of [2.6, 5.4]) {
-      const band = new Mesh(new CylinderGeometry(1.19 - (y - 0.8) * 0.06, 1.25 - (y - 0.8) * 0.06, 1.1, 16), new MeshBasicMaterial({ color: "#c2384f" }));
-      band.position.y = y;
-      g.add(band);
-    }
-    const lamp = new Mesh(new CylinderGeometry(0.7, 0.7, 1.1, 14), new MeshBasicMaterial({ color: c }));
-    lamp.position.y = 9.35;
-    const cap = new Mesh(new ConeGeometry(1, 1.1, 14), new MeshBasicMaterial({ color: "#1d2a44" }));
-    cap.position.y = 10.45;
-    g.add(lamp, cap);
-    const halo = new Sprite(new SpriteMaterial({ map: glow, color: c, blending: AdditiveBlending, depthWrite: false, transparent: true }));
-    halo.position.y = 9.35;
-    halo.scale.setScalar(5);
-    g.add(halo);
-    // the beam: two long, faint cones turning round the lamp
-    const beam = new Group();
-    beam.position.y = 9.35;
-    const beamMat = new MeshBasicMaterial({ color: c, transparent: true, opacity: 0.13, blending: AdditiveBlending, depthWrite: false, side: DoubleSide });
-    for (const sgn of [-1, 1]) {
-      const cone = new Mesh(new ConeGeometry(2.4, 30, 18, 1, true), beamMat);
-      cone.rotation.z = (sgn * Math.PI) / 2;
-      cone.position.x = sgn * -15;
-      beam.add(cone);
-    }
-    beam.rotation.y = j * 1.3;
-    beams.push(beam);
-    g.add(beam);
-    const plate = sign(s.name ?? nrText(nr), c, 1.1);
-    plate.position.y = 12.3;
-    g.add(plate);
-    g.position.set(p.x, 0, p.z);
-    scene.add(g);
-    picks.push({ pos: new Vector3(p.x, 6, p.z), nr, radius: 50 });
+  for (const { nr, top } of tops) {
+    scene.add(top.group);
+    if (top.beam) beams.push(top.beam);
+    picks.push({ pos: top.pick, nr, radius: 60 });
   }
 
   // the chosen light: a ring on the ground that pulses
@@ -426,6 +398,7 @@ async function start(): Promise<void> {
     ${demo ? `<div class="note">${T.demo}</div>` : ""}
     <div class="hint">${T.hint}</div>
     <button class="walk" type="button">${T.walk}</button>
+    <button class="portal" type="button" hidden></button>
     <div class="stick" hidden><b></b></div>
     <div class="card" hidden></div>`;
   const card = ui.querySelector<HTMLDivElement>(".card")!;
@@ -519,19 +492,52 @@ async function start(): Promise<void> {
   const stick = ui.querySelector<HTMLDivElement>(".stick")!;
   const knob = stick.querySelector("b")!;
   const floorView = { y: LIFT, floor: plan.floor, mask: { standing: { value: 0 }, glass: { value: 0 } } };
+  const views = [floorView, ...[...levels.values()].map((l) => ({ y: LIFT, floor: l.floor, mask: { standing: { value: 0 }, glass: { value: 0 } } }))];
   const internals = {
     camera,
     controls,
-    floorMap: new Map([[plan.floor.id, floorView]]),
-    floors: [floorView],
+    floorMap: new Map(views.map((v) => [v.floor.id, v])),
+    floors: views,
     labels: document.createElement("div"),
     renderer,
     invalidate: () => (dirty = true),
     updateWalls: () => {},
   };
+  // standing at stairs or a lift offers the way to the other level
+  const portalBtn = ui.querySelector<HTMLButtonElement>(".portal")!;
+  let level = "city";
+  let here: (typeof portals)[number] | null = null;
+  const checkPortal = () => {
+    const st = walker?.state;
+    const near = st ? portals.find((p) => p.from === level && Math.hypot(p.at[0] - st.x, p.at[1] - st.z) < 2.4) ?? null : null;
+    if (near === here) return;
+    here = near;
+    portalBtn.hidden = !near;
+    if (near) portalBtn.textContent = T[near.kind];
+  };
+  portalBtn.addEventListener("click", () => {
+    if (!walker || !here) return;
+    const to = here.to;
+    if (to === "city") {
+      // back down: out at the foot of the stairs, the lift or the lighthouse
+      const foot = portals.find((p) => p.from === "city" && p.to === level);
+      const st = walker.state;
+      walker.setMap(walkMap, foot ? { x: foot.at[0], z: foot.at[1], yaw: st.yaw, pitch: -0.05 } : undefined);
+    } else {
+      const l = levels.get(to)!;
+      walker.setMap(l.map, { ...l.start });
+    }
+    level = to;
+    here = null;
+    checkPortal();
+    dirty = true;
+  });
   const endWalk = () => {
     walker?.dispose();
     walker = null;
+    level = "city";
+    here = null;
+    portalBtn.hidden = true;
     walkBtn.textContent = T.walk;
     stick.hidden = true;
     hint.textContent = T.hint;
@@ -546,7 +552,8 @@ async function start(): Promise<void> {
       start: { x: 0, z: front, yaw: -Math.PI / 2, pitch: -0.08 },
       // stepping into a supporter's house shows whose it is
       onRoom: (r) => {
-        if (r?.id.startsWith("house_")) show(Number(r.id.split("_")[1]), false);
+        const m = /^(house|estate|tower)_(\d+)/.exec(r?.id ?? "");
+        if (m) show(Number(m[2]), false);
       },
     });
     walkBtn.textContent = T.walkEnd;
@@ -587,6 +594,20 @@ async function start(): Promise<void> {
     stick.addEventListener("pointercancel", up);
   });
   if (params.has("rundgang") || params.has("walk")) setTimeout(startWalk, 300);
+  // for the page's own tests: stand somewhere on the current level
+  if (params.has("debug"))
+    (window as unknown as Record<string, unknown>).fp3dCity = {
+      portals,
+      startWalk,
+      level: () => level,
+      stand: (x: number, z: number, yaw: number) => {
+        const map = level === "city" ? walkMap : levels.get(level)!.map;
+        walker?.setMap(map, { x, z, yaw, pitch: -0.05 });
+        checkPortal();
+      },
+      portal: () => portalBtn.click(),
+      portalText: () => (portalBtn.hidden ? "" : portalBtn.textContent),
+    };
 
   const light = Number(params.get("licht") ?? params.get("light"));
   if (Number.isInteger(light) && byNr.has(light)) setTimeout(() => show(light, true), 400);
@@ -608,6 +629,7 @@ async function start(): Promise<void> {
       dirty = true;
     }
     updateLod();
+    if (walker) checkPortal();
     if (chosen !== null && marker.visible) {
       const t = ((now - chosenAt) / 1000) % 1.6;
       (marker.material as MeshBasicMaterial).opacity = 0.9 - t / 2;
