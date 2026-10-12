@@ -183,6 +183,7 @@ export class Fp3dView3d extends LitElement {
     _find: { state: true },
     _walk: { state: true },
     walkable: { attribute: false },
+    petsOn: { attribute: false },
     _central: { state: true },
     _thumbsCompact: { state: true },
     _armed: { state: true },
@@ -391,6 +392,8 @@ export class Fp3dView3d extends LitElement {
   declare central: boolean;
   /** Offer the walk through the house at eye height (card option walk; default on). */
   declare walkable: boolean;
+  /** The card can leave the pets out (card option "pets: false"); the panel always shows them. */
+  declare petsOn: boolean;
   /** The walk: the room one stands in (null between rooms), or false when not walking. */
   private declare _walk: { room: string | null; hint: boolean } | false;
   private walker: { dispose(): void; setStick(v: { x: number; y: number } | null): void } | null = null;
@@ -483,6 +486,7 @@ export class Fp3dView3d extends LitElement {
     this._armed = null;
     this.central = true;
     this.walkable = true;
+    this.petsOn = true;
     this._walk = false;
     this.buttons = null;
     this._thumbs = [];
@@ -681,7 +685,7 @@ export class Fp3dView3d extends LitElement {
       v.setBuilding(this.building);
       if (startChanged && this.floorId === null) v.resetView();
     }
-    if (changed.has("building") || changed.has("packs")) void this.syncPets();
+    if (changed.has("building") || changed.has("packs") || changed.has("petsOn")) void this.syncPets();
     if (changed.has("startView") && changed.get("startView") !== undefined) {
       v.setStartView(this.startViewOf());
       if (this.floorId === null) v.resetView();
@@ -2815,7 +2819,7 @@ export class Fp3dView3d extends LitElement {
   private async syncPets(): Promise<void> {
     const b = this.building;
     const v = this.viewer;
-    const on = b?.settings.pets?.on !== false;
+    const on = b?.settings.pets?.on !== false && this.petsOn !== false;
     const list = on ? (b?.settings.pets?.list ?? []) : [];
     // the fun pack also brings fish to the pets pack's aquariums
     const fish = on && !!b?.floors.some((f) => f.furniture.some((m) => /:aquarium(_large)?$/.test(m.type)));
@@ -2843,7 +2847,7 @@ export class Fp3dView3d extends LitElement {
         FloorMap: mod.FloorMap,
         viewer: this.viewer as never,
         building: this.building!,
-        pets: this.building?.settings.pets?.on !== false ? (this.building?.settings.pets?.list ?? []) : [],
+        pets: this.building?.settings.pets?.on !== false && this.petsOn !== false ? (this.building?.settings.pets?.list ?? []) : [],
         night: () => this.hass?.states["sun.sun"]?.state === "below_horizon",
         base: (floor, f) => mountBase(floor, f),
         closedDoors: () => {
