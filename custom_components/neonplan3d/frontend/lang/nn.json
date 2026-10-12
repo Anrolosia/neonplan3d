@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Botnsluk",
  "feed_inlet": "Innløp",
- "feed_waste": "Avløp (tilbakespyling)"
+ "feed_waste": "Avløp (tilbakespyling)",
+ "tech_open": "Teikn teknikkrommet",
+ "tech_open_hint": "Trykk deretter i planen på veggen der anlegget heng.",
+ "tech_step": "Steg {n}",
+ "tech_step_feed": "Trykk på «{name}» til venstre og så på staden på veggen der ledningen kjem inn (heilt nedst: opp av golvet).",
+ "tech_step_devices": "Trykk på filterpumpe og sandfilter til venstre – dei vert sette mot veggen. Varmepumpe og dosering om du har dei.",
+ "tech_step_line": "Trekk ei linje: frå «{a}» til «{b}». Trykk på det eine og dra til det andre.",
+ "tech_step_loose": "Eit røyr endar framleis laust – trekk det vidare til eit apparat eller ein ledning, eller slett det (✋ Vel).",
+ "tech_step_drawing": "Dra vidare eller trykk punkt for punkt – linja endar på eit apparat, ein ledning eller eit røyr.",
+ "tech_step_fit": "Trykk på røyret ventilen (sjåglaset) skal i – det lyser oransje."
 }

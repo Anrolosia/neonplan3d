@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Bottenavlopp",
  "feed_inlet": "Inlopp",
- "feed_waste": "Avlopp (backspolning)"
+ "feed_waste": "Avlopp (backspolning)",
+ "tech_open": "Rita teknikrummet",
+ "tech_open_hint": "Tryck sedan i planen på väggen där anläggningen hänger.",
+ "tech_step": "Steg {n}",
+ "tech_step_feed": "Tryck på ”{name}” till vänster och sedan på stället på väggen där ledningen kommer in (längst ner: ur golvet).",
+ "tech_step_devices": "Tryck på filterpump och sandfilter till vänster – de ställs mot väggen. Värmepump och dosering om du har dem.",
+ "tech_step_line": "Dra en linje: från ”{a}” till ”{b}”. Tryck på det ena och dra till det andra.",
+ "tech_step_loose": "Ett rör slutar fortfarande löst – dra det vidare till en apparat eller ledning, eller ta bort det (✋ Välj).",
+ "tech_step_drawing": "Dra vidare eller tryck punkt för punkt – linjen slutar på en apparat, ledning eller ett rör.",
+ "tech_step_fit": "Tryck på röret där ventilen (synglaset) ska sitta – det lyser orange."
 }

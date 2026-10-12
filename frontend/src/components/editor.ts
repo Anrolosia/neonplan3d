@@ -449,6 +449,8 @@ export class Fp3dEditor extends LitElement {
   private declare _feedKind: string | null;
   /** Where a press in the drawing went down (a drag from there draws a pipe to where it is let go). */
   private techPress: { s: number; y: number } | null = null;
+  /** The wall about to be picked opens straight in "Technik zeichnen" (asked from the pool tool). */
+  private techPick = false;
   /** Pool Pro: the part whose card is open ("dev:<id>", "joint:<id>", "port:<id>") and its pool. */
   private declare _card: { pool: string; part: string } | null;
   /** The card's open connection being joined: its target and stops. */
@@ -5862,10 +5864,34 @@ export class Fp3dEditor extends LitElement {
       if (!room) return;
       this._wallPick = false;
       this.openRoomWalls(room);
+      if (this.techPick) this.enterTech();
       return;
     }
     this._wallPick = false;
     this.openWallView((best as { room: Room }).room.id, (best as { edge: number }).edge);
+    if (this.techPick) this.enterTech();
+  }
+
+  /** The 3D wall view's building while drawing the technical room: only the pool devices of all furniture. */
+  private techDoc3d(): Building {
+    const b = this._doc3d;
+    if (this.techDocCache?.src === b) return this.techDocCache.doc;
+    const doc = { ...b, floors: b.floors.map((f) => ({ ...f, furniture: f.furniture.filter((m) => (POOL_DEVICES as readonly string[]).includes(m.type)) })) };
+    this.techDocCache = { src: b, doc };
+    return doc;
+  }
+  private techDocCache: { src: Building; doc: Building } | null = null;
+
+  /** "Technik zeichnen" on: only the wall, the pool devices and the pipes; the pen in the hand. */
+  private enterTech(): void {
+    this.techPick = false;
+    this._techMode = true;
+    this._wallSel = null;
+    this._wallMulti = [];
+    this._runSel = null;
+    this._runDraft = null;
+    this._feedKind = null;
+    this._runMode = "draw";
   }
 
   /** Turns a piece in the wall view; turned against a wall it is pushed back into the room. */
@@ -5978,7 +6004,10 @@ export class Fp3dEditor extends LitElement {
     const frame = roomEdgeFrame(room, v.edge);
     const L = frame.length;
     const H = Math.max(floor.height, room.ceiling_height ?? 0);
-    const items = furnitureOnWall(frame, floor, room);
+    // drawing the technical room: the other furniture stays out of the way (kitchen, cabinets …)
+    const items = this._techMode
+      ? furnitureOnWall(frame, floor, room, 1.6).filter((i) => (POOL_DEVICES as readonly string[]).includes(floor.furniture.find((f) => f.id === i.id)?.type ?? ""))
+      : furnitureOnWall(frame, floor, room);
     const holes = openingsOnWall(frame, floor);
     // drawing in metres: x from the left as seen from inside the room, y down from the ceiling
     const X = (s: number) => (frame.rightward ? s : L - s);
@@ -6221,13 +6250,12 @@ export class Fp3dEditor extends LitElement {
           <span class="fp3d-wv-grow"></span>
           ${admin && hasFeature("pool") && released("pool") && this.runPool
             ? html`<button class="fp3d-btn ${this._techMode ? "fp3d-primary" : ""}" title=${this.t("tech_mode_hint")} @click=${() => {
-                this._techMode = !this._techMode;
-                this._wallSel = null;
-                this._wallMulti = [];
-                this._runSel = null;
-                this._runDraft = null;
-                this._feedKind = null;
-                this._runMode = this._techMode ? "draw" : null;
+                if (this._techMode) {
+                  this._techMode = false;
+                  this._runDraft = null;
+                  this._feedKind = null;
+                  this._runMode = null;
+                } else this.enterTech();
               }}>🛠 ${this.t("tech_mode")}</button>`
             : nothing}
           ${rc && admin && !this._techMode
@@ -6255,7 +6283,7 @@ export class Fp3dEditor extends LitElement {
               class="fp3d-wv-3d"
               ${ref((el) => el && this.setupWall3d(el as HTMLElement, room, v.edge))}
               .hass=${this.hass}
-              .building=${this._doc3d}
+              .building=${this._techMode ? this.techDoc3d() : this._doc3d}
               .floorId=${this._floorId}
               .roomId=${null}
               .wallMode=${"auto"}
@@ -6293,7 +6321,7 @@ export class Fp3dEditor extends LitElement {
               <span>↕</span><b></b>
             </div>`
           : html`<svg
-          class="fp3d-wv-svg ${this._runMode ? "fp3d-wv-drawing" : ""}"
+          class="fp3d-wv-svg ${this._runMode ? "fp3d-wv-drawing" : ""} ${this._runMode === "valve" || this._runMode === "sight" ? "fp3d-wv-fitmode" : ""}"
           viewBox="${-0.5} ${-0.35} ${L + 1} ${H + 0.9}"
           preserveAspectRatio="xMidYMid meet"
           @pointerdown=${(e: PointerEvent) => {
@@ -6462,7 +6490,7 @@ export class Fp3dEditor extends LitElement {
                 }}>${this.t("wall_view_form")}</button>
                 ${admin ? html`<button class="fp3d-btn fp3d-danger" @click=${() => this.deleteOnWall([sel.id])}>${this.t("delete")}</button>` : nothing}`
             : html`<span class="fp3d-muted">${this._wallView3d ? this.t("wall_view_hint_3d") : items.length ? this.t("wall_view_hint") : this.t("wall_view_empty")}</span>`}
-          ${admin ? this.renderMultiToggle() : nothing}
+          ${admin && !this._techMode ? this.renderMultiToggle() : nothing}
         </div>
       </div>
     </div>`;
@@ -6808,7 +6836,7 @@ export class Fp3dEditor extends LitElement {
         const l2 = vs * vs + vy * vy;
         const t = l2 > 0 ? Math.max(0, Math.min(1, ((s - pc.s0) * vs + (y - pc.y0) * vy) / l2)) : 0;
         const [qs, qy] = [pc.s0 + vs * t, pc.y0 + vy * t];
-        if (Math.hypot(qs - s, qy - y) < 0.07) return { pipe: { id: r.id, p: onWall(c.frame, qs, qy, pc.d0 + (pc.d1 - pc.d0) * t) } };
+        if (Math.hypot(qs - s, qy - y) < (pipesOnly ? 0.16 : 0.07)) return { pipe: { id: r.id, p: onWall(c.frame, qs, qy, pc.d0 + (pc.d1 - pc.d0) * t) } };
       }
     return {};
   }
@@ -6877,7 +6905,9 @@ export class Fp3dEditor extends LitElement {
     const hit = node ? { node } : this.runPick(c, s, y, mode !== "draw");
     if (mode !== "draw") {
       if (hit.pipe) this.addFitting(c, hit.pipe.id, hit.pipe.p, mode);
-      this._runMode = null;
+      // drawing the technical room: back to the pen
+      this._runMode = this._techMode ? "draw" : null;
+      if (this._techMode) this._runSel = null;
       return;
     }
     const d = this._runDraft;
@@ -7103,6 +7133,7 @@ export class Fp3dEditor extends LitElement {
         this._runMode = this._runMode === mode ? "draw" : mode;
       }}>+ ${this.t(label)}</button>`;
     return html`<aside class="fp3d-wv-kit fp3d-tech-kit">
+      ${this.renderTechStep(c)}
       <div class="fp3d-seg fp3d-tech-pen" role="group">
         <button aria-pressed=${this._runMode === "draw"} @click=${() => {
           this._runMode = "draw";
@@ -7129,6 +7160,45 @@ export class Fp3dEditor extends LitElement {
       ${fit("valve", "wall_run_valve")} ${fit("sight", "wall_run_sight")}
       <p class="fp3d-sub">${this.t("tech_hint")}</p>
     </aside>`;
+  }
+
+  /**
+   * The next step, in plain words: bring the pool's lines in, put the pump and filter up, then the line still missing
+   * ("from the skimmer to the pump's suction side") – one at a time, until the water flows.
+   */
+  private renderTechStep(c: RunCtx) {
+    const area = c.pool;
+    const ports = area.pool?.ports ?? [];
+    const devs = c.floor.furniture.filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type));
+    const box = (n: number | null, text: string) => html`<div class="fp3d-tech-step ${n === null ? "fp3d-done" : ""}"><b>${n === null ? "✓" : this.t("tech_step", { n })}</b>${text}</div>`;
+    if (this._runMode === "feed") return box(1, this.t("tech_feed_place"));
+    if (this._runMode === "valve" || this._runMode === "sight") return box(4, this.t("tech_step_fit"));
+    if (this._runDraft) return box(3, this.t("tech_step_drawing"));
+    if (!ports.some((q) => q.kind !== "waste")) return box(1, this.t("tech_no_ports"));
+    const missing = ["skimmer", "drain", "inlet"].find((k) => ports.some((q) => q.kind === k) && !feedDone(area, k));
+    if (missing) return box(1, this.t("tech_step_feed", { name: this.t(`feed_${missing}` as I18nKey) }));
+    const pump = devs.find((f) => f.type === "pool_pump");
+    const filter = devs.find((f) => f.type === "pool_filter");
+    if (!pump || !filter) return box(2, this.t("tech_step_devices"));
+    const issues = sketchIssues(area, devs.map((f) => ({ id: f.id, type: f.type })));
+    const name = (n: string) => this.poolNodeLabel(area, n);
+    const port = issues.find((i) => i.kind === "port");
+    if (port) {
+      const { port: q } = splitNode(port.node);
+      // where the line to this connection comes from (or goes to)
+      const fromTo: Record<string, string> = {
+        suction: this.t("feed_skimmer"),
+        pressure: name(`dev:${filter.id}:pump`),
+        pump: name(`dev:${pump.id}:pressure`),
+        return: devs.some((f) => f.type === "pool_heat_pump") ? this.t("furn_pool_heat_pump") : this.t("feed_inlet"),
+        waste: this.t("feed_waste"),
+        in: name(`dev:${filter.id}:return`),
+        out: this.t("feed_inlet"),
+      };
+      return box(3, this.t("tech_step_line", { a: q ? (fromTo[q] ?? "…") : "…", b: name(port.node) }));
+    }
+    if (issues.some((i) => i.kind === "loose")) return box(3, this.t("tech_step_loose"));
+    return box(null, this.t("tech_ok"));
   }
 
   /** "Technik zeichnen": what is still missing, or that the water flows. */
@@ -8345,6 +8415,13 @@ export class Fp3dEditor extends LitElement {
     const devs = this._doc.floors.flatMap((f) => f.furniture).filter((m) => (POOL_DEVICES as readonly string[]).includes(m.type));
     const pipe = pipes.find((p) => p.id === this._pipeId);
     return html`<section>
+        <button class="fp3d-btn fp3d-primary fp3d-wide" ?disabled=${!admin} title=${this.t("tech_open_hint")} @click=${() => {
+          this.techPick = true;
+          this._wallPick = true;
+        }}>🛠 ${this.t("tech_open")}</button>
+        <p class="fp3d-sub">${this.t("tech_open_hint")}</p>
+      </section>
+      <section>
         <h3>${this.t("pool_ports")}</h3>
         <div class="fp3d-actions">
           ${(["skimmer", "drain", "inlet", "waste"] as const).map((k) => html`<button class="fp3d-btn" ?disabled=${!admin} @click=${() => this.addPoolPort(k)}>+ ${this.t(`pool_port_${k}` as I18nKey)}</button>`)}
@@ -12379,6 +12456,36 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-wv-runpt.fp3d-on {
         fill: var(--fp3d-accent);
+      }
+      .fp3d-wv-fitmode .fp3d-wv-run line {
+        cursor: copy;
+        stroke-width: 0.05 !important;
+      }
+      .fp3d-wv-fitmode .fp3d-wv-run line:hover {
+        stroke: #ffb547 !important;
+      }
+      .fp3d-tech-step {
+        border: 1px solid #ffb547;
+        background: rgba(255, 181, 71, 0.1);
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 12.5px;
+        line-height: 1.35;
+      }
+      .fp3d-tech-step b {
+        display: block;
+        color: #ffb547;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .fp3d-tech-step.fp3d-done {
+        border-color: #4dff9a;
+        background: rgba(77, 255, 154, 0.08);
+      }
+      .fp3d-tech-step.fp3d-done b {
+        color: #4dff9a;
       }
       .fp3d-wv-dry line {
         stroke-dasharray: 0.04 0.03;

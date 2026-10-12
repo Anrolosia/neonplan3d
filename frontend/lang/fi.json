@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmeri",
  "feed_drain": "Pohjakaivo",
  "feed_inlet": "Suuttimet",
- "feed_waste": "Viemäri (vastahuuhtelu)"
+ "feed_waste": "Viemäri (vastahuuhtelu)",
+ "tech_open": "Piirrä tekninen tila",
+ "tech_open_hint": "Napauta sitten pohjapiirroksessa seinää, jolla laitteisto on.",
+ "tech_step": "Vaihe {n}",
+ "tech_step_feed": "Napauta vasemmalta ”{name}” ja sitten seinän kohtaa, josta linja tulee sisään (aivan alhaalla: lattiasta).",
+ "tech_step_devices": "Napauta vasemmalta suodatinpumppua ja hiekkasuodatinta – ne asettuvat seinää vasten. Lämpöpumppu ja annostelija, jos sinulla on.",
+ "tech_step_line": "Vedä viiva: ”{a}” → ”{b}”. Paina toista ja vedä toiseen.",
+ "tech_step_loose": "Putki päättyy vielä irrallaan – jatka sitä laitteeseen tai linjaan tai poista se (✋ Valitse).",
+ "tech_step_drawing": "Jatka vetämistä tai napauta piste pisteeltä – viiva päättyy laitteeseen, linjaan tai putkeen.",
+ "tech_step_fit": "Napauta putkea, johon venttiili (tarkastuslasi) tulee – se syttyy oranssiksi."
 }

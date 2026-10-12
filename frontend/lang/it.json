@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Scarico di fondo",
  "feed_inlet": "Bocchette",
- "feed_waste": "Scarico (controlavaggio)"
+ "feed_waste": "Scarico (controlavaggio)",
+ "tech_open": "Disegna il locale tecnico",
+ "tech_open_hint": "Poi tocca nella pianta la parete dove si trova l'impianto.",
+ "tech_step": "Passo {n}",
+ "tech_step_feed": "Tocca «{name}» a sinistra, poi il punto della parete dove entra la linea (in fondo: dal pavimento).",
+ "tech_step_devices": "Tocca a sinistra pompa e filtro a sabbia – si mettono alla parete. Pompa di calore e dosaggio se li hai.",
+ "tech_step_line": "Traccia una linea: da «{a}» a «{b}». Premi su uno e trascina fino all'altro.",
+ "tech_step_loose": "Un tubo finisce ancora libero – prolungalo fino a un apparecchio o una linea, oppure eliminalo (✋ Seleziona).",
+ "tech_step_drawing": "Continua a trascinare o tocca punto per punto – la linea finisce su un apparecchio, una linea o un tubo.",
+ "tech_step_fit": "Tocca il tubo dove va la valvola (la spia) – si accende in arancione."
 }

@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Bodemafvoer",
  "feed_inlet": "Inlaten",
- "feed_waste": "Riool (terugspoelen)"
+ "feed_waste": "Riool (terugspoelen)",
+ "tech_open": "Technische ruimte tekenen",
+ "tech_open_hint": "Tik daarna in de plattegrond op de muur waar je installatie hangt.",
+ "tech_step": "Stap {n}",
+ "tech_step_feed": "Tik links op „{name}” en dan op de plek aan de muur waar de leiding binnenkomt (helemaal onderaan: uit de vloer).",
+ "tech_step_devices": "Tik links op filterpomp en zandfilter – ze komen tegen de muur te staan. Warmtepomp en doseerinstallatie als je die hebt.",
+ "tech_step_line": "Trek een lijn: van „{a}” naar „{b}”. Druk op het ene en sleep naar het andere.",
+ "tech_step_loose": "Een buis eindigt nog los – trek hem door naar een apparaat of leiding, of verwijder hem (✋ Selecteren).",
+ "tech_step_drawing": "Sleep verder of tik punt voor punt – de lijn eindigt op een apparaat, leiding of buis.",
+ "tech_step_fit": "Tik op de buis waar de kraan (het kijkglas) in moet – hij licht oranje op."
 }

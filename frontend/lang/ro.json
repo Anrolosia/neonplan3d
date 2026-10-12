@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Scurgere de fund",
  "feed_inlet": "Duze",
- "feed_waste": "Canalizare (spălare inversă)"
+ "feed_waste": "Canalizare (spălare inversă)",
+ "tech_open": "Desenează camera tehnică",
+ "tech_open_hint": "Apoi atinge în plan peretele pe care e instalația.",
+ "tech_step": "Pasul {n}",
+ "tech_step_feed": "Atinge în stânga „{name}”, apoi locul de pe perete unde intră conducta (jos de tot: din pardoseală).",
+ "tech_step_devices": "Atinge în stânga pompa și filtrul cu nisip – se așază lângă perete. Pompa de căldură și dozarea, dacă le ai.",
+ "tech_step_line": "Trage o linie: de la „{a}” la „{b}”. Apasă pe unul și trage până la celălalt.",
+ "tech_step_loose": "O țeavă se termină încă liberă – prelungește-o până la un aparat sau o conductă ori șterge-o (✋ Selectează).",
+ "tech_step_drawing": "Trage mai departe sau atinge punct cu punct – linia se termină pe un aparat, o conductă sau o țeavă.",
+ "tech_step_fit": "Atinge țeava în care merge robinetul (vizorul) – se aprinde portocaliu."
 }

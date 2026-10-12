@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Fenékszívó",
  "feed_inlet": "Befúvók",
- "feed_waste": "Csatorna (visszamosás)"
+ "feed_waste": "Csatorna (visszamosás)",
+ "tech_open": "Gépház rajzolása",
+ "tech_open_hint": "Utána koppints a tervrajzon arra a falra, ahol a berendezés van.",
+ "tech_step": "{n}. lépés",
+ "tech_step_feed": "Koppints balra a(z) „{name}” elemre, majd arra a falpontra, ahol a vezeték belép (legalul: a padlóból).",
+ "tech_step_devices": "Koppints balra a szűrőszivattyúra és a homokszűrőre – a falhoz állnak. A hőszivattyút és az adagolót, ha van.",
+ "tech_step_line": "Húzz egy vonalat: „{a}” → „{b}”. Nyomd meg az egyiket, és húzd a másikig.",
+ "tech_step_loose": "Egy cső még szabadon végződik – húzd tovább egy géphez vagy vezetékhez, vagy töröld (✋ Kijelölés).",
+ "tech_step_drawing": "Húzd tovább, vagy koppints pontonként – a vonal egy gépen, vezetéken vagy csövön ér véget.",
+ "tech_step_fit": "Koppints arra a csőre, amelybe a csap (kémlelőüveg) kerül – narancssárgán világít."
 }

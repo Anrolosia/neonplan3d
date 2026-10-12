@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Dnová výpust",
  "feed_inlet": "Trysky",
- "feed_waste": "Kanál (zpětný proplach)"
+ "feed_waste": "Kanál (zpětný proplach)",
+ "tech_open": "Nakreslit technickou místnost",
+ "tech_open_hint": "Pak v plánu klepněte na stěnu, na které je zařízení.",
+ "tech_step": "Krok {n}",
+ "tech_step_feed": "Klepněte vlevo na „{name}“ a pak na místo na stěně, kde potrubí vstupuje (úplně dole: z podlahy).",
+ "tech_step_devices": "Klepněte vlevo na filtrační čerpadlo a pískový filtr – postaví se ke stěně. Tepelné čerpadlo a dávkování, pokud je máte.",
+ "tech_step_line": "Natáhněte čáru: z „{a}“ do „{b}“. Stiskněte jedno a táhněte k druhému.",
+ "tech_step_loose": "Jedna trubka ještě končí volně – protáhněte ji k zařízení nebo potrubí, nebo ji smažte (✋ Vybrat).",
+ "tech_step_drawing": "Táhněte dál nebo klepejte bod po bodu – čára končí na zařízení, potrubí nebo trubce.",
+ "tech_step_fit": "Klepněte na trubku, kam patří ventil (průhledítko) – rozsvítí se oranžově."
 }

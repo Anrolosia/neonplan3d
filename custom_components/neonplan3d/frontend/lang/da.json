@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Bundafløb",
  "feed_inlet": "Indløb",
- "feed_waste": "Kloak (returskyl)"
+ "feed_waste": "Kloak (returskyl)",
+ "tech_open": "Tegn teknikrummet",
+ "tech_open_hint": "Tryk derefter på væggen i planen, hvor anlægget hænger.",
+ "tech_step": "Trin {n}",
+ "tech_step_feed": "Tryk på „{name}” til venstre og derefter på stedet på væggen, hvor ledningen kommer ind (helt nede: op af gulvet).",
+ "tech_step_devices": "Tryk på filterpumpe og sandfilter til venstre – de stilles op ad væggen. Varmepumpe og dosering, hvis du har dem.",
+ "tech_step_line": "Træk en linje: fra „{a}” til „{b}”. Tryk på det ene og træk til det andet.",
+ "tech_step_loose": "Et rør ender stadig løst – træk det videre til et apparat eller en ledning, eller slet det (✋ Vælg).",
+ "tech_step_drawing": "Træk videre eller tryk punkt for punkt – linjen ender på et apparat, en ledning eller et rør.",
+ "tech_step_fit": "Tryk på røret, ventilen (skueglasset) skal i – det lyser orange."
 }

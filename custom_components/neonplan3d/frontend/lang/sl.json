@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimer",
  "feed_drain": "Talni odtok",
  "feed_inlet": "Šobe",
- "feed_waste": "Kanal (povratno pranje)"
+ "feed_waste": "Kanal (povratno pranje)",
+ "tech_open": "Nariši strojnico",
+ "tech_open_hint": "Nato v tlorisu tapnite steno, na kateri je naprava.",
+ "tech_step": "Korak {n}",
+ "tech_step_feed": "Tapnite levo „{name}“ in nato mesto na steni, kjer vod vstopi (čisto spodaj: iz tal).",
+ "tech_step_devices": "Tapnite levo filtrsko črpalko in peščeni filter – postavita se k steni. Toplotno črpalko in doziranje, če ju imate.",
+ "tech_step_line": "Potegnite črto: od „{a}“ do „{b}“. Pritisnite eno in povlecite do drugega.",
+ "tech_step_loose": "Cev se še konča prosto – podaljšajte jo do naprave ali voda ali jo izbrišite (✋ Izberi).",
+ "tech_step_drawing": "Vlecite naprej ali tapajte točko za točko – črta se konča na napravi, vodu ali cevi.",
+ "tech_step_fit": "Tapnite cev, kamor gre ventil (kontrolno steklo) – zasveti oranžno."
 }

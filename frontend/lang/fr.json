@@ -1672,5 +1672,14 @@
  "feed_skimmer": "Skimmer",
  "feed_drain": "Bonde de fond",
  "feed_inlet": "Buses",
- "feed_waste": "Égout (lavage)"
+ "feed_waste": "Égout (lavage)",
+ "tech_open": "Dessiner le local technique",
+ "tech_open_hint": "Touchez ensuite dans le plan le mur où se trouve l'installation.",
+ "tech_step": "Étape {n}",
+ "tech_step_feed": "Touchez « {name} » à gauche, puis l'endroit du mur où la conduite entre (tout en bas : par le sol).",
+ "tech_step_devices": "Touchez la pompe et le filtre à sable à gauche – ils se placent contre le mur. La pompe à chaleur et le dosage si vous en avez.",
+ "tech_step_line": "Tracez une ligne : de « {a} » à « {b} ». Appuyez sur l'un et glissez jusqu'à l'autre.",
+ "tech_step_loose": "Un tuyau se termine encore librement – prolongez-le vers un appareil ou une conduite, ou supprimez-le (✋ Sélectionner).",
+ "tech_step_drawing": "Continuez à glisser ou touchez point par point – la ligne se termine sur un appareil, une conduite ou un tuyau.",
+ "tech_step_fit": "Touchez le tuyau où va la vanne (le voyant) – il s'allume en orange."
 }
