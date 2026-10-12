@@ -17,7 +17,7 @@ import { devicePorts, FILTER_VALVES, jointPorts, nodePart, poolPortFlow, portFlo
 import { holeInRoom } from "../geometry/holes.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, manualUrl, released, shopUrl } from "../features.ts";
+import { hasFeature, labOn, manualUrl, released, shopUrl } from "../features.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline } from "../pool-flow.ts";
@@ -6166,9 +6166,9 @@ export class Fp3dEditor extends LitElement {
     return this.poolArea ?? this.floor?.outdoor.find((o) => o.type === "pool" && o.points.length >= 3);
   }
 
-  /** The pipe tools of the wall view: Pool Pro with a pool on this floor. */
+  /** The pipe tools of the wall view (pool parts, holes, T-pieces): parked – only with the lab switch, while the pool round is rethought. */
   private get canLayRuns(): boolean {
-    return released("pool") && !!this.runPool;
+    return labOn() && !!this.runPool;
   }
 
   private runFrame(key: string): WallFrame | null {

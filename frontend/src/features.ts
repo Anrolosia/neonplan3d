@@ -19,7 +19,7 @@ export type Gated = Feature | FreeFeature;
  */
 export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics"];
 
-function labOn(): boolean {
+export function labOn(): boolean {
   try {
     return localStorage.getItem("neonplan3d.lab") === "1";
   } catch {
