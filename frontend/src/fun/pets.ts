@@ -357,7 +357,7 @@ function stairWay(item: string, w: number, d: number): [number, number, number][
     const zl = d / 2 - 0.5;
     return [[w / 2 + out, zl, 0], [w / 2, zl, 0], [xs + 0.3, zl, 3 / 14], [xs, zl, 4 / 14], [xs, d / 2 - 1, 4 / 14], [xs, -d / 2, 1], [xs, -d / 2 - out, 1]];
   }
-  if (item === "stairs" || item === "straight" || item === "floating" || item === "space_saver") return [[0, d / 2 + out, 0], [0, d / 2, 0], [0, -d / 2, 1], [0, -d / 2 - out, 1]];
+  if (item === "stairs" || item === "straight" || item === "straight_open" || item === "floating" || item === "space_saver") return [[0, d / 2 + out, 0], [0, d / 2, 0], [0, -d / 2, 1], [0, -d / 2 - out, 1]];
   return null;
 }
 
