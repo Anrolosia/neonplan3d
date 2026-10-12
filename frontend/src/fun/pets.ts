@@ -301,7 +301,85 @@ function spotsFor(floor: Floor, kind: Pet["kind"]): Spot[] {
   return out;
 }
 
-type Mode = "walk" | "rest" | "sleep" | "stand";
+/**
+ * A staircase between two floors: the way up in the lower floor's coordinates, from the foot (on the lower floor) over
+ * the steps (and a landing) to where one steps off on the upper floor; heights relative to the lower floor.
+ */
+interface Link {
+  lower: string;
+  upper: string;
+  /** The steps (and landing), foot to top. */
+  pts: [number, number, number][];
+  /** Where one may step on below and step off above: in front, else beside (a stair often stands against a wall). */
+  foot: Vec2[];
+  top: Vec2[];
+}
+
+/** The way up a stair in its own coordinates (front +z is the foot, the top at the back), heights 0 … 1 of the rise. */
+function stairWay(item: string, w: number, d: number): [number, number, number][] | null {
+  const out = 0.35;
+  if (item === "stairs_u") {
+    // built-in U-stair: up the left half to the landing at the back, across, back up the right half towards the front
+    const fw = (w - Math.min(0.12, w * 0.06)) / 2;
+    const landing = Math.min(fw, d * 0.45);
+    const xa = -w / 2 + fw / 2;
+    const xb = w / 2 - fw / 2;
+    const zl = -d / 2 + landing / 2;
+    return [[xa, d / 2 + out, 0], [xa, d / 2, 0], [xa, zl, 0.5], [xb, zl, 0.5], [xb, d / 2 - 0.15, 1], [xb, d / 2 + out, 1]];
+  }
+  if (item === "u_shape" || item === "u_open_winder") return [[0.6, 1.5 + out, 0], [0.6, 1.5, 0], [0.6, -1.05, 0.5], [-0.6, -1.05, 0.5], [-0.6, 1.4, 1], [-0.6, 1.4 + out, 1]];
+  if (item === "l_shape") return [[0.6, 1.3 + out, 0], [0.6, 1.3, 0], [0.6, -0.8, 0.5], [0.1, -0.8, 0.5], [-1.1, -0.8, 1], [-1.1 - out, -0.8, 1]];
+  if (item === "spiral") {
+    // round the post, counter-clockwise from the front
+    const way: [number, number, number][] = [];
+    for (let i = 0; i <= 12; i++) {
+      const a = ((-90 + (i * 300) / 12) * Math.PI) / 180;
+      way.push([Math.cos(a) * 0.45, Math.sin(a) * 0.45, i / 12]);
+    }
+    const a0 = (-90 * Math.PI) / 180;
+    const a1 = (210 * Math.PI) / 180;
+    return [[Math.cos(a0) * 1.0, Math.sin(a0) * 1.0, 0], ...way, [Math.cos(a1) * 1.0, Math.sin(a1) * 1.0, 1]];
+  }
+  if (item === "stairs" || item === "straight" || item === "floating" || item === "space_saver") return [[0, d / 2 + out, 0], [0, d / 2, 0], [0, -d / 2, 1], [0, -d / 2 - out, 1]];
+  return null;
+}
+
+/** Every staircase that joins a floor to the one above it (built-in stairs and the stairs pack's). */
+function stairLinks(b: Building): Link[] {
+  const floors = b.floors.filter((f) => f.rooms.some((r) => r.points.length >= 3)).sort((x, y) => x.elevation - y.elevation);
+  const out: Link[] = [];
+  for (let i = 0; i < floors.length - 1; i++) {
+    const lower = floors[i];
+    const upper = floors[i + 1];
+    const rise = upper.elevation - lower.elevation;
+    for (const f of lower.furniture) {
+      const way = stairWay(itemOf(f.type), f.w, f.d);
+      if (!way) continue;
+      const a = (f.rotation * Math.PI) / 180;
+      const m = f.mirror ? -1 : 1;
+      const W = (x: number, z: number): Vec2 => [f.x + x * m * Math.cos(a) - z * Math.sin(a), f.z + x * m * Math.sin(a) + z * Math.cos(a)];
+      const pts = way.map(([x, z, t]): [number, number, number] => {
+        const [wx, wz] = W(x, z);
+        return [wx, t * rise, wz];
+      });
+      // the way's first and last points step off the stair; beside them, the first and last step from the side
+      const z0 = way[1][1];
+      const z1 = way[way.length - 2][1];
+      const side = f.w / 2 + 0.35;
+      out.push({
+        lower: lower.id,
+        upper: upper.id,
+        pts: pts.slice(1, -1),
+        // (beside: at the first steps, a little up the stair, where a wall in front leaves room)
+        foot: [[pts[0][0], pts[0][2]], ...[0, -0.35, -0.7].flatMap((k) => [W(-side, z0 + k), W(side, z0 + k)])],
+        top: [[pts[pts.length - 1][0], pts[pts.length - 1][2]], ...[0, 0.35, 0.7].flatMap((k) => [W(-side, z1 + k), W(side, z1 + k)])],
+      });
+    }
+  }
+  return out;
+}
+
+type Mode = "walk" | "rest" | "sleep" | "stand" | "climb";
 
 interface Animal {
   pet: Pet;
@@ -324,6 +402,12 @@ interface Animal {
   phase: number;
   /** A jump up or down: from one point and height to another, then lying, resting or walking on. */
   jump: { from: [number, number, number]; to: [number, number, number]; t: number; then: Mode } | null;
+  /** Bound for the stairs: walking to their foot (or top), then up (or down) the steps. */
+  stairs: { link: Link; up: boolean } | null;
+  /** Where it steps onto the stairs. */
+  stairsEntry?: Vec2 | null;
+  /** On the steps: the way left (lower floor's coordinates) and the floor it ends on. */
+  climb: { pts: [number, number, number][]; to: string } | null;
 }
 
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
@@ -340,6 +424,32 @@ export function startPets(ctx: PetsContext): PetsController {
   let raf = 0;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let last = 0;
+  let links: Link[] = [];
+  /** Per floor: its walk map, the rooms and the favourite places of each kind (made once per plan). */
+  let floors = new Map<string, { floor: Floor; map: FloorMap; rooms: Floor["rooms"]; spots: Map<Pet["kind"], Spot[]> }>();
+  let plan: Building = ctx.building;
+
+  const floorInfo = (id: string) => {
+    let info = floors.get(id);
+    if (!info) {
+      const floor = plan.floors.find((f) => f.id === id)!;
+      info = { floor, map: new ctx.FloorMap(plan, floor), rooms: floor.rooms.filter((r) => r.points.length >= 3), spots: new Map() };
+      floors.set(id, info);
+    }
+    return info;
+  };
+
+  /** Move an animal onto a floor: its map, rooms and places, and its model into that floor's group. */
+  const toFloor = (a: Animal, id: string) => {
+    const info = floorInfo(id);
+    a.floorId = id;
+    a.map = info.map;
+    a.rooms = info.rooms;
+    let spots = info.spots.get(a.pet.kind);
+    if (!spots) info.spots.set(a.pet.kind, (spots = spotsFor(info.floor, a.pet.kind)));
+    a.spots = spots;
+    viewer.floorMap.get(id)?.group.add(a.model.root);
+  };
 
   const floorFor = (b: Building, pet: Pet): Floor | undefined => {
     const withRooms = b.floors.filter((f) => f.rooms.some((r) => r.points.length >= 3));
@@ -365,6 +475,33 @@ export function startPets(ctx: PetsContext): PetsController {
     const choices: Spot[] = night && sleepers.length ? sleepers : a.spots;
     // up on the sofa: first down to its front
     const start: Vec2 = a.on?.approach ?? a.pos;
+    // now and then up or down the stairs (at night it stays where it is)
+    const here = links.filter((l) => l.lower === a.floorId || l.upper === a.floorId);
+    if (here.length && !night && Math.random() < 0.22) {
+      const link = here[Math.floor(Math.random() * here.length)];
+      const up = link.lower === a.floorId;
+      // the first way on that works: in front of the stair, else from either side
+      let path: Vec2[] | null = null;
+      let entry: Vec2 | null = null;
+      for (const c of up ? link.foot : link.top) {
+        if (a.map.blocked(c) || !a.map.roomAt(c)) continue;
+        path = a.map.path(start, c);
+        if (path) {
+          entry = c;
+          break;
+        }
+      }
+      if (path && entry) {
+        a.stairsEntry = entry;
+        a.path = path;
+        a.goal = null;
+        a.stairs = { link, up };
+        a.mode = "walk";
+        if (a.on?.approach && a.y > 0.05) a.jump = { from: [a.pos[0], a.y, a.pos[1]], to: [a.on.approach[0], 0, a.on.approach[1]], t: 0, then: "walk" };
+        a.on = null;
+        return;
+      }
+    }
     for (let tries = 0; tries < 6; tries++) {
       const fav = choices.length && (night || Math.random() < 0.6) ? choices[Math.floor(Math.random() * choices.length)] : null;
       if (fav && fav === a.on) continue;
@@ -374,6 +511,7 @@ export function startPets(ctx: PetsContext): PetsController {
       if (!path) continue;
       a.path = path;
       a.goal = fav;
+      a.stairs = null;
       a.mode = "walk";
       if (a.on?.approach && a.y > 0.05) a.jump = { from: [a.pos[0], a.y, a.pos[1]], to: [a.on.approach[0], 0, a.on.approach[1]], t: 0, then: "walk" };
       a.on = null;
@@ -389,7 +527,7 @@ export function startPets(ctx: PetsContext): PetsController {
     a.model.root.position.set(a.pos[0], a.y, a.pos[1]);
     a.model.root.rotation.y = a.heading;
     // walking: legs swing, the head nods, the tail wags; lying like a loaf: legs tucked away, the tail round the side
-    const moving = a.mode === "walk" && !a.jump;
+    const moving = (a.mode === "walk" || a.mode === "climb") && !a.jump;
     const swing = moving ? Math.sin(a.phase) : 0;
     a.model.legs.forEach((l, i) => {
       l.rotation.x = lying ? 0 : (i === 0 || i === 3 ? swing : -swing) * 0.6;
@@ -406,6 +544,25 @@ export function startPets(ctx: PetsContext): PetsController {
 
   /** At the end of the way: up onto the spot (a cat, from the front) facing the room, or a short stop at the bowls. */
   const arrive = (a: Animal, now: number) => {
+    if (a.stairs) {
+      // the steps: always in the lower floor's coordinates (its group), up or down
+      const { link, up } = a.stairs;
+      a.stairs = null;
+      // step off where the other floor is free: in front, else beside the stair
+      const other = floorInfo(up ? link.upper : link.lower).map;
+      const offs = up ? link.top : link.foot;
+      const off = offs.find((c) => !other.blocked(c) && other.roomAt(c)) ?? other.freeNear(offs[0]);
+      const rise = link.pts[link.pts.length - 1][1];
+      const steps = up ? link.pts : [...link.pts].reverse();
+      const pts: [number, number, number][] = [...steps, [off[0], up ? rise : 0, off[1]]];
+      const from = a.stairsEntry ?? a.pos;
+      if (!up) toFloor(a, link.lower);
+      a.pos = [from[0], from[1]];
+      a.y = up ? 0 : rise;
+      a.climb = { pts, to: up ? link.upper : link.lower };
+      a.mode = "climb";
+      return;
+    }
     const s = a.goal;
     a.goal = null;
     if (s?.visit) {
@@ -444,6 +601,34 @@ export function startPets(ctx: PetsContext): PetsController {
         a.mode = j.then;
         // up there: turn round to face the room
         if (j.then !== "walk" && a.on?.face != null) a.heading = a.on.face;
+      }
+      pose(a);
+      return true;
+    }
+    if (a.mode === "climb" && a.climb) {
+      const c = a.climb;
+      const next = c.pts[0];
+      if (!next) {
+        // off the stairs: on the upper floor at its level, or back on the lower
+        a.climb = null;
+        a.y = 0;
+        if (c.to !== a.floorId) toFloor(a, c.to);
+        a.mode = "rest";
+        a.until = now + rnd(1, 3) * 1000;
+        pose(a);
+        return true;
+      }
+      const dx = next[0] - a.pos[0];
+      const dz = next[2] - a.pos[1];
+      const dy = next[1] - a.y;
+      const dist = Math.hypot(dx, dy, dz);
+      if (Math.hypot(dx, dz) > 0.02) a.heading += angleTo(a.heading, Math.atan2(dx, dz)) * Math.min(1, dt * 8);
+      const move = Math.min(dist, a.look.speed * 0.95 * dt);
+      if (dist < 0.02) c.pts.shift();
+      else {
+        a.pos = [a.pos[0] + (dx / dist) * move, a.pos[1] + (dz / dist) * move];
+        a.y += (dy / dist) * move;
+        a.phase += dt * a.look.speed * 22;
       }
       pose(a);
       return true;
@@ -501,24 +686,23 @@ export function startPets(ctx: PetsContext): PetsController {
   const update = (b: Building, pets: readonly Pet[]) => {
     const before = new Map(animals.map((a) => [a.pet.id, a]));
     clear();
+    plan = b;
+    floors = new Map();
+    links = stairLinks(b);
     for (const pet of pets) {
-      const floor = floorFor(b, pet);
-      const fv = floor && viewer.floorMap.get(floor.id);
-      if (!floor || !fv) continue;
-      const map = new ctx.FloorMap(b, floor);
-      const rooms = floor.rooms.filter((r) => r.points.length >= 3);
-      if (!rooms.length) continue;
-      const model = buildModel(lib, pet);
-      fv.group.add(model.root);
-      const old = before.get(pet.id);
+      // a pet that went up or down the stairs stays on that floor
+      const prev = before.get(pet.id);
+      const floor = (prev && prev.pet.floor_id === pet.floor_id ? b.floors.find((f) => f.id === prev.floorId) : undefined) ?? floorFor(b, pet);
+      if (!floor || !viewer.floorMap.get(floor.id) || !floorInfo(floor.id).rooms.length) continue;
+      const old = prev;
       const a: Animal = {
         pet,
         look: lookOf(pet),
-        model,
+        model: buildModel(lib, pet),
         floorId: floor.id,
-        map,
-        spots: spotsFor(floor, pet.kind),
-        rooms,
+        map: floorInfo(floor.id).map,
+        spots: [],
+        rooms: [],
         pos: [0, 0],
         y: 0,
         heading: old?.heading ?? rnd(0, Math.PI * 2),
@@ -529,9 +713,13 @@ export function startPets(ctx: PetsContext): PetsController {
         until: 0,
         phase: 0,
         jump: null,
+        stairs: null,
+        stairsEntry: null,
+        climb: null,
       };
+      toFloor(a, floor.id);
       // a pet already living here keeps its place (up on a sofa it starts in front of it)
-      a.pos = old && old.floorId === floor.id ? (old.on?.approach ?? old.pos) : somewhere(a);
+      a.pos = old && old.floorId === floor.id && !old.climb ? (old.on?.approach ?? old.pos) : somewhere(a);
       pose(a);
       animals.push(a);
     }
