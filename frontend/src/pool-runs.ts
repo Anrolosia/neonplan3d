@@ -45,9 +45,25 @@ export function poolNodeAt(b: Building, floor: Floor, area: OutdoorArea): NodeAt
  * under the floor to the pool's edge, and only there up to the pipe's own height. Other paths stay as they are.
  */
 export function underBasin(path: P3[], p: Pick<PoolPipe, "from" | "to">, area: OutdoorArea, floor: Floor): P3[] {
-  const drainAt = (node: string) => {
+  const portKind = (node: string) => {
     const { kind, id } = splitNode(node);
-    return kind === "port" && area.pool?.ports?.find((q) => q.id === id)?.kind === "drain";
+    return kind === "port" ? area.pool?.ports?.find((q) => q.id === id)?.kind : undefined;
+  };
+  const drainAt = (node: string) => portKind(node) === "drain";
+  const wallPort = (node: string) => portKind(node) === "inlet" || portKind(node) === "skimmer";
+  // an inlet or the skimmer sits in the wall: its pipe leaves straight out through the wall at its height, and only
+  // outside the basin turns to its own height (not up through the water)
+  const through = (pts: P3[]): P3[] => {
+    if (pts.length < 2) return pts;
+    const d = pts[0];
+    const n = poolWallNormal(area, [d[0], d[2]]);
+    if (!n) return pts;
+    const out: P3 = [d[0] + n[0] * 0.35, d[1], d[2] + n[1] * 0.35];
+    // drop the riser at the port itself (same place in the plan), keep the rest
+    let k = 1;
+    while (k < pts.length && Math.hypot(pts[k][0] - d[0], pts[k][2] - d[2]) < 0.01) k++;
+    const next = pts[k] ?? pts[pts.length - 1];
+    return [d, out, [out[0], next[1], out[2]], ...pts.slice(k)];
   };
   const fix = (pts: P3[]): P3[] => {
     if (pts.length < 2) return pts;
@@ -71,7 +87,37 @@ export function underBasin(path: P3[], p: Pick<PoolPipe, "from" | "to">, area: O
   let out = path;
   if (p.from && drainAt(p.from)) out = fix(out);
   if (p.to && drainAt(p.to)) out = fix([...out].reverse()).reverse();
+  if (p.from && wallPort(p.from)) out = through(out);
+  if (p.to && wallPort(p.to)) out = through([...out].reverse()).reverse();
   return out;
+}
+
+/** The outward direction of the pool wall nearest to a point (the wall an inlet or skimmer sits in). */
+export function poolWallNormal(area: Pick<OutdoorArea, "points">, at: Vec2): Vec2 | null {
+  const pts = area.points;
+  if (pts.length < 3) return null;
+  // the outline's turning sense decides which side of an edge is outside
+  let sum = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    sum += a[0] * b[1] - b[0] * a[1];
+  }
+  let best: { d: number; n: Vec2 } | null = null;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    const dx = b[0] - a[0];
+    const dz = b[1] - a[1];
+    const len = Math.hypot(dx, dz);
+    if (len < 1e-6) continue;
+    const t = Math.max(0, Math.min(1, ((at[0] - a[0]) * dx + (at[1] - a[1]) * dz) / (len * len)));
+    const d = Math.hypot(a[0] + dx * t - at[0], a[1] + dz * t - at[1]);
+    // left normal (-dz, dx) points inside a counter-clockwise outline in x/z
+    const n: Vec2 = sum > 0 ? [dz / len + 0, -dx / len + 0] : [-dz / len + 0, dx / len + 0];  // (+ 0: no negative zero)
+    if (!best || d < best.d) best = { d, n };
+  }
+  return best ? best.n : null;
 }
 
 /** Where two segments cross (null: they do not). */

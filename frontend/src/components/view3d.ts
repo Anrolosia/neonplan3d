@@ -98,7 +98,7 @@ import { centroid, furnitureFootprint, isLamp, poolFloorY, LAMP_MODEL, LIFT_SPOT
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
-import { poolNodeAt, underBasin } from "../pool-runs.ts";
+import { poolNodeAt, poolWallNormal, underBasin } from "../pool-runs.ts";
 import type { PipeTube } from "../viewer/viewer3d.ts";
 import type { PoolPiece } from "../viewer/pool-water.ts";
 import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
@@ -1440,6 +1440,16 @@ export class Fp3dView3d extends LitElement {
       // pipes at the bottom drain run under the pool's floor
       const shape = (path: P3[], p: PoolPipe) => underBasin(path, p, area, floor);
       out.push(...pipePieces(links.pipes ?? [], flows, nodeAt, shape));
+      // inlet nozzles: a short spout from the wall into the pool, glowing in the water's colour while water flows
+      for (const q of ports) {
+        if (q.kind !== "inlet") continue;
+        const at = nodeAt(`port:${q.id}`);
+        const n = at && poolWallNormal(area, [at.x, at.z]);
+        if (!at || !n) continue;
+        const feed = (links.pipes ?? []).find((pp) => pp.to === `port:${q.id}`);
+        const f = feed ? flows.get(feed.id) : undefined;
+        tubes.push({ floorId: floor.id, points: [[at.x + n[0] * 0.03, at.y, at.z + n[1] * 0.03], [at.x - n[0] * 0.09, at.y, at.z - n[1] * 0.09]], radius: 0.035, water: f?.active ? waterColor(f) : null, fittings: [] });
+      }
       // holes through a wall or the floor: a sleeve from the inside to the outside
       for (const j of links.joints ?? []) {
         if (j.kind !== "wall" && j.kind !== "floor") continue;
