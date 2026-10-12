@@ -124,7 +124,7 @@ import { deleteDiagnostics, getDiagnostics, setDiagnostics, type DiagnosticsStat
 import { load3d } from "../load3d.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
-import { furnitureSize, isElectric, isPackType, mountBase, packDisplay, packItem, packItemName, packName, packType, setPacks, type FurniturePack } from "../packs.ts";
+import { furnitureSize, isElectric, isPackType, isRobotVacuum, mountBase, packDisplay, packItem, packItemName, packName, packType, setPacks, type FurniturePack } from "../packs.ts";
 
 /** Items that can be fixed against moving. */
 type FixKind = "room" | "opening" | "furniture" | "device" | "wall" | "outdoor";
@@ -4450,7 +4450,7 @@ export class Fp3dEditor extends LitElement {
     const fits = (t: string): boolean => {
       if (kind === "light") return isLamp(t);
       if (kind === "climate") return t === "radiator";
-      if (entityId.startsWith("vacuum.")) return t === "robot_vacuum" || (isPackType(t) && t.endsWith(":robot_vacuum"));
+      if (entityId.startsWith("vacuum.")) return isRobotVacuum(t);
       if (kind === "media") return hasScreen(t) || (isElectric(t) && speakerish.test(t));
       return isElectric(t) && !isLamp(t);
     };
@@ -10363,6 +10363,7 @@ export class Fp3dEditor extends LitElement {
   }
 
   private renderFurnitureLinks(f: Furniture) {
+    const ALARM_CLASSES = new Set(["smoke", "gas", "carbon_monoxide", "heat", "moisture", "safety", "sound", "problem"]);
     if (!this.hass) return nothing;
     const hass = this.hass;
     // what "automatic" would choose: resolve with this item's own links cleared
@@ -10385,19 +10386,22 @@ export class Fp3dEditor extends LitElement {
             /^(media_player|switch|input_boolean|light)\./.test(id)
           : f.type === "radiator"
             ? id.startsWith("climate.")
-            : f.type === "robot_vacuum"
+            : isRobotVacuum(f.type)
               ? id.startsWith("vacuum.")
               : // or a status sensor (a 3D printer's print status: running, idle, finish …)
                 // (a robot vacuum from a pack, e.g. the one with its dock, follows its vacuum entity; a motorised
                 // curtain its cover, #286)
-                /^(switch|media_player|fan|input_boolean|climate|vacuum|cover)\./.test(id) || isStatusSensor(hass.states[id]),
+                /^(switch|media_player|fan|input_boolean|climate|vacuum|cover)\./.test(id) ||
+                isStatusSensor(hass.states[id]) ||
+                // alarms that report as binary sensors (binary_sensor.…_smoke, #490); a smoke detector takes any
+                (id.startsWith("binary_sensor.") && (f.type.endsWith("smoke_detector") || ALARM_CLASSES.has(String(hass.states[id]?.attributes.device_class ?? "")))),
     );
     const power = this.entityOptions((id) => this.isPowerSensor(id));
     const doorSensors = f.type === "fridge_smart" ? this.entityOptions((id) => id.startsWith("binary_sensor.")) : [];
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "radiator" ? "furn_entity_climate" : f.type === "robot_vacuum" ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "radiator" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type) ? this.renderStateLinks(f) : nothing}
@@ -10475,7 +10479,7 @@ export class Fp3dEditor extends LitElement {
           >
           <div class="fp3d-form">${this.markerSelect(f.marker ?? null, (v) => this.updateFurniture({ marker: v }))}${this.iconInput(f.icon, (v) => this.updateFurniture({ icon: v }))}</div>`
         : nothing}
-      ${f.type === "robot_vacuum"
+      ${isRobotVacuum(f.type)
         ? html`<div class="fp3d-form fp3d-links">
             ${this.entitySelect(
               this.t("furn_robot_room"),
@@ -10494,7 +10498,7 @@ export class Fp3dEditor extends LitElement {
             <p class="fp3d-sub">${this.t("fridge_hint")}</p>`
         : nothing}
       ${hasScreen(f.type) ? this.renderPictureRules(f) : nothing}
-      <p class="fp3d-sub">${this.t(lamp ? (f.type === "lamp_pendant" ? "lamp_hint_pendant" : "lamp_hint") : media ? "furn_links_hint_tv" : f.type === "robot_vacuum" ? "robot_hint" : "furn_links_hint")}</p>`;
+      <p class="fp3d-sub">${this.t(lamp ? (f.type === "lamp_pendant" ? "lamp_hint_pendant" : "lamp_hint") : media ? "furn_links_hint_tv" : isRobotVacuum(f.type) ? "robot_hint" : "furn_links_hint")}</p>`;
   }
 
   /** Parking spot: presence sensor, the vehicle shown, its size, and an optional vehicle type sensor. */

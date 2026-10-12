@@ -82,7 +82,7 @@ import { HEAT_SCALES, heatColor, heatGradient, roomValues, type HeatMode } from 
 import { furnitureName } from "../furniture-names.ts";
 import { fetchImage, saveBuilding } from "../api.ts";
 import { formatNumber, translate, type I18nKey } from "../i18n.ts";
-import { getPacks, mountBase, packItem, packsVersion } from "../packs.ts";
+import { getPacks, isPackType, isRobotVacuum, mountBase, packItem, packsVersion } from "../packs.ts";
 import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from "../parking.ts";
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
@@ -2294,7 +2294,7 @@ export class Fp3dView3d extends LitElement {
     for (const floor of b.floors) {
       const rooms = floor.rooms.filter((room) => room.points.length >= 3);
       for (const f of floor.furniture) {
-        if (f.type !== "robot_vacuum") continue;
+        if (!isRobotVacuum(f.type)) continue;
         const entity = this.furnitureLinks?.get(f.id)?.entity ?? null;
         if (!entity) continue;
         const names = r.robotRooms(entity, robotRoomSensor(hass, entity, f.room_sensor));
@@ -2420,21 +2420,23 @@ export class Fp3dView3d extends LitElement {
     const out: RobotInfo[] = [];
     for (const floor of b.floors) {
       for (const f of floor.furniture) {
-        if (f.type !== "robot_vacuum") continue;
+        if (!isRobotVacuum(f.type)) continue;
         const entity = this.furnitureLinks.get(f.id)?.entity ?? null;
         const state = entity ? hass.states[entity]?.state : undefined;
         const mode: RobotInfo["mode"] =
           vacuumCleaning(state) ? "cleaning" : state === "returning" ? "returning" : state === "error" ? "error" : state === "docked" || !state ? "docked" : "idle";
         // the robot rests in front of its dock, facing away from it
         const a = (f.rotation * Math.PI) / 180;
-        const off = f.d * 0.14;
+        // the pack's dock has its own robot in the model, further out: the moving one starts (and hides) there
+        const inModel = isPackType(f.type);
+        const off = f.d * (inModel ? 0.227 : 0.14);
         const rest: [number, number] = [f.x - Math.sin(a) * off, f.z + Math.cos(a) * off];
         // the room the robot reports (a "current room" sensor), else the room of its dock
         const rooms = floor.rooms.filter((r) => r.points.length >= 3);
         const reported = mode === "cleaning" ? robotRoom(hass, rooms, entity, robotRoomSensor(hass, entity, f.room_sensor)) : null;
         const room = reported ?? rooms.find((r) => pointInPolygon(rest, r.points));
         const obstacles = mode === "cleaning" && room ? this.robotObstacles(floor, room.points) : [];
-        out.push({ id: f.id, floorId: floor.id, rest, restHeading: -a, mode, room: room?.points ?? null, roomId: room?.id ?? null, obstacles });
+        out.push({ id: f.id, floorId: floor.id, rest, restHeading: -a, mode, room: room?.points ?? null, roomId: room?.id ?? null, obstacles, ...(inModel ? { inModel } : {}) });
       }
     }
     return out;

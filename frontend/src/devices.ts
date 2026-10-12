@@ -3,7 +3,7 @@
 
 import type { Furniture, EntityRef, Floor, LampMount, Opening, Placement, Room, Vec2 } from "./model.ts";
 import { centroid, pointInPolygon } from "./model.ts";
-import { packScreen } from "./packs.ts";
+import { isRobotVacuum, packScreen } from "./packs.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
 export type DeviceKind =
@@ -838,7 +838,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
     const used = new Set<string>([...floor.furniture.flatMap((f) => [f.entity, f.power]), ...floor.placements.map((p) => p.entity_id)].filter((v): v is string => !!v && v !== "none"));
     for (const f of floor.furniture) {
       const lamp = f.type in LAMP_NAMES;
-      const pattern = lamp ? LAMP_NAMES[f.type] : FURNITURE_NAMES[f.type];
+      const pattern = lamp ? LAMP_NAMES[f.type] : (FURNITURE_NAMES[f.type] ?? (isRobotVacuum(f.type) ? FURNITURE_NAMES.robot_vacuum : undefined));
       if (!pattern && f.entity == null && f.power == null) continue;
       const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
       const ids = room ? primaryEntities(hass, areaEntities(hass, room.area_id)) : [];
@@ -849,7 +849,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         if (lamp) {
           const lights = free.filter((id) => kindOf(id) === "light");
           entity = lights.find((id) => pattern.test(name(id))) ?? lights[0] ?? null;
-        } else if (f.type === "robot_vacuum") {
+        } else if (isRobotVacuum(f.type)) {
           // vacuums are no device kind of their own: look them up in the room's area directly
           const area = room?.area_id ?? null;
           entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && entityAreaId(hass, id) === area) ?? null;
