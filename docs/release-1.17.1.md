@@ -12,6 +12,7 @@
 - **Smoke detectors** take binary sensors (`binary_sensor.…_smoke`); other items offer binary sensors of alarm classes (smoke, gas, CO, water, heat) (#490, thanks frops83).
 - **Roof windows** stay in the slope when the roof fades out over a floor or a room – open, tilted, blind down; a closed rim between roof and frame, so a low view no longer looks through into the room below (#482 thanks RkcCorian, #490).
 - **Wall view:** the Del key there no longer reaches what is chosen in the plan behind it.
+- **Pool warnings** (frost, pH, chlorine) no longer make every room of the house pulse – they show at the top only.
 
 ### How to update
 
@@ -33,6 +34,7 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 - **Rauchmelder** nehmen Binärsensoren (`binary_sensor.…_smoke`); andere Möbel bieten Binärsensoren mit Alarm-Klasse an (Rauch, Gas, CO, Wasser, Hitze) (#490, danke frops83).
 - **Dachfenster** bleiben in der Schräge stehen, wenn das Dach über einer Etage oder einem Raum ausblendet – offen, gekippt, Rollladen unten; ein geschlossener Rand zwischen Dach und Rahmen, so schaut man von schräg vorne nicht mehr in den Raum darunter (#482 danke RkcCorian, #490).
 - **Wandansicht:** Die Taste Entf erreicht dort nicht mehr, was im Grundriss dahinter ausgewählt ist.
+- **Pool-Warnungen** (Frost, pH, Chlor) lassen nicht mehr alle Räume im Haus pulsieren – sie stehen nur oben als Hinweis.
 
 ### So bekommst du das Update
 

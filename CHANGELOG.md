@@ -18,6 +18,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Smoke detectors** take binary sensors; other items alarm-class binary sensors (#490).
 - **Roof windows** stay in the slope when the roof fades over a floor or room; closed rim between roof and frame (#482, #490).
 - **Wall view:** Del no longer reaches the item chosen in the plan behind it.
+- **Pool warnings** no longer make every room pulse; they show at the top only.
 
 ## 1.17.0
 
