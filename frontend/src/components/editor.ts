@@ -467,6 +467,8 @@ export class Fp3dEditor extends LitElement {
   /** The height handle over the chosen piece in the 3D wall view (screen position, height text), and a lift in progress. */
   private liftRaf = 0;
   private lift: { id: string; y: number; startY: number; perPx: number; base: Building; top: number; moved: boolean } | null = null;
+  /** Wall view: a size handle being dragged (side l/r = width along the wall, t/b = top or bottom edge). */
+  private wallResize: { id: string; side: "l" | "r" | "t" | "b"; x0: number; x1: number; y0: number; y1: number; base: Building; moved: boolean } | null = null;
   private wallDrag: { id: string; ids?: string[]; w?: number; x: number; y: number; base: Building; s0: number; y0: number; lift: boolean; moved: boolean } | null = null;
   /** Front pictures of the pieces in the wall view, by type, size and turn (null: none to draw); asked for once. */
   private wallPics = new Map<string, { url: string; x0: number; x1: number; y0: number; y1: number } | null>();
@@ -5890,6 +5892,44 @@ export class Fp3dEditor extends LitElement {
     );
   }
 
+  /** Which of a piece's own sizes runs along the wall (w facing it, d standing sideways), null when it stands at a slant. */
+  private alongAxis(frame: WallFrame, f: Furniture): "w" | "d" | null {
+    const a = (this.wallTurn(frame, f) * Math.PI) / 180;
+    if (Math.abs(Math.sin(a)) < 0.05) return "w";
+    if (Math.abs(Math.cos(a)) < 0.05) return "d";
+    return null;
+  }
+
+  /**
+   * A piece's size in the wall view: its stretch along the wall (s0..s1, metres along the wall) and its bottom and
+   * top (metres above the floor); null keeps that side. The other sides stay where they are.
+   */
+  private resizeOnWall(frame: WallFrame, id: string, s0: number | null, s1: number | null, y0: number | null, y1: number | null, base: Building = this._doc, history = true): void {
+    this.change(
+      (_, floor) => {
+        const m = floor.furniture.find((x) => x.id === id);
+        if (!m) return;
+        const axis = this.alongAxis(frame, m);
+        if (s0 !== null && s1 !== null && axis && s1 - s0 >= 0.05) {
+          const c = furnitureFootprint(m).map((q) => toWall(frame, q).s);
+          const mid = (Math.min(...c) + Math.max(...c)) / 2;
+          m[axis] = round(s1 - s0);
+          Object.assign(m, slideAlong(frame, m, (s0 + s1) / 2 - mid));
+        }
+        if (y0 !== null || y1 !== null) {
+          const bottom = mountBase(floor, m);
+          const nb = y0 ?? bottom;
+          const nt = y1 ?? bottom + m.h;
+          if (nt - nb < 0.03) return;
+          m.h = round(nt - nb);
+          if (y0 !== null && canLift(m)) m.mount_y = round(Math.max(0, nb));
+        }
+      },
+      base,
+      history,
+    );
+  }
+
   /** The turn of a piece relative to the viewer of a wall (0: its front faces into the room, towards the viewer). */
   private wallTurn(frame: WallFrame, f: Furniture): number {
     const wallRot = (Math.atan2(-frame.n[0], frame.n[1]) * 180) / Math.PI;
@@ -5998,6 +6038,29 @@ export class Fp3dEditor extends LitElement {
       this._wallGap = sAt >= 0 && sAt <= L && p.y >= 0 && p.y <= H ? this.wallGapAt(frame, floor, room, sAt, H - p.y) : null;
     };
     const move = (e: PointerEvent) => {
+      const rz = this.wallResize;
+      if (rz) {
+        const p = svgPoint(e);
+        rz.moved = true;
+        // edges snap to the neighbours, the wall's ends, doors and windows (Alt: freely), by the centimetre
+        const edgesX = snaps([rz.id]).map((q) => X(q));
+        const snapX = (v: number) => {
+          v = Math.round(v * 100) / 100;
+          if (!e.altKey) for (const q of edgesX) if (Math.abs(v - q) < 0.04) return q;
+          return v;
+        };
+        if (rz.side === "l" || rz.side === "r") {
+          const x0 = rz.side === "l" ? Math.min(snapX(p.x), rz.x1 - 0.1) : rz.x0;
+          const x1 = rz.side === "r" ? Math.max(snapX(p.x), rz.x0 + 0.1) : rz.x1;
+          const [s0, s1] = frame.rightward ? [x0, x1] : [L - x1, L - x0];
+          this.resizeOnWall(frame, rz.id, s0, s1, null, null, rz.base, false);
+        } else {
+          const y = Math.round((H - p.y) * 100) / 100;
+          if (rz.side === "t") this.resizeOnWall(frame, rz.id, null, null, null, Math.max(rz.y0 + 0.05, Math.min(H, y)), rz.base, false);
+          else this.resizeOnWall(frame, rz.id, null, null, Math.max(0, Math.min(rz.y1 - 0.05, y)), null, rz.base, false);
+        }
+        return;
+      }
       const fr = this._wallFrame;
       if (fr) {
         const p = svgPoint(e);
@@ -6030,6 +6093,12 @@ export class Fp3dEditor extends LitElement {
       this.moveOnWall(frame, d.id, s0 - d.s0, y0, d.base, false);
     };
     const up = () => {
+      const rz = this.wallResize;
+      if (rz) {
+        this.wallResize = null;
+        if (rz.moved) this.pushHistory(rz.base);
+        return;
+      }
       const fr = this._wallFrame;
       if (fr) {
         // every piece whose middle lies in the frame joins the choice
@@ -6263,6 +6332,29 @@ export class Fp3dEditor extends LitElement {
             </g>`;
           })}
           ${dims}
+          ${sel && selF && !many && admin && !selF.locked && items.some((i) => i.id === sel.id)
+            ? (() => {
+                const [x, w] = span(sel.s0, sel.s1);
+                const yt = Y(sel.y1);
+                const yb = Y(sel.y0);
+                const hs = fs * 0.75;
+                const along = this.alongAxis(frame, selF);
+                const grab = (side: "l" | "r" | "t" | "b") => (e: PointerEvent) => {
+                  e.stopPropagation();
+                  (e.currentTarget as Element).closest("svg")!.setPointerCapture(e.pointerId);
+                  this.wallResize = { id: sel.id, side, x0: x, x1: x + w, y0: sel.y0, y1: sel.y1, base: this._doc, moved: false };
+                };
+                return svg`<g class="fp3d-wv-handles">
+                  ${along
+                    ? svg`<rect class="fp3d-wv-handle fp3d-wv-ew" x=${x - hs / 2} y=${(yt + yb) / 2 - hs} width=${hs} height=${hs * 2} rx=${hs / 3} @pointerdown=${grab("l")} />
+                        <rect class="fp3d-wv-handle fp3d-wv-ew" x=${x + w - hs / 2} y=${(yt + yb) / 2 - hs} width=${hs} height=${hs * 2} rx=${hs / 3} @pointerdown=${grab("r")} />`
+                    : nothing}
+                  <rect class="fp3d-wv-handle fp3d-wv-ns" x=${x + w / 2 - hs} y=${yt - hs / 2} width=${hs * 2} height=${hs} rx=${hs / 3} @pointerdown=${grab("t")} />
+                  ${sel.y0 > 0.05 && canLift(selF) ? svg`<rect class="fp3d-wv-handle fp3d-wv-ns" x=${x + w / 2 - hs} y=${yb - hs / 2} width=${hs * 2} height=${hs} rx=${hs / 3} @pointerdown=${grab("b")} />` : nothing}
+                  <text class="fp3d-wv-size" x=${x + w / 2} y=${yt - hs * 0.9} style="font-size:${fs * 0.85}px">${text(sel.s1 - sel.s0)} × ${text(sel.y1 - sel.y0)}</text>
+                </g>`;
+              })()
+            : nothing}
           ${many && setSpan
             ? (() => {
                 const [x, w] = span(setSpan.s0, setSpan.s1);
@@ -6308,6 +6400,15 @@ export class Fp3dEditor extends LitElement {
                   this.moveOnWall(frame, sel.id, frame.rightward ? ds : -ds, null);
                 }, 0.01, 0)}
                 ${this.len(this.t("wall_view_depth"), Math.round(Math.max(0, sel.d) * 1000) / 1000, (val) => this.moveFromWall(frame, sel.id, val - sel.d), 0.01, 0)}
+                ${admin && !selF.locked && this.alongAxis(frame, selF)
+                  ? this.len(this.t("width"), Math.round((sel.s1 - sel.s0) * 1000) / 1000, (val) => {
+                      // typed: the left side (as seen) stays, the right one moves
+                      const v = Math.max(0.05, val);
+                      if (frame.rightward) this.resizeOnWall(frame, sel.id, sel.s0, sel.s0 + v, null, null);
+                      else this.resizeOnWall(frame, sel.id, sel.s1 - v, sel.s1, null, null);
+                    }, 0.01, 0.05)
+                  : nothing}
+                ${admin && !selF.locked ? this.len(this.t("height_m"), Math.round((sel.y1 - sel.y0) * 1000) / 1000, (val) => this.resizeOnWall(frame, sel.id, null, null, null, sel.y0 + Math.max(0.03, val)), 0.01, 0.03) : nothing}
                 ${lift ? this.len(this.t("mount_height"), Math.round(sel.y0 * 1000) / 1000, (val) => this.moveOnWall(frame, sel.id, 0, val), 0.01, 0) : html`<span class="fp3d-muted">${this.t("wall_view_floor")}</span>`}
                 ${admin && !selF.locked
                   ? html`<span class="fp3d-wv-turn">
@@ -12351,6 +12452,21 @@ export class Fp3dEditor extends LitElement {
       .fp3d-wv-gap text {
         fill: var(--fp3d-accent);
         text-anchor: middle;
+        pointer-events: none;
+      }
+      .fp3d-wv-handle {
+        fill: var(--fp3d-accent);
+        stroke: #06101c;
+        stroke-width: 0.006;
+        cursor: ew-resize;
+      }
+      .fp3d-wv-handle.fp3d-wv-ns {
+        cursor: ns-resize;
+      }
+      .fp3d-wv-size {
+        fill: var(--fp3d-accent);
+        text-anchor: middle;
+        font-weight: 600;
         pointer-events: none;
       }
       .fp3d-wv-marquee {
