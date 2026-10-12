@@ -2625,6 +2625,10 @@ export class Fp3dEditor extends LitElement {
   private deleteOutdoor(): void {
     const id = this._outdoorId;
     if (!id || !this.isAdmin || !this.confirmFixedDelete("outdoor", id)) return;
+    // a pool with its pipes is a lot of work: ask first
+    const a = this.floor?.outdoor.find((o) => o.id === id);
+    const pipes = a?.pool?.pipes?.length ?? 0;
+    if (a?.type === "pool" && pipes && !confirm(this.t("pool_delete_confirm", { n: pipes }))) return;
     this.change((_, floor) => (floor.outdoor = floor.outdoor.filter((o) => o.id !== id)));
     this._outdoorId = null;
   }
@@ -2657,6 +2661,9 @@ export class Fp3dEditor extends LitElement {
     if (path.some((el) => el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) return;
     if (!this.isConnected || !this.offsetParent) return;
     const mod = e.ctrlKey || e.metaKey;
+    // the wall view has its own keys: Delete there must never reach what is chosen in the plan behind it
+    // (it took the whole pool with every pipe); only undo and redo still work from here
+    if (this._wallView && !(mod && ["z", "y"].includes(e.key.toLowerCase()))) return;
     if (mod && e.key.toLowerCase() === "z") {
       e.preventDefault();
       if (e.shiftKey) this.redo();
