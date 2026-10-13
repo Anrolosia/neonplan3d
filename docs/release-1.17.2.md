@@ -10,10 +10,11 @@
 
 ### Changed
 
-- **Roof windows when the roof fades out:** they fade out with the roof again, as before 1.17.1. Who wants a window to stay over the room ticks **Show over the room without the roof** in its form (#482).
+- **Roof windows when the roof fades out:** they fade out with the roof again, as before 1.17.1. Who wants a window to stay over the room ticks **Show over the room without the roof** in its form (#482). Windows in a slope that reaches down over a lower floor stay in the roof, so they no longer hang in the air below the floor shown.
 
 ### Fixed
 
+- **Weather outside switched off** stayed on after a reload until switched on and off again – in the panel and in the dashboard card (card option *Weather*) (#509).
 - **Echo speakers (Klang & Kino):** ▶ after ⏸ sends play even while the Echo still reports "playing" – it answers late; the button shows what was pressed until the speaker catches up (#400).
 
 ### How to update
@@ -34,10 +35,11 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ### Geändert
 
-- **Dachfenster, wenn das Dach ausblendet:** Sie blenden wieder mit dem Dach aus, wie vor 1.17.1. Wer ein Fenster über dem Raum stehen lassen will, setzt in seinem Formular den Haken **Ohne Dach über dem Raum zeigen** (#482).
+- **Dachfenster, wenn das Dach ausblendet:** Sie blenden wieder mit dem Dach aus, wie vor 1.17.1. Wer ein Fenster über dem Raum stehen lassen will, setzt in seinem Formular den Haken **Ohne Dach über dem Raum zeigen** (#482). Fenster in einer Schräge, die über eine tiefere Etage reicht, bleiben im Dach – sie hängen nicht mehr unter der gezeigten Etage in der Luft.
 
 ### Behoben
 
+- **Wetter draußen ausgeschaltet** blieb nach dem Neuladen an, bis man es einmal an- und wieder ausschaltete – im Panel und in der Dashboard-Karte (Option *Wetter*) (#509).
 - **Echo-Lautsprecher (Klang & Kino):** ▶ nach ⏸ schickt Play, auch wenn das Echo noch „spielt“ meldet – es antwortet spät; die Taste zeigt, was gedrückt wurde, bis der Lautsprecher nachzieht (#400).
 
 ### So bekommst du das Update
