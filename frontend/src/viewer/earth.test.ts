@@ -72,3 +72,18 @@ test("on a hillside a lawn follows the ground, a pool and a terrace stay level a
     assert.equal(areaGround(eg, a as never), -0.2 - 3);
   }
 });
+
+test("a house on a hillside stands on a plinth on its downhill side; on a flat plot it gets none", () => {
+  const flat = house();
+  flat.floors = [flat.floors[1]];
+  setTerrain(flat);
+  const eg = (b: Building) => {
+    const f = b.floors[0];
+    return buildEarth(b, f, buildFloorGeometry(f, b.settings.wall_exterior, b.settings.wall_interior).openings, true);
+  };
+  assert.equal(eg(flat), null);
+  const hill = house({ level: -0.2, slope: 1.5, slope_dir: "z" });
+  hill.floors = [hill.floors[1]];
+  setTerrain(hill);
+  assert.ok(eg(hill)!.earth.count > 0);
+});

@@ -5,7 +5,7 @@ import { Color } from "three";
 import type { Building, Floor, Vec2 } from "../model.ts";
 import { pointInPolygon, terrainAt } from "../model.ts";
 import { floorOutline } from "../roof-sections.ts";
-import type { OpeningInfo } from "./build.ts";
+import { SLAB, type OpeningInfo } from "./build.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
 const EARTH = new Color(0x172334);
@@ -14,6 +14,9 @@ const WELL = new Color(0x1b2638);
 const WELL_LOW = new Color(0x111a28);
 const GROUND_LINE = new Color(0x3f86b8);
 const GRATE = new Color(0x5b7a99);
+// the plinth a house stands on where the ground falls away under it (the downhill side of a hillside)
+const PLINTH = new Color(0x22314a);
+const PLINTH_LOW = new Color(0x141f30);
 /** How far the earth reaches under the floor slab. */
 const BELOW = 0.35;
 /** A light well in front of a cellar window: depth from the wall and how far it reaches below the sill. */
@@ -51,11 +54,17 @@ function outlineOf(b: Building, floor: Floor): Vec2[] | null {
 /**
  * The earth around a floor, in its own coordinates (its floor at 0): from under the slab up to the ground along
  * every outer wall (never above the wall), with light wells cut out in front of the windows below the ground.
- * Null when the floor stands fully above the ground.
+ * The lowest floor also gets a plinth down to the ground where the ground lies below it (a house on a hillside
+ * stands on its plinth instead of floating). Null when there is nothing of either.
  */
-export function buildEarth(b: Building, floor: Floor, openings: readonly OpeningInfo[]): EarthGeometry | null {
-  if (!inGround(b, floor)) return null;
-  const outline = outlineOf(b, floor)!;
+export function buildEarth(b: Building, floor: Floor, openings: readonly OpeningInfo[], lowest = false): EarthGeometry | null {
+  if (b.settings.terrain?.earth === false || floor.elevation > 0.3) return null;
+  const outline = outlineOf(b, floor);
+  if (!outline) return null;
+  const local = (x: number, z: number) => terrainAt(x, z) - floor.elevation;
+  // the slab reaches 0.2 m down (the lawn of a flat plot lies there): the plinth starts below it
+  const plinth = lowest && outline.some(([x, z]) => local(x, z) < -SLAB - 0.03);
+  if (!plinth && !inGround(b, floor)) return null;
   const H = floor.height;
   const bottom = -BELOW;
   const ground = (x: number, z: number) => Math.min(H, terrainAt(x, z) - floor.elevation);
@@ -124,8 +133,18 @@ export function buildEarth(b: Building, floor: Floor, openings: readonly Opening
         const y1 = Math.min(t1, bottom);
         quad([p0[0], y0, p0[1]], [p1[0], y1, p1[1]], [p1[0], Math.max(t1, bottom), p1[1]], [p0[0], Math.max(t0, bottom), p0[1]], n, EARTH_LOW, EARTH, earth);
       }
-      // the line where the ground meets the wall
-      if (g0 > bottom || g1 > bottom) lines.seg([p0[0], Math.max(g0, bottom) + 0.004, p0[1]], [p1[0], Math.max(g1, bottom) + 0.004, p1[1]], GROUND_LINE);
+      // where the ground lies below the lowest floor: the plinth from the ground up to the floor
+      const r0 = local(p0[0], p0[1]);
+      const r1 = local(p1[0], p1[1]);
+      if (plinth && (r0 < -SLAB - 0.01 || r1 < -SLAB - 0.01)) {
+        quad([p0[0], Math.min(r0, -SLAB), p0[1]], [p1[0], Math.min(r1, -SLAB), p1[1]], [p1[0], -SLAB, p1[1]], [p0[0], -SLAB, p0[1]], n, PLINTH_LOW, PLINTH, earth);
+      }
+      // the line where the ground meets the wall (or the plinth)
+      if (g0 > bottom || g1 > bottom || (plinth && (r0 < -SLAB || r1 < -SLAB))) {
+        const y0 = plinth ? Math.min(r0, Math.max(g0, bottom)) : Math.max(g0, bottom);
+        const y1 = plinth ? Math.min(r1, Math.max(g1, bottom)) : Math.max(g1, bottom);
+        lines.seg([p0[0], y0 + 0.004, p0[1]], [p1[0], y1 + 0.004, p1[1]], GROUND_LINE);
+      }
     }
     // the light wells: floor, two sides and the front, from their bottom up to the ground, a grate on top
     for (const h of holes) {
