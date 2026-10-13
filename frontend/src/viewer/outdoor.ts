@@ -6,7 +6,7 @@
 
 import { Color } from "three";
 import type { Floor, OutdoorArea, OutdoorType, Vec2 } from "../model.ts";
-import { bounds, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorDrop, outdoorStanding, pointInPolygon, poolFloorY, poolRimY, poolSunken, poolWaterY, signedArea } from "../model.ts";
+import { bounds, groundDrop, groundLevel, isAxisRect, OUTDOOR_TOP, outdoorStanding, pointInPolygon, poolFloorY, poolRimY, poolSunken, poolWaterY, signedArea } from "../model.ts";
 import { ALWAYS, type GeoBuffer, type LineBuffer, pushPrism, shade, triangulate } from "./geo.ts";
 
 interface Look {
@@ -119,7 +119,7 @@ export function pushOutdoor(buf: GeoBuffer, lines: LineBuffer, floor: Floor, wat
     if (a.points.length < 3) return;
     // an area may sit above or below the ground (a driveway down to a lower garage) and fall along one direction
     const g = ground + (a.offset ?? 0);
-    const groundAt = (x: number, z: number) => g - outdoorDrop(a, x, z);
+    const groundAt = (x: number, z: number) => g - groundDrop(floor, a, x, z);
     const lowest = g - (a.type === "pool" ? 0 : (a.slope ?? 0));
     // hedges, fences and pergolas take their own height; the outline can be switched off per area
     const own = outdoorStanding(a.type) && a.height ? a.height : OUTDOOR_TOP[a.type];

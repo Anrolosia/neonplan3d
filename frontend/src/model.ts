@@ -582,6 +582,8 @@ export interface BuildingSettings {
   outage_entity?: string | null;
   /** Sunlight falls through the windows as patches on the floor (default on, #266). */
   sun_patches?: boolean;
+  /** The ground around the house: its height, a slope (a house on a hillside) and the earth around cellars. */
+  terrain?: Terrain | null;
   /** Plan lock: rooms, walls, doors, windows and outdoor areas cannot be moved by accident. */
   lock_plan?: boolean;
   /** The camera the house view opens with (3D view, card, kiosk); null = fitted from the front left. */
@@ -662,12 +664,77 @@ export function outdoorDrop(a: OutdoorArea, x: number, z: number): number {
 
 /** Height of the surface of an area at a point, in floor coordinates (offset and slope included). */
 export function outdoorTopAt(floor: Floor, a: OutdoorArea, x: number, z: number): number {
-  return groundLevel(floor) + (a.offset ?? 0) + OUTDOOR_TOP[a.type] - outdoorDrop(a, x, z);
+  return groundLevel(floor) + (a.offset ?? 0) + OUTDOOR_TOP[a.type] - groundDrop(floor, a, x, z);
+}
+
+/**
+ * The ground around the house. `level` is the ground's height (m, the ground floor at 0) on the uphill side of
+ * the house, `slope` how much lower it lies on the downhill side, `slope_dir` the way it falls. Floors that
+ * reach below it stand in the earth: a cellar, half of a semi-basement, the uphill side on a hillside.
+ */
+export interface Terrain {
+  /** Null = 0.2 m under the ground floor (as before). */
+  level?: number | null;
+  slope?: number | null;
+  slope_dir?: SlopeDir | null;
+  /** The earth around floors below the ground (default on). */
+  earth?: boolean;
+}
+
+/** Default ground: the lawn 0.2 m under the ground floor. */
+export const DEFAULT_GROUND = -0.2;
+
+let terrainNow: { set: boolean; level: number; slope: number; dir: SlopeDir; lo: number; hi: number } = { set: false, level: DEFAULT_GROUND, slope: 0, dir: "x", lo: 0, hi: 1 };
+
+/** The plan's ground for the height functions below (set with the building, like the packs). */
+export function setTerrain(b: Pick<Building, "floors" | "settings"> | null): void {
+  const t = b?.settings.terrain ?? null;
+  const dir = (t?.slope_dir ?? "x") as SlopeDir;
+  const proj = (x: number, z: number) => (dir === "x" ? x : dir === "-x" ? -x : dir === "z" ? z : -z);
+  // the slope runs across the house: the ground floor's rooms (or the lowest floor with rooms)
+  const floors = b ? [...b.floors].filter((f) => f.rooms.length).sort((p, q) => Math.abs(p.elevation) - Math.abs(q.elevation)) : [];
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const r of floors[0]?.rooms ?? [])
+    for (const [x, z] of r.points) {
+      lo = Math.min(lo, proj(x, z));
+      hi = Math.max(hi, proj(x, z));
+    }
+  if (!Number.isFinite(lo) || hi - lo < 1e-6) {
+    lo = 0;
+    hi = 1;
+  }
+  terrainNow = { set: !!t && (t.level != null || !!t.slope), level: t?.level ?? DEFAULT_GROUND, slope: Math.max(0, t?.slope ?? 0), dir, lo, hi };
+}
+
+/** How far the ground has fallen at a plan point (m) from the uphill side of the house (beyond it, it goes on). */
+export function terrainDrop(x: number, z: number): number {
+  const t = terrainNow;
+  if (!t.slope) return 0;
+  const v = t.dir === "x" ? x : t.dir === "-x" ? -x : t.dir === "z" ? z : -z;
+  return (t.slope * (v - t.lo)) / (t.hi - t.lo);
+}
+
+/** Height of the ground at a plan point (m, the ground floor at 0). */
+export function terrainAt(x: number, z: number): number {
+  return terrainNow.level - terrainDrop(x, z);
+}
+
+/** Whether the plan has a ground of its own (height or slope set); without one the outdoor areas stay as before. */
+export function terrainSet(): boolean {
+  return terrainNow.set;
 }
 
 /** Ground level in floor coordinates: below the ground floor slab (0.2 m), the floor itself further up. */
 export function groundLevel(floor: Floor): number {
-  return floor.elevation > 0.3 ? 0 : -0.2;
+  if (floor.elevation > 0.3) return 0;
+  return terrainNow.set ? terrainNow.level - floor.elevation : DEFAULT_GROUND;
+}
+
+/** How far an outdoor area's surface lies below its level at a point: its own slope, and the hillside on the ground. */
+export function groundDrop(floor: Floor, a: OutdoorArea, x: number, z: number): number {
+  if (a.type === "pool") return 0;
+  return outdoorDrop(a, x, z) + (floor.elevation > 0.3 ? 0 : terrainDrop(x, z));
 }
 
 /** Height outdoor lamps stand on at a point: ground level, or the top of a terrace or bed there. */

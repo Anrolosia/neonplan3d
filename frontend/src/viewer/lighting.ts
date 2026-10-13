@@ -7,7 +7,7 @@
 
 import type { Floor, Vec2 } from "../model.ts";
 import { outdoorSurface } from "./outdoor.ts";
-import { outdoorDrop, outdoorStanding, pointInPolygon } from "../model.ts";
+import { groundDrop, outdoorStanding, pointInPolygon } from "../model.ts";
 import type { Wall } from "../geometry/walls.ts";
 import type { OpeningInfo } from "./build.ts";
 import { LOWER_OFFSET } from "./geo.ts";
@@ -127,7 +127,7 @@ export function buildLightSurface(
     const z0 = Math.floor(Math.min(...zs) / cell) * cell;
     const nx = Math.max(1, Math.ceil((Math.max(...xs) - x0) / cell));
     const nz = Math.max(1, Math.ceil((Math.max(...zs) - z0) / cell));
-    const yAt = (a: (typeof flat)[number], x: number, z: number) => outdoorSurface(floor, a) - (a.type === "pool" ? 0 : outdoorDrop(a, x, z)) + LIFT;
+    const yAt = (a: (typeof flat)[number], x: number, z: number) => outdoorSurface(floor, a) - groundDrop(floor, a, x, z) + LIFT;
     for (let i = 0; i < nx; i++) {
       for (let j = 0; j < nz; j++) {
         const px = x0 + i * cell;

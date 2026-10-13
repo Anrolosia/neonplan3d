@@ -116,6 +116,7 @@ import {
   type OpeningStyle,
   type ScreenPicture,
   STAIR_TYPES,
+  setTerrain,
 } from "../model.ts";
 import { controls, tokens } from "../styles.ts";
 import "./entity-picker.ts";
@@ -716,6 +717,7 @@ export class Fp3dEditor extends LitElement {
   protected willUpdate(changed: PropertyValues): void {
     // this bundle keeps its own pack registry – and its own language table, so it fetches the language itself
     if (changed.has("packs")) setPacks(this.packs ?? []);
+    if (changed.has("_doc")) setTerrain(this._doc);
     if (changed.has("hass") && this.hass && !languageReady(this.hass.language)) void loadLanguage(this.hass.language).then(() => this.requestUpdate());
     // the 3D pane and the wall view's 3D both show the draft (otherwise a piece moved in the wall view jumps back)
     if (changed.has("_doc") && (this._split || this._wallView)) this.queue3d();
