@@ -8,11 +8,11 @@ import { floorOutline } from "../roof-sections.ts";
 import type { OpeningInfo } from "./build.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
-const EARTH = new Color(0x0a1322);
-const EARTH_LOW = new Color(0x060b16);
+const EARTH = new Color(0x172334);
+const EARTH_LOW = new Color(0x080e19);
 const WELL = new Color(0x1b2638);
 const WELL_LOW = new Color(0x111a28);
-const GROUND_LINE = new Color(0x2c4f6e);
+const GROUND_LINE = new Color(0x3f86b8);
 const GRATE = new Color(0x5b7a99);
 /** How far the earth reaches under the floor slab. */
 const BELOW = 0.35;

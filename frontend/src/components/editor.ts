@@ -9460,7 +9460,7 @@ export class Fp3dEditor extends LitElement {
       ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
-      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing}
+      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderTerrain() : nothing}
       ${admin ? this.renderBackup() : nothing} ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
   }
@@ -9861,6 +9861,21 @@ export class Fp3dEditor extends LitElement {
         ${this.len(this.t("opening_position"), o.offset, (v) => this.updateOpening({ offset: Math.max(0, v) }), 0.01, 0)}
         ${window ? this.len(this.t("sill"), o.sill, (v) => this.updateOpening({ sill: Math.max(0, v) }), 0.01, 0) : nothing}
         ${this.len(this.t("opening_height"), o.height, (v) => this.updateOpening({ height: Math.max(0.3, v) }), 0.01, 0.3)}
+        ${window && this.isAdmin
+          ? html`<div class="fp3d-actions fp3d-wide">
+              <button
+                class="fp3d-btn"
+                title=${this.t("cellar_window_hint")}
+                @click=${() => {
+                  // small and high up in the wall: 1.0 × 0.5 m, its top 25 cm under the ceiling
+                  const h = this.floor?.height ?? 2.5;
+                  this.updateOpening({ width: 1, height: 0.5, sill: Math.max(0, Math.round((h - 0.75) * 100) / 100) });
+                }}
+              >
+                ▭ ${this.t("cellar_window")}
+              </button>
+            </div>`
+          : nothing}
         ${garage ? nothing : this.renderStyleSelect(o)}
         ${this.renderSidelightFields(o)}
         <label class="fp3d-field fp3d-wide" title=${this.t("opening_mark_hint")}
@@ -11572,6 +11587,39 @@ export class Fp3dEditor extends LitElement {
         /></label>
       </div>
       <p class="fp3d-sub">${this.t("backup_full_hint")}</p>
+    </details>`;
+  }
+
+  /** The ground around the house: its height, a hillside, the earth around cellars. */
+  private renderTerrain() {
+    const t = this._doc.settings.terrain ?? {};
+    const set = (patch: Partial<NonNullable<Building["settings"]["terrain"]>>) => {
+      const next = structuredClone(this._doc);
+      next.settings.terrain = { ...(next.settings.terrain ?? {}), ...patch };
+      this.setDoc(next);
+    };
+    const low = this._doc.floors.some((f) => f.elevation < -0.3);
+    return html`<details class="fp3d-section">
+      <summary>⛰ ${this.t("terrain")}</summary>
+      <p class="fp3d-sub">${this.t("terrain_hint")}</p>
+      <div class="fp3d-form">
+        ${this.len(this.t("terrain_level"), t.level ?? -0.2, (v) => set({ level: Math.max(-20, Math.min(20, v)) }), 0.05)}
+        ${this.len(this.t("terrain_slope"), t.slope ?? 0, (v) => set({ slope: Math.max(0, Math.min(30, v)) || null }), 0.05, 0)}
+        <label class="fp3d-field"
+          >${this.t("outdoor_slope_dir")}
+          <select ?disabled=${!t.slope} @change=${(e: Event) => set({ slope_dir: (e.target as HTMLSelectElement).value as SlopeDir })}>
+            ${SLOPE_DIRS.map((d) => html`<option value=${d} ?selected=${d === (t.slope_dir ?? "x")}>${this.t(`slope_${d.replace("-", "n")}` as I18nKey)}</option>`)}
+          </select></label
+        >
+        <label class="fp3d-check fp3d-wide" title=${this.t("terrain_earth_hint")}
+          ><input type="checkbox" .checked=${t.earth !== false} @change=${(ev: Event) => set({ earth: (ev.target as HTMLInputElement).checked })} />
+          ${this.t("terrain_earth")}</label
+        >
+      </div>
+      <p class="fp3d-sub">${this.t(low ? "terrain_cellar_hint" : "terrain_no_cellar_hint")}</p>
+      ${t.level != null || t.slope
+        ? html`<div class="fp3d-actions"><button class="fp3d-btn" @click=${() => set({ level: null, slope: null, slope_dir: null })}>${this.t("terrain_reset")}</button></div>`
+        : nothing}
     </details>`;
   }
 
