@@ -1880,6 +1880,10 @@ export class Fp3dView3d extends LitElement {
       },
     };
     // play and pause by their own services: some players (an Echo through Alexa Media Player) ignore play_pause
+    // what the player says it can do (supported_features): previous 16, next 32, pause 1, play 16384 – a button it
+    // cannot serve is greyed out (#400: an Echo without "previous"); unknown features leave every button on
+    const features = hass.states[m.id]?.attributes.supported_features;
+    const can = (bit: number) => typeof features !== "number" || (features & bit) !== 0;
     const intent = this.mediaIntent.get(m.id);
     if (intent && (intent.playing === m.playing || Date.now() - intent.at > 30000)) this.mediaIntent.delete(m.id);
     const playing = this.mediaIntent.get(m.id)?.playing ?? m.playing;
@@ -1913,9 +1917,9 @@ export class Fp3dView3d extends LitElement {
         </div>
         ${open && !this.ro
           ? html`<div class="fp3d-holo-media-controls">
-                <button aria-label=${t("previous")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_previous_track"))} @click=${press.key(() => call("media_previous_track"))}>⏮</button>
-                <button aria-label=${t("play_pause")} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${playing ? "⏸" : "▶"}</button>
-                <button aria-label=${t("next")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_next_track"))} @click=${press.key(() => call("media_next_track"))}>⏭</button>
+                <button aria-label=${t("previous")} ?disabled=${!can(16)} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_previous_track"))} @click=${press.key(() => call("media_previous_track"))}>⏮</button>
+                <button aria-label=${t("play_pause")} ?disabled=${playing ? !can(1) : !can(16384)} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${playing ? "⏸" : "▶"}</button>
+                <button aria-label=${t("next")} ?disabled=${!can(32)} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_next_track"))} @click=${press.key(() => call("media_next_track"))}>⏭</button>
                 <input
                   type="range"
                   min="0"
@@ -4678,6 +4682,10 @@ export class Fp3dView3d extends LitElement {
         color: var(--fp3d-text);
         cursor: pointer;
         font-size: 12px;
+      }
+      .fp3d-holo-media-controls button:disabled {
+        opacity: 0.3;
+        cursor: default;
       }
       .fp3d-holo-media-controls input[type="range"] {
         width: 70px;
