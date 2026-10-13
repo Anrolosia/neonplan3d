@@ -4,6 +4,24 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.17.2
+
+### New
+
+- **Air conditioner (wall)** item with a glow in the colour of its mode (heat red, cool blue, auto green, dry yellow, fan white).
+- **Cooktops glow** while they cook; operating-state sensors (`run` / `ready` / `inactive`) supported.
+- **Lamps in one colour only** (*Glow in one colour only*): a colour light used as a signal shows only that colour.
+- **Running from (watts):** own power threshold for appliances behind smart plugs (default 10 W).
+- **Roof windows in the room card** and sunlight through them (#482).
+
+### Changed
+
+- Roof windows fade out with the roof again; *Show over the room without the roof* keeps one over its room (#482).
+
+### Fixed
+
+- Echo speakers: play after pause works while the speaker still reports playing (#400).
+
 ## 1.17.1
 
 ### New

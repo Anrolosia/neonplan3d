@@ -183,13 +183,13 @@ const HISTORY = 100;
 /** Wall view side bar: what stands or hangs at a wall, by kind. */
 const WALL_CATS: Record<string, string[]> = {
   base: ["kitchen", "sink", "stove", "dishwasher", "sideboard", "dresser", "tv_board", "nightstand", "washbasin", "washer", "dryer", "worktop", "desk"],
-  hang: ["kitchen_wall", "tv_wall", "shelf", "lamp_wall", "radiator", "led_strip"],
+  hang: ["kitchen_wall", "tv_wall", "shelf", "lamp_wall", "radiator", "ac_unit", "led_strip"],
   tall: ["kitchen_tall", "fridge", "wardrobe", "tall_cabinet", "shelf", "coat_rack"],
   living: ["sofa", "armchair", "bed", "bunk_bed", "bench", "corner_bench", "plant"],
   light: ["lamp_wall", "lamp_floor", "led_strip", "lamp_table"],
 };
 /** Hanging pieces (they go into a gap high on the wall). */
-const HANGING = new Set(["kitchen_wall", "tv_wall", "lamp_wall", "shelf", "led_strip"]);
+const HANGING = new Set(["kitchen_wall", "tv_wall", "lamp_wall", "shelf", "led_strip", "ac_unit"]);
 /** Cabinets built to measure: in a gap they take its width. */
 const WALL_FIT = new Set(["kitchen", "kitchen_wall", "kitchen_tall", "sideboard", "dresser", "tv_board", "worktop", "wardrobe", "tall_cabinet", "shelf", "desk"]);
 /** The narrowest a fitted piece may become (a 29 cm desk is no desk). */
@@ -4455,7 +4455,7 @@ export class Fp3dEditor extends LitElement {
     const speakerish = /speaker|sound|subwoofer|receiver|smart_|display|tv|media|turntable|projector|console/;
     const fits = (t: string): boolean => {
       if (kind === "light") return isLamp(t);
-      if (kind === "climate") return t === "radiator";
+      if (kind === "climate") return t === "radiator" || t === "ac_unit";
       if (entityId.startsWith("vacuum.")) return isRobotVacuum(t);
       if (kind === "media") return hasScreen(t) || (isElectric(t) && speakerish.test(t));
       return isElectric(t) && !isLamp(t);
@@ -10434,7 +10434,7 @@ export class Fp3dEditor extends LitElement {
         : tvLike
           ? // a media player, or the smart plug an older TV is switched with
             /^(media_player|switch|input_boolean|light)\./.test(id)
-          : f.type === "radiator"
+          : f.type === "radiator" || f.type === "ac_unit"
             ? id.startsWith("climate.")
             : isRobotVacuum(f.type)
               ? id.startsWith("vacuum.")
@@ -10451,7 +10451,7 @@ export class Fp3dEditor extends LitElement {
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "radiator" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "radiator" || f.type === "ac_unit" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type) ? this.renderStateLinks(f) : nothing}
@@ -10460,6 +10460,18 @@ export class Fp3dEditor extends LitElement {
               <p class="fp3d-sub fp3d-wide">${this.t("furn_color_entity_hint")}</p>`
           : nothing}
         ${lamp ? this.glowScaleField(f.glow_scale, (v) => this.updateFurniture({ glow_scale: v })) : nothing}
+        ${lamp && f.entity && f.entity !== "none"
+          ? html`<label class="fp3d-check fp3d-wide" title=${this.t("furn_only_color_hint")}
+                ><input type="checkbox" .checked=${!!f.only_color} ?disabled=${!this.isAdmin} @change=${(ev: Event) => this.updateFurniture({ only_color: (ev.target as HTMLInputElement).checked ? "#ffd400" : null })} />
+                ${this.t("furn_only_color")}</label
+              >
+              ${f.only_color
+                ? html`<label class="fp3d-field"
+                      >${this.t("furn_only_color_pick")}
+                      <input type="color" .value=${f.only_color} ?disabled=${!this.isAdmin} @change=${(ev: Event) => this.updateFurniture({ only_color: (ev.target as HTMLInputElement).value })} /></label>
+                    <p class="fp3d-sub fp3d-wide">${this.t("furn_only_color_hint")}</p>`
+                : nothing}`
+          : nothing}
         ${lamp || f.type === "grid_point"
           ? nothing
           : this.entitySelect(
@@ -10469,6 +10481,23 @@ export class Fp3dEditor extends LitElement {
               power,
               (v) => this.updateFurniture({ power: v }),
             )}
+        ${!lamp && f.power && f.power !== "none" && !(ENERGY_DEVICES as readonly string[]).includes(f.type)
+          ? html`<label class="fp3d-field" title=${this.t("furn_run_w_hint")}
+              >${this.t("furn_run_w")}
+              <input
+                type="number"
+                min="1"
+                max="5000"
+                step="5"
+                placeholder="10"
+                .value=${f.run_w ? String(f.run_w) : ""}
+                ?disabled=${!this.isAdmin}
+                @change=${(ev: Event) => {
+                  const v = Number((ev.target as HTMLInputElement).value);
+                  this.updateFurniture({ run_w: v > 0 ? Math.min(5000, Math.round(v)) : null });
+                }}
+            /></label>`
+          : nothing}
         ${hasFeature("energy_pro") && !lamp && !["grid_point", "meter", "inverter", "home_battery"].includes(f.type)
           ? html`<label class="fp3d-check fp3d-wide" title=${this.t("furn_holo_hint")}
               ><input type="checkbox" .checked=${!!f.holo} ?disabled=${!this.isAdmin} @change=${(ev: Event) => this.updateFurniture({ holo: (ev.target as HTMLInputElement).checked })} />

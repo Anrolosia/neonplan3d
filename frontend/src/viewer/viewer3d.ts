@@ -248,7 +248,7 @@ export interface ScreenState {
   plain?: boolean;
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights"; color: [number, number, number]; level: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners"; color: [number, number, number]; level: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -2684,6 +2684,22 @@ export class FloorplanViewer {
               pushPackGlow(buf, model, f, base, col.getHex(), glassy);
               continue;
             }
+          }
+          if (face.part === "burners") {
+            // a cooktop's four zones glow on its top (where the built-in stove draws them)
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.25 + 0.6 * face.level))) as [number, number, number]);
+            const y = base + h + 0.008;
+            for (const [bx, bz, br] of [[-0.14, -0.13, 0.09], [0.14, -0.13, 0.07], [-0.14, 0.13, 0.07], [0.14, 0.13, 0.09]]) {
+              const cx = (bx * Math.abs(w)) / 0.6;
+              const cz = (bz * d) / 0.62;
+              const n = 14;
+              for (let i = 0; i < n; i++) {
+                const a0 = (i / n) * Math.PI * 2;
+                const a1 = ((i + 1) / n) * Math.PI * 2;
+                buf.tri(P(cx, y, cz), P(cx + Math.cos(a0) * br, y, cz + Math.sin(a0) * br), P(cx + Math.cos(a1) * br, y, cz + Math.sin(a1) * br), col);
+              }
+            }
+            continue;
           }
           if (face.part === "band" || face.part === "cabin") {
             // a light band around the item at mid height (a car's charge): four thin vertical strips;

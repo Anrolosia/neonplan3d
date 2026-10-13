@@ -26,6 +26,9 @@ import { carState, type CarState, roomClimateValue,
   floorControls,
   favoriteCall,
   runButton,
+  climateModeGlow,
+  cooktopLevel,
+  onlyColor,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
@@ -311,6 +314,11 @@ export class Fp3dView3d extends LitElement {
   private mediaGraceTimer: ReturnType<typeof setTimeout> | undefined;
   /** The volume being dragged (shown at once; the player answers later, a cloud speaker slowly). */
   private mediaVolume = new Map<string, { v: number; at: number }>();
+  /**
+   * Play or pause as last pressed, until the player reports it (an Echo answers late, #400): otherwise a second
+   * tap while it still says "playing" would send pause again instead of play.
+   */
+  private mediaIntent = new Map<string, { playing: boolean; at: number }>();
   /** Pool Pro: a target temperature just set, shown until the heat pump reports it (at most 30 s). */
   private poolTarget = new Map<string, { v: number; at: number }>();
   private volumeSent = 0;
@@ -1856,7 +1864,14 @@ export class Fp3dView3d extends LitElement {
       },
     };
     // play and pause by their own services: some players (an Echo through Alexa Media Player) ignore play_pause
-    const playPause = () => call(m.playing ? "media_pause" : "media_play");
+    const intent = this.mediaIntent.get(m.id);
+    if (intent && (intent.playing === m.playing || Date.now() - intent.at > 30000)) this.mediaIntent.delete(m.id);
+    const playing = this.mediaIntent.get(m.id)?.playing ?? m.playing;
+    const playPause = () => {
+      this.mediaIntent.set(m.id, { playing: !playing, at: Date.now() });
+      this.requestUpdate();
+      call(playing ? "media_pause" : "media_play");
+    };
     // the dragged volume shows at once and is sent while dragging (at most every 350 ms) and on release;
     // it stays until the player reports it (a cloud speaker like an Echo answers late), at most 30 s
     const local = this.mediaVolume.get(m.id);
@@ -1875,7 +1890,7 @@ export class Fp3dView3d extends LitElement {
       <div class="fp3d-holo-sheen"></div>
       <div class="fp3d-holo-scan"></div>
       <div class="fp3d-holo-body">
-        <div class="fp3d-holo-head" role="button" tabindex="0" @click=${toggle}><span>♪ ${card.name}</span><span class="fp3d-holo-live">${m.playing ? `● ${t("holo_media_playing")}` : t("holo_media_paused")}</span></div>
+        <div class="fp3d-holo-head" role="button" tabindex="0" @click=${toggle}><span>♪ ${card.name}</span><span class="fp3d-holo-live">${playing ? `● ${t("holo_media_playing")}` : t("holo_media_paused")}</span></div>
         <div class="fp3d-holo-track">
           ${m.picture ? html`<img class="fp3d-holo-cover" src=${m.picture} alt="" />` : html`<span class="fp3d-holo-cover fp3d-holo-cover-none">♪</span>`}
           <div class="fp3d-holo-titles"><b>${m.title}</b>${m.artist ? html`<span>${m.artist}</span>` : nothing}</div>
@@ -1883,7 +1898,7 @@ export class Fp3dView3d extends LitElement {
         ${open && !this.ro
           ? html`<div class="fp3d-holo-media-controls">
                 <button aria-label=${t("previous")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_previous_track"))} @click=${press.key(() => call("media_previous_track"))}>⏮</button>
-                <button aria-label=${t("play_pause")} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${m.playing ? "⏸" : "▶"}</button>
+                <button aria-label=${t("play_pause")} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${playing ? "⏸" : "▶"}</button>
                 <button aria-label=${t("next")} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_next_track"))} @click=${press.key(() => call("media_next_track"))}>⏭</button>
                 <input
                   type="range"
@@ -2196,7 +2211,9 @@ export class Fp3dView3d extends LitElement {
           consumerSensors.add(link.power);
           consumers.push({ id, powerEntity: link.power, floorId: floor.id, x: f.x, z: f.z, power: Math.max(0, power), wallbox: f.type === "wallbox" || undefined });
         }
-        const running = (power ?? 0) > 10 || st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st));
+        // an own threshold for appliances behind a smart plug that draw a few watts on standby (null: 10 W)
+        const runW = typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 10;
+        const running = (power ?? 0) > runW || st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st));
         // Auto Pro: the vehicle in the spot wears a light band in the colour of its charge (brighter while
         // charging) and a warm glow on top while the climate runs; the spot's pin tells charge and range
         if (car && parkedVehicle(hass, f)) {
@@ -2222,8 +2239,15 @@ export class Fp3dView3d extends LitElement {
             const gap = typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
             screens.set(f.id, { color: [1, 0.42, 0.1], level: Math.min(1, 0.45 + 0.25 * Math.max(0, gap)) });
           }
+        } else if (f.type === "ac_unit" && st && kindOf(st.entity_id) === "climate") {
+          const glow = climateModeGlow(st);
+          if (glow) screens.set(f.id, glow);
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
           screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
+        } else if (f.type === "stove") {
+          // the burners glow while it cooks (or draws power), faintly while it is ready
+          const level = cooktopLevel(st, running);
+          if (level > 0) screens.set(f.id, { color: [1, 0.32, 0.08], level, faces: [{ part: "burners", color: [1, 0.32, 0.08], level }] });
         }
         const packed = packItem(f.type);
         const ringed = !!packed && !packed.light && packed.parts.some((p) => p.glow);
@@ -2272,7 +2296,7 @@ export class Fp3dView3d extends LitElement {
                     : power !== null
                       ? formatPower(hass, Math.max(0, power))
                       : "",
-          active: car ? car.charging : st ? isActive(st) : (power ?? 0) > 5,
+          active: car ? car.charging : st ? isActive(st) : (power ?? 0) > (typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 5),
           unavailable: st ? isUnavailable(st) : false,
           glow: null,
           // its pin grabs the item when furnishing
@@ -2422,7 +2446,7 @@ export class Fp3dView3d extends LitElement {
    * hung on the wall.
    */
   private robotObstacles(floor: Building["floors"][number], room: [number, number][]): [number, number][][] {
-    const OPEN_BELOW = new Set(["rug", "worktop", "table", "table_round", "coffee_table", "chair", "office_chair", "stool", "bar_stool", "bench", "desk", "robot_vacuum", "parking", "stairwell", "radiator", "tv_wall", "kitchen_wall", "led_strip"]);
+    const OPEN_BELOW = new Set(["rug", "worktop", "table", "table_round", "coffee_table", "chair", "office_chair", "stool", "bar_stool", "bench", "desk", "robot_vacuum", "parking", "stairwell", "radiator", "ac_unit", "tv_wall", "kitchen_wall", "led_strip"]);
     return floor.furniture
       .filter((m) => {
         if (OPEN_BELOW.has(m.type) || (m.type.startsWith("lamp_") && m.type !== "lamp_floor" && m.type !== "lamp_uplight")) return false;
@@ -2597,7 +2621,7 @@ export class Fp3dView3d extends LitElement {
       text: st ? stateText(hass, st) : "",
       active: st ? isActive(st) : false,
       unavailable: st ? isUnavailable(st) : false,
-      glow: st ? scaleGlow(lightGlow(st, f.color_entity && f.color_entity !== "none" ? hass.states[f.color_entity] : undefined), f.glow_scale) : null,
+      glow: st ? scaleGlow(onlyColor(lightGlow(st, f.color_entity && f.color_entity !== "none" ? hass.states[f.color_entity] : undefined), f.only_color), f.glow_scale) : null,
       lamp: model,
       rotation: f.rotation,
       mirror: !!f.mirror,

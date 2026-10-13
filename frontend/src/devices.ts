@@ -327,7 +327,7 @@ export function isUnavailable(st: HassEntity | undefined): boolean {
 }
 
 /** States of a status sensor (a 3D printer, a washing machine's programme) that mean "it is working". */
-const WORKING_STATES = new Set(["running", "printing", "prepare", "preparing", "slicing", "heating", "busy", "working", "active", "washing", "rinsing", "spinning", "drying", "cleaning", "in_progress", "in progress", "on"]);
+const WORKING_STATES = new Set(["run", "cooking", "running", "printing", "prepare", "preparing", "slicing", "heating", "busy", "working", "active", "washing", "rinsing", "spinning", "drying", "cleaning", "in_progress", "in progress", "on"]);
 
 /** Whether an entity is a status sensor (enum states such as running / idle / finish) that furniture can follow. */
 export function isStatusSensor(st: HassEntity | undefined): boolean {
@@ -368,6 +368,56 @@ export function isActive(st: HassEntity | undefined): boolean {
     default:
       return false;
   }
+}
+
+/**
+ * A cooktop's operating state (Home Connect and others: "run" cooking, "ready" switched on, "inactive" off):
+ * the burners glow while it cooks, faintly while it is ready, not at all when it is off.
+ */
+export function cooktopLevel(st: HassEntity | undefined, running: boolean): number {
+  if (!st || isUnavailable(st)) return running ? 1 : 0;
+  const s = String(st.state).toLowerCase();
+  if (running || s === "run" || s === "cooking" || s === "on") return 1;
+  if (s === "ready" || s === "standby" || s === "pause" || s === "paused") return 0.3;
+  return 0;
+}
+
+/**
+ * An air conditioner by its mode: red heating, blue cooling, green automatic, yellow drying, white fan only –
+ * bright while it works (hvac_action), dimmer while it only stands by in that mode; null when off.
+ */
+export function climateModeGlow(st: HassEntity | undefined): { color: [number, number, number]; level: number } | null {
+  if (!st || isUnavailable(st)) return null;
+  const mode = String(st.state).toLowerCase();
+  if (mode === "off") return null;
+  const action = String(st.attributes.hvac_action ?? "").toLowerCase();
+  const color: [number, number, number] =
+    mode === "heat" ? [1, 0.32, 0.12] : mode === "cool" ? [0.3, 0.65, 1] : mode === "dry" ? [1, 0.85, 0.3] : mode === "fan_only" ? [0.85, 0.92, 1] : [0.3, 1, 0.5];
+  const working = ["heating", "cooling", "drying", "fan"].includes(action);
+  return { color, level: working || !action ? 1 : 0.45 };
+}
+
+/**
+ * A lamp that only shows one colour of its light (#mail 10.10.): the glow stays when the light's colour is close to
+ * the chosen one (hue within 30°, both clearly coloured), else the lamp stays dark.
+ */
+export function onlyColor<T extends { color: [number, number, number] }>(glow: T | null, hex: string | null | undefined): T | null {
+  if (!glow || !hex || !/^#[0-9a-f]{6}$/i.test(hex)) return glow;
+  const want = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+  const hs = (c: readonly number[]): [number, number] => {
+    const max = Math.max(...c);
+    const min = Math.min(...c);
+    const d = max - min;
+    if (max <= 0 || d / max < 0.25) return [-1, 0];
+    const h = max === c[0] ? ((c[1] - c[2]) / d + 6) % 6 : max === c[1] ? (c[2] - c[0]) / d + 2 : (c[0] - c[1]) / d + 4;
+    return [h * 60, d / max];
+  };
+  const [hw] = hs(want);
+  const [hl] = hs(glow.color);
+  // a white (unsaturated) choice matches a white light, a colour only a colour
+  if (hw < 0 || hl < 0) return hw < 0 && hl < 0 ? glow : null;
+  const diff = Math.abs(hw - hl);
+  return Math.min(diff, 360 - diff) <= 30 ? glow : null;
 }
 
 /** Colour (0..1 channels) and level (0..1) of a light that is on; null when off. */
@@ -739,6 +789,7 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   island: /(kochfeld|herd|induktion|cooktop)/i,
   sink: /(spülmaschine|geschirrspül|dishwasher)/i,
   radiator: /(heiz|radiator|thermostat|climate|hk|trv)/i,
+  ac_unit: /(klima|air ?con|aircon|airco|split|\bac\b|clim)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -853,7 +904,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
           // vacuums are no device kind of their own: look them up in the room's area directly
           const area = room?.area_id ?? null;
           entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && entityAreaId(hass, id) === area) ?? null;
-        } else if (f.type === "radiator") {
+        } else if (f.type === "radiator" || f.type === "ac_unit") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
         } else if (isMediaFurniture(f.type)) {
