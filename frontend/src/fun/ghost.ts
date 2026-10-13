@@ -21,9 +21,9 @@ export interface GhostController {
 }
 
 const SPEED = 0.9;
-const HEIGHT = 1.25;
-/** About a metre tall: big enough to spot in the house view. */
-const SIZE = 2.6;
+const HEIGHT = 1.0;
+/** About 80 cm tall: still easy to spot in the house view. */
+const SIZE = 2.0;
 const FADE = 0.8;
 
 /** A body of revolution from (radius, height) rings; `wave` ripples the lowest ring (the ghost's hem). */
