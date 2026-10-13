@@ -1,7 +1,7 @@
 // The "Extensions" page of the panel: the shop connection, the Pro add-ons and the installed packs.
 // It lives in the editor bundle (loaded with it) and is shown to admins only.
 
-import { css, html, LitElement, nothing } from "lit";
+import { css, html, LitElement, nothing, type PropertyValues } from "lit";
 import {
   activateLicense,
   getLicense,
@@ -232,6 +232,14 @@ export class Extensions extends LitElement {
             </div>`,
       )}
     </section>`;
+  }
+
+  protected updated(changed: PropertyValues): void {
+    // the tab's badge follows what is left to install or update here (after an install it goes down)
+    if (changed.has("_license") && this._license?.active) {
+      const ready = (this._license.packs ?? []).filter((p) => p.installed === null || p.installed < p.release).length;
+      this.dispatchEvent(new CustomEvent("packs-ready", { detail: ready, bubbles: true, composed: true }));
+    }
   }
 
   private async loadLicense(): Promise<void> {

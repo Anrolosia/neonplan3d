@@ -54,6 +54,7 @@ export class Floorplan3dPanel extends LitElement {
     panel: { attribute: false },
     _mode: { state: true },
     _newOffers: { state: true },
+    _readyPacks: { state: true },
     _editorReady: { state: true },
     _floorId: { state: true },
     _roomId: { state: true },
@@ -88,6 +89,8 @@ export class Floorplan3dPanel extends LitElement {
   private declare _mode: Mode;
   /** Shop offers not seen yet (a dot on the extensions tab). */
   private declare _newOffers: number;
+  /** Bought packs waiting here: updates and packs not installed yet (a gift such as a fun pack too). */
+  private declare _readyPacks: number;
   private offersChecked = false;
   /** The editor bundle is loaded (it is fetched the first time the editor opens). */
   private declare _editorReady: boolean;
@@ -136,6 +139,7 @@ export class Floorplan3dPanel extends LitElement {
     this.narrow = false;
     this._mode = "view";
     this._newOffers = 0;
+    this._readyPacks = 0;
     this._editorReady = !!customElements.get("fp3d-editor");
     this._floorId = null;
     this._roomId = null;
@@ -470,7 +474,10 @@ export class Floorplan3dPanel extends LitElement {
     if (this.offersChecked || !this.hass?.user?.is_admin) return;
     this.offersChecked = true;
     getLicense(this.hass)
-      .then((lic) => (this._newOffers = lic.active ? unseenOffers(lic.offers ?? []).length + unseenUpdates(lic.updates ?? []).length : 0))
+      .then((lic) => {
+        this._newOffers = lic.active ? unseenOffers(lic.offers ?? []).length : 0;
+        this._readyPacks = lic.active ? unseenUpdates(lic.updates ?? []).length + (lic.packs ?? []).filter((p) => p.installed === null).length : 0;
+      })
       .catch(() => undefined);
   }
 
@@ -494,8 +501,12 @@ export class Floorplan3dPanel extends LitElement {
             ? html`<div class="fp3d-seg" role="tablist">
                 <button role="tab" aria-pressed=${this._mode === "view"} @click=${() => this.setMode("view")}>${this.t("view")}</button>
                 <button role="tab" aria-pressed=${this._mode === "editor"} @click=${() => this.setMode("editor")}>${this.t("editor")}</button>
-                <button role="tab" class="fp3d-tab-ext" aria-pressed=${this._mode === "extensions"} @click=${() => this.setMode("extensions")} title=${this._newOffers ? this.t("offers_dot") : ""}>
-                  ✦ ${this.t("ext_tab")}${this._newOffers ? html`<span class="fp3d-dot" aria-label=${this.t("offers_dot")}></span>` : nothing}
+                <button role="tab" class="fp3d-tab-ext" aria-pressed=${this._mode === "extensions"} @click=${() => this.setMode("extensions")}>
+                  ✦ ${this.t("ext_tab")}${this._readyPacks
+                    ? html`<span class="fp3d-badge" title=${this.t("ext_badge_ready_hint")}>⬇ ${this.t("ext_badge_ready", { n: this._readyPacks })}</span>`
+                    : this._newOffers
+                      ? html`<span class="fp3d-badge" title=${this.t("offers_dot")}>${this.t("ext_badge_new", { n: this._newOffers })}</span>`
+                      : nothing}
                 </button>
               </div>`
             : nothing}
@@ -675,6 +686,7 @@ export class Floorplan3dPanel extends LitElement {
       @building-edit=${(e: CustomEvent<Building>) => this.data.edit(e.detail)}
       @packs-changed=${() => void this.data.reloadPacks()}
       @offers-seen=${() => (this._newOffers = 0)}
+      @packs-ready=${(e: CustomEvent<number>) => (this._readyPacks = e.detail)}
     ></fp3d-extensions>`;
   }
 
@@ -955,15 +967,28 @@ export class Floorplan3dPanel extends LitElement {
     tokens,
     controls,
     css`
-      .fp3d-dot {
+      .fp3d-badge {
         display: inline-block;
-        width: 8px;
-        height: 8px;
         margin-left: 6px;
-        border-radius: 50%;
+        padding: 1px 8px;
+        border-radius: 999px;
         background: #ffb547;
-        box-shadow: 0 0 8px #ffb547;
+        color: #1a1204;
+        font-size: 0.78em;
+        font-weight: 700;
+        line-height: 1.5;
+        box-shadow: 0 0 10px rgba(255, 181, 71, 0.7);
         vertical-align: middle;
+        white-space: nowrap;
+        animation: fp3d-badge-in 1.6s ease-out 2;
+      }
+      @keyframes fp3d-badge-in {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 181, 71, 0.9);
+        }
+        100% {
+          box-shadow: 0 0 0 10px rgba(255, 181, 71, 0);
+        }
       }
       :host {
         display: block;
