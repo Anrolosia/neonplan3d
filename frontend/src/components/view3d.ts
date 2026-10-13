@@ -2247,7 +2247,7 @@ export class Fp3dView3d extends LitElement {
         } else if (f.type === "stove" || isPackCooktop(f.type)) {
           // the burners glow while it cooks (or draws power), faintly while it is ready
           const level = cooktopLevel(st, running);
-          if (level > 0) screens.set(f.id, { color: [1, 0.16, 0.03], level, faces: [{ part: "burners", color: [1, 0.16, 0.03], level }] });
+          if (level > 0) screens.set(f.id, { color: [1, 0.05, 0.01], level, faces: [{ part: "burners", color: [1, 0.05, 0.01], level }] });
         }
         const packed = packItem(f.type);
         const ringed = !!packed && !packed.light && packed.parts.some((p) => p.glow);
