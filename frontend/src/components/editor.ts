@@ -270,6 +270,7 @@ export class Fp3dEditor extends LitElement {
     _backupBusy: { state: true },
     _wall3d: { state: true },
     _sidePinned: { state: true },
+    _sideMin: { state: true },
     _sideOpen: { state: true },
     _floorId: { state: true },
     _roomId: { state: true },
@@ -370,6 +371,8 @@ export class Fp3dEditor extends LitElement {
   private declare _wall3d: WallMode;
   /** Sidebar beside the 3D pane: pinned open always, or folded to a strip while nothing is selected. */
   private declare _sidePinned: boolean;
+  /** The sidebar folded to a narrow strip beside the plan (more room to move furniture); remembered per browser. */
+  private declare _sideMin: boolean;
   private declare _sideOpen: boolean;
   private declare _floorId: string | null;
   private declare _roomId: string | null;
@@ -682,6 +685,13 @@ export class Fp3dEditor extends LitElement {
       // no storage
     }
     this._sidePinned = pinned;
+    let min = false;
+    try {
+      min = localStorage.getItem("neonplan3d.sideMin") === "1";
+    } catch {
+      // no storage
+    }
+    this._sideMin = min;
     this._preview = null;
     this._measureLen = 3;
     this._packages = false;
@@ -5256,23 +5266,16 @@ export class Fp3dEditor extends LitElement {
       <div class="fp3d-seg fp3d-seg-menu">
         <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
         <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
+        <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => (close(), (this._viewMenu = false), this.toggleSplit())}>${this.t("split_3d")}</button>
         <div class="fp3d-menu-wrap">
           <button aria-haspopup="menu" aria-expanded=${this._viewMenu} @click=${() => ((this._viewMenu = !this._viewMenu), close())}>${this.t("view_menu")} <span class="fp3d-caret">▾</span></button>
           ${this._viewMenu
             ? html`<div class="fp3d-menu-veil" @click=${() => (this._viewMenu = false)}></div>
                 <div class="fp3d-menu fp3d-menu-right" role="menu">
                   <button role="menuitem" class="fp3d-menu-item" @click=${() => ((this._viewMenu = false), this.fit())}>${this.t("fit")}</button>
-                  <button role="menuitem" class="fp3d-menu-item ${this._split ? "fp3d-menu-on" : ""}" title=${this.t("split_3d_hint")} @click=${() => ((this._viewMenu = false), this.toggleSplit())}>
-                    ${this.t("split_3d")}<span class="fp3d-menu-more">${this._split ? "✓" : ""}</span>
-                  </button>
                   <button role="menuitem" class="fp3d-menu-item ${this._wallPick ? "fp3d-menu-on" : ""}" title=${this.t("wall_view_open")} @click=${(e: Event) => ((this._viewMenu = false), this.toggleWallPick(e.currentTarget as HTMLElement))}>
                     ${this.t("wall_view")}
                   </button>
-                  ${admin
-                    ? html`<button role="menuitem" class="fp3d-menu-item ${this._doc.settings.lock_plan ? "fp3d-menu-on" : ""}" title=${this.t("lock_plan_hint")} @click=${() => ((this._viewMenu = false), this.toggleLockPlan())}>
-                        ${this.t("lock_plan")}<span class="fp3d-menu-more">${this._doc.settings.lock_plan ? "✓" : ""}</span>
-                      </button>`
-                    : nothing}
                 </div>`
             : nothing}
         </div>
@@ -9436,21 +9439,36 @@ export class Fp3dEditor extends LitElement {
     }
   }
 
-  /** The sidebar: always beside the plan, or, next to the 3D pane, folded to a strip while idle. */
+  /** Fold the sidebar to its strip, or unfold it (beside the 3D pane: over the pane, while needed). */
+  private setSideFolded(folded: boolean): void {
+    if (this._split && !this._sidePinned) {
+      this._sideOpen = !folded;
+      return;
+    }
+    this._sideMin = folded;
+    try {
+      localStorage.setItem("neonplan3d.sideMin", folded ? "1" : "0");
+    } catch {
+      // no storage
+    }
+  }
+
+  /**
+   * The sidebar: beside the plan, folded to a narrow strip on request (more room for the plan); next to the 3D pane
+   * and not pinned, folded while idle and opened over the pane.
+   */
   private renderAside(floor: Floor | undefined) {
     const folding = this._split && !this._sidePinned && !this.narrow;
-    if (!folding) return html`<aside class="fp3d-side">${this.renderPinRow()}${this.renderSide(floor)}</aside>`;
-    const open = this._sideOpen;
-    if (!open) {
+    const folded = !this.narrow && (folding ? !this._sideOpen : this._sideMin);
+    if (folded) {
       return html`<aside class="fp3d-side fp3d-side-strip">
-        <button class="fp3d-strip-btn" title=${this.t("side_open")} @click=${() => (this._sideOpen = true)}>☰</button>
-        ${this._furnitureId || this._deviceId || this._openingId
-          ? html`<button class="fp3d-strip-btn fp3d-strip-hot" title=${this.t("side_details")} @click=${() => (this._sideOpen = true)}>⚙</button>`
+        <button class="fp3d-strip-btn" title=${this.t("side_open")} @click=${() => this.setSideFolded(false)}>‹</button>
+        ${this._furnitureId || this._deviceId || this._openingId || this._roomId
+          ? html`<button class="fp3d-strip-btn fp3d-strip-hot" title=${this.t("side_details")} @click=${() => this.setSideFolded(false)}>⚙</button>`
           : nothing}
-        <button class="fp3d-strip-btn" title=${this.t("tool_furniture")} @click=${() => ((this._tool = "furniture"), (this._draft = []), (this._sideOpen = true))}>🛋</button>
-        <button class="fp3d-strip-btn" title=${this.t("tool_opening")} @click=${() => ((this._tool = "opening"), (this._draft = []), (this._sideOpen = true))}>🚪</button>
       </aside>`;
     }
+    if (!folding) return html`<aside class="fp3d-side">${this.renderPinRow()}${this.renderSide(floor)}</aside>`;
     // open over the 3D pane, so the pane keeps its size
     return html`<aside class="fp3d-side fp3d-side-strip"></aside>
       <aside class="fp3d-side fp3d-side-overlay">
@@ -9459,10 +9477,12 @@ export class Fp3dEditor extends LitElement {
       </aside>`;
   }
 
-  private renderPinRow(overlay = false) {
-    if (!this._split || this.narrow) return nothing;
+  private renderPinRow(_overlay = false) {
+    if (this.narrow) return nothing;
+    const fold = html`<button class="fp3d-btn" title=${this.t("side_fold_hint")} @click=${() => this.setSideFolded(true)}>${this.t("side_close")} ›</button>`;
+    if (!this._split) return html`<div class="fp3d-pin-row">${fold}</div>`;
     return html`<div class="fp3d-pin-row">
-      ${overlay ? html`<button class="fp3d-btn" @click=${() => (this._sideOpen = false)}>${this.t("side_close")}</button>` : nothing}
+      ${fold}
       <button class="fp3d-btn" aria-pressed=${this._sidePinned} title=${this.t("side_pin_hint")} @click=${() => this.setSidePinned(!this._sidePinned)}>
         📌 ${this.t(this._sidePinned ? "side_pinned" : "side_pin")}
       </button>
@@ -9509,6 +9529,11 @@ export class Fp3dEditor extends LitElement {
       <section>
         <h3>${floor ? this.t("floor_settings_of", { floor: floor.name }) : this.t("floors")}</h3>
         ${floors.length ? nothing : html`<p class="fp3d-sub">${this.t("floor_none_hint")}</p>`}
+        ${admin && floor
+          ? html`<button class="fp3d-btn" aria-pressed=${!!this._doc.settings.lock_plan} title=${this.t("lock_plan_hint")} @click=${() => this.toggleLockPlan()}>
+              ${this.t(this._doc.settings.lock_plan ? "plan_unlock" : "plan_lock")}
+            </button>`
+          : nothing}
         ${floor
           ? html`<div class="fp3d-form">
               <label class="fp3d-field fp3d-wide"
