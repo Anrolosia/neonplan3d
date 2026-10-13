@@ -60,7 +60,7 @@ export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
 export const funLib = { Group, Mesh, MeshBasicMaterial, CanvasTexture, Color, PlaneGeometry, BufferGeometry: Geometry, Float32BufferAttribute, DoubleSide };
 
 export type { PipeTube };
-import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
+import { isCooktopZone, mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
 import { buildRoof, type RoofWindowState } from "./roof.ts";
 import { GROUND, groundFace, groundFloor, roofFaces, roofWindowRoom, wallFaces } from "../solar.ts";
@@ -2684,6 +2684,13 @@ export class FloorplanViewer {
               pushPackGlow(buf, model, f, base, col.getHex(), glassy);
               continue;
             }
+          }
+          if (face.part === "burners" && packItem(f.type)) {
+            // a pack cooktop: its own zones (thin discs on its top) glow
+            const model = packItem(f.type)!;
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.25 + 0.6 * face.level))) as [number, number, number]);
+            pushPackGlow(buf, model, f, base, col.getHex(), isCooktopZone);
+            continue;
           }
           if (face.part === "burners") {
             // a cooktop's four zones glow on its top (where the built-in stove draws them)
