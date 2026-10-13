@@ -187,6 +187,7 @@ export class Fp3dView3d extends LitElement {
     _walk: { state: true },
     walkable: { attribute: false },
     petsOn: { attribute: false },
+    ghostOn: { attribute: false },
     _central: { state: true },
     _thumbsCompact: { state: true },
     _armed: { state: true },
@@ -402,6 +403,8 @@ export class Fp3dView3d extends LitElement {
   declare walkable: boolean;
   /** The card can leave the pets out (card option "pets: false"); the panel always shows them. */
   declare petsOn: boolean;
+  /** The card can leave the Halloween ghost out (card option "ghost: false"). */
+  declare ghostOn: boolean;
   /** The walk: the room one stands in (null between rooms), or false when not walking. */
   private declare _walk: { room: string | null; hint: boolean } | false;
   private walker: { dispose(): void; setStick(v: { x: number; y: number } | null): void } | null = null;
@@ -409,6 +412,9 @@ export class Fp3dView3d extends LitElement {
   private pets: { update(b: Building, pets: readonly Pet[]): void; dispose(): void } | null = null;
   private petsFor: Building | null = null;
   private petsLoading = false;
+  /** Fun pack "Halloween": the ghost floating through the house now and then. */
+  private ghost: { update(b: Building): void; dispose(): void } | null = null;
+  private ghostLoading = false;
   private walkKeys: ((e: KeyboardEvent) => void) | null = null;
   /** The outline of the room one walks in (its glass cards show). */
   private walkRoomPts: [number, number][] | null = null;
@@ -495,6 +501,7 @@ export class Fp3dView3d extends LitElement {
     this.central = true;
     this.walkable = true;
     this.petsOn = true;
+    this.ghostOn = true;
     this._walk = false;
     this.buttons = null;
     this._thumbs = [];
@@ -544,6 +551,8 @@ export class Fp3dView3d extends LitElement {
     this.pets?.dispose();
     this.pets = null;
     this.petsFor = null;
+    this.ghost?.dispose();
+    this.ghost = null;
     this.unlistenReplay?.();
     this.unlistenReplay = null;
     this.unwatchDiag?.();
@@ -655,6 +664,7 @@ export class Fp3dView3d extends LitElement {
       this.scheduleThumbs();
       this.syncDevices(true);
       void this.syncPets();
+      void this.syncGhost();
       this.viewer.setFloor(this.floorId, false);
       if (this.roomId) this.viewer.selectRoom(this.roomId);
     } catch (err) {
@@ -699,6 +709,7 @@ export class Fp3dView3d extends LitElement {
       if (startChanged && this.floorId === null) v.resetView();
     }
     if (changed.has("building") || changed.has("packs") || changed.has("petsOn")) void this.syncPets();
+    if (changed.has("building") || changed.has("packs") || changed.has("ghostOn")) void this.syncGhost();
     if (changed.has("startView") && changed.get("startView") !== undefined) {
       v.setStartView(this.startViewOf());
       if (this.floorId === null) v.resetView();
@@ -2890,6 +2901,37 @@ export class Fp3dView3d extends LitElement {
       console.error("NeonPlan 3D: the pets failed to load", err);
     } finally {
       this.petsLoading = false;
+    }
+  }
+
+  /** Fun pack "Halloween": while it is unlocked and the ghost switched on, it floats through the house now and then. */
+  private async syncGhost(): Promise<void> {
+    const b = this.building;
+    const on = !!b && hasFeature("fun_halloween") && b.settings.halloween?.ghost !== false && this.ghostOn !== false;
+    if (!this.viewer || !on) {
+      this.ghost?.dispose();
+      this.ghost = null;
+      return;
+    }
+    if (this.ghost) {
+      this.ghost.update(b);
+      return;
+    }
+    if (this.ghostLoading) return;
+    this.ghostLoading = true;
+    try {
+      const [fun, mod] = await Promise.all([loadFun(), load3d()]);
+      if (!this.viewer || this.ghost || !this.building) return;
+      this.ghost = fun.startGhost({
+        lib: mod.funLib,
+        viewer: this.viewer as never,
+        building: this.building,
+        night: () => this.hass?.states["sun.sun"]?.state === "below_horizon",
+      });
+    } catch (err) {
+      console.error("NeonPlan 3D: the ghost failed to load", err);
+    } finally {
+      this.ghostLoading = false;
     }
   }
 

@@ -4,7 +4,7 @@
  */
 import { getPacks } from "./packs.ts";
 
-export type Feature = "camera_cockpit" | "weather" | "screens" | "energy_pro" | "sound" | "auto_pro" | "time_travel" | "pool" | "fridge_smart" | "fun_pets";
+export type Feature = "camera_cockpit" | "weather" | "screens" | "energy_pro" | "sound" | "auto_pro" | "time_travel" | "pool" | "fridge_smart" | "fun_pets" | "fun_halloween";
 
 /** The add-ons shown on the extensions page (sold in the shop). */
 export const FEATURES: readonly Feature[] = ["camera_cockpit", "weather", "screens", "energy_pro", "sound", "auto_pro", "time_travel", "pool"];
@@ -12,7 +12,7 @@ export const FEATURES: readonly Feature[] = ["camera_cockpit", "weather", "scree
  * Fun packs: free extras (0 €, anyone may give what they like) picked up in the shop by customers – not Pro add-ons,
  * shown in their own section of the extensions page and switched on and off there.
  */
-export const FUN: readonly Feature[] = ["fun_pets"];
+export const FUN: readonly Feature[] = ["fun_pets", "fun_halloween"];
 /** Free features built but not released yet (no pack unlocks them; only the lab switch shows them). */
 export type FreeFeature = "diagnostics";
 export type Gated = Feature | FreeFeature;
@@ -22,7 +22,7 @@ export type Gated = Feature | FreeFeature;
  * unlocked (the tester has the pack) or the lab switch is on (localStorage "neonplan3d.lab" = "1").
  * A release takes a feature off this list.
  */
-export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics"];
+export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics", "fun_halloween"];
 
 export function labOn(): boolean {
   try {
