@@ -5265,8 +5265,8 @@ export class Fp3dEditor extends LitElement {
         ${plain("furniture", this.t("tool_furniture"))} ${plain("energy", this.t("tool_energy"))}
       </div>
       <div class="fp3d-seg fp3d-seg-menu">
-        <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
-        <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
+        <button class="fp3d-undo" ?disabled=${!this._canUndo} @click=${() => this.undo()} title=${`${this.t("undo")} (Ctrl+Z)`} aria-label=${this.t("undo")}>↶</button>
+        <button class="fp3d-undo" ?disabled=${!this._canRedo} @click=${() => this.redo()} title=${`${this.t("redo")} (Ctrl+Y)`} aria-label=${this.t("redo")}>↷</button>
       </div>
       <div class="fp3d-seg fp3d-seg-menu">
         <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => (close(), this.toggleSplit())}>${this.t("split_3d")}</button>
@@ -11906,7 +11906,8 @@ export class Fp3dEditor extends LitElement {
         right: 0;
         bottom: 0;
         width: min(340px, 60%);
-        z-index: 8;
+        /* open over the 3D pane: above the toolbar too, so its buttons never sit on the sidebar's */
+        z-index: 30;
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45);
       }
       .fp3d-pin-row {
@@ -11944,6 +11945,8 @@ export class Fp3dEditor extends LitElement {
         height: auto;
       }
       .fp3d-main {
+        /* nothing of the plan column reaches over the sidebar (its menus still hang down) */
+        overflow-x: clip;
         display: grid;
         grid-template-rows: auto 1fr;
         /* the column never grows with a wide toolbar (that would push the plan under the sidebar) */
@@ -13377,6 +13380,14 @@ export class Fp3dEditor extends LitElement {
       /* a group with a menu lets it hang out below (the others scroll sideways on a narrow screen) */
       .fp3d-seg.fp3d-seg-menu {
         overflow: visible;
+        /* too narrow for a group: its buttons wrap (they never reach over the sidebar) */
+        flex-wrap: wrap;
+        max-width: 100%;
+      }
+      .fp3d-seg > button.fp3d-undo {
+        font-size: 20px;
+        line-height: 1;
+        padding-inline: 12px;
       }
       .fp3d-menu-wrap {
         position: relative;
