@@ -690,7 +690,7 @@ SETTINGS_SCHEMA = vol.Schema(
         vol.Optional("outage_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # sunlight through the windows as patches on the floor
         vol.Optional("sun_patches", default=True): bool,
-        # the ground around the house: height, a hillside slope and the earth around cellars
+        # the ground around the house: its height and the earth around cellars
         vol.Optional("terrain", default=None): vol.Any(
             None,
             vol.Schema(
@@ -698,10 +698,6 @@ SETTINGS_SCHEMA = vol.Schema(
                     vol.Optional("level", default=None): vol.Any(
                         None, vol.All(vol.Coerce(float), vol.Range(min=-20, max=20))
                     ),
-                    vol.Optional("slope", default=None): vol.Any(
-                        None, vol.All(vol.Coerce(float), vol.Range(min=0, max=30))
-                    ),
-                    vol.Optional("slope_dir", default=None): vol.Any(None, vol.In(["x", "-x", "z", "-z"])),
                     vol.Optional("earth", default=True): bool,
                 },
                 extra=vol.ALLOW_EXTRA,

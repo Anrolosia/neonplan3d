@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { areaGround, emptyBuilding, groundDrop, groundLevel, newFloor, setTerrain, terrainAt, type Building, type Opening, type Room } from "../model.ts";
+import { emptyBuilding, groundLevel, newFloor, setTerrain, terrainAt, type Building, type Opening, type Room } from "../model.ts";
 import { buildFloorGeometry } from "./build.ts";
 import { buildEarth, inGround } from "./earth.ts";
 
@@ -28,14 +28,6 @@ test("without a ground of its own the plan keeps its lawn 0.2 m under the ground
   assert.equal(groundLevel(b.floors[0]), -0.2);
 });
 
-test("a hillside: the ground falls across the house and goes on beyond it", () => {
-  house({ level: -0.5, slope: 2, slope_dir: "z" });
-  assert.equal(terrainAt(5, 0), -0.5);
-  assert.equal(terrainAt(5, 8), -2.5);
-  assert.equal(terrainAt(5, 4), -1.5);
-  assert.equal(terrainAt(5, 12), -3.5);
-});
-
 test("a cellar sits in the earth, the ground floor above it does not", () => {
   const b = house();
   assert.ok(inGround(b, b.floors[0]));
@@ -58,22 +50,7 @@ test("a cellar window below the ground gets a light well, one above the ground d
   assert.equal(earthOf(half, 0)!.wells.count, 0);
 });
 
-test("on a hillside a lawn follows the ground, a pool and a terrace stay level at the ground under their middle", () => {
-  const b = house({ level: -0.2, slope: 2, slope_dir: "z" });
-  const eg = b.floors[1];
-  const area = (type: "lawn" | "pool" | "terrace") => ({ id: type, type, points: [[0, 10], [10, 10], [10, 14], [0, 14]] as [number, number][] });
-  const lawn = area("lawn");
-  // the lawn falls with the ground: 0.25 m per metre across the 8 m deep house
-  assert.equal(groundDrop(eg, lawn as never, 5, 10) - groundDrop(eg, lawn as never, 5, 14), -1);
-  for (const t of ["pool", "terrace"] as const) {
-    const a = area(t);
-    assert.equal(groundDrop(eg, a as never, 5, 10), groundDrop(eg, a as never, 5, 14));
-    // its middle (z = 12) lies 3 m down the hillside
-    assert.equal(areaGround(eg, a as never), -0.2 - 3);
-  }
-});
-
-test("a house on a hillside stands on a plinth on its downhill side; on a flat plot it gets none", () => {
+test("a raised house (the ground lower, no cellar) stands on a plinth; on a flat plot it gets none", () => {
   const flat = house();
   flat.floors = [flat.floors[1]];
   setTerrain(flat);
@@ -82,7 +59,7 @@ test("a house on a hillside stands on a plinth on its downhill side; on a flat p
     return buildEarth(b, f, buildFloorGeometry(f, b.settings.wall_exterior, b.settings.wall_interior).openings, true);
   };
   assert.equal(eg(flat), null);
-  const hill = house({ level: -0.2, slope: 1.5, slope_dir: "z" });
+  const hill = house({ level: -1.0 });
   hill.floors = [hill.floors[1]];
   setTerrain(hill);
   assert.ok(eg(hill)!.earth.count > 0);

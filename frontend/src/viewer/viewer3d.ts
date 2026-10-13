@@ -1891,7 +1891,7 @@ export class FloorplanViewer {
       // pool water after the basin, see-through
       const waterMesh = new Mesh(geo.water, materials.water);
       waterMesh.renderOrder = 4;
-      // a cellar, a semi-basement, the uphill side of a house on a hillside: the earth around it (never tapped)
+      // a cellar, a semi-basement: the earth around it (never tapped)
       const lowestWithRooms = Math.min(...b.floors.filter((f) => f.rooms.length).map((f) => f.elevation));
       const earthGeo = buildEarth(b, floor, geo.openings, floor.elevation === lowestWithRooms);
       const earthParts = earthGeo

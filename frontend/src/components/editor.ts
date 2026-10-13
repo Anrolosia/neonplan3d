@@ -11604,21 +11604,14 @@ export class Fp3dEditor extends LitElement {
       <p class="fp3d-sub">${this.t("terrain_hint")}</p>
       <div class="fp3d-form">
         ${this.len(this.t("terrain_level"), t.level ?? -0.2, (v) => set({ level: Math.max(-20, Math.min(20, v)) }), 0.05)}
-        ${this.len(this.t("terrain_slope"), t.slope ?? 0, (v) => set({ slope: Math.max(0, Math.min(30, v)) || null }), 0.05, 0)}
-        <label class="fp3d-field"
-          >${this.t("outdoor_slope_dir")}
-          <select ?disabled=${!t.slope} @change=${(e: Event) => set({ slope_dir: (e.target as HTMLSelectElement).value as SlopeDir })}>
-            ${SLOPE_DIRS.map((d) => html`<option value=${d} ?selected=${d === (t.slope_dir ?? "x")}>${this.t(`slope_${d.replace("-", "n")}` as I18nKey)}</option>`)}
-          </select></label
-        >
         <label class="fp3d-check fp3d-wide" title=${this.t("terrain_earth_hint")}
           ><input type="checkbox" .checked=${t.earth !== false} @change=${(ev: Event) => set({ earth: (ev.target as HTMLInputElement).checked })} />
           ${this.t("terrain_earth")}</label
         >
       </div>
       <p class="fp3d-sub">${this.t(low ? "terrain_cellar_hint" : "terrain_no_cellar_hint")}</p>
-      ${t.level != null || t.slope
-        ? html`<div class="fp3d-actions"><button class="fp3d-btn" @click=${() => set({ level: null, slope: null, slope_dir: null })}>${this.t("terrain_reset")}</button></div>`
+      ${t.level != null
+        ? html`<div class="fp3d-actions"><button class="fp3d-btn" @click=${() => set({ level: null })}>${this.t("terrain_reset")}</button></div>`
         : nothing}
     </details>`;
   }

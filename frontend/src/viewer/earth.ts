@@ -1,5 +1,5 @@
 // The earth around the parts of a floor below the ground: a cellar sits in the ground, a semi-basement half in
-// it, a house on a hillside on its uphill side. Cellar windows below the ground get a light well in front.
+// it. Cellar windows below the ground get a light well in front.
 
 import { Color } from "three";
 import type { Building, Floor, Vec2 } from "../model.ts";
@@ -14,7 +14,7 @@ const WELL = new Color(0x1b2638);
 const WELL_LOW = new Color(0x111a28);
 const GROUND_LINE = new Color(0x3f86b8);
 const GRATE = new Color(0x5b7a99);
-// the plinth a house stands on where the ground falls away under it (the downhill side of a hillside)
+// the plinth a house stands on where the ground lies below its lowest floor (a raised house without a cellar)
 const PLINTH = new Color(0x22314a);
 const PLINTH_LOW = new Color(0x141f30);
 /** How far the earth reaches under the floor slab. */
@@ -54,7 +54,7 @@ function outlineOf(b: Building, floor: Floor): Vec2[] | null {
 /**
  * The earth around a floor, in its own coordinates (its floor at 0): from under the slab up to the ground along
  * every outer wall (never above the wall), with light wells cut out in front of the windows below the ground.
- * The lowest floor also gets a plinth down to the ground where the ground lies below it (a house on a hillside
+ * The lowest floor also gets a plinth down to the ground where the ground lies below it (a raised house
  * stands on its plinth instead of floating). Null when there is nothing of either.
  */
 export function buildEarth(b: Building, floor: Floor, openings: readonly OpeningInfo[], lowest = false): EarthGeometry | null {
@@ -105,7 +105,7 @@ export function buildEarth(b: Building, floor: Floor, openings: readonly Opening
       if (o.sill >= ground(cx, cz) - 0.05) continue;
       holes.push({ s0: Math.max(0, s - o.width / 2 - WELL_SIDE), s1: Math.min(len, s + o.width / 2 + WELL_SIDE), bottom: Math.max(bottom + 0.05, o.sill - WELL_BELOW) });
     }
-    // the earth in pieces of at most half a metre (so it follows a hillside), lower where a light well is
+    // the earth in pieces of at most half a metre, lower where a light well is
     const cuts = new Set<number>([0, len]);
     for (const h of holes) {
       cuts.add(h.s0);
