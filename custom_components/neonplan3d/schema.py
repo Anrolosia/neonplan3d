@@ -695,8 +695,12 @@ SETTINGS_SCHEMA = vol.Schema(
             None,
             vol.Schema(
                 {
-                    vol.Optional("level", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=-20, max=20))),
-                    vol.Optional("slope", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=30))),
+                    vol.Optional("level", default=None): vol.Any(
+                        None, vol.All(vol.Coerce(float), vol.Range(min=-20, max=20))
+                    ),
+                    vol.Optional("slope", default=None): vol.Any(
+                        None, vol.All(vol.Coerce(float), vol.Range(min=0, max=30))
+                    ),
                     vol.Optional("slope_dir", default=None): vol.Any(None, vol.In(["x", "-x", "z", "-z"])),
                     vol.Optional("earth", default=True): bool,
                 },
