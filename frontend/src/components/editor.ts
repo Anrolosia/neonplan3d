@@ -5138,8 +5138,8 @@ export class Fp3dEditor extends LitElement {
       const first = floor?.outdoor.find((x) => x.type === "pool");
       if (first) this.selectItem("outdoor", first.id);
     }
-    // a tool needs the sidebar (library, presets): open it beside the 3D pane
-    this._sideOpen = tool !== "select";
+    // another tool: its sidebar (library, presets, details) unfolds again, even if it was collapsed for the last one
+    this.setSideFolded(false);
   }
 
   /**
