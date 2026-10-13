@@ -664,7 +664,7 @@ export function outdoorDrop(a: OutdoorArea, x: number, z: number): number {
 
 /** Height of the surface of an area at a point, in floor coordinates (offset and slope included). */
 export function outdoorTopAt(floor: Floor, a: OutdoorArea, x: number, z: number): number {
-  return groundLevel(floor) + (a.offset ?? 0) + OUTDOOR_TOP[a.type] - groundDrop(floor, a, x, z);
+  return areaGround(floor, a) + OUTDOOR_TOP[a.type] - groundDrop(floor, a, x, z);
 }
 
 /**
@@ -731,10 +731,28 @@ export function groundLevel(floor: Floor): number {
   return terrainNow.set ? terrainNow.level - floor.elevation : DEFAULT_GROUND;
 }
 
-/** How far an outdoor area's surface lies below its level at a point: its own slope, and the hillside on the ground. */
+/** Areas built level on a hillside (a pool, a terrace): they sit at the ground's height under their middle. */
+const LEVEL_TYPES = new Set<OutdoorType>(["pool", "terrace", "balcony"]);
+
+/** How far a level area (pool, terrace) lies below the ground's uphill height: the hillside under its middle. */
+function levelDrop(floor: Floor, a: OutdoorArea): number {
+  if (floor.elevation > 0.3 || !LEVEL_TYPES.has(a.type) || a.points.length < 3) return 0;
+  const [cx, cz] = centroid(a.points);
+  return terrainDrop(cx, cz);
+}
+
+/** The level an outdoor area starts from, in floor coordinates: the ground, its own offset, on a hillside its place. */
+export function areaGround(floor: Floor, a: OutdoorArea): number {
+  return groundLevel(floor) + (a.offset ?? 0) - levelDrop(floor, a);
+}
+
+/**
+ * How far an outdoor area's surface lies below its level at a point: its own slope, and on a hillside the ground
+ * falling under it (lawns, beds, paths follow it; pools and terraces stay level, see `areaGround`).
+ */
 export function groundDrop(floor: Floor, a: OutdoorArea, x: number, z: number): number {
   if (a.type === "pool") return 0;
-  return outdoorDrop(a, x, z) + (floor.elevation > 0.3 ? 0 : terrainDrop(x, z));
+  return outdoorDrop(a, x, z) + (floor.elevation > 0.3 || LEVEL_TYPES.has(a.type) ? 0 : terrainDrop(x, z));
 }
 
 /** Height outdoor lamps stand on at a point: ground level, or the top of a terrace or bed there. */
@@ -880,7 +898,7 @@ export const VALVE_POSITIONS: ValvePosition[] = ["filter", "backwash", "rinse", 
 
 /** Top of a pool's rim in floor coordinates: a little (or `rim` metres) above the lawn, or an above-ground pool's wall height. */
 export function poolRimY(floor: Floor, a: OutdoorArea): number {
-  const g = groundLevel(floor) + (a.offset ?? 0);
+  const g = areaGround(floor, a);
   return g + (a.above ? poolHeight(a) : Math.min(2, Math.max(-0.3, a.rim ?? 0.06)));
 }
 

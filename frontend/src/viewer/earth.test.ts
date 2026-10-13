@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyBuilding, groundLevel, newFloor, setTerrain, terrainAt, type Building, type Opening, type Room } from "../model.ts";
+import { areaGround, emptyBuilding, groundDrop, groundLevel, newFloor, setTerrain, terrainAt, type Building, type Opening, type Room } from "../model.ts";
 import { buildFloorGeometry } from "./build.ts";
 import { buildEarth, inGround } from "./earth.ts";
 
@@ -56,4 +56,19 @@ test("a cellar window below the ground gets a light well, one above the ground d
   const half = house({ level: -1.2 });
   half.floors[0].openings = [win(1.65)];
   assert.equal(earthOf(half, 0)!.wells.count, 0);
+});
+
+test("on a hillside a lawn follows the ground, a pool and a terrace stay level at the ground under their middle", () => {
+  const b = house({ level: -0.2, slope: 2, slope_dir: "z" });
+  const eg = b.floors[1];
+  const area = (type: "lawn" | "pool" | "terrace") => ({ id: type, type, points: [[0, 10], [10, 10], [10, 14], [0, 14]] as [number, number][] });
+  const lawn = area("lawn");
+  // the lawn falls with the ground: 0.25 m per metre across the 8 m deep house
+  assert.equal(groundDrop(eg, lawn as never, 5, 10) - groundDrop(eg, lawn as never, 5, 14), -1);
+  for (const t of ["pool", "terrace"] as const) {
+    const a = area(t);
+    assert.equal(groundDrop(eg, a as never, 5, 10), groundDrop(eg, a as never, 5, 14));
+    // its middle (z = 12) lies 3 m down the hillside
+    assert.equal(areaGround(eg, a as never), -0.2 - 3);
+  }
 });
