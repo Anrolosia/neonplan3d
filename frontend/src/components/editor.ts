@@ -533,8 +533,8 @@ export class Fp3dEditor extends LitElement {
   private declare _rectSize: [number, number];
   private declare _spots: { type: FurnitureType; rows: number; cols: number; entity: string | null } | null;
   private declare _tool: Tool;
-  /** The tool menu of the toolbar is open; which tool's options are unfolded in it. */
-  private declare _toolMenu: boolean;
+  /** The toolbar menu open (its group), and which tool's choices are unfolded in it. */
+  private declare _toolMenu: string | null;
   private declare _toolOpen: Tool | null;
   /** The view menu of the toolbar (fit, 3D beside, wall view, lock) is open. */
   private declare _viewMenu: boolean;
@@ -687,7 +687,7 @@ export class Fp3dEditor extends LitElement {
     this._packages = false;
     this._rectSize = [4, 3];
     this._tool = "select";
-    this._toolMenu = false;
+    this._toolMenu = null;
     this._toolOpen = null;
     this._viewMenu = false;
     this._draft = [];
@@ -2606,7 +2606,7 @@ export class Fp3dEditor extends LitElement {
     };
     this.change((_, floor) => floor.furniture.push(item));
     this.selectItem("furniture", item.id);
-    this._tool = "select";
+    // the tool stays: the next one is placed right away (Esc or "Select" ends it)
   }
 
   private addOutdoor(points: Vec2[]): void {
@@ -2623,8 +2623,7 @@ export class Fp3dEditor extends LitElement {
     if (type === "pool" && hasFeature("pool")) area.pool = {};
     this.change((_, floor) => floor.outdoor.push(area));
     this.selectItem("outdoor", area.id);
-    // the pool tool stays: ports, devices and pipes come next
-    if (this._tool !== "pool") this._tool = "select";
+    // the tool stays: the next area (or the pool's ports and pipes) right away; Esc or "Select" ends it
   }
 
   private get outdoorArea(): OutdoorArea | undefined {
@@ -2664,7 +2663,7 @@ export class Fp3dEditor extends LitElement {
     );
     this._roomId = id;
     this._vertex = null;
-    this._tool = "select";
+    // the tool stays: one room after the other (Esc or "Select" ends it)
   }
 
   // ------------------------------------------------------------------ keyboard
@@ -4413,7 +4412,7 @@ export class Fp3dEditor extends LitElement {
       tilt: null,
     };
     this.change((_, f) => f.openings.push(opening));
-    this._tool = "select";
+    // the tool stays: six doors and windows in a row without going back to the menu (Esc or "Select" ends it)
     this.selectItem("opening", opening.id);
     return true;
   }
@@ -5063,140 +5062,145 @@ export class Fp3dEditor extends LitElement {
   }
 
   /**
-   * The toolbar, tidied up: "Select" stays a button, every drawing tool sits in one tool menu (the button shows the one
-   * in use, with its shape or kind); tools with choices (room, outdoor, pool) unfold them in the menu. Undo and redo
-   * stay, the view switches (fit, 3D beside, wall view, lock) are in a view menu. The tools carry their group, so the
-   * menu could also be split into one menu per group.
+   * The toolbar, tidied up: "Select" stays a button; the drawing tools sit in menus by what they are for – "Build"
+   * (room, wall, door & window, floor opening, roof), "Outside" (areas, pool) – with "Furniture" and "Energy" as
+   * buttons of their own. Tools with choices (room, outdoor, pool) unfold them in the menu; a group's button names the
+   * tool in use. Undo and redo stay, the view switches (fit, 3D beside, wall view, lock) are in a view menu.
    */
   private renderToolBar(floor: Floor | undefined) {
     const admin = this.isAdmin;
     const off = !floor || !admin;
     type Choice = { label: string; on: boolean; pick: () => void };
+    type Entry = { tool: Tool; label: string; choices?: () => Choice[] };
     const outdoorTypes = OUTDOOR_TYPES.filter((t) => t !== "pool");
-    const tools: { tool: Tool; icon: string; group: "build" | "furnish" | "outside" | "tech"; choices?: () => Choice[] }[] = [
+    const room: Entry = {
+      tool: "rect",
+      label: this.t("tool_room"),
+      choices: () => [
+        { label: this.t("tool_rect"), on: this._tool === "rect", pick: () => this.setTool("rect") },
+        { label: this.t("tool_polygon"), on: this._tool === "polygon", pick: () => this.setTool("polygon") },
+        { label: this.t("tool_measure"), on: this._tool === "measure", pick: () => this.setTool("measure") },
+      ],
+    };
+    const outdoor: Entry = {
+      tool: "outdoor",
+      label: this.t("tool_outdoor"),
+      choices: () => [
+        ...outdoorTypes.map((t) => ({
+          label: this.t(`out_${t}` as I18nKey),
+          on: this._tool === "outdoor" && (this._outdoorType ?? "lawn") === t,
+          pick: () => {
+            this.setTool("outdoor");
+            this._outdoorType = t;
+          },
+        })),
+        { label: this.t("outdoor_shape_rect"), on: this._tool === "outdoor" && !this._outdoorFree, pick: () => (this.setTool("outdoor"), (this._outdoorFree = false)) },
+        { label: this.t("outdoor_shape_free"), on: this._tool === "outdoor" && this._outdoorFree, pick: () => (this.setTool("outdoor"), (this._outdoorFree = true)) },
+      ],
+    };
+    const pool: Entry = {
+      tool: "pool",
+      label: this.t("tool_pool"),
+      choices: () => [
+        ...(["rect", "round", "oval", "free"] as const).map((k) => ({
+          label: this.t(`pool_shape_${k}` as I18nKey),
+          on: this._tool === "pool" && !this._pipeMode && (this._poolShape ?? "rect") === k,
+          pick: () => {
+            this.setTool("pool");
+            this._poolShape = k;
+            this._outdoorFree = k === "free";
+          },
+        })),
+        ...(released("pool") ? [{ label: this.t("pool_pipe_draw"), on: this._tool === "pool" && !!this._pipeMode, pick: () => (this.setTool("pool"), (this._pipeMode = true)) }] : []),
+      ],
+    };
+    const groups: { id: string; label: string; entries: Entry[] }[] = [
       {
-        tool: "rect",
-        icon: "▭",
-        group: "build",
-        choices: () => [
-          { label: `▭ ${this.t("tool_rect")}`, on: this._tool === "rect", pick: () => this.setTool("rect") },
-          { label: `✎ ${this.t("tool_polygon")}`, on: this._tool === "polygon", pick: () => this.setTool("polygon") },
-          { label: `📏 ${this.t("tool_measure")}`, on: this._tool === "measure", pick: () => this.setTool("measure") },
-        ],
+        id: "build",
+        label: this.t("tool_group_build"),
+        entries: [room, { tool: "wall", label: this.t("tool_wall") }, { tool: "opening", label: this.t("tool_opening") }, { tool: "hole", label: this.t("tool_hole") }, { tool: "roof", label: this.t("tool_roof") }],
       },
-      { tool: "wall", icon: "┃", group: "build" },
-      { tool: "opening", icon: "🚪", group: "build" },
-      { tool: "hole", icon: "⬚", group: "build" },
-      { tool: "roof", icon: "⌂", group: "build" },
-      { tool: "furniture", icon: "🛋", group: "furnish" },
-      {
-        tool: "outdoor",
-        icon: "🌳",
-        group: "outside",
-        choices: () => [
-          ...outdoorTypes.map((t) => ({
-            label: this.t(`out_${t}` as I18nKey),
-            on: this._tool === "outdoor" && (this._outdoorType ?? "lawn") === t,
-            pick: () => {
-              this.setTool("outdoor");
-              this._outdoorType = t;
-            },
-          })),
-          { label: `▭ ${this.t("outdoor_shape_rect")}`, on: this._tool === "outdoor" && !this._outdoorFree, pick: () => (this.setTool("outdoor"), (this._outdoorFree = false)) },
-          { label: `✎ ${this.t("outdoor_shape_free")}`, on: this._tool === "outdoor" && this._outdoorFree, pick: () => (this.setTool("outdoor"), (this._outdoorFree = true)) },
-        ],
-      },
-      {
-        tool: "pool",
-        icon: "🏊",
-        group: "outside",
-        choices: () => [
-          ...(["rect", "round", "oval", "free"] as const).map((k) => ({
-            label: `${k === "rect" ? "▭" : k === "round" ? "◯" : k === "oval" ? "⬭" : "✎"} ${this.t(`pool_shape_${k}` as I18nKey)}`,
-            on: this._tool === "pool" && !this._pipeMode && (this._poolShape ?? "rect") === k,
-            pick: () => {
-              this.setTool("pool");
-              this._poolShape = k;
-              this._outdoorFree = k === "free";
-            },
-          })),
-          ...(released("pool") ? [{ label: `〰 ${this.t("pool_pipe_draw")}`, on: this._tool === "pool" && !!this._pipeMode, pick: () => (this.setTool("pool"), (this._pipeMode = true)) }] : []),
-        ],
-      },
-      { tool: "energy", icon: "⚡", group: "tech" },
+      { id: "outside", label: this.t("tool_group_outside"), entries: [outdoor, pool] },
     ];
-    const entryOf = (t: Tool) => tools.find((x) => x.tool === t || (x.tool === "rect" && (t === "polygon" || t === "measure")));
-    const current = this._tool === "select" ? undefined : entryOf(this._tool);
-    // what the button says: the tool and, where it has one, the shape or kind chosen
-    const detail =
-      this._tool === "pool" ? (this._pipeMode ? this.t("pool_pipe_draw") : this.t(`pool_shape_${this._poolShape ?? "rect"}` as I18nKey)) : this._tool === "outdoor" ? this.t(`out_${this._outdoorType ?? "lawn"}` as I18nKey) : "";
-    const label = current ? `${current.icon} ${this.t(`tool_${this._tool}` as I18nKey)}${detail ? ` · ${detail}` : ""}` : `✏ ${this.t("tool_menu")}`;
-    const close = () => ((this._toolMenu = false), (this._toolOpen = null));
+    const inEntry = (e: Entry) => e.tool === this._tool || (e === room && (this._tool === "polygon" || this._tool === "measure"));
+    // what a group's button says while one of its tools is in use: the tool, and its shape or kind
+    const detail = (e: Entry) =>
+      e === pool ? (this._pipeMode ? this.t("pool_pipe_draw") : this.t(`pool_shape_${this._poolShape ?? "rect"}` as I18nKey)) : e === outdoor ? this.t(`out_${this._outdoorType ?? "lawn"}` as I18nKey) : e === room ? this.t(`tool_${this._tool}` as I18nKey) : "";
+    const close = () => ((this._toolMenu = null), (this._toolOpen = null));
+    const plain = (tool: Tool, label: string) =>
+      html`<button aria-pressed=${this._tool === tool} ?disabled=${off} @click=${() => (close(), this.setTool(tool))}>${label}</button>`;
     return html`<div class="fp3d-seg fp3d-seg-menu" role="group">
         <button aria-pressed=${this._tool === "select"} ?disabled=${!floor} @click=${() => (close(), this.setTool("select"))}>${this.t("tool_select")}</button>
-        <div class="fp3d-menu-wrap">
-          <button aria-pressed=${this._tool !== "select"} aria-haspopup="menu" aria-expanded=${this._toolMenu} ?disabled=${off} @click=${() => ((this._toolMenu = !this._toolMenu), (this._viewMenu = false))}>${label} ▾</button>
-          ${this._toolMenu
-            ? html`<div class="fp3d-menu-veil" @click=${close}></div>
-                <div class="fp3d-menu" role="menu">
-                  ${tools.map((x) => {
-                    const choices = x.choices?.() ?? [];
-                    const active = current === x;
-                    const unfolded = this._toolOpen === x.tool;
-                    return html`<button
-                        role="menuitem"
-                        class="fp3d-menu-item ${active ? "fp3d-menu-on" : ""}"
-                        aria-expanded=${choices.length ? unfolded : nothing}
-                        @click=${() => {
-                          if (choices.length) this._toolOpen = unfolded ? null : x.tool;
-                          else {
-                            this.setTool(x.tool);
-                            close();
-                          }
-                        }}
-                      >
-                        <span class="fp3d-menu-icon">${x.icon}</span>${this.t(x.tool === "rect" ? "tool_room" : (`tool_${x.tool}` as I18nKey))}${choices.length ? html`<span class="fp3d-menu-more">${unfolded ? "▾" : "▸"}</span>` : nothing}
-                      </button>
-                      ${unfolded
-                        ? html`<div class="fp3d-menu-sub">
-                            ${choices.map(
-                              (c) =>
-                                html`<button
-                                  class="fp3d-chip ${c.on ? "fp3d-menu-on" : ""}"
-                                  @click=${() => {
-                                    c.pick();
-                                    this._draft = [];
-                                    close();
-                                  }}
-                                >
-                                  ${c.label}
-                                </button>`,
-                            )}
-                          </div>`
-                        : nothing}`;
-                  })}
-                </div>`
-            : nothing}
-        </div>
+        ${groups.map((g) => {
+          const active = g.entries.find(inEntry);
+          const open = this._toolMenu === g.id;
+          const text = active ? `${active.label}${detail(active) ? `: ${detail(active)}` : ""}` : g.label;
+          return html`<div class="fp3d-menu-wrap">
+            <button aria-pressed=${!!active} aria-haspopup="menu" aria-expanded=${open} ?disabled=${off} @click=${() => ((this._toolMenu = open ? null : g.id), (this._toolOpen = null), (this._viewMenu = false))}>
+              ${text} <span class="fp3d-caret">▾</span>
+            </button>
+            ${open
+              ? html`<div class="fp3d-menu-veil" @click=${close}></div>
+                  <div class="fp3d-menu" role="menu">
+                    ${g.entries.map((x) => {
+                      const choices = x.choices?.() ?? [];
+                      const unfolded = this._toolOpen === x.tool;
+                      return html`<button
+                          role="menuitem"
+                          class="fp3d-menu-item ${inEntry(x) ? "fp3d-menu-on" : ""}"
+                          aria-expanded=${choices.length ? unfolded : nothing}
+                          @click=${() => {
+                            if (choices.length) this._toolOpen = unfolded ? null : x.tool;
+                            else {
+                              this.setTool(x.tool);
+                              close();
+                            }
+                          }}
+                        >
+                          ${x.label}${choices.length ? html`<span class="fp3d-menu-more">${unfolded ? "▾" : "▸"}</span>` : nothing}
+                        </button>
+                        ${unfolded
+                          ? html`<div class="fp3d-menu-sub">
+                              ${choices.map(
+                                (c) =>
+                                  html`<button
+                                    class="fp3d-chip ${c.on ? "fp3d-menu-on" : ""}"
+                                    @click=${() => {
+                                      c.pick();
+                                      this._draft = [];
+                                      close();
+                                    }}
+                                  >
+                                    ${c.label}
+                                  </button>`,
+                              )}
+                            </div>`
+                          : nothing}`;
+                    })}
+                  </div>`
+              : nothing}
+          </div>`;
+        })}
+        ${plain("furniture", this.t("tool_furniture"))} ${plain("energy", this.t("tool_energy"))}
       </div>
       <div class="fp3d-seg fp3d-seg-menu">
-        <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">↶ ${this.t("undo")}</button>
-        <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">↷ ${this.t("redo")}</button>
+        <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
+        <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
         <div class="fp3d-menu-wrap">
-          <button aria-haspopup="menu" aria-expanded=${this._viewMenu} aria-pressed=${this._split || !!this._doc.settings.lock_plan} @click=${() => ((this._viewMenu = !this._viewMenu), close())}>👁 ${this.t("view_menu")} ▾</button>
+          <button aria-haspopup="menu" aria-expanded=${this._viewMenu} @click=${() => ((this._viewMenu = !this._viewMenu), close())}>${this.t("view_menu")} <span class="fp3d-caret">▾</span></button>
           ${this._viewMenu
             ? html`<div class="fp3d-menu-veil" @click=${() => (this._viewMenu = false)}></div>
                 <div class="fp3d-menu fp3d-menu-right" role="menu">
-                  <button role="menuitem" class="fp3d-menu-item" @click=${() => ((this._viewMenu = false), this.fit())}><span class="fp3d-menu-icon">⤢</span>${this.t("fit")}</button>
+                  <button role="menuitem" class="fp3d-menu-item" @click=${() => ((this._viewMenu = false), this.fit())}>${this.t("fit")}</button>
                   <button role="menuitem" class="fp3d-menu-item ${this._split ? "fp3d-menu-on" : ""}" title=${this.t("split_3d_hint")} @click=${() => ((this._viewMenu = false), this.toggleSplit())}>
-                    <span class="fp3d-menu-icon">${this._split ? "✓" : "◫"}</span>${this.t("split_3d")}
+                    ${this.t("split_3d")}<span class="fp3d-menu-more">${this._split ? "✓" : ""}</span>
                   </button>
                   <button role="menuitem" class="fp3d-menu-item ${this._wallPick ? "fp3d-menu-on" : ""}" title=${this.t("wall_view_open")} @click=${(e: Event) => ((this._viewMenu = false), this.toggleWallPick(e.currentTarget as HTMLElement))}>
-                    <span class="fp3d-menu-icon">▦</span>${this.t("wall_view")}
+                    ${this.t("wall_view")}
                   </button>
                   ${admin
                     ? html`<button role="menuitem" class="fp3d-menu-item ${this._doc.settings.lock_plan ? "fp3d-menu-on" : ""}" title=${this.t("lock_plan_hint")} @click=${() => ((this._viewMenu = false), this.toggleLockPlan())}>
-                        <span class="fp3d-menu-icon">${this._doc.settings.lock_plan ? "🔒" : "🔓"}</span>${this.t("lock_plan")}
+                        ${this.t("lock_plan")}<span class="fp3d-menu-more">${this._doc.settings.lock_plan ? "✓" : ""}</span>
                       </button>`
                     : nothing}
                 </div>`
@@ -13353,7 +13357,9 @@ export class Fp3dEditor extends LitElement {
         gap: 8px;
         width: 100%;
         text-align: left;
-        padding: 8px 10px;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 9px 12px;
         border-radius: 10px;
         color: var(--fp3d-text);
         background: none;
@@ -13373,11 +13379,15 @@ export class Fp3dEditor extends LitElement {
         margin-left: auto;
         color: var(--fp3d-muted);
       }
+      .fp3d-caret {
+        font-size: 0.8em;
+        opacity: 0.7;
+      }
       .fp3d-menu-sub {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        padding: 2px 8px 8px 38px;
+        padding: 2px 8px 8px 16px;
       }
       .fp3d-seg .fp3d-menu-sub .fp3d-chip {
         min-height: 30px;
