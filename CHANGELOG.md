@@ -20,6 +20,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
+- Weather outside switched off stayed on after a reload (panel and card) (#509).
 - Echo speakers: play after pause works while the speaker still reports playing (#400).
 
 ## 1.17.1

@@ -8,7 +8,7 @@ import type { Building, Floor, RoofSection, SolarField, Vec2 } from "../model.ts
 import { polygonArea } from "../model.ts";
 import { cutHole, sectionFloor, dormerHoles, dormerParent, effectiveDormer, offsetPolygon, sectionGeometry, sectionHeightAt, sectionPolygon, sectionFrame, sectionOverhang, sectionProfile, sectionUV, type Q, type SectionOverhang } from "../roof-sections.ts";
 import { DEG, GeoBuffer, LineBuffer, pushPrism, shade } from "./geo.ts";
-import { fieldModules, roofFaces, windowCorners, type RoofFace } from "../solar.ts";
+import { fieldModules, roofFaces, roofWindowRoom, windowCorners, type RoofFace } from "../solar.ts";
 
 const ROOF = 0x1a2338;
 const ROOF_TOP = 0x222d48;
@@ -94,7 +94,10 @@ function pushRoofWindows(b: Building, parts: RoofGeometry[], states: ReadonlyMap
     const L = (p: number[]): number[] => [p[0], p[1] - dy, p[2]];
     const [a, c, d, e] = corners.map(L);
     const st = states.get(w.id) ?? { open: 0, tilt: 0, cover: 0 };
-    const win = w.float ? (part.win ??= { solid: new GeoBuffer(), lines: new LineBuffer() }) : (part.winRoof ??= { solid: new GeoBuffer(), lines: new LineBuffer() });
+    // floating over its room only above a room of the roof's own floor: a slope reaching down over a lower floor
+    // would leave the window hanging in the air under the floor shown (#482)
+    const float = !!w.float && roofWindowRoom(b, face, w)?.floor.id === part.floor.id;
+    const win = float ? (part.win ??= { solid: new GeoBuffer(), lines: new LineBuffer() }) : (part.winRoof ??= { solid: new GeoBuffer(), lines: new LineBuffer() });
     const up = (p: number[], k: number) => [p[0] + face.n[0] * k, p[1] + face.n[1] * k, p[2] + face.n[2] * k];
     const mix = (p: number[], q: number[], t: number) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t];
     // the fixed frame in the roof; it glows warm while the window is open or tilted
