@@ -59,6 +59,8 @@ export interface RoofGeometry {
    * room shows its windows in the slope, open or shut, the blind down or up (#482).
    */
   win?: { solid: GeoBuffer; lines: LineBuffer };
+  /** The roof windows that only show in the roof: they fade out with it (the default). */
+  winRoof?: { solid: GeoBuffer; lines: LineBuffer };
 }
 
 /** The floor the roof sits on: the highest one with rooms. */
@@ -92,7 +94,7 @@ function pushRoofWindows(b: Building, parts: RoofGeometry[], states: ReadonlyMap
     const L = (p: number[]): number[] => [p[0], p[1] - dy, p[2]];
     const [a, c, d, e] = corners.map(L);
     const st = states.get(w.id) ?? { open: 0, tilt: 0, cover: 0 };
-    const win = (part.win ??= { solid: new GeoBuffer(), lines: new LineBuffer() });
+    const win = w.float ? (part.win ??= { solid: new GeoBuffer(), lines: new LineBuffer() }) : (part.winRoof ??= { solid: new GeoBuffer(), lines: new LineBuffer() });
     const up = (p: number[], k: number) => [p[0] + face.n[0] * k, p[1] + face.n[1] * k, p[2] + face.n[2] * k];
     const mix = (p: number[], q: number[], t: number) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t];
     // the fixed frame in the roof; it glows warm while the window is open or tilted

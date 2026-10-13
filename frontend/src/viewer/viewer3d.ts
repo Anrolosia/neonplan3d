@@ -63,7 +63,7 @@ export type { PipeTube };
 import { mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
 import { buildRoof, type RoofWindowState } from "./roof.ts";
-import { GROUND, groundFace, groundFloor, roofFaces, wallFaces } from "../solar.ts";
+import { GROUND, groundFace, groundFloor, roofFaces, roofWindowRoom, wallFaces } from "../solar.ts";
 import { buildSolarLive, solarLiveMaterial, writeSolarLevels, type SolarLive } from "./solar-live.ts";
 import { buildPools, disposePools, type PoolPiece } from "./pool-water.ts";
 import { accentOnUniform, accentUniform, parseAccent, lineBlending, themed, themeIndex, type Theme, type ThemeUniform } from "./theme.ts";
@@ -248,7 +248,7 @@ export interface ScreenState {
   plain?: boolean;
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights"; color: [number, number, number]; level: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners"; color: [number, number, number]; level: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -887,6 +887,7 @@ export class FloorplanViewer {
     this.roofWindowsKey = key;
     this.roofWindows = states;
     this.buildRoofMesh();
+    for (const fv of this.floors) this.buildSun(fv);
     this.invalidate();
   }
 
@@ -2063,6 +2064,8 @@ export class FloorplanViewer {
         lives.push(overlay);
         writeSolarLevels(overlay, this.solarLevels);
       }
+      // roof windows that only show in the roof ride and fade with it
+      if (geo.winRoof?.solid.count) part.add(new Mesh(geo.winRoof.solid.geometry(), winSolid), new LineSegments(geo.winRoof.lines.geometry(), winLines));
       part.renderOrder = 8;
       group.add(part);
       let win: Group | null = null;
@@ -2386,7 +2389,7 @@ export class FloorplanViewer {
     const cloud = this.weather?.cloud ?? 0;
     // rooms joined without a wall share the sunlight too: the zones belong to the patch's signature
     const zones = lightZonesOf(fv.floor, fv.geo.openRooms);
-    const sig = sun ? `${sun.elevation.toFixed(1)},${sun.azimuth.toFixed(1)},${north},${cloud.toFixed(2)},${[...fv.openings.values()].map((o) => (o.cover ?? 0).toFixed(2)).join(",")},${zones.join(".")}` : "";
+    const sig = sun ? `${sun.elevation.toFixed(1)},${sun.azimuth.toFixed(1)},${north},${cloud.toFixed(2)},${[...fv.openings.values()].map((o) => (o.cover ?? 0).toFixed(2)).join(",")},${zones.join(".")},${this.roofWindowsKey},${JSON.stringify(this.building?.settings.roof?.windows ?? [])}` : "";
     if (sig === fv.sunSig) return;
     fv.sunSig = sig;
     const buf = new GeoBuffer();
@@ -2446,10 +2449,66 @@ export class FloorplanViewer {
           }
         }
       }
+      this.pushRoofSun(fv, buf, zones, toSun, el, day);
     }
     fv.sunMesh.geometry.dispose();
     fv.sunMesh.geometry = buf.geometry();
     fv.sunMesh.visible = buf.count > 0;
+  }
+
+  /**
+   * Sunlight through the roof windows over this floor's rooms (#482): the window's glass, less its blind, cast
+   * along the sun's rays onto the floor, kept inside the room under it (and rooms joined to it without a wall).
+   */
+  private pushRoofSun(fv: FloorView, buf: GeoBuffer, zones: number[], toSun: [number, number], el: number, day: number): void {
+    const b = this.building;
+    const windows = b?.settings.roof?.windows ?? [];
+    if (!b || !windows.length) return;
+    const faces = new Map(roofFaces(b).map((f) => [f.key, f]));
+    const sunDir = [toSun[0] * Math.cos(el), Math.sin(el), toSun[1] * Math.cos(el)];
+    for (const w of windows) {
+      const face = faces.get(w.face);
+      const under = roofWindowRoom(b, face, w);
+      if (!face || !under || under.floor.id !== fv.floor.id) continue;
+      const facing = face.n[0] * sunDir[0] + face.n[1] * sunDir[1] + face.n[2] * sunDir[2];
+      if (facing < 0.05) continue;
+      // lower left, lower right, upper right, upper left; the blind comes down from the top edge
+      const [a, c, d, e] = under.corners;
+      const cover = Math.min(1, this.roofWindows.get(w.id)?.cover ?? 0);
+      if (cover > 0.95) continue;
+      const mix = (p: number[], q: number[], t: number) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t];
+      const top0 = mix(e, a, cover);
+      const top1 = mix(d, c, cover);
+      // a point of the glass, followed down the sun's rays to the floor (at most 7 m away)
+      const ground = (p: number[]): number[] => {
+        const t = Math.min(7, (p[1] - fv.floor.elevation) / Math.tan(el));
+        return [p[0] - toSun[0] * t, 0.02, p[2] - toSun[1] * t];
+      };
+      const g = [ground(a), ground(c), ground(top1), ground(top0)];
+      const ri = fv.floor.rooms.findIndex((r) => r.id === under.roomId);
+      if (ri < 0) continue;
+      const lit = fv.floor.rooms.filter((r, i) => zones[i] === zones[ri] && r.points.length >= 3).map((r) => r.points);
+      const k = 0.16 * day * Math.min(1, facing * 1.5);
+      const col = new Color(1 * k, 0.84 * k, 0.6 * k);
+      const at = (s: number, t: number) => {
+        const lo = mix(g[0], g[1], s);
+        const hi = mix(g[3], g[2], s);
+        return mix(lo, hi, t);
+      };
+      const n = 6;
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          const m = at((i + 0.5) / n, (j + 0.5) / n);
+          if (!lit.some((pts) => pointInPolygon([m[0], m[2]], pts))) continue;
+          const p0 = at(i / n, j / n);
+          const p1 = at((i + 1) / n, j / n);
+          const p2 = at((i + 1) / n, (j + 1) / n);
+          const p3 = at(i / n, (j + 1) / n);
+          buf.tri(p0, p1, p2, col, col, col);
+          buf.tri(p0, p2, p3, col, col, col);
+        }
+      }
+    }
   }
 
   /** Glow points at lit shades (not at the tablet level) and light cones under spots (level "High"). */
@@ -2625,6 +2684,22 @@ export class FloorplanViewer {
               pushPackGlow(buf, model, f, base, col.getHex(), glassy);
               continue;
             }
+          }
+          if (face.part === "burners") {
+            // a cooktop's four zones glow on its top (where the built-in stove draws them)
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.25 + 0.6 * face.level))) as [number, number, number]);
+            const y = base + h + 0.008;
+            for (const [bx, bz, br] of [[-0.14, -0.13, 0.09], [0.14, -0.13, 0.07], [-0.14, 0.13, 0.07], [0.14, 0.13, 0.09]]) {
+              const cx = (bx * Math.abs(w)) / 0.6;
+              const cz = (bz * d) / 0.62;
+              const n = 14;
+              for (let i = 0; i < n; i++) {
+                const a0 = (i / n) * Math.PI * 2;
+                const a1 = ((i + 1) / n) * Math.PI * 2;
+                buf.tri(P(cx, y, cz), P(cx + Math.cos(a0) * br, y, cz + Math.sin(a0) * br), P(cx + Math.cos(a1) * br, y, cz + Math.sin(a1) * br), col);
+              }
+            }
+            continue;
           }
           if (face.part === "band" || face.part === "cabin") {
             // a light band around the item at mid height (a car's charge): four thin vertical strips;

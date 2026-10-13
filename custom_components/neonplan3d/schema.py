@@ -535,6 +535,8 @@ ROOF_WINDOW_SCHEMA = vol.Schema(
         vol.Optional("window", default=None): _ENTITY_REF,
         vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=64))),
         vol.Optional("locked", default=False): bool,
+        # stays over its room when the roof fades out (off: shown in the roof only)
+        vol.Optional("float", default=False): bool,
     },
     extra=vol.ALLOW_EXTRA,
 )

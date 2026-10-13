@@ -393,6 +393,7 @@ clearTimeout(this.cleanTimer);
               ?readOnly=${tt}
               .room=${b.floors.flatMap((f) => f.rooms).find((r) => r.id === this._roomId) ?? null}
               .floor=${b.floors.find((f) => f.rooms.some((r) => r.id === this._roomId)) ?? null}
+              .building=${b}
               .confirmEntities=${confirmEntities(this.hass, b.floors)}
               @close=${() => (this._roomId = null)}
             ></fp3d-room-panel>`

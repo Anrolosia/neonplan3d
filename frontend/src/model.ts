@@ -153,6 +153,13 @@ export interface Furniture {
   show_name?: boolean;
   /** Lamps: how strongly the lamp glows in 3D, 0.1–1.5 (1 = as bright as the light reports) – #181. */
   glow_scale?: number | null;
+  /**
+   * Lamps: glow only while the light shows this colour ("#rrggbb", similar shades count) – a colour light used as a
+   * signal (yellow: water) does not show its other colours here. Null: every colour.
+   */
+  only_color?: string | null;
+  /** With a power sensor: the item counts as running above this many watts (null = the default, 10 W). */
+  run_w?: number | null;
   /** An own symbol for the marker: a Material Design icon name without "mdi:" (null = by kind). */
   icon?: string | null;
   /** Linked entity, e.g. the TV's media player (null = automatic, "none" = none). */
@@ -473,6 +480,11 @@ export interface RoofWindow {
   name?: string | null;
   /** Fixed: cannot be moved by accident. */
   locked?: boolean;
+  /**
+   * Stays over its room when the roof fades out (zooming in on a floor or a room), open or shut, the blind down or
+   * up (#482). Off (the default): the window shows in the roof only and fades out with it.
+   */
+  float?: boolean;
 }
 
 /** A string of solar modules: one or more fields wired together to one inverter. */
@@ -1000,6 +1012,7 @@ export const FURNITURE_TYPES = [
   "lamp_bollard",
   "lamp_garden",
   "radiator",
+  "ac_unit",
   "sofa",
   "sofa_l",
   "sofa_u",
@@ -1068,7 +1081,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   kitchen: ["kitchen", "kitchen_wall", "kitchen_tall", "island", "worktop", "sink", "stove", "dishwasher", "fridge"],
   sleeping: ["bed", "bunk_bed", "nightstand", "wardrobe", "dresser"],
   bath: ["bathtub", "shower", "wc", "washbasin", "washer", "dryer"],
-  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "stairs", "stairs_u", "robot_vacuum"],
+  work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "ac_unit", "stairs", "stairs_u", "robot_vacuum"],
   vehicles: ["parking"],
 };
 
@@ -1204,6 +1217,9 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
       return Math.max(0, 1.3 - f.h / 2);
     case "radiator":
       return 0.12;
+    case "ac_unit":
+      // an air conditioner's indoor unit hangs high on the wall
+      return 2.05;
     case "inverter":
       return 1.1;
     case "wallbox":
@@ -1227,6 +1243,7 @@ export function surfaceHeight(floor: Floor, x: number, z: number): number {
 export const ELECTRIC_FURNITURE = new Set<string>([
   ...LAMP_TYPES,
   "radiator",
+  "ac_unit",
   "robot_vacuum",
   "inverter",
   "home_battery",
@@ -1307,6 +1324,7 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   lamp_bollard: [0.16, 0.16, 0.8],
   lamp_garden: [0.12, 0.12, 0.3],
   radiator: [1.0, 0.1, 0.6],
+  ac_unit: [0.85, 0.22, 0.3],
   robot_vacuum: [0.36, 0.5, 0.1],
   parking: [2.6, 5.2, 0.02],
   lamp_pendant: [0.4, 0.4, 0.8],
