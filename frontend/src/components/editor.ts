@@ -5044,6 +5044,76 @@ export class Fp3dEditor extends LitElement {
     </div>`;
   }
 
+  /** Work on another floor (from the floor menu of the toolbar). */
+  private selectFloor(id: string): void {
+    this._floorId = id;
+    this._roomId = null;
+    this._vertex = null;
+    this._draft = [];
+    this.fit();
+  }
+
+  /**
+   * The floor worked on, always at hand at the left of the toolbar whatever the tool: a menu with every floor (top
+   * floor first), "New floor" (from a Home Assistant floor or empty) and the floor's settings in the sidebar.
+   */
+  private renderFloorMenu() {
+    const floors = this._doc.floors;
+    const floor = this.floor;
+    const admin = this.isAdmin;
+    const open = this._toolMenu === "floor";
+    const close = () => ((this._toolMenu = null), (this._floorMenu = false));
+    return html`<div class="fp3d-seg fp3d-seg-menu">
+      <div class="fp3d-menu-wrap">
+        <button aria-haspopup="menu" aria-expanded=${open} @click=${() => ((this._toolMenu = open ? null : "floor"), (this._floorMenu = false), (this._viewMenu = false))}>
+          <span class="fp3d-menu-label">${this.t("floor_label")}</span> ${floor?.name ?? this.t("floors")} <span class="fp3d-caret">▾</span>
+        </button>
+        ${open
+          ? html`<div class="fp3d-menu-veil" @click=${close}></div>
+              <div class="fp3d-menu" role="menu">
+                ${[...floors].reverse().map(
+                  (f) => html`<button role="menuitem" class="fp3d-menu-item ${f.id === this._floorId ? "fp3d-menu-on" : ""}" @click=${() => (close(), this.selectFloor(f.id))}>
+                    ${f.name}<span class="fp3d-menu-more">${f.id === this._floorId ? "✓" : ""}</span>
+                  </button>`,
+                )}
+                ${admin
+                  ? html`<div class="fp3d-menu-sep"></div>
+                      <button
+                        role="menuitem"
+                        class="fp3d-menu-item"
+                        aria-expanded=${this.freeHaFloors.length ? this._floorMenu : nothing}
+                        @click=${() => (this.freeHaFloors.length ? (this._floorMenu = !this._floorMenu) : (close(), this.addFloor()))}
+                      >
+                        ${this.t("add_floor")}${this.freeHaFloors.length ? html`<span class="fp3d-menu-more">${this._floorMenu ? "▾" : "▸"}</span>` : nothing}
+                      </button>
+                      ${this._floorMenu
+                        ? html`<div class="fp3d-menu-sub">
+                            ${this.freeHaFloors.map((f) => html`<button class="fp3d-chip" @click=${() => (close(), this.addFloor(f))}>${f.name}</button>`)}
+                            <button class="fp3d-chip" @click=${() => (close(), this.addFloor())}>${this.t("floor_empty")}</button>
+                          </div>`
+                        : nothing}
+                      ${floor
+                        ? html`<button
+                            role="menuitem"
+                            class="fp3d-menu-item"
+                            @click=${() => {
+                              close();
+                              // the floor's settings are the sidebar's first page: "Select", nothing chosen
+                              this.setTool("select");
+                              this.selectItem("room", null);
+                              this._sideOpen = true;
+                            }}
+                          >
+                            ${this.t("floor_settings")}
+                          </button>`
+                        : nothing}`
+                  : nothing}
+              </div>`
+          : nothing}
+      </div>
+    </div>`;
+  }
+
   /** Switch to a tool (from the tool menu): a fresh drawing, the sidebar for it. */
   private setTool(tool: Tool): void {
     const floor = this.floor;
@@ -5218,7 +5288,7 @@ export class Fp3dEditor extends LitElement {
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
             ${this._wallPick ? html`<div class="fp3d-pick-tip" style=${`left:${this.wallPickTip[0]}px;top:${this.wallPickTip[1]}px`} @click=${() => (this._wallPick = false)}>${this.t("hint_wall_pick")}</div>` : nothing}
-            ${this.renderToolBar(floor)}
+            ${this.renderFloorMenu()} ${this.renderToolBar(floor)}
             ${walls?.warnings.length ? html`<span class="fp3d-warn">${this.t("overlap_warning")}</span>` : nothing}
           </div>
           <div class="fp3d-stage-pair ${this._split ? "fp3d-split" : ""}" style=${this._split && !this.narrow ? `--fp3d-split:${Math.round(this._splitRatio * 100)}%` : ""}>
@@ -9437,44 +9507,8 @@ export class Fp3dEditor extends LitElement {
     return html`
       ${admin ? nothing : html`<p class="fp3d-note">${this.t("read_only")}</p>`}
       <section>
-        <h3>${this.t("floors")}</h3>
-        <div class="fp3d-floor-list">
-          ${[...floors].reverse().map(
-            (f) => html`<button
-              class="fp3d-chip"
-              aria-pressed=${f.id === this._floorId}
-              @click=${() => {
-                this._floorId = f.id;
-                this._roomId = null;
-                this._vertex = null;
-                this._draft = [];
-                this.fit();
-              }}
-            >
-              ${f.name}
-            </button>`,
-          )}
-          ${admin
-            ? html`<button
-                class="fp3d-btn"
-                aria-expanded=${this._floorMenu}
-                @click=${() => (this.freeHaFloors.length ? (this._floorMenu = !this._floorMenu) : this.addFloor())}
-              >
-                + ${this.t("add_floor")}
-              </button>`
-            : nothing}
-        </div>
-        ${admin && this._floorMenu
-          ? html`<div class="fp3d-floor-menu">
-              <p class="fp3d-sub">${this.t("floor_from_ha")}</p>
-              ${this.freeHaFloors.map(
-                (f) => html`<button class="fp3d-btn" @click=${() => this.addFloor(f)}>
-                  ${f.name}${f.level != null ? html` <span class="fp3d-sub">· ${this.t("level", { n: f.level })}</span>` : nothing}
-                </button>`,
-              )}
-              <button class="fp3d-btn" @click=${() => this.addFloor()}>${this.t("floor_empty")}</button>
-            </div>`
-          : nothing}
+        <h3>${floor ? this.t("floor_settings_of", { floor: floor.name }) : this.t("floors")}</h3>
+        ${floors.length ? nothing : html`<p class="fp3d-sub">${this.t("floor_none_hint")}</p>`}
         ${floor
           ? html`<div class="fp3d-form">
               <label class="fp3d-field fp3d-wide"
@@ -13382,6 +13416,15 @@ export class Fp3dEditor extends LitElement {
       .fp3d-caret {
         font-size: 0.8em;
         opacity: 0.7;
+      }
+      .fp3d-menu-label {
+        color: var(--fp3d-muted);
+        font-weight: 500;
+      }
+      .fp3d-menu-sep {
+        height: 1px;
+        margin: 4px 6px;
+        background: var(--fp3d-line, rgba(120, 190, 255, 0.22));
       }
       .fp3d-menu-sub {
         display: flex;

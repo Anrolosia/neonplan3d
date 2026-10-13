@@ -97,9 +97,10 @@ function copyFonts() {
 // main 540 KB on 2026-10-12 for the fun packs' switch (pets: the loader, settings and texts; the animals live in their own bundle)
 // main 550 KB and editor 780 KB on 2026-10-13 for the customer wishes (air conditioner, cooktop states, one-colour lamps, watt threshold) and roof windows in the room card
 // card editor 220 KB on 2026-10-13 for the cellar and ground texts (the card editor shares the language table)
+// card editor 225 KB on 2026-10-13 for the floor menu texts
 // main 560 KB on 2026-10-13 for the Halloween gift notice, the extension badge and the cellar texts
 // editor 790 KB on 2026-10-13 for the tidied toolbar (tool and view menus)
-const BUDGET = { "neonplan3d.js": 560 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 760 * 1024, "neonplan3d-editor.js": 790 * 1024, "neonplan3d-card-editor.js": 220 * 1024 };
+const BUDGET = { "neonplan3d.js": 560 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 760 * 1024, "neonplan3d-editor.js": 790 * 1024, "neonplan3d-card-editor.js": 225 * 1024 };
 
 copyFonts();
 if (watch) {
