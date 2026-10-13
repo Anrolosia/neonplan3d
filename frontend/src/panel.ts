@@ -19,7 +19,7 @@ import { furnitureName } from "./furniture-names.ts";
 import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts";
 import { canLift, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
-import { hasFeature } from "./features.ts";
+import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -55,6 +55,8 @@ export class Floorplan3dPanel extends LitElement {
     _mode: { state: true },
     _newOffers: { state: true },
     _readyPacks: { state: true },
+    _shopConnected: { state: true },
+    _giftLater: { state: true },
     _editorReady: { state: true },
     _floorId: { state: true },
     _roomId: { state: true },
@@ -91,6 +93,10 @@ export class Floorplan3dPanel extends LitElement {
   private declare _newOffers: number;
   /** Bought packs waiting here: updates and packs not installed yet (a gift such as a fun pack too). */
   private declare _readyPacks: number;
+  /** Whether this installation is connected to the shop (null until known). */
+  private declare _shopConnected: boolean | null;
+  /** "Later" on the gift notice: gone for this visit. */
+  private declare _giftLater: boolean;
   private offersChecked = false;
   /** The editor bundle is loaded (it is fetched the first time the editor opens). */
   private declare _editorReady: boolean;
@@ -140,6 +146,8 @@ export class Floorplan3dPanel extends LitElement {
     this._mode = "view";
     this._newOffers = 0;
     this._readyPacks = 0;
+    this._shopConnected = null;
+    this._giftLater = false;
     this._editorReady = !!customElements.get("fp3d-editor");
     this._floorId = null;
     this._roomId = null;
@@ -475,6 +483,7 @@ export class Floorplan3dPanel extends LitElement {
     this.offersChecked = true;
     getLicense(this.hass)
       .then((lic) => {
+        this._shopConnected = !!lic.active;
         this._newOffers = lic.active ? unseenOffers(lic.offers ?? []).length : 0;
         this._readyPacks = lic.active ? unseenUpdates(lic.updates ?? []).length + (lic.packs ?? []).filter((p) => p.installed === null).length : 0;
       })
@@ -634,8 +643,46 @@ export class Floorplan3dPanel extends LitElement {
               ? this.renderExtensions()
               : this.renderView(b)
           : nothing}
+        ${this.renderGift()}
       </div>
     `;
+  }
+
+  /**
+   * A gift for everyone (the fun pack "Halloween"), once per admin until "don't show again": connected to the shop,
+   * it is waiting under Extensions; not connected, a free customer account brings it (and connects the app).
+   */
+  private renderGift() {
+    const id = "fun_halloween_2026";
+    if (!this.isAdmin || this._giftLater || this._shopConnected === null || UNRELEASED.includes("fun_halloween") || hasFeature("fun_halloween")) return nothing;
+    try {
+      if (localStorage.getItem(`neonplan3d.news.${id}`) === "never") return nothing;
+    } catch {
+      // no storage: shown each visit until "later"
+    }
+    const never = () => {
+      try {
+        localStorage.setItem(`neonplan3d.news.${id}`, "never");
+      } catch {
+        // a private window
+      }
+      this._giftLater = true;
+    };
+    const connected = this._shopConnected;
+    return html`<div class="fp3d-gift-veil" @click=${(e: Event) => e.target === e.currentTarget && (this._giftLater = true)}>
+      <div class="fp3d-gift" role="dialog" aria-label=${this.t(connected ? "gift_title" : "gift_title_free")}>
+        <div class="fp3d-gift-pic">🎃 👻 🦇</div>
+        <h3>${this.t(connected ? "gift_title" : "gift_title_free")}</h3>
+        <p>${this.t(connected ? "gift_text" : "gift_text_free")}</p>
+        <div class="fp3d-gift-actions">
+          ${connected
+            ? html`<button class="fp3d-btn fp3d-primary" @click=${() => ((this._giftLater = true), this.setMode("extensions"))}>⬇ ${this.t("gift_install")}</button>`
+            : html`<a class="fp3d-btn fp3d-primary" href=${registerUrl(this.hass?.language)} target="_blank" rel="noopener" @click=${() => (this._giftLater = true)}>🎁 ${this.t("gift_register")}</a>`}
+          <button class="fp3d-btn" @click=${() => (this._giftLater = true)}>${this.t("news_later")}</button>
+          <button class="fp3d-btn" @click=${never}>${this.t("news_never")}</button>
+        </div>
+      </div>
+    </div>`;
   }
 
   /** Restart hint, save errors and unsaved edits from an earlier session. */
@@ -967,6 +1014,41 @@ export class Floorplan3dPanel extends LitElement {
     tokens,
     controls,
     css`
+      .fp3d-gift-veil {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: rgba(2, 6, 14, 0.55);
+      }
+      .fp3d-gift {
+        max-width: 440px;
+        padding: 22px 22px 18px;
+        border-radius: 18px;
+        border: 1px solid #ff9a3c;
+        background: var(--fp3d-panel, #0d1628);
+        box-shadow: 0 0 40px rgba(255, 154, 60, 0.3);
+        text-align: center;
+      }
+      .fp3d-gift-pic {
+        font-size: 34px;
+        letter-spacing: 6px;
+      }
+      .fp3d-gift h3 {
+        margin: 10px 0 6px;
+      }
+      .fp3d-gift p {
+        margin: 0 0 14px;
+        color: var(--fp3d-muted, #a9b8d4);
+      }
+      .fp3d-gift-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
       .fp3d-badge {
         display: inline-block;
         margin-left: 6px;

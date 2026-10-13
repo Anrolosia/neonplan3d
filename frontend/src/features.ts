@@ -51,6 +51,14 @@ export const PRO_URL = "https://mastershort.de/neonplan3d/";
 const isGerman = (lang: string | undefined) => (lang ?? navigator.language).toLowerCase().startsWith("de");
 
 /** The NeonPlan 3D page of the shop in the user's language (?lang= makes the site keep that language). */
+/**
+ * The shop's sign-up page: a free customer account with its licence key (and the free fun packs). Marked as coming
+ * from the app. (The exact address comes from the shop – see "Rueckmeldung Claude Desktop - Fun-Pack Halloween.md".)
+ */
+export function registerUrl(lang: string | undefined): string {
+  return isGerman(lang) ? "https://mastershort.de/mein-konto/?action=register&src=neonplan-app" : "https://mastershort.de/en/my-account/?action=register&src=neonplan-app";
+}
+
 export function shopUrl(lang: string | undefined): string {
   return isGerman(lang) ? "https://mastershort.de/neonplan3d/?lang=de" : "https://mastershort.de/en/neonplan3d/?lang=en";
 }
