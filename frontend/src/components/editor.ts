@@ -1180,6 +1180,7 @@ export class Fp3dEditor extends LitElement {
 
   private fit(): void {
     const pts = this.floor?.rooms.flatMap((r) => r.points) ?? [];
+    if (this._tool === "outdoor" || this._tool === "pool") for (const a of this.floor?.outdoor ?? []) pts.push(...a.points);
     // the roof tool shows the roof sections too, which reach past the rooms
     if (this._tool === "roof") for (const s of this._doc.settings.roof.sections ?? []) pts.push([s.x0, s.z0], [s.x1, s.z1]);
     const b = pts.length ? bounds(pts) : { x0: 0, z0: 0, x1: 10, z1: 8 };
@@ -5266,19 +5267,11 @@ export class Fp3dEditor extends LitElement {
       <div class="fp3d-seg fp3d-seg-menu">
         <button ?disabled=${!this._canUndo} @click=${() => this.undo()} title="Ctrl+Z">${this.t("undo")}</button>
         <button ?disabled=${!this._canRedo} @click=${() => this.redo()} title="Ctrl+Y">${this.t("redo")}</button>
-        <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => (close(), (this._viewMenu = false), this.toggleSplit())}>${this.t("split_3d")}</button>
-        <div class="fp3d-menu-wrap">
-          <button aria-haspopup="menu" aria-expanded=${this._viewMenu} @click=${() => ((this._viewMenu = !this._viewMenu), close())}>${this.t("view_menu")} <span class="fp3d-caret">▾</span></button>
-          ${this._viewMenu
-            ? html`<div class="fp3d-menu-veil" @click=${() => (this._viewMenu = false)}></div>
-                <div class="fp3d-menu fp3d-menu-right" role="menu">
-                  <button role="menuitem" class="fp3d-menu-item" @click=${() => ((this._viewMenu = false), this.fit())}>${this.t("fit")}</button>
-                  <button role="menuitem" class="fp3d-menu-item ${this._wallPick ? "fp3d-menu-on" : ""}" title=${this.t("wall_view_open")} @click=${(e: Event) => ((this._viewMenu = false), this.toggleWallPick(e.currentTarget as HTMLElement))}>
-                    ${this.t("wall_view")}
-                  </button>
-                </div>`
-            : nothing}
-        </div>
+      </div>
+      <div class="fp3d-seg fp3d-seg-menu">
+        <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => (close(), this.toggleSplit())}>${this.t("split_3d")}</button>
+        <button aria-pressed=${this._wallPick} title=${this.t("wall_view_open")} @click=${(e: Event) => (close(), this.toggleWallPick(e.currentTarget as HTMLElement))}>${this.t("wall_view")}</button>
+        <button title=${this.t("fit_hint")} @click=${() => (close(), this.fit())}>${this.t("fit")}</button>
       </div>`;
   }
 
@@ -11913,7 +11906,7 @@ export class Fp3dEditor extends LitElement {
         right: 0;
         bottom: 0;
         width: min(340px, 60%);
-        z-index: 6;
+        z-index: 8;
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45);
       }
       .fp3d-pin-row {
@@ -12117,6 +12110,7 @@ export class Fp3dEditor extends LitElement {
       }
       .fp3d-editor-3d {
         position: relative;
+        overflow: hidden;
         flex: 1 1 0;
         min-width: 240px;
         min-height: 0;
@@ -12315,6 +12309,10 @@ export class Fp3dEditor extends LitElement {
         flex-direction: column;
         gap: 18px;
         min-height: 0;
+      }
+      .fp3d-side:not(.fp3d-side-overlay) {
+        position: relative;
+        z-index: 7;
       }
       .fp3d-narrow .fp3d-side {
         border-left: none;
