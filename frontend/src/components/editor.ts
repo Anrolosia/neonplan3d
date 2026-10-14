@@ -10619,6 +10619,24 @@ export class Fp3dEditor extends LitElement {
               <p class="fp3d-sub fp3d-wide">${this.t("furn_state_hint")}</p>`;
   }
 
+  /** Awning: its fall, the valance, a position sensor, its run time and the other direction (with the cover above). */
+  private renderAwningFields(f: Furniture) {
+    const admin = this.isAdmin;
+    const sensors = this.entityOptions((id) => id.startsWith("sensor.") || id.startsWith("input_number.") || id.startsWith("number."));
+    return html`${this.num(this.t("awning_pitch"), f.awning_pitch ?? 12, (v) => this.updateFurniture({ awning_pitch: Math.max(0, Math.min(80, Math.round(v))) }), 1)}
+      ${this.num(this.t("awning_time"), f.awning_time ?? 20, (v) => this.updateFurniture({ awning_time: Math.max(2, Math.min(300, Math.round(v))) }), 1)}
+      ${this.entitySelect(this.t("awning_position"), f.awning_position ?? null, undefined, sensors, (v) => this.updateFurniture({ awning_position: v === "none" ? null : v }))}
+      <label class="fp3d-check fp3d-wide"
+        ><input type="checkbox" .checked=${f.awning_valance !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateFurniture({ awning_valance: (ev.target as HTMLInputElement).checked })} />
+        ${this.t("awning_valance")}</label
+      >
+      <label class="fp3d-check fp3d-wide" title=${this.t("awning_invert_hint")}
+        ><input type="checkbox" .checked=${!!f.awning_invert} ?disabled=${!admin} @change=${(ev: Event) => this.updateFurniture({ awning_invert: (ev.target as HTMLInputElement).checked })} />
+        ${this.t("awning_invert")}</label
+      >
+      <p class="fp3d-sub fp3d-wide">${this.t("awning_hint")}</p>`;
+  }
+
   private renderFurnitureLinks(f: Furniture) {
     const ALARM_CLASSES = new Set(["smoke", "gas", "carbon_monoxide", "heat", "moisture", "safety", "sound", "problem"]);
     if (!this.hass) return nothing;
@@ -10641,7 +10659,9 @@ export class Fp3dEditor extends LitElement {
         : tvLike
           ? // a media player, or the smart plug an older TV is switched with
             /^(media_player|switch|input_boolean|light)\./.test(id)
-          : f.type === "radiator" || f.type === "ac_unit"
+          : f.type === "awning"
+            ? id.startsWith("cover.")
+            : f.type === "radiator" || f.type === "ac_unit"
             ? id.startsWith("climate.")
             : isRobotVacuum(f.type)
               ? id.startsWith("vacuum.")
@@ -10658,9 +10678,10 @@ export class Fp3dEditor extends LitElement {
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "radiator" || f.type === "ac_unit" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "awning" ? "awning_cover" : f.type === "radiator" || f.type === "ac_unit" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
+        ${f.type === "awning" ? this.renderAwningFields(f) : nothing}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type) ? this.renderStateLinks(f) : nothing}
         ${lamp && f.entity && f.entity !== "none"
           ? html`${this.entitySelect(this.t("furn_color_entity"), f.color_entity ?? null, undefined, this.entityOptions((id) => id.startsWith("light.") && id !== f.entity), (v) => this.updateFurniture({ color_entity: v === "none" ? null : v }))}

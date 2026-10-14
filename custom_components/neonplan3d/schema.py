@@ -256,6 +256,12 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("color_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # mirrored left-right
         vol.Optional("mirror", default=False): bool,
+        # awning: the fabric's fall (degrees), the valance, a position sensor, its run time and the other direction
+        vol.Optional("awning_pitch", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=80))),
+        vol.Optional("awning_valance", default=True): bool,
+        vol.Optional("awning_position", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("awning_time", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=2, max=300))),
+        vol.Optional("awning_invert", default=False): bool,
         # LED strip: tilt about its length (degrees) and standing upright
         vol.Optional("tilt", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
         vol.Optional("upright", default=False): bool,

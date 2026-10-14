@@ -54,7 +54,7 @@ import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
+import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -1373,6 +1373,48 @@ export class FloorplanViewer {
     this.invalidate();
   }
 
+  /**
+   * Awnings: how far each is out now and where it is going. A reported position is followed smoothly (a cover that
+   * reports while it runs shows the awning run out slowly); without one it runs at its run time while it says
+   * opening or closing.
+   */
+  private awnings = new Map<string, { cur: number; to: number; speed: number }>();
+
+  setAwnings(states: Map<string, { out: number | null; moving: -1 | 0 | 1; time: number }>): void {
+    for (const [id, a] of states) {
+      const st = this.awnings.get(id) ?? { cur: a.out ?? 0, to: a.out ?? 0, speed: 0 };
+      if (a.out === null) {
+        st.to = a.moving > 0 ? 1 : 0;
+        st.speed = 1 / Math.max(2, a.time);
+      } else {
+        st.to = a.out;
+        st.speed = 0;
+      }
+      this.awnings.set(id, st);
+    }
+    for (const id of [...this.awnings.keys()]) if (!states.has(id)) this.awnings.delete(id);
+    this.invalidate();
+  }
+
+  private stepAwnings(dt: number): Set<string> {
+    const touched = new Set<string>();
+    // a reported position: eased over about a second, so steps of a moving cover read as a smooth run (dt in ms)
+    const k = 1 - Math.exp(-dt / 450);
+    for (const [id, st] of this.awnings) {
+      const d = st.to - st.cur;
+      if (Math.abs(d) < 0.002) {
+        if (d !== 0) {
+          st.cur = st.to;
+          touched.add(id);
+        }
+        continue;
+      }
+      st.cur = st.speed > 0 ? st.cur + Math.sign(d) * Math.min(Math.abs(d), (st.speed * dt) / 1000) : st.cur + d * k;
+      touched.add(id);
+    }
+    return touched;
+  }
+
   private stepFridges(dt: number): boolean {
     const k = 1 - Math.exp(-dt / OPENING_TAU);
     const touched = new Set<string>();
@@ -1390,6 +1432,7 @@ export class FloorplanViewer {
         touched.add(id);
       }
     }
+    for (const id of this.stepAwnings(dt)) touched.add(id);
     if (!touched.size) return false;
     for (const fv of this.floors) if (fv.floor.furniture.some((f) => touched.has(f.id))) this.buildFridges(fv);
     return true;
@@ -1402,6 +1445,8 @@ export class FloorplanViewer {
       const st = this.fridges.get(f.id);
       pushFridgeDoors(buf, f, mountBase(fv.floor, f), st?.l ?? 0, st?.r ?? 0);
     }
+    // awnings ride in the same mesh: they run out and in with their cover
+    for (const f of fv.floor.furniture) if (f.type === "awning") pushAwning(buf, f, mountBase(fv.floor, f), this.awnings.get(f.id)?.cur ?? 0);
     fv.fridgeMesh.geometry.dispose();
     fv.fridgeMesh.geometry = buf.geometry();
     fv.fridgeMesh.visible = buf.count > 0;

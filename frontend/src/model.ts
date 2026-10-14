@@ -164,6 +164,16 @@ export interface Furniture {
   only_color?: string | null;
   /** With a power sensor: the item counts as running above this many watts (null = the default, 10 W). */
   run_w?: number | null;
+  /** Awning: the fabric's fall in degrees (null = 12°). */
+  awning_pitch?: number | null;
+  /** Awning: false leaves out the valance hanging from the front bar. */
+  awning_valance?: boolean;
+  /** Awning: a sensor with the position while it moves (0–100), for covers that only report at the end. */
+  awning_position?: EntityRef;
+  /** Awning: seconds it takes to run out fully, to move along when the cover only says opening or closing (null = 20 s). */
+  awning_time?: number | null;
+  /** Awning: the cover counts the other way round (100 = in). */
+  awning_invert?: boolean;
   /** An own symbol for the marker: a Material Design icon name without "mdi:" (null = by kind). */
   icon?: string | null;
   /** Linked entity, e.g. the TV's media player (null = automatic, "none" = none). */
@@ -1117,6 +1127,7 @@ export const FURNITURE_TYPES = [
   "parking",
   "fridge_smart",
   "stairwell",
+  "awning",
 ] as const;
 
 /** Furniture library sections (the editor lists them in this order). */
@@ -1129,6 +1140,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   bath: ["bathtub", "shower", "wc", "washbasin", "washer", "dryer"],
   work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "ac_unit", "stairs", "stairs_u", "robot_vacuum"],
   vehicles: ["parking"],
+  outdoor: ["awning"],
 };
 
 /** Energy devices: placed and set up in the Energy tool (stored like furniture, not in the library). */
@@ -1266,6 +1278,9 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
     case "ac_unit":
       // an air conditioner's indoor unit hangs high on the wall
       return 2.05;
+    case "awning":
+      // the cassette over a terrace door
+      return 2.3;
     case "inverter":
       return 1.1;
     case "wallbox":
@@ -1290,6 +1305,7 @@ export const ELECTRIC_FURNITURE = new Set<string>([
   ...LAMP_TYPES,
   "radiator",
   "ac_unit",
+  "awning",
   "robot_vacuum",
   "inverter",
   "home_battery",
@@ -1371,6 +1387,8 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   lamp_garden: [0.12, 0.12, 0.3],
   radiator: [1.0, 0.1, 0.6],
   ac_unit: [0.85, 0.22, 0.3],
+  // width along the wall, the projection (how far it reaches out fully extended), the cassette
+  awning: [3.0, 2.5, 0.22],
   robot_vacuum: [0.36, 0.5, 0.1],
   parking: [2.6, 5.2, 0.02],
   lamp_pendant: [0.4, 0.4, 0.8],

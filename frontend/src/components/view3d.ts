@@ -14,7 +14,7 @@ import { carState, type CarState, roomClimateValue,
   openingState,
   TOGGLE_KINDS,
   type FurnitureLinks,
-  type OpeningEntities, confirmEntities, fridgeDoors, hasScreen, pictureRuleMatches,
+  type OpeningEntities, awningStates, confirmEntities, fridgeDoors, hasScreen, pictureRuleMatches,
   fromCelsius,
   tempUnit,
   robotRoom,
@@ -858,6 +858,7 @@ export class Fp3dView3d extends LitElement {
     v.setPickTargets(furniture.targets, this.openingTargets());
     v.setScreens(furniture.screens);
     v.setFridgeDoors(fridgeDoors(hass, b.floors));
+    v.setAwnings(awningStates(hass, b.floors));
     v.setRobots(this.robotInfos(hass, b));
     // roof windows: sash and blind follow their contact and cover like windows do
     const roofWindows = new Map<string, { open: number; tilt: number; cover: number }>();

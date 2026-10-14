@@ -419,6 +419,104 @@ export const FRIDGE_DOOR = 0.06;
  * outer hinge: the left one carries the water dispenser, the right one the screen. An open door turns
  * red – it should not stay open for long.
  */
+/**
+ * An awning on its wall: the cassette along the back edge of its box (the wall side), the fabric running out towards
+ * the front with its fall, two folding arms, the front bar and a valance. `out` is how far it is run out (0 … 1);
+ * `base` is the cassette's underside above the floor.
+ */
+export function pushAwning(buf: GeoBuffer, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "awning_pitch" | "awning_valance">, base: number, out: number): void {
+  const a = f.rotation * DEG;
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  // local x along the wall, local z out from the wall (the item's front), y up
+  const P = (lx: number, y: number, lz: number): number[] => [f.x + lx * c - lz * s, y, f.z + lx * s + lz * c];
+  const quad = (p: number[], q: number[], r: number[], t: number[], col: Color, both = false) => {
+    buf.tri(p, q, r, col);
+    buf.tri(p, r, t, col);
+    if (both) {
+      buf.tri(p, r, q, col);
+      buf.tri(p, t, r, col);
+    }
+  };
+  // a square beam between two points (arms, the front bar)
+  const beam = (p: number[], q: number[], r: number, col: Color) => {
+    const dx = q[0] - p[0];
+    const dy = q[1] - p[1];
+    const dz = q[2] - p[2];
+    const len = Math.hypot(dx, dy, dz) || 1;
+    const d = [dx / len, dy / len, dz / len];
+    // two directions across the beam
+    const up = Math.abs(d[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
+    const u = [d[1] * up[2] - d[2] * up[1], d[2] * up[0] - d[0] * up[2], d[0] * up[1] - d[1] * up[0]];
+    const ul = Math.hypot(u[0], u[1], u[2]) || 1;
+    const n1 = [(u[0] / ul) * r, (u[1] / ul) * r, (u[2] / ul) * r];
+    const n2 = [d[1] * n1[2] - d[2] * n1[1], d[2] * n1[0] - d[0] * n1[2], d[0] * n1[1] - d[1] * n1[0]];
+    const corner = (o: number[], i: number) => {
+      const k = [
+        [1, 1],
+        [-1, 1],
+        [-1, -1],
+        [1, -1],
+      ][i];
+      return [o[0] + n1[0] * k[0] + n2[0] * k[1], o[1] + n1[1] * k[0] + n2[1] * k[1], o[2] + n1[2] * k[0] + n2[2] * k[1]];
+    };
+    for (let i = 0; i < 4; i++) quad(corner(p, i), corner(q, i), corner(q, (i + 1) % 4), corner(p, (i + 1) % 4), col, true);
+  };
+  const hw = f.w / 2;
+  const back = -f.d / 2;
+  const box = Math.max(0.12, Math.min(0.3, f.h));
+  const body = new Color(C.body);
+  const top = new Color(C.bodyTop);
+  const accent = new Color(C.accent);
+  // the cassette: a box along the wall
+  const z0 = back;
+  const z1 = back + box;
+  const y0 = base;
+  const y1 = base + box;
+  quad(P(-hw, y1, z0), P(hw, y1, z0), P(hw, y1, z1), P(-hw, y1, z1), top, true);
+  quad(P(-hw, y0, z1), P(hw, y0, z1), P(hw, y1, z1), P(-hw, y1, z1), body, true);
+  quad(P(-hw, y0, z0), P(hw, y0, z0), P(hw, y0, z1), P(-hw, y0, z1), body, true);
+  quad(P(-hw, y0, z0), P(-hw, y0, z1), P(-hw, y1, z1), P(-hw, y1, z0), body, true);
+  quad(P(hw, y0, z0), P(hw, y0, z1), P(hw, y1, z1), P(hw, y1, z0), body, true);
+  // the fabric: from the cassette's mouth down its fall to the front bar, in stripes
+  const pitch = ((f.awning_pitch ?? 12) * Math.PI) / 180;
+  const reach = Math.max(0, f.d - box) * Math.max(0, Math.min(1, out));
+  const mouth = [z1 - 0.02, y0 + box * 0.35];
+  const end = [mouth[0] + reach, mouth[1] - reach * Math.tan(pitch)];
+  const stripes = Math.max(4, Math.round(f.w / 0.3));
+  const stripeA = new Color(0x1d6f8a);
+  const stripeB = new Color(0x0f2f45);
+  if (reach > 0.01) {
+    for (let i = 0; i < stripes; i++) {
+      const xa = -hw + 0.04 + ((f.w - 0.08) * i) / stripes;
+      const xb = -hw + 0.04 + ((f.w - 0.08) * (i + 1)) / stripes;
+      quad(P(xa, mouth[1], mouth[0]), P(xb, mouth[1], mouth[0]), P(xb, end[1], end[0]), P(xa, end[1], end[0]), i % 2 ? stripeA : stripeB, true);
+    }
+    // the folding arms: from the wall at the cassette's ends to the front bar, bending out sideways at the elbow
+    const arm = Math.max(0.3, (f.d - box) / 2 + 0.05);
+    for (const side of [-1, 1]) {
+      const x = side * (hw - 0.12);
+      const sh = [x, y0 + 0.02, z1 - 0.04];
+      const hand = [x, end[1] - 0.02, end[0]];
+      const span = Math.hypot(hand[2] - sh[2], hand[1] - sh[1]);
+      const bend = Math.sqrt(Math.max(0, arm * arm - (span / 2) ** 2));
+      const elbow = [x - side * Math.min(bend, hw - 0.15), (sh[1] + hand[1]) / 2, (sh[2] + hand[2]) / 2];
+      beam(P(sh[0], sh[1], sh[2]), P(elbow[0], elbow[1], elbow[2]), 0.018, accent);
+      beam(P(elbow[0], elbow[1], elbow[2]), P(hand[0], hand[1], hand[2]), 0.018, accent);
+    }
+  }
+  // the front bar (at the cassette when run in) and the valance hanging from it
+  beam(P(-hw + 0.02, end[1], end[0]), P(hw - 0.02, end[1], end[0]), 0.03, accent);
+  if (f.awning_valance !== false && reach > 0.05) {
+    const vh = 0.2;
+    for (let i = 0; i < stripes; i++) {
+      const xa = -hw + 0.04 + ((f.w - 0.08) * i) / stripes;
+      const xb = -hw + 0.04 + ((f.w - 0.08) * (i + 1)) / stripes;
+      quad(P(xa, end[1] - vh, end[0] + 0.01), P(xb, end[1] - vh, end[0] + 0.01), P(xb, end[1], end[0] + 0.01), P(xa, end[1], end[0] + 0.01), i % 2 ? stripeA : stripeB, true);
+    }
+  }
+}
+
 export function pushFridgeDoors(buf: GeoBuffer, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "mirror">, base: number, left: number, right: number): void {
   const p0 = buf.p.length;
   pushFridgeDoorsUnflipped(buf, f, base, left, right);
@@ -1225,6 +1323,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "fridge_smart":
       fridgeSmart(b, w, d, h);
       break;
+    case "awning":
+      // drawn with its moving fabric and arms by pushAwning (it runs in and out with its cover)
+      return;
     case "stove":
       stove(b, w, d, h);
       break;
