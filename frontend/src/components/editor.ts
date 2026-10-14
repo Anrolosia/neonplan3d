@@ -5020,7 +5020,8 @@ export class Fp3dEditor extends LitElement {
    * customers). Shown to admins who bought something and do not have it yet, until "don't show again".
    */
   private renderNews() {
-    const news = [{ id: "fun_pets_2026", feature: "fun_pets" as const }];
+    // the pets' notice went with the gift notice of the panel (both fun packs free with a customer account)
+    const news: { id: string; feature: "fun_pets" }[] = [];
     if (this.newsLater || !this.isAdmin) return nothing;
     const customer = (this.packs ?? []).some((p) => p.licensee);
     const item = news.find((n) => {

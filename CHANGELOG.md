@@ -4,6 +4,15 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.18.1
+
+### New
+
+- **Fun pack Halloween** released: 13 decorations and a ghost floating through the house (switch under Extensions, card option `ghost: false`).
+- **Fun packs free with every customer account** (Halloween and Pets): with a licence key they wait under Extensions to install; without one, a free account brings them. A one-time notice in the 3D view; the pets' old shop notice is gone.
+- **Chinese (Simplified) and Portuguese** as app languages (config flow too: zh-Hans, zh-Hant, pt, pt-BR).
+- All 16 extra languages complete with the texts of 1.18.
+
 ## 1.18.0
 
 ### New
