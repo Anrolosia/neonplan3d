@@ -970,7 +970,8 @@ export class FloorplanViewer {
         ((c as Mesh).material as Material | undefined)?.dispose?.();
       }
       const mine = list.filter((s) => s.floorId === fv.floor.id);
-      const y = fv.floor.elevation + 0.03;
+      // in the floor's own coordinates: its group already stands at the floor's elevation (#521)
+      const y = 0.03;
       for (const src of mine) {
         if (!src.playing) continue;
         // three rings per speaker, staggered; the frame loop scales and fades them
