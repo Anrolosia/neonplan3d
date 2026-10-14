@@ -10623,7 +10623,30 @@ export class Fp3dEditor extends LitElement {
   private renderAwningFields(f: Furniture) {
     const admin = this.isAdmin;
     const sensors = this.entityOptions((id) => id.startsWith("sensor.") || id.startsWith("input_number.") || id.startsWith("number."));
-    return html`${this.num(this.t("awning_pitch"), f.awning_pitch ?? 12, (v) => this.updateFurniture({ awning_pitch: Math.max(0, Math.min(80, Math.round(v))) }), 1)}
+    // each kind with the sizes it usually has: width, projection (depth), height above the floor, fall
+    const KINDS: Record<string, { w: number; d: number; y: number; pitch: number | null }> = {
+      arm: { w: 3, d: 2.5, y: 2.3, pitch: null },
+      drop: { w: 2.4, d: 1.2, y: 2.3, pitch: 20 },
+      vertical: { w: 2, d: 0.2, y: 2.3, pitch: null },
+      pergola: { w: 4, d: 3.5, y: 2.6, pitch: 6 },
+      side: { w: 3, d: 0.2, y: 1.8, pitch: null },
+    };
+    const kind = f.variant ?? "arm";
+    return html`<label class="fp3d-field fp3d-wide"
+        >${this.t("awning_kind")}
+        <select
+          ?disabled=${!admin}
+          @change=${(e: Event) => {
+            const k = (e.target as HTMLSelectElement).value;
+            const d = KINDS[k];
+            this.updateFurniture({ variant: k === "arm" ? null : k, w: d.w, d: d.d, mount_y: d.y, awning_pitch: d.pitch });
+          }}
+        >
+          ${Object.keys(KINDS).map((k) => html`<option value=${k} ?selected=${kind === k}>${this.t(`awning_kind_${k}` as I18nKey)}</option>`)}
+        </select></label
+      >
+      <p class="fp3d-sub fp3d-wide">${this.t(`awning_kind_${kind}_hint` as I18nKey)}</p>
+      ${kind === "vertical" || kind === "side" ? nothing : this.num(this.t("awning_pitch"), f.awning_pitch ?? 12, (v) => this.updateFurniture({ awning_pitch: Math.max(0, Math.min(80, Math.round(v))) }), 1)}
       ${this.num(this.t("awning_time"), f.awning_time ?? 20, (v) => this.updateFurniture({ awning_time: Math.max(2, Math.min(300, Math.round(v))) }), 1)}
       ${this.entitySelect(this.t("awning_position"), f.awning_position ?? null, undefined, sensors, (v) => this.updateFurniture({ awning_position: v === "none" ? null : v }))}
       <label class="fp3d-check fp3d-wide"
