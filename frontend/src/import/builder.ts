@@ -205,8 +205,19 @@ export function buildPlan(raw: RawPlan, options: BuildOptions = {}): BuildResult
       // an area that holds another one is no room: the outline of the whole house around the rooms (an outer
       // wall face that touches nothing inside)
       // (a wardrobe cut through inside a room is no reason: what it holds must make up much of its area)
-      const holds = (f: { points: Vec2[]; area: number }) =>
-        found.filter((g) => g !== f && g.area < f.area * 0.98 && pointInPolygon(centroidOf(g.points), f.points) && g.points.every((p) => pointInPolygon(p, f.points) || f.points.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.03))).reduce((s, g) => s + g.area, 0) >= f.area * 0.4;
+      const box = (pts: Vec2[]) => ({ x0: Math.min(...pts.map((p) => p[0])), z0: Math.min(...pts.map((p) => p[1])), x1: Math.max(...pts.map((p) => p[0])), z1: Math.max(...pts.map((p) => p[1])) });
+      const boxes = new Map(found.map((f) => [f, box(f.points)]));
+      const holds = (f: { points: Vec2[]; area: number }) => {
+        const fb = boxes.get(f)!;
+        let held = 0;
+        for (const g of found) {
+          if (g === f || g.area >= f.area * 0.98) continue;
+          const gb = boxes.get(g)!;
+          if (gb.x0 < fb.x0 - 0.05 || gb.x1 > fb.x1 + 0.05 || gb.z0 < fb.z0 - 0.05 || gb.z1 > fb.z1 + 0.05) continue;
+          if (pointInPolygon(centroidOf(g.points), f.points) && g.points.every((p) => pointInPolygon(p, f.points) || f.points.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.03))) held += g.area;
+        }
+        return held >= f.area * 0.4;
+      };
       rooms = found
         .filter((f) => f.area >= 1.0 && !isStrip(f.points, f.area) && !holds(f))
         .map((f) => ({ id: id("room"), name: "", area_id: null, points: cleanPolygon(f.points), floor_material: "wood" }));

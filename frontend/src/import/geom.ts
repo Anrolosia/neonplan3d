@@ -140,8 +140,22 @@ export function bridgeGaps(segs: readonly Seg[], minGap = 0.5, maxGap = 1.3, tol
   // a line goes on straight from this end: no gap starts here
   const goesOn = (e: { p: Vec2; dir: Vec2 }) => (at.get(key(e.p)) ?? []).some((v) => v[0] * e.dir[0] + v[1] * e.dir[1] > 0.995);
   const free = ends.filter((e) => !goesOn(e));
+  const sgrid = new Map<string, Seg[]>();
+  for (const s of segs) {
+    const x0 = Math.floor(Math.min(s.a[0], s.b[0]));
+    const x1 = Math.floor(Math.max(s.a[0], s.b[0]));
+    const z0 = Math.floor(Math.min(s.a[1], s.b[1]));
+    const z1 = Math.floor(Math.max(s.a[1], s.b[1]));
+    for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) (sgrid.get(`${x},${z}`) ?? sgrid.set(`${x},${z}`, []).get(`${x},${z}`)!).push(s);
+  }
+  const nearSegs = (a: Vec2, b: Vec2) => {
+    const out = new Set<Seg>();
+    for (let x = Math.floor(Math.min(a[0], b[0])); x <= Math.floor(Math.max(a[0], b[0])); x++)
+      for (let z = Math.floor(Math.min(a[1], b[1])); z <= Math.floor(Math.max(a[1], b[1])); z++) for (const s of sgrid.get(`${x},${z}`) ?? []) out.add(s);
+    return out;
+  };
   const crosses = (a: Vec2, b: Vec2) =>
-    segs.some((s) => {
+    [...nearSegs(a, b)].some((s) => {
       const r: Vec2 = [b[0] - a[0], b[1] - a[1]];
       const q: Vec2 = [s.b[0] - s.a[0], s.b[1] - s.a[1]];
       const den = r[0] * q[1] - r[1] * q[0];
@@ -153,11 +167,21 @@ export function bridgeGaps(segs: readonly Seg[], minGap = 0.5, maxGap = 1.3, tol
     });
   const out: Seg[] = [];
   const seen = new Set<string>();
+  // free ends by 2 m cells: a partner lies at most maxGap away
+  const cell = (p: Vec2) => `${Math.floor(p[0] / 2)},${Math.floor(p[1] / 2)}`;
+  const byCell = new Map<string, (typeof free)[number][]>();
+  for (const f of free) (byCell.get(cell(f.p)) ?? byCell.set(cell(f.p), []).get(cell(f.p))!).push(f);
+  const around = (p: Vec2) => {
+    const [cx, cz] = cell(p).split(",").map(Number);
+    const out: (typeof free)[number][] = [];
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) out.push(...(byCell.get(`${cx + dx},${cz + dz}`) ?? []));
+    return out;
+  };
   for (const e of free) {
     if (e.used) continue;
     let best: (typeof free)[number] | null = null;
     let bestD = Infinity;
-    for (const f of free) {
+    for (const f of around(e.p)) {
       if (f === e || f.used) continue;
       // facing each other on one line
       if (e.dir[0] * f.dir[0] + e.dir[1] * f.dir[1] > -0.995) continue;
@@ -182,12 +206,29 @@ export function bridgeGaps(segs: readonly Seg[], minGap = 0.5, maxGap = 1.3, tol
 /** Segments split where they cross or touch each other, end points within `tol` merged. */
 export function splitSegments(segs: readonly Seg[], tol = 0.01): Seg[] {
   const cuts = segs.map(() => [0, 1]);
+  // a grid of 1 m cells: only segments sharing a cell can touch (large drawings and model sections hold thousands)
+  const CELL = 1;
+  const grid = new Map<string, number[]>();
+  const cellsOf = (s: Seg) => {
+    const out: string[] = [];
+    const x0 = Math.floor((Math.min(s.a[0], s.b[0]) - tol) / CELL);
+    const x1 = Math.floor((Math.max(s.a[0], s.b[0]) + tol) / CELL);
+    const z0 = Math.floor((Math.min(s.a[1], s.b[1]) - tol) / CELL);
+    const z1 = Math.floor((Math.max(s.a[1], s.b[1]) + tol) / CELL);
+    for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) out.push(`${x},${z}`);
+    return out;
+  };
+  segs.forEach((s, i) => {
+    for (const c of cellsOf(s)) (grid.get(c) ?? grid.set(c, []).get(c)!).push(i);
+  });
   for (let i = 0; i < segs.length; i++) {
     const s = segs[i];
     const r: Vec2 = [s.b[0] - s.a[0], s.b[1] - s.a[1]];
     const rl = Math.hypot(r[0], r[1]);
     if (rl < 1e-9) continue;
-    for (let j = 0; j < segs.length; j++) {
+    const near = new Set<number>();
+    for (const c of cellsOf(s)) for (const j of grid.get(c) ?? []) near.add(j);
+    for (const j of near) {
       if (i === j) continue;
       const t = segs[j];
       const q: Vec2 = [t.b[0] - t.a[0], t.b[1] - t.a[1]];

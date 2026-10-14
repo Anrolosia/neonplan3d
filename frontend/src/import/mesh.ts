@@ -248,42 +248,100 @@ function slice(pts: Float64Array, h: number): RawWall[] {
 }
 
 /** Pieces of one straight line joined (a wall's face is cut into many small pieces by its triangles). */
-function mergeCollinear(segs: RawWall[]): RawWall[] {
+function mergeCollinear(input: RawWall[]): RawWall[] {
+  const segs = input.map((s) => ({ a: s.a, b: s.b }));
   const key = (p: Vec2) => `${Math.round(p[0] * 200)},${Math.round(p[1] * 200)}`;
-  const by = new Map<string, number[]>();
+  const by = new Map<string, Set<number>>();
+  const add = (k: string, i: number) => (by.get(k) ?? by.set(k, new Set()).get(k)!).add(i);
   segs.forEach((s, i) => {
-    for (const p of [s.a, s.b]) (by.get(key(p)) ?? by.set(key(p), []).get(key(p))!).push(i);
+    add(key(s.a), i);
+    add(key(s.b), i);
   });
   const alive = segs.map(() => true);
   const dir = (s: RawWall): Vec2 => {
     const l = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) || 1;
     return [(s.b[0] - s.a[0]) / l, (s.b[1] - s.a[1]) / l];
   };
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const [k, list] of by) {
-      const live = list.filter((i) => alive[i]);
-      if (live.length !== 2) continue;
-      const [i, j] = live;
-      const s = segs[i];
-      const t = segs[j];
-      const ds = dir(s);
-      const dt = dir(t);
-      if (Math.abs(ds[0] * dt[1] - ds[1] * dt[0]) > 0.02) continue;
-      // the far ends of both
-      const far = (x: RawWall) => (key(x.a) === k ? x.b : x.a);
-      const merged: RawWall = { a: far(s), b: far(t) };
-      segs[i] = merged;
-      alive[j] = false;
-      for (const p of [merged.a, merged.b]) {
-        const l = by.get(key(p));
-        if (l && !l.includes(i)) l.push(i);
-      }
-      changed = true;
-    }
+  // a work list of points: where exactly two pieces meet in line, they become one, and its far ends are looked at again
+  const queue = [...by.keys()];
+  while (queue.length) {
+    const k = queue.pop()!;
+    const set = by.get(k);
+    if (!set || set.size !== 2) continue;
+    const [i, j] = [...set];
+    const s = segs[i];
+    const t = segs[j];
+    const ds = dir(s);
+    const dt = dir(t);
+    if (Math.abs(ds[0] * dt[1] - ds[1] * dt[0]) > 0.02) continue;
+    const far = (x: RawWall) => (key(x.a) === k ? x.b : x.a);
+    const fa = far(s);
+    const fb = far(t);
+    if (key(fa) === key(fb)) continue;
+    segs[i] = { a: fa, b: fb };
+    alive[j] = false;
+    by.delete(k);
+    by.get(key(fb))?.delete(j);
+    add(key(fb), i);
+    queue.push(key(fa), key(fb));
   }
   return segs.filter((_, i) => alive[i]);
+}
+
+/**
+ * Small separate parts of a cut left out: table legs, vases, a chair's frame (less than `minLen` of lines in all).
+ * Walls are long connected runs of lines.
+ */
+function dropSmallParts(segs: RawWall[], minLen = 1.5): RawWall[] {
+  const key = (p: Vec2) => `${Math.round(p[0] * 100)},${Math.round(p[1] * 100)}`;
+  const parent = new Map<string, string>();
+  const find = (k: string): string => {
+    let r = k;
+    while (parent.get(r) !== r) r = parent.get(r)!;
+    let c = k;
+    while (parent.get(c) !== r) {
+      const n = parent.get(c)!;
+      parent.set(c, r);
+      c = n;
+    }
+    return r;
+  };
+  for (const s of segs)
+    for (const p of [s.a, s.b])
+      if (!parent.has(key(p))) parent.set(key(p), key(p));
+  for (const s of segs) {
+    const a = find(key(s.a));
+    const b = find(key(s.b));
+    if (a !== b) parent.set(a, b);
+  }
+  const total = new Map<string, number>();
+  for (const s of segs) {
+    const r = find(key(s.a));
+    total.set(r, (total.get(r) ?? 0) + Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]));
+  }
+  return segs.filter((s) => (total.get(find(key(s.a))) ?? 0) >= minLen);
+}
+
+/** Whether lines of a cut lie near a point (a wall below a window's gap; nothing below a door's). */
+function linesNear(segs: RawWall[]): (p: Vec2, r: number) => boolean {
+  const grid = new Map<string, RawWall[]>();
+  for (const s of segs) {
+    const x0 = Math.floor(Math.min(s.a[0], s.b[0]));
+    const x1 = Math.floor(Math.max(s.a[0], s.b[0]));
+    const z0 = Math.floor(Math.min(s.a[1], s.b[1]));
+    const z1 = Math.floor(Math.max(s.a[1], s.b[1]));
+    for (let x = x0; x <= x1; x++) for (let z = z0; z <= z1; z++) (grid.get(`${x},${z}`) ?? grid.set(`${x},${z}`, []).get(`${x},${z}`)!).push(s);
+  }
+  return (p, r) => {
+    for (const s of grid.get(`${Math.floor(p[0])},${Math.floor(p[1])}`) ?? []) {
+      const dx = s.b[0] - s.a[0];
+      const dz = s.b[1] - s.a[1];
+      const l2 = dx * dx + dz * dz || 1e-9;
+      const t = Math.max(0, Math.min(1, ((p[0] - s.a[0]) * dx + (p[1] - s.a[1]) * dz) / l2));
+      if (Math.hypot(s.a[0] + dx * t - p[0], s.a[1] + dz * t - p[1]) <= r) return true;
+    }
+    return false;
+  };
 }
 
 export function readMesh(t: Tris, opt: MeshOptions = {}): { plan: RawPlan; info: MeshInfo } {
@@ -295,14 +353,18 @@ export function readMesh(t: Tris, opt: MeshOptions = {}): { plan: RawPlan; info:
     const height = i + 1 < levels.length ? levels[i + 1] - y : Math.min(3, Math.max(2.3, size[1] - y - 0.2));
     // just under the door heads (doors are gaps there), above most furniture; and at window height
     const high = y + Math.min(1.95, height * 0.78);
-    const walls = slice(pts, high);
-    const gapsAt = (h: number, min: number, max: number) => bridgeGaps(slice(pts, h).map((w) => ({ a: w.a, b: w.b })), min, max);
+    const walls = dropSmallParts(slice(pts, high));
     const mid = (g: { a: Vec2; b: Vec2 }): Vec2 => [(g.a[0] + g.b[0]) / 2, (g.a[1] + g.b[1]) / 2];
     const near = (p: Vec2, q: Vec2) => Math.hypot(p[0] - q[0], p[1] - q[1]) < 0.6;
-    // a door is open down to the floor; a gap only higher up is a window
-    const low = gapsAt(y + 0.3, 0.5, 3.2);
-    const doors = bridgeGaps(walls.map((w) => ({ a: w.a, b: w.b })), 0.5, 3.2).filter((g) => low.some((l) => near(mid(l), mid(g))));
-    const windows = gapsAt(y + Math.min(1.35, height * 0.55), 0.4, 3.2).filter((g) => !doors.some((d) => near(mid(d), mid(g))));
+    // a gap in the walls under the door heads: a door when the wall is open down to the floor there too, else
+    // (a wall under it) a window reaching up high
+    const lowLines = linesNear(slice(pts, y + 0.3));
+    const highGaps = bridgeGaps(walls.map((w) => ({ a: w.a, b: w.b })), 0.5, 3.2);
+    const doors = highGaps.filter((g) => !lowLines(mid(g), 0.12));
+    const windows = [
+      ...highGaps.filter((g) => lowLines(mid(g), 0.12)),
+      ...bridgeGaps(dropSmallParts(slice(pts, y + Math.min(1.35, height * 0.55))).map((w) => ({ a: w.a, b: w.b })), 0.4, 3.2),
+    ].filter((g, i, all) => !doors.some((d) => near(mid(d), mid(g))) && all.findIndex((x) => near(mid(x), mid(g))) === i);
     return {
       name: levels.length === 1 ? (de ? "Erdgeschoss" : "Ground floor") : de ? `Etage ${i + 1}` : `Floor ${i + 1}`,
       elevation: Math.round(y * 100) / 100,
