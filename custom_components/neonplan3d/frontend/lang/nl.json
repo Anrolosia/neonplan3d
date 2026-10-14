@@ -204,6 +204,8 @@
  "backup_import_error": "Het bestand is geen NeonPlan 3D-plattegrond ({error}).",
  "backup_imported": "Geïmporteerd.",
  "backup_hint": "Achtergrondafbeeldingen horen niet bij het bestand.",
+ "backup_other_hint": "Een plattegrond uit Sweet Home 3D, een iPhone-scan, CAD (DXF), Blender/SketchUp of een kaart van een robotstofzuiger?",
+ "backup_other": "Naar de importpagina",
  "backup_full": "Volledige back-up",
  "backup_full_export": "Alles opslaan (plattegrond, afbeeldingen, packs)",
  "backup_full_import": "Een volledige back-up herstellen …",

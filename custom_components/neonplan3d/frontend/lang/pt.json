@@ -204,6 +204,8 @@
  "backup_import_error": "O ficheiro não é uma planta do NeonPlan 3D ({error}).",
  "backup_imported": "Importado.",
  "backup_hint": "As imagens de fundo não fazem parte do ficheiro.",
+ "backup_other_hint": "Uma planta do Sweet Home 3D, de uma digitalização do iPhone, CAD (DXF), Blender/SketchUp ou de um mapa de robô aspirador?",
+ "backup_other": "Para a página de importação",
  "backup_full": "Cópia de segurança completa",
  "backup_full_export": "Guardar tudo (planta, imagens, pacotes)",
  "backup_full_import": "Restaurar uma cópia completa …",

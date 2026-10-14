@@ -204,6 +204,8 @@
  "backup_import_error": "Fișierul nu este un plan NeonPlan 3D ({error}).",
  "backup_imported": "Importat.",
  "backup_hint": "Imaginile de fundal nu fac parte din fișier.",
+ "backup_other_hint": "Un plan din Sweet Home 3D, o scanare iPhone, CAD (DXF), Blender/SketchUp sau o hartă de robot aspirator?",
+ "backup_other": "La pagina de import",
  "backup_full": "Backup complet",
  "backup_full_export": "Salvează tot (plan, imagini, pachete)",
  "backup_full_import": "Restaurează un backup complet …",

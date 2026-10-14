@@ -11813,6 +11813,10 @@ export class Fp3dEditor extends LitElement {
         /></label>
       </div>
       <p class="fp3d-sub">${this.t("backup_hint")}</p>
+      <p class="fp3d-sub">
+        ${this.t("backup_other_hint")}
+        <a href=${`https://neonplan3d.mastershort.de/import/?lang=${(this.hass?.language ?? "en").startsWith("de") ? "de" : "en"}`} target="_blank" rel="noopener">${this.t("backup_other")}</a>
+      </p>
       <h4 class="fp3d-lib-head">${this.t("backup_full")}</h4>
       <div class="fp3d-actions">
         <button class="fp3d-btn" ?disabled=${this._backupBusy} @click=${() => this.exportBackup()}>${this._backupBusy ? "…" : this.t("backup_full_export")}</button>

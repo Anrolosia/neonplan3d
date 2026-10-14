@@ -204,6 +204,8 @@
  "backup_import_error": "Soubor není plán NeonPlan 3D ({error}).",
  "backup_imported": "Importováno.",
  "backup_hint": "Obrázky na pozadí nejsou součástí souboru.",
+ "backup_other_hint": "Půdorys ze Sweet Home 3D, skenu z iPhonu, CAD (DXF), Blenderu/SketchUpu nebo mapy robotického vysavače?",
+ "backup_other": "Na stránku importu",
  "backup_full": "Úplná záloha",
  "backup_full_export": "Zálohovat vše (plán, obrázky, balíčky)",
  "backup_full_import": "Obnovit úplnou zálohu …",

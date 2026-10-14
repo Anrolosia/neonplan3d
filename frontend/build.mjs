@@ -40,6 +40,8 @@ const editorConfig = (viewerHash) => ({
 const timeTravelConfig = { ...common, entryPoints: ["src/timetravel/entry.ts"], outfile: `${out}/neonplan3d-timetravel.js` };
 // the fun packs (pets …) only load when one is unlocked and switched on; three.js is lent by the 3D bundle
 const funConfig = { ...common, entryPoints: ["src/fun/entry.ts"], outfile: `${out}/neonplan3d-fun.js` };
+// the import page of the website (other programs' plans to NeonPlan, in the browser): not part of the integration
+const importConfig = { ...common, entryPoints: ["src/import/app.ts"], outfile: "../site/import/neonplan-import.js" };
 // The main bundle loads the 3D bundle with a hash of its content in the URL, so a new 3D bundle is
 // never taken from the browser cache (the integration version only changes after a restart).
 // the frontend knows its own version, to notice a backend that still runs an older one
@@ -115,6 +117,7 @@ if (watch) {
   await build(cardEditorConfig);
   await build(timeTravelConfig);
   await build(funConfig);
+  await build(importConfig);
   await build(mainConfig(hashOf(viewerConfig.outfile), hashOf(editor.outfile), hashOf(cardEditorConfig.outfile), hashOf(timeTravelConfig.outfile), hashOf(funConfig.outfile)));
   let over = false;
   for (const [file, limit] of Object.entries(BUDGET)) {
@@ -123,5 +126,9 @@ if (watch) {
     over ||= !ok;
     console.log(`${ok ? "ok  " : "OVER"} ${file}: ${(size / 1024).toFixed(1)} KB (budget ${limit / 1024} KB)`);
   }
+  // the import page loads once on a website, not on a wall tablet
+  const importSize = statSync(importConfig.outfile).size;
+  over ||= importSize > 160 * 1024;
+  console.log(`${importSize <= 160 * 1024 ? "ok  " : "OVER"} site/import/neonplan-import.js: ${(importSize / 1024).toFixed(1)} KB (budget 160 KB)`);
   if (over) process.exit(1);
 }

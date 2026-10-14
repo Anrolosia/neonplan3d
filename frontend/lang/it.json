@@ -204,6 +204,8 @@
  "backup_import_error": "Il file non è una planimetria NeonPlan 3D ({error}).",
  "backup_imported": "Importato.",
  "backup_hint": "Le immagini di sfondo non fanno parte del file.",
+ "backup_other_hint": "Una planimetria da Sweet Home 3D, una scansione iPhone, CAD (DXF), Blender/SketchUp o una mappa del robot aspirapolvere?",
+ "backup_other": "Alla pagina di importazione",
  "backup_full": "Backup completo",
  "backup_full_export": "Salva tutto (planimetria, immagini, pack)",
  "backup_full_import": "Ripristina un backup completo …",

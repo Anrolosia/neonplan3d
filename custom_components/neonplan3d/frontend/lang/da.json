@@ -204,6 +204,8 @@
  "backup_import_error": "Filen er ikke en NeonPlan 3D-plan ({error}).",
  "backup_imported": "Importeret.",
  "backup_hint": "Baggrundsbilleder er ikke med i filen.",
+ "backup_other_hint": "En plantegning fra Sweet Home 3D, en iPhone-scanning, CAD (DXF), Blender/SketchUp eller et robotstøvsugerkort?",
+ "backup_other": "Til importsiden",
  "backup_full": "Fuld backup",
  "backup_full_export": "Tag backup af alt (plan, billeder, pakker)",
  "backup_full_import": "Gendan en fuld backup …",

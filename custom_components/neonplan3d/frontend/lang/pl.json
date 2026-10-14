@@ -204,6 +204,8 @@
  "backup_import_error": "Ten plik nie jest planem NeonPlan 3D ({error}).",
  "backup_imported": "Zaimportowano.",
  "backup_hint": "Obrazy tła nie są częścią pliku.",
+ "backup_other_hint": "Rzut ze Sweet Home 3D, skanu z iPhone'a, CAD (DXF), Blendera/SketchUpa lub mapy robota sprzątającego?",
+ "backup_other": "Do strony importu",
  "backup_full": "Pełna kopia zapasowa",
  "backup_full_export": "Zabezpiecz wszystko (plan, obrazy, pakiety)",
  "backup_full_import": "Przywróć pełną kopię …",

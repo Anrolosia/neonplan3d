@@ -204,6 +204,8 @@
  "backup_import_error": "Filen är ingen NeonPlan 3D-plan ({error}).",
  "backup_imported": "Importerat.",
  "backup_hint": "Bakgrundsbilder ingår inte i filen.",
+ "backup_other_hint": "En planritning från Sweet Home 3D, en iPhone-skanning, CAD (DXF), Blender/SketchUp eller en robotdammsugarkarta?",
+ "backup_other": "Till importsidan",
  "backup_full": "Fullständig säkerhetskopia",
  "backup_full_export": "Säkerhetskopiera allt (plan, bilder, paket)",
  "backup_full_import": "Återställ en fullständig säkerhetskopia …",

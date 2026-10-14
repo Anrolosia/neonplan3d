@@ -204,6 +204,8 @@
  "backup_import_error": "Datoteka ni tloris NeonPlan 3D ({error}).",
  "backup_imported": "Uvoženo.",
  "backup_hint": "Slike ozadja niso del datoteke.",
+ "backup_other_hint": "Tloris iz Sweet Home 3D, skeniranja z iPhonom, CAD (DXF), Blenderja/SketchUpa ali zemljevida robotskega sesalnika?",
+ "backup_other": "Na stran za uvoz",
  "backup_full": "Popolna varnostna kopija",
  "backup_full_export": "Varnostno kopiraj vse (tloris, slike, paketi)",
  "backup_full_import": "Obnovi popolno varnostno kopijo …",
