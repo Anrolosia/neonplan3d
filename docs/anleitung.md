@@ -463,6 +463,15 @@ Ein **Keller** ist eine Etage mit negativer **Höhe über Boden**, etwa −2,6 m
 
 **Kellerfenster:** Im Formular eines Fensters setzt **Kellerfenster** die passende Größe – 100 × 50 cm, 25 cm unter der Decke. Liegt ein Fenster unter dem Gelände, bekommt es in 3D von selbst einen **Lichtschacht** mit Gitterrost. Im Fensterformular nimmt der Haken **Lichtschacht** ihn wieder weg (etwa wenn außen ein Weg vorbeiführt); **Rand über dem Gelände** hebt Rand und Gitter an, damit ein Kies- oder Plattenweg ums Haus sie nicht verdeckt.
 
+### 4.22 Markisen
+
+Unter **Möbel → Terrasse & Balkon** gibt es die **Markise**. Sie fährt in 3D mit ihrem Cover aus und ein – wie ein Rollladen.
+
+- **Art:** **Gelenkarm** (die Klassiker über der Terrasse), **Fallarm** (Balkon, Fenster – die Arme schwenken nach vorn und unten), **Senkrecht / ZIP** (das Tuch fährt in Seitenschienen senkrecht herunter), **Pergola / Wintergarten** (fester Rahmen mit Pfosten, das Tuch fährt oben aus) und **Seitenmarkise** (Sichtschutz, aus einem Pfosten zur Seite gezogen). Mit der Art setzt NeonPlan passende Maße, die du danach anpasst.
+- **Größe:** Breite ist die Markise entlang der Wand, Tiefe der Ausfall ganz ausgefahren (beim Fallarm die Armlänge, bei der Pergola bis zu den Pfosten). Die Rückseite des Rahmens kommt an die Hauswand; **Höhe über Boden** ist die Unterkante der Kassette (bei der Seitenmarkise die Höhe des Tuchs). **Neigung** ist das Gefälle des Tuchs.
+- **Markise (Cover):** das Cover aus Home Assistant. Meldet es seine Position auch während der Fahrt, fährt die Markise in 3D langsam mit; meldet es nur „öffnet“/„schließt“, fährt sie in der **Laufzeit ganz aus**. Ein eigener **Positionssensor** geht auch. **Richtung umkehren** hilft bei Covers, die 100 % melden, wenn die Markise eingefahren ist.
+- **Volant:** die herunterhängende Stoffkante vorne, abschaltbar.
+
 ---
 
 ## 5. Die 3D-Ansicht

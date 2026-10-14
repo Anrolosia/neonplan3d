@@ -463,6 +463,15 @@ A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Without a 
 
 **Cellar window:** in a window's form, **Cellar window** sets the right size – 100 × 50 cm, 25 cm under the ceiling. A window below the ground gets a **light well** with a grate in 3D by itself. In the window form, the tick **Light well** takes it away again (e.g. where a path runs past outside); **Rim above the ground** raises the rim and grate so a gravel or paved path around the house does not cover them.
 
+### 4.22 Awnings
+
+Under **Furniture → Terrace & balcony** there is the **Awning**. In 3D it runs out and in with its cover – like a blind.
+
+- **Kind:** **Folding-arm** (the classic over a terrace), **Drop-arm** (balcony, window – the arms swing out and down), **Vertical / ZIP** (the fabric runs straight down in side rails), **Pergola / conservatory** (a fixed frame with posts, the fabric runs out on top) and **Side awning** (a privacy screen pulled out sideways from a post). Choosing a kind sets its usual sizes, which you then adjust.
+- **Size:** width is the awning along the wall, depth its projection fully out (for a drop-arm the arm length, for a pergola up to the posts). The back of the frame goes against the house wall; **Height above the floor** is the cassette's underside (for a side awning the fabric's height). **Fall** is the fabric's slope.
+- **Awning (cover):** the cover from Home Assistant. If it reports its position while it runs, the awning runs out slowly in 3D; if it only says opening/closing, it moves at its **Run time fully out**. A separate **Position sensor** works too. **Reverse direction** helps with covers that report 100 % while the awning is in.
+- **Valance:** the fabric edge hanging at the front, can be switched off.
+
 ---
 
 ## 5. The 3D view
