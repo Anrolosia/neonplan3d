@@ -1559,7 +1559,6 @@
  "solar_string_n": "Streng {n}",
  "solar_string_name": "Navn på strengen",
  "solar_string_entity": "Soleffekt for strengen",
- "solar_string_inverter": "Vekselretter",
  "solar_string_inverter_none": "Ingen vekselretter valgt",
  "inverter_strings": "Strenger på denne vekselretteren: {names}",
  "inverter_strings_none": "Ingen strenger på denne vekselretteren ennå – tildel en ved et solcellefelt under Streng › Vekselretter.",

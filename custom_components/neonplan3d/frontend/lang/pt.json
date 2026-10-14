@@ -1559,7 +1559,6 @@
  "solar_string_n": "String {n}",
  "solar_string_name": "Nome da string",
  "solar_string_entity": "Potência FV da string",
- "solar_string_inverter": "Inversor",
  "solar_string_inverter_none": "Nenhum inversor escolhido",
  "inverter_strings": "Strings neste inversor: {names}",
  "inverter_strings_none": "Ainda nenhuma string neste inversor – atribua-a num campo solar em String › Inversor.",

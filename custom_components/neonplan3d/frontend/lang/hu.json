@@ -1559,7 +1559,6 @@
  "solar_string_n": "{n}. string",
  "solar_string_name": "A string neve",
  "solar_string_entity": "A string PV-teljesítménye",
- "solar_string_inverter": "Inverter",
  "solar_string_inverter_none": "Nincs inverter kiválasztva",
  "inverter_strings": "Stringek ezen az inverteren: {names}",
  "inverter_strings_none": "Ehhez az inverterhez még nincs string – a napelemmezőnél rendeld hozzá: String › Inverter.",

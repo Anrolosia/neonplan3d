@@ -1559,7 +1559,6 @@
  "solar_string_n": "Streng {n}",
  "solar_string_name": "Strengens navn",
  "solar_string_entity": "Strengens solcelleeffekt",
- "solar_string_inverter": "Inverter",
  "solar_string_inverter_none": "Ingen inverter valgt",
  "inverter_strings": "Strenge på denne inverter: {names}",
  "inverter_strings_none": "Ingen streng på denne inverter endnu – tildel den ved et solcellefelt under Streng › Inverter.",

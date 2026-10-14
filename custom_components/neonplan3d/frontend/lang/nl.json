@@ -1559,7 +1559,6 @@
  "solar_string_n": "String {n}",
  "solar_string_name": "Naam van de string",
  "solar_string_entity": "PV-vermogen van de string",
- "solar_string_inverter": "Omvormer",
  "solar_string_inverter_none": "Geen omvormer gekozen",
  "inverter_strings": "Strings op deze omvormer: {names}",
  "inverter_strings_none": "Nog geen string op deze omvormer – wijs hem toe bij een zonneveld onder String › Omvormer.",

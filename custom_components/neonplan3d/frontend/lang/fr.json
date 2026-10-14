@@ -1559,7 +1559,6 @@
  "solar_string_n": "Chaîne {n}",
  "solar_string_name": "Nom de la chaîne",
  "solar_string_entity": "Puissance PV de la chaîne",
- "solar_string_inverter": "Onduleur",
  "solar_string_inverter_none": "Aucun onduleur choisi",
  "inverter_strings": "Strings sur cet onduleur : {names}",
  "inverter_strings_none": "Aucun string sur cet onduleur pour l'instant – à attribuer dans un champ solaire sous String › Onduleur.",

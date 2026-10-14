@@ -1346,6 +1346,8 @@ export class Fp3dEditor extends LitElement {
     }
     if (this.pointers.size > 2) return;
     if (e.button === 1 || e.button === 2 || !this.floor) {
+      // the right button: dragged it moves the plan, a click without moving opens the item's menu (D518)
+      if (e.button === 2) this.rightPress = { at: local, target: e.target as Element, moved: false };
       this.drag = { kind: "pan", last: local };
       return;
     }
@@ -1713,6 +1715,10 @@ export class Fp3dEditor extends LitElement {
   }
 
   private onPointerMove(e: PointerEvent): void {
+    if (this.rightPress && !this.rightPress.moved) {
+      const p = this.localPoint(e);
+      if (Math.hypot(p[0] - this.rightPress.at[0], p[1] - this.rightPress.at[1]) > 5) this.rightPress.moved = true;
+    }
     if (this.pressStart) {
       const p = this.localPoint(e);
       if (Math.hypot(p[0] - this.pressStart[0], p[1] - this.pressStart[1]) > 8) {
@@ -2251,6 +2257,13 @@ export class Fp3dEditor extends LitElement {
   }
 
   private onPointerUp(e: PointerEvent): void {
+    const right = this.rightPress;
+    this.rightPress = null;
+    if (right && e.button === 2) {
+      // the browser's contextmenu event (before or after this) stays quiet; a click without moving opens the menu
+      this.rightUp = performance.now();
+      if (!right.moved && e.type !== "pointercancel" && (this._tool === "select" || this._tool === "furniture")) this.openContext(right.target, right.at);
+    }
     clearTimeout(this.pressTimer);
     this.pressStart = null;
     this.fixedPan = false;
@@ -4233,6 +4246,8 @@ export class Fp3dEditor extends LitElement {
 
   private onContextMenu(e: MouseEvent): void {
     e.preventDefault();
+    // a mouse's right button is handled on its release (drag = move the plan); this is a long press on a tablet
+    if (this.rightPress || performance.now() - this.rightUp < 600) return;
     if (this._tool !== "select" && this._tool !== "furniture") return;
     this.drag = null;
     this.openContext(e.target as Element, this.localPoint(e as PointerEvent));
@@ -9421,6 +9436,11 @@ export class Fp3dEditor extends LitElement {
     /></label>`;
   }
 
+  /** The right mouse button held down: where, on what, and whether it was dragged (then it moved the plan). */
+  private rightPress: { at: [number, number]; target: Element; moved: boolean } | null = null;
+  /** When the right button was last released (its contextmenu event then stays quiet). */
+  private rightUp = -1e9;
+
   /** The last press on a point, to tell a double click (a pointerdown's `detail` stays 0 in Chrome, D410). */
   private lastTap: { key: string; at: number } | null = null;
 
@@ -10158,8 +10178,8 @@ export class Fp3dEditor extends LitElement {
           </select></label
         >
         ${this.len(this.t("x"), f.x, (v) => this.updateFurniture({ x: v }))} ${this.len(this.t("z"), f.z, (v) => this.updateFurniture({ z: v }))}
-        ${this.len(this.t("width"), f.w, (v) => this.updateFurniture({ w: Math.max(0.05, v) }), 0.01, 0.05)}
-        ${this.len(this.t("depth"), f.d, (v) => this.updateFurniture({ d: Math.max(0.05, v) }), 0.01, 0.05)}
+        ${this.len(this.t("width"), f.w, (v) => this.updateFurniture({ w: Math.max(0.01, v) }), 0.01, 0.01)}
+        ${this.len(this.t("depth"), f.d, (v) => this.updateFurniture({ d: Math.max(0.01, v) }), 0.01, 0.01)}
         ${this.len(this.t("height_m"), f.h, (v) => this.updateFurniture({ h: Math.max(0.005, v) }), 0.01, 0)}
         ${this.num(this.t("rotation"), f.rotation, (v) => this.updateFurniture({ rotation: ((v % 360) + 360) % 360 }), 1)}
         ${isLamp(f.type)

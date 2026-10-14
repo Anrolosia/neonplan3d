@@ -1559,7 +1559,6 @@
  "solar_string_n": "Niz {n}",
  "solar_string_name": "Ime niza",
  "solar_string_entity": "Moč FV niza",
- "solar_string_inverter": "Razsmernik",
  "solar_string_inverter_none": "Ni izbranega razsmernika",
  "inverter_strings": "Nizi na tem razsmerniku: {names}",
  "inverter_strings_none": "Na tem razsmerniku še ni niza – dodeli ga pri sončnem polju pod Niz › Razsmernik.",

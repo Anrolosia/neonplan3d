@@ -1559,7 +1559,6 @@
  "solar_string_n": "String {n}",
  "solar_string_name": "Numele stringului",
  "solar_string_entity": "Puterea PV a stringului",
- "solar_string_inverter": "Invertor",
  "solar_string_inverter_none": "Niciun invertor ales",
  "inverter_strings": "Stringuri pe acest invertor: {names}",
  "inverter_strings_none": "Încă niciun string pe acest invertor – atribuie-l la un câmp solar, la String › Invertor.",
