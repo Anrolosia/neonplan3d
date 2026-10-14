@@ -22,7 +22,7 @@ export type Gated = Feature | FreeFeature;
  * unlocked (the tester has the pack) or the lab switch is on (localStorage "neonplan3d.lab" = "1").
  * A release takes a feature off this list.
  */
-export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics", "fun_halloween"];
+export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics"];
 
 export function labOn(): boolean {
   try {
@@ -56,7 +56,7 @@ const isGerman = (lang: string | undefined) => (lang ?? navigator.language).toLo
  * from the app. (The exact address comes from the shop – see "Rueckmeldung Claude Desktop - Fun-Pack Halloween.md".)
  */
 export function registerUrl(lang: string | undefined): string {
-  return isGerman(lang) ? "https://mastershort.de/mein-konto/?action=register&src=neonplan-app" : "https://mastershort.de/en/my-account/?action=register&src=neonplan-app";
+  return `https://mastershort.de/my-account/?lang=${isGerman(lang) ? "de" : "en"}&src=neonplan-app`;
 }
 
 export function shopUrl(lang: string | undefined): string {

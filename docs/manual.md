@@ -4,7 +4,7 @@
 
 NeonPlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
 
-This manual describes every feature of the current version. What changed in which version is in the [changelog](../CHANGELOG.md) and on the [releases page](https://github.com/Mastershort/neonplan3d/releases). The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian and Slovenian are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
+This manual describes every feature of the current version. What changed in which version is in the [changelog](../CHANGELOG.md) and on the [releases page](https://github.com/Mastershort/neonplan3d/releases). The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian, Slovenian, Portuguese and Chinese (Simplified) are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
 
 ![The house in the 3D view](images/view-house.jpg)
 
@@ -878,7 +878,12 @@ At the bottom of the page a **bar** sums up your installed packs (furniture pack
 
 ### 7.4 Fun packs
 
-**Fun packs** are free extras just for fun – a thank-you to everyone who already supports NeonPlan 3D. Get them in the shop for **0 €** (give something if you like) and switch them on and off here under **🎈 Fun packs**.
+**Fun packs** are free extras just for fun – for everyone with a customer account at mastershort.de. No purchase is needed:
+
+- **With a shop connection** they are already in your account. Under **Extensions** they are among your packs with **Install**; Home Assistant also announces new fun packs once under Notifications.
+- **Without an account** you create one for free: **🎁 Create a free customer account** under **🎈 Fun packs** (or in the notice in the 3D view), confirm your e-mail, paste the licence key from the mail under **Shop connection**. Then the fun packs show up to install – and from then on new packs too, right in the app.
+
+Switch them on and off under **🎈 Fun packs** afterwards.
 
 **Pets:** a cat, a rabbit or a dog – as a dachshund, pug, terrier, labrador or shepherd – lives in your 3D house. **+ Add a pet** sets one up: kind, breed (for dogs), name, fur and the floor it starts on. **Show the pets** switches all of them on and off; in the dashboard card the option **Show the pets** (YAML `pets: false`) leaves them out of that card, e.g. on the wall tablet.
 
@@ -887,6 +892,8 @@ At the bottom of the page a **bar** sums up your installed packs (furniture pack
 - **At night** (the sun in Home Assistant has set) they sleep curled up, with a little "z Z".
 - Colourful **fish** swim in the Pets pack's **aquariums**.
 - They are only drawn while one moves – resting, they cost nothing, even on old wall tablets.
+
+**Halloween:** 13 decorations in the furniture library under **Fun pack: Halloween** – a jack-o'-lantern, a small pumpkin, a pumpkin trio, a cobweb (for the corner under the ceiling), a bat garland, two gravestones, a skeleton, a witch's cauldron, a candelabra, orange string lights, a ghost figure and a witch's broom. Pumpkin, cauldron and candles glow when you link a light. A little **ghost** floats through the house now and then – right through the walls, more often at night. **Let the ghost float** under **🎈 Fun packs** switches it off; in the dashboard card the option **Show the Halloween ghost** (YAML `ghost: false`) leaves it out of that card. The ghost, too, is only drawn while it is on its way.
 
 ---
 

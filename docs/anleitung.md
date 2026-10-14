@@ -87,7 +87,7 @@ Oben gibt es drei Reiter:
 
 Zusätzlich gibt es die Dashboard-Karte, die dieselbe 3D-Ansicht in jedes Dashboard bringt. Mehr dazu in [Kapitel 8](#8-die-dashboard-karte).
 
-**Sprache:** NeonPlan folgt der Sprache deines Home-Assistant-Nutzers (Profil → Sprache). Deutsch und Englisch sind eingebaut; Französisch, Spanisch, Niederländisch, Italienisch, Ungarisch, Dänisch, Schwedisch, Norwegisch (Bokmål und Nynorsk), Finnisch, Tschechisch, Polnisch, Rumänisch und Slowenisch werden bei Bedarf nachgeladen, so bleiben die Bundles für Wandtablets klein. Fehlt ein Text in einer Sprache, erscheint er auf Englisch.
+**Sprache:** NeonPlan folgt der Sprache deines Home-Assistant-Nutzers (Profil → Sprache). Deutsch und Englisch sind eingebaut; Französisch, Spanisch, Niederländisch, Italienisch, Ungarisch, Dänisch, Schwedisch, Norwegisch (Bokmål und Nynorsk), Finnisch, Tschechisch, Polnisch, Rumänisch, Slowenisch, Portugiesisch und Chinesisch (vereinfacht) werden bei Bedarf nachgeladen, so bleiben die Bundles für Wandtablets klein. Fehlt ein Text in einer Sprache, erscheint er auf Englisch.
 
 ---
 
@@ -878,7 +878,12 @@ Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Mö
 
 ### 7.4 Fun-Packs
 
-**Fun-Packs** sind kostenlose Extras zum Spaß – ein Dankeschön an alle, die NeonPlan 3D schon unterstützen. Du holst sie dir im Shop für **0 €** (wer mag, gibt freiwillig etwas dazu) und schaltest sie hier unter **🎈 Fun-Packs** ein und aus.
+**Fun-Packs** sind kostenlose Extras zum Spaß – für jeden mit einem Kundenkonto bei mastershort.de. Ein Kauf ist nicht nötig:
+
+- **Mit Shop-Verbindung** liegen sie schon in deinem Konto. Unter **Erweiterungen** stehen sie bei deinen Packs mit **Installieren**; Home Assistant meldet neue Fun-Packs außerdem einmal unter Benachrichtigungen.
+- **Ohne Konto** legst du dir kostenlos eins an: **🎁 Kostenloses Kundenkonto anlegen** unter **🎈 Fun-Packs** (oder im Hinweis in der 3D-Ansicht), E-Mail bestätigen, den Lizenzschlüssel aus der Mail unter **Shop-Verbindung** einfügen. Danach erscheinen die Fun-Packs zum Installieren – und künftig auch neue Packs direkt in der App.
+
+Unter **🎈 Fun-Packs** schaltest du sie danach ein und aus.
 
 **Haustiere:** Katze, Kaninchen oder Hund – als Dackel, Mops, Terrier, Labrador oder Schäferhund – leben in deinem 3D-Haus. **+ Haustier hinzufügen** legt ein Tier an: Art, Rasse (bei Hunden), Name, Fell und die Etage, auf der es startet. **Haustiere zeigen** schaltet alle auf einmal ein und aus; in der Dashboard-Karte blendet die Option **Haustiere zeigen** (YAML `pets: false`) sie für diese Karte aus, etwa am Wandtablet.
 
@@ -887,6 +892,8 @@ Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Mö
 - **Nachts** (die Sonne in Home Assistant ist untergegangen) schlafen sie eingerollt, mit einem kleinen „z Z“.
 - In den **Aquarien** des Packs Haustiere schwimmen bunte **Fische**.
 - Gezeichnet wird nur, solange sich ein Tier bewegt – ruhend kosten sie nichts, auch nicht auf alten Wandtablets.
+
+**Halloween:** 13 Deko-Möbel in der Möbel-Bibliothek unter **Fun-Pack: Halloween** – Kürbis mit Gesicht, kleiner Kürbis, Kürbis-Trio, Spinnennetz (für die Ecke unter der Decke), Fledermaus-Girlande, zwei Grabsteine, Skelett, Hexenkessel, Kerzenständer, orange Lichterkette, Gespenst-Figur und Hexenbesen. Kürbis, Kessel und Kerzen leuchten, wenn du ein Licht verknüpfst. Dazu schwebt ab und zu ein kleiner **Geist** durchs Haus – mitten durch die Wände, nachts öfter. **Geist schweben lassen** unter **🎈 Fun-Packs** schaltet ihn ab; in der Dashboard-Karte blendet die Option **Halloween-Geist zeigen** (YAML `ghost: false`) ihn für diese Karte aus. Auch der Geist wird nur gezeichnet, solange er unterwegs ist.
 
 ---
 
