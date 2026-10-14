@@ -6,7 +6,7 @@ import type { Building, Floor, FreeWall, Furniture, FurnitureType, Opening, Room
 import { canLift, emptyBuilding, FURNITURE_SIZE, FURNITURE_TYPES, newFloor, normalizeBuilding, pointInPolygon, polygonArea } from "../model.ts";
 import { closeGaps, suggestedThickness } from "../geometry/gaps.ts";
 import { bridgeGaps, cleanPolygon, faces, squareUp, type Seg } from "./geom.ts";
-import { furnitureType } from "./furniture-map.ts";
+import { furnitureType, isDecor } from "./furniture-map.ts";
 
 export interface RawRoom {
   name: string;
@@ -173,7 +173,7 @@ export function buildPlan(raw: RawPlan, options: BuildOptions = {}): BuildResult
   const floors: Floor[] = [];
   const stats = { floors: 0, rooms: 0, doors: 0, windows: 0, walls: 0, furniture: 0 };
   sortedFloors.forEach((src, fi) => {
-    const floor = newFloor(`floor_${fi + 1}`, src.name.trim() || `${de ? "Etage" : "Floor"} ${fi + 1}`, r3(sortedFloors.length === 1 ? 0 : src.elevation));
+    const floor = newFloor(`floor_${fi + 1}`, src.name.trim() || (sortedFloors.length === 1 ? (de ? "Erdgeschoss" : "Ground floor") : `${de ? "Etage" : "Floor"} ${fi + 1}`), r3(sortedFloors.length === 1 ? 0 : src.elevation));
     const wallHeights = src.walls.map((w) => w.height ?? NaN).filter((h) => h > 1.5 && h < 8);
     floor.height = r3(clamp(src.height ?? median(wallHeights) ?? 2.5, 1.8, 8));
     const walls = src.walls.map((w) => ({ ...w, a: shift(w.a), b: shift(w.b) })).filter((w) => Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]) > 0.02);
@@ -329,12 +329,18 @@ export function buildPlan(raw: RawPlan, options: BuildOptions = {}): BuildResult
     // furniture
     const furniture: Furniture[] = [];
     let unknown = 0;
+    let skipped = 0;
     if (opt.furniture)
       for (const m of src.furniture) {
         const [x, z] = shift([m.x, m.z]);
         const y = m.y ?? 0;
         let type = (m.type && KNOWN.has(m.type) ? m.type : null) ?? furnitureType(m.name, m.h, y);
         let name: string | null = null;
+        // decoration and small things (frames, vases, curtains, sockets, fence posts …) are left out
+        if (!type && (isDecor(m.name) || Math.max(m.w, m.d) < 0.35 || m.h < 0.12)) {
+          skipped++;
+          continue;
+        }
         if (!type) {
           type = "sideboard";
           name = m.name.trim().slice(0, 60) || null;
@@ -360,6 +366,7 @@ export function buildPlan(raw: RawPlan, options: BuildOptions = {}): BuildResult
         furniture.push(f);
       }
     if (unknown) warnings.push({ code: "furniture_unknown", floor: floor.name, n: unknown });
+    if (skipped) warnings.push({ code: "furniture_decor", floor: floor.name, n: skipped });
     floor.furniture = furniture;
     stats.furniture += furniture.length;
     stats.rooms += rooms.length;
