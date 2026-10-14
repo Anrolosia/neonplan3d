@@ -50,6 +50,19 @@ test("a cellar window below the ground gets a light well, one above the ground d
   assert.equal(earthOf(half, 0)!.wells.count, 0);
 });
 
+test("a window can do without its light well, and its rim can stand above the ground (#524)", () => {
+  const win = (extra: Partial<Opening>): Opening => ({ id: "w", room_id: "k", edge: 0, offset: 5, width: 1, type: "window", sill: 1.65, height: 0.5, hinge: "left", leaves: 1, swing: "in", contact2: null, ...extra }) as Opening;
+  const b = house();
+  b.floors[0].openings = [win({ well: false })];
+  assert.equal(earthOf(b, 0)!.wells.count, 0);
+  // a raised rim: the grate lies higher than with a rim level with the ground
+  const top = (g: NonNullable<ReturnType<typeof earthOf>>) => Math.max(...g.lines.p.filter((_, i) => i % 3 === 1));
+  b.floors[0].openings = [win({})];
+  const level = top(earthOf(b, 0)!);
+  b.floors[0].openings = [win({ well_rim: 0.1 })];
+  assert.ok(Math.abs(top(earthOf(b, 0)!) - level - 0.1) < 1e-6);
+});
+
 test("a raised house (the ground lower, no cellar) stands on a plinth; on a flat plot it gets none", () => {
   const flat = house();
   flat.floors = [flat.floors[1]];

@@ -117,6 +117,7 @@ import {
   type ScreenPicture,
   STAIR_TYPES,
   setTerrain,
+  groundLevel,
 } from "../model.ts";
 import { controls, tokens } from "../styles.ts";
 import "./entity-picker.ts";
@@ -10079,6 +10080,13 @@ export class Fp3dEditor extends LitElement {
               ><input type="checkbox" .checked=${!!o.contact_invert} ?disabled=${!admin} @change=${(ev: Event) => this.updateOpening({ contact_invert: (ev.target as HTMLInputElement).checked })} />
               ${this.t("contact_invert")}</label
             >`
+          : nothing}
+        ${o.type === "window" && this.floor && o.sill < groundLevel(this.floor) - 0.05
+          ? html`<label class="fp3d-check fp3d-wide" title=${this.t("well_hint")}
+                ><input type="checkbox" .checked=${o.well !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateOpening({ well: (ev.target as HTMLInputElement).checked ? undefined : false })} />
+                ${this.t("well")}</label
+              >
+              ${o.well !== false ? this.len(this.t("well_rim"), o.well_rim ?? 0, (v) => this.updateOpening({ well_rim: Math.max(-0.3, Math.min(1, v)) || null }), 0.01, -0.3) : nothing}`
           : nothing}
         ${o.type === "window"
           ? html`<label class="fp3d-check fp3d-wide" title=${this.t("rain_ignore_hint")}

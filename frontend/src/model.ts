@@ -109,6 +109,10 @@ export interface Opening {
   contact_invert?: boolean;
   /** Windows: no rain warning for this one (it may stay open in the rain, under a canopy, D328). */
   rain_ignore?: boolean;
+  /** Windows below the ground: false leaves out the light well (a path runs past the window, #524). */
+  well?: boolean;
+  /** How far the light well's rim and grate stand above the ground in m (null = level with it), e.g. above gravel. */
+  well_rim?: number | null;
   /** Highlight in 3D while open (null, default) or while closed (a WC or a child's room door). */
   mark?: "closed" | null;
   /** Ask before moving the blind or garage door; it then does not follow a swipe either. */
