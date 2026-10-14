@@ -78,3 +78,19 @@ test("files are told apart by name and content", async () => {
   await assert.rejects(readFile("x.json", enc({ hello: 1 })), /unknown_format/);
   await assert.rejects(readFile("x.json", new TextEncoder().encode("{ broken")), /not_json/);
 });
+
+test("a plan lying at an angle is squared to the axes, furniture turned with it", () => {
+  const a = (20 * Math.PI) / 180;
+  const rot = ([x, z]: number[]) => [x * Math.cos(a) - z * Math.sin(a), x * Math.sin(a) + z * Math.cos(a)];
+  const plan = readSimple({ format: "neonplan-import", floors: [{ name: "EG", rooms: [{ name: "A", points: [[0, 0], [5, 0], [5, 3], [0, 3]].map(rot) }], furniture: [{ type: "bed", at: rot([2, 1.5]), rotation: 20 }] }] });
+  const { building: b } = buildPlan(plan, { align: true });
+  const pts = b.floors[0].rooms[0].points;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    const q = pts[(i + 1) % pts.length];
+    assert.ok(Math.abs(p[0] - q[0]) < 0.01 || Math.abs(p[1] - q[1]) < 0.01, JSON.stringify(pts));
+  }
+  // the bed was turned 20° with the room: square again
+  const r = b.floors[0].furniture[0].rotation % 90;
+  assert.ok(r < 0.5 || r > 89.5, String(b.floors[0].furniture[0].rotation));
+});

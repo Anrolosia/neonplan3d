@@ -67,6 +67,8 @@ export interface RawPlan {
   wallFaces?: boolean;
   /** Gaps in the wall lines are doors (CAD, a model's section). */
   doorsFromGaps?: boolean;
+  /** The plan may lie at any angle (a scan, a model, a robot map): turn it so its walls run along x and z. */
+  align?: boolean;
   warnings?: Warning[];
 }
 
@@ -82,6 +84,8 @@ export interface BuildOptions {
   mirror?: boolean;
   /** Turn the whole plan by 90° steps. */
   turn?: 0 | 90 | 180 | 270;
+  /** Turn the plan so most walls run along x and z (default: for scans, models and robot maps). */
+  align?: boolean;
   /** Language of made-up names ("Raum 3" / "Room 3"). */
   lang?: string;
 }
@@ -129,9 +133,28 @@ export function buildPlan(raw: RawPlan, options: BuildOptions = {}): BuildResult
   let ids = 0;
   const id = (p: string) => `${p}_${(++ids).toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
+  // a scan lies at any angle: the walls' main direction (lengths weighted, folded onto 90°) turned onto x
+  let tilt = 0;
+  if (opt.align ?? raw.align ?? false) {
+    let sx = 0;
+    let sz = 0;
+    const edge = (a: Vec2, b: Vec2) => {
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 4;
+      sx += len * Math.cos(ang);
+      sz += len * Math.sin(ang);
+    };
+    for (const f of raw.floors) {
+      for (const r of f.rooms) r.points.forEach((p, i) => edge(p, r.points[(i + 1) % r.points.length]));
+      for (const w of f.walls) edge(w.a, w.b);
+    }
+    if (Math.hypot(sx, sz) > 1e-6) tilt = -Math.atan2(sz, sx) / 4;
+  }
+  const ct = Math.cos(tilt);
+  const st = Math.sin(tilt);
   // the whole plan turned or mirrored first, so everything below works in the final orientation
   const turn = (p: Vec2): Vec2 => {
-    let [x, z] = p;
+    let [x, z] = [p[0] * ct - p[1] * st, p[0] * st + p[1] * ct];
     if (opt.mirror) x = -x;
     switch (opt.turn) {
       case 90:
@@ -144,7 +167,7 @@ export function buildPlan(raw: RawPlan, options: BuildOptions = {}): BuildResult
         return [x, z];
     }
   };
-  const turnAngle = (deg: number) => (opt.mirror ? -deg : deg) + opt.turn;
+  const turnAngle = (deg: number) => (opt.mirror ? -(deg + (tilt * 180) / Math.PI) : deg + (tilt * 180) / Math.PI) + opt.turn;
   const floorsIn = raw.floors.map((f) => ({
     ...f,
     rooms: f.rooms.map((r) => ({ ...r, points: r.points.map(turn) })),

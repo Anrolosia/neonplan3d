@@ -382,5 +382,5 @@ export function readMesh(t: Tris, opt: MeshOptions = {}): { plan: RawPlan; info:
   const used = floors.filter((f) => f.walls.length >= 4);
   if (!used.length) throw new Error("nothing_found");
   used.forEach((f, i) => (f.name = used.length === 1 ? (de ? "Erdgeschoss" : "Ground floor") : de ? `Etage ${i + 1}` : `Floor ${i + 1}`));
-  return { plan: { source: "3D", floors: used, roomsAtInnerFaces: true, wallFaces: true }, info: { up, unit, levels: used.map((f) => f.elevation), size } };
+  return { plan: { source: "3D", floors: used, roomsAtInnerFaces: true, wallFaces: true, align: true }, info: { up, unit, levels: used.map((f) => f.elevation), size } };
 }

@@ -35,6 +35,8 @@ const DE = {
   join: "Räume an den Wänden zusammenführen",
   join_hint: "Für Pläne, deren Räume an den Innenkanten der Wände gezeichnet sind: Nachbarräume teilen sich danach eine Wand.",
   square: "Fast gerade Kanten gerade ziehen",
+  align: "Gerade ausrichten",
+  align_hint: "Dreht den Plan so, dass die Wände waagerecht und senkrecht liegen (ein Scan oder eine Roboterkarte liegt oft schräg).",
   with_furniture: "Möbel übernehmen",
   mirror: "Spiegeln (links ↔ rechts)",
   turn: "Drehen",
@@ -104,6 +106,8 @@ const EN: typeof DE = {
   join: "Join rooms at their walls",
   join_hint: "For plans whose rooms are drawn at the inner faces of the walls: neighbouring rooms then share one wall.",
   square: "Straighten nearly straight edges",
+  align: "Square to the axes",
+  align_hint: "Turns the plan so the walls run horizontally and vertically (a scan or a robot map often lies at an angle).",
   with_furniture: "Take the furniture",
   mirror: "Mirror (left ↔ right)",
   turn: "Turn",
@@ -283,10 +287,11 @@ function optionsHtml(): string {
   const t = T();
   const r = state.read!;
   const o = state.build;
-  const check = (key: keyof BuildOptions, label: string, hint = "") => `<label class="check" title="${esc(hint)}"><input type="checkbox" data-opt="${key}" ${o[key] ?? (key === "join" ? r.raw?.roomsAtInnerFaces : false) ? "checked" : ""}> ${esc(label)}</label>`;
+  const check = (key: keyof BuildOptions, label: string, hint = "") =>
+    `<label class="check" title="${esc(hint)}"><input type="checkbox" data-opt="${key}" ${o[key] ?? (key === "join" ? r.raw?.roomsAtInnerFaces : key === "align" ? r.raw?.align : false) ? "checked" : ""}> ${esc(label)}</label>`;
   const parts: string[] = [];
   if (r.raw) {
-    parts.push(check("join", t.join, t.join_hint), check("square", t.square), check("furniture", t.with_furniture), check("mirror", t.mirror));
+    parts.push(check("join", t.join, t.join_hint), check("align", t.align, t.align_hint), check("square", t.square), check("furniture", t.with_furniture), check("mirror", t.mirror));
     parts.push(`<label>${esc(t.turn)} <select data-opt="turn">${[0, 90, 180, 270].map((v) => `<option value="${v}" ${o.turn === v ? "selected" : ""}>${v}°</option>`).join("")}</select></label>`);
   }
   if (r.kind === "dxf") {

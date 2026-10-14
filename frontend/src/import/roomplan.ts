@@ -144,5 +144,5 @@ export function readRoomPlan(data: unknown, lang = "de"): RawPlan {
     return { ...floor, name: all.length > 1 ? (de ? `Etage ${i + 1}` : `Floor ${i + 1}`) : de ? "Erdgeschoss" : "Ground floor" };
   });
   // RoomPlan places the walls at their room-side surfaces: neighbouring rooms lie a wall apart
-  return { source: "RoomPlan", floors: out, roomsAtInnerFaces: true, wallFaces: true };
+  return { source: "RoomPlan", floors: out, roomsAtInnerFaces: true, wallFaces: true, align: true };
 }

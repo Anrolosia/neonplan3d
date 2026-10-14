@@ -111,5 +111,5 @@ export function readValetudo(data: unknown, lang = "de"): RawPlan {
     rooms.push({ name: l.metaData?.name?.trim() || `${de ? "Raum" : "Room"} ${i + 1}`, points: pts });
   });
   if (!rooms.length) throw new Error("nothing_found");
-  return { source: "Valetudo", floors: [{ name: de ? "Erdgeschoss" : "Ground floor", elevation: 0, rooms, walls: [], openings: [], furniture: [] }], roomsAtInnerFaces: true, warnings: [{ code: "robot_map" }] };
+  return { source: "Valetudo", floors: [{ name: de ? "Erdgeschoss" : "Ground floor", elevation: 0, rooms, walls: [], openings: [], furniture: [] }], roomsAtInnerFaces: true, align: true, warnings: [{ code: "robot_map" }] };
 }
