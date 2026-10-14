@@ -324,6 +324,9 @@ export class Fp3dView3d extends LitElement {
   private poolTarget = new Map<string, { v: number; at: number }>();
   private volumeSent = 0;
   private holoIds = "";
+  /** When the day curves were last fetched, and a fetch for when the page shows again. */
+  private holoFetched = 0;
+  private holoRefetch: (() => void) | null = null;
   /** The start view last handed to the viewer (JSON), to notice a new one. */
   private shownStartView: string | undefined;
   /** A running swipe on a lamp or blind: the value shown next to the finger. */
@@ -542,11 +545,20 @@ export class Fp3dView3d extends LitElement {
     if (this.hasUpdated) {
       this.observeStage();
       if (!this.viewer) void this.start();
+      // back in the page: the trail's history is fetched again (its timer stopped while away)
+      this.watchTrail();
     }
+    document.addEventListener("visibilitychange", this.onVisible);
   }
+
+  /** A wall tablet's screen on again: stale day curves are fetched at once. */
+  private onVisible = (): void => {
+    if (!document.hidden) this.holoRefetch?.();
+  };
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
+    document.removeEventListener("visibilitychange", this.onVisible);
     this.stopWalk();
     this.pets?.dispose();
     this.pets = null;
@@ -568,6 +580,8 @@ export class Fp3dView3d extends LitElement {
     this.trailTimer = undefined;
     clearInterval(this.holoTimer);
     this.holoTimer = undefined;
+    // back in the page (another dashboard view and back), the day curves are fetched and kept fresh again (#527)
+    this.holoIds = "";
     clearTimeout(this.flashTimer);
     this.flashTimer = undefined;
     clearTimeout(this.infoTimer);
@@ -1544,11 +1558,16 @@ export class Fp3dView3d extends LitElement {
     }
     const fetch = async () => {
       if (!this.hass || document.hidden) return;
+      this.holoFetched = Date.now();
       const rows = await fetchSolarRows(this.hass, ids);
       if (this.holoIds === key) this._rows = rows;
     };
     void fetch();
+    // every five minutes, and at once when a wall tablet's screen comes back on after a longer pause
     this.holoTimer = setInterval(() => void fetch(), 300000);
+    this.holoRefetch = () => {
+      if (Date.now() - this.holoFetched > 300000) void fetch();
+    };
   }
 
   /**

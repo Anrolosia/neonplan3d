@@ -953,14 +953,19 @@ export function solarDayFromStats(rows: Record<string, StatRow[]>, now = new Dat
   midnight.setHours(0, 0, 0, 0);
   const slots = Math.max(1, Math.floor((now.getTime() - midnight.getTime()) / 300000) + 1);
   const curve = new Array<number>(slots).fill(0);
+  let last = -1;
   for (const list of Object.values(rows)) {
     for (const r of list) {
       const start = typeof r.start === "number" ? r.start : Date.parse(r.start);
       const i = Math.floor((start - midnight.getTime()) / 300000);
       if (i < 0 || i >= slots || typeof r.mean !== "number") continue;
       curve[i] += Math.max(0, r.mean);
+      last = Math.max(last, i);
     }
   }
+  // the recorder writes a five-minute mean only after its slot: the last few minutes have none yet, so the curve
+  // ends at the newest mean instead of dropping to zero there (#527); a longer gap stays a gap
+  curve.length = Math.max(last + 1, slots - 3, 1);
   const kwh = curve.reduce((s, w) => s + (w * 5) / 60 / 1000, 0);
   return { kwh, peak: Math.max(0, ...curve), curve };
 }
