@@ -1426,8 +1426,8 @@ export class Fp3dEditor extends LitElement {
           const i = pt.lastIndexOf(":");
           const id = pt.slice(0, i);
           const index = Number(pt.slice(i + 1));
-          // a double click takes the point out (two points stay at least)
-          if (e.detail >= 2) {
+          // a double click takes the point out (one point stays at least)
+          if (this.doubleTap(e, `cable:${pt}`)) {
             this.change((d) => {
               const c = d.settings.roof.cables?.find((x) => x.id === id);
               if (c && c.points.length > 1) c.points.splice(index, 1);
@@ -3727,13 +3727,16 @@ export class Fp3dEditor extends LitElement {
             if (!st) return this.entitySelect(this.t("solar_entity"), f.entity ?? null, undefined, power, (v) => set({ entity: v === "none" ? null : v }));
             // each inverter by its own name, else its entity's name, numbered across the house only as a last resort (#213)
             const linked = this.hass ? furnitureEntities(this.hass, this._doc.floors) : null;
-            const inverters = this._doc.floors
-              .flatMap((fl) => fl.furniture.filter((m) => m.type === "inverter").map((m) => ({ m, fl })))
-              .map(({ m, fl }, i) => {
-                const entity = linked?.get(m.id)?.entity;
-                const own = m.name?.trim() || (entity && this.hass ? entityName(this.hass, entity) : "");
-                return { id: m.id, label: `${own || `${this.t("furn_inverter")} ${i + 1}`} · ${fl.name}` };
-              });
+            // the inverters, and the batteries with a solar input of their own (a power station, D410)
+            const named = (type: "inverter" | "home_battery") =>
+              this._doc.floors
+                .flatMap((fl) => fl.furniture.filter((m) => m.type === type).map((m) => ({ m, fl })))
+                .map(({ m, fl }, i) => {
+                  const entity = linked?.get(m.id)?.entity;
+                  const own = m.name?.trim() || (entity && this.hass ? entityName(this.hass, entity) : "");
+                  return { id: m.id, label: `${own || `${this.t(`furn_${type}`)} ${i + 1}`} · ${fl.name}` };
+                });
+            const inverters = [...named("inverter"), ...named("home_battery")];
             return html`<label class="fp3d-field fp3d-wide"
                 >${this.t("solar_string_name")}
                 <input type="text" ?disabled=${!admin} .value=${st.name} @change=${(e: Event) => this.updateSolarString({ name: (e.target as HTMLInputElement).value.trim() || st.name })}
@@ -7689,7 +7692,7 @@ export class Fp3dEditor extends LitElement {
     if (this._runMode || !this.isAdmin) return;
     e.stopPropagation();
     const nodeAt = poolNodeAt(this._doc, c.floor, c.pool);
-    if (e.detail >= 2) {
+    if (this.doubleTap(e, `runpt:${pipeId}:${i}`)) {
       this.changePool(c.pool.id, (l) => {
         const q = l.pipes?.find((x) => x.id === pipeId);
         if (!q) return;
@@ -7759,7 +7762,7 @@ export class Fp3dEditor extends LitElement {
     if (this._runMode || !this.isAdmin) return;
     e.stopPropagation();
     this._runSel = { pipe: pipeId, pt: null };
-    if (e.detail >= 2) {
+    if (this.doubleTap(e, `fitting:${id}`)) {
       this.changePool(c.pool.id, (l) => {
         const q = l.pipes?.find((x) => x.id === pipeId);
         if (q?.fittings) q.fittings = q.fittings.filter((x) => x.id !== id);
@@ -8066,7 +8069,7 @@ export class Fp3dEditor extends LitElement {
       if (pt) {
         const [pipe, i] = split(pt);
         // a double click takes the corner point out
-        if (e.detail >= 2)
+        if (this.doubleTap(e, `pipept:${pt}`))
           this.change((_, f) => {
             const q = f.outdoor.find((x) => x.id === a.id)?.pool?.pipes?.find((x) => x.id === pipe);
             q?.points.splice(i, 1);
@@ -9416,6 +9419,17 @@ export class Fp3dEditor extends LitElement {
           if (Number.isFinite(v)) onChange(v);
         }}
     /></label>`;
+  }
+
+  /** The last press on a point, to tell a double click (a pointerdown's `detail` stays 0 in Chrome, D410). */
+  private lastTap: { key: string; at: number } | null = null;
+
+  /** Whether this press is the second of a double click on the same point (within 450 ms). */
+  private doubleTap(e: PointerEvent, key: string): boolean {
+    const now = performance.now();
+    const twice = e.detail >= 2 || (this.lastTap?.key === key && now - this.lastTap.at < 450);
+    this.lastTap = twice ? null : { key, at: now };
+    return twice;
   }
 
   /** A tap in the 3D pane: select there, and fold the sidebar away (the bar under the pane has the essentials). */

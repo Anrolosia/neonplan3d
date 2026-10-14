@@ -634,7 +634,20 @@ export function flowSegments({ building, consumers, summary, battery, fieldPower
     for (const f of fields) {
       const power = fieldPower.get(f.id) ?? 0;
       const named = f.string ? strings.find((x) => x.id === f.string)?.inverter : null;
-      let inv = named ? (inverters.find((x) => x.id === named) ?? null) : null;
+      // a string may also end at a battery with its own solar input (a power station such as an EcoFlow, D410)
+      const station = named ? (batteries.find((x) => x.id === named) ?? null) : null;
+      let inv = named && !station ? (inverters.find((x) => x.id === named) ?? null) : null;
+      if (station) {
+        const via = onInverter.get(station.id);
+        if (via) fieldsOf.set(via.id, (fieldsOf.get(via.id) ?? 0) + power);
+        const batY = station.variant === "wall" ? 0.5 + station.h : 0.9;
+        const hand = laid(`solar:${f.id}`);
+        const start = hand ? fieldStart(building, f) : null;
+        const floor = building.floors.find((x) => x.id === station.floorId);
+        if (hand && start && floor) out.push(...tag(absolutePolyline(building, manualPoints(building, hand, start, [station.x, floor.elevation + batY, station.z]), power, "solar", floor), `solar:${f.id}`));
+        else out.push(...tag(solarRoute(building, f, power, station, batY), `solar:${f.id}`));
+        continue;
+      }
       if (!inv && inverters.length) {
         const face = fieldFace(building, f, faces);
         const c = face ? fieldCenter(face, f) : [f.u, f.v];

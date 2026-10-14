@@ -1559,7 +1559,6 @@
  "solar_string_n": "组串 {n}",
  "solar_string_name": "组串名称",
  "solar_string_entity": "组串光伏功率",
- "solar_string_inverter": "逆变器",
  "solar_string_inverter_none": "未选择逆变器",
  "inverter_strings": "此逆变器上的组串：{names}",
  "inverter_strings_none": "此逆变器上还没有组串——请在太阳能阵列的“组串 › 逆变器”中分配。",

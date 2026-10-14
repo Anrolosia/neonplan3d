@@ -1559,7 +1559,6 @@
  "solar_string_n": "String {n}",
  "solar_string_name": "Stringin nimi",
  "solar_string_entity": "Stringin aurinkosähköteho",
- "solar_string_inverter": "Invertteri",
  "solar_string_inverter_none": "Invertteriä ei ole valittu",
  "inverter_strings": "Tämän invertterin stringit: {names}",
  "inverter_strings_none": "Tällä invertterillä ei ole vielä stringiä – määritä se aurinkopaneelikentässä kohdassa String › Invertteri.",

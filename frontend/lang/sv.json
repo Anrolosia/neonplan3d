@@ -1559,7 +1559,6 @@
  "solar_string_n": "Sträng {n}",
  "solar_string_name": "Strängens namn",
  "solar_string_entity": "Strängens soleffekt",
- "solar_string_inverter": "Växelriktare",
  "solar_string_inverter_none": "Ingen växelriktare vald",
  "inverter_strings": "Strängar på den här växelriktaren: {names}",
  "inverter_strings_none": "Ingen sträng på den här växelriktaren än – tilldela den vid ett solfält under Sträng › Växelriktare.",

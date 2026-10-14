@@ -1559,7 +1559,6 @@
  "solar_string_n": "Cadena {n}",
  "solar_string_name": "Nombre de la cadena",
  "solar_string_entity": "Potencia FV de la cadena",
- "solar_string_inverter": "Inversor",
  "solar_string_inverter_none": "Ningún inversor elegido",
  "inverter_strings": "Strings en este inversor: {names}",
  "inverter_strings_none": "Aún no hay ningún string en este inversor; asígnalo en un campo solar en String › Inversor.",

@@ -1559,7 +1559,6 @@
  "solar_string_n": "String {n}",
  "solar_string_name": "Nazwa stringu",
  "solar_string_entity": "Moc PV stringu",
- "solar_string_inverter": "Falownik",
  "solar_string_inverter_none": "Nie wybrano falownika",
  "inverter_strings": "Stringi na tym falowniku: {names}",
  "inverter_strings_none": "Ten falownik nie ma jeszcze stringu – przypisz go przy polu fotowoltaicznym w String › Falownik.",

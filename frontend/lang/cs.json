@@ -1559,7 +1559,6 @@
  "solar_string_n": "String {n}",
  "solar_string_name": "Název stringu",
  "solar_string_entity": "FV výkon stringu",
- "solar_string_inverter": "Střídač",
  "solar_string_inverter_none": "Nevybrán žádný střídač",
  "inverter_strings": "Stringy na tomto střídači: {names}",
  "inverter_strings_none": "Na tomto střídači zatím není žádný string – přiřaď ho u solárního pole v String › Střídač.",
