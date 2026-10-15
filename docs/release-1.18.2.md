@@ -1,4 +1,4 @@
-**NeonPlan 3D 1.18.2** is a round of fixes from your reports: light wells you can leave out, sound rings back on their speakers, live energy curves, daylight under roof windows, calmer pets – and the right mouse button pans the plan.
+**NeonPlan 3D 1.18.2** is a round of fixes from your reports: light wells you can leave out, sound rings back on their speakers, live energy curves, roof windows over lower floors, round mirrors you can see, daylight under roof windows, calmer pets – and the right mouse button pans the plan.
 
 ### New
 
@@ -14,6 +14,11 @@
 - **Roof windows:** a soft patch of daylight lies under every roof window with an open blind – also when the sun is on the other side of the roof or so low that its light fell onto the walls of a small room (D340).
 - **Pets:** they no longer sink into rugs, a dog lies along the sofa instead of half inside it, and they wander through more of the house instead of going back and forth between two places (D507).
 - **Cables:** a double click on a cable point takes it out again (D410).
+- **Round parts that looked hollow:** cylinders lying along the depth showed only their outline from the front, and one end of every lying cylinder was missing – e.g. the **round mirror with light** of the Bath pack, a camera's lens and some pack items. They are solid again (#534). The Bath pack gets an update with a brighter mirror and a light ring round it.
+- **Roof windows over a lower floor:** where the slope reaches down over the floor below, floating roof windows now show with that floor when the roof fades out (#482).
+- **Light wells under a lawn or path:** a lawn, path or terrace drawn up to the house no longer covers the light well – its rim stands just above the surface by itself (#524).
+- **Furniture type list:** it offered devices of the energy tool and parts not released yet (e.g. a ball valve) that are not in the library; it now offers what the library offers (#530).
+- **Sidebar panel:** with themes that set safe-area insets it was taller than the window and its bottom was cut off (#529 – thanks @brentgl for the precise report).
 
 ### How to update
 
@@ -21,7 +26,7 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ---
 
-**NeonPlan 3D 1.18.2** ist eine Runde Fixes aus euren Meldungen: Lichtschächte zum Weglassen, Klang-Ringe wieder an den Lautsprechern, Energie-Kurven live, Tageslicht unter Dachfenstern, entspanntere Haustiere – und die rechte Maustaste verschiebt den Plan.
+**NeonPlan 3D 1.18.2** ist eine Runde Fixes aus euren Meldungen: Lichtschächte zum Weglassen, Klang-Ringe wieder an den Lautsprechern, Energie-Kurven live, Dachfenster über unteren Etagen, sichtbare runde Spiegel, Tageslicht unter Dachfenstern, entspanntere Haustiere – und die rechte Maustaste verschiebt den Plan.
 
 ### Neu
 
@@ -37,6 +42,11 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 - **Dachfenster:** Unter jedem Dachfenster mit offenem Rollo liegt ein sanfter Tageslichtfleck – auch wenn die Sonne auf der anderen Dachseite steht oder so tief, dass ihr Licht in einem kleinen Raum auf die Wände fiel (D340).
 - **Haustiere:** Sie versinken nicht mehr im Teppich, ein Hund liegt längs vor dem Sofa statt halb darin, und sie laufen mehr durchs Haus statt zwischen zwei Plätzen hin und her (D507).
 - **Leitungen:** Ein Doppelklick auf einen Leitungspunkt nimmt ihn wieder heraus (D410).
+- **Runde Teile, die hohl aussahen:** Zylinder, die in der Tiefe liegen, zeigten von vorn nur ihren Umriss, und bei allen liegenden Zylindern fehlte ein Ende – etwa beim **runden Spiegel mit Licht** aus dem Bad-Pack, bei einer Kamera-Linse und einigen Pack-Möbeln. Sie sind wieder massiv (#534). Das Bad-Pack bekommt ein Update mit hellerem Spiegel und Leuchtring.
+- **Dachfenster über einer unteren Etage:** Reicht die Dachschräge über die Etage darunter, zeigen sich schwebende Dachfenster jetzt mit dieser Etage, wenn das Dach ausblendet (#482).
+- **Lichtschächte unter Rasen oder Weg:** Ein Rasen, Weg oder eine Terrasse bis ans Haus deckt den Lichtschacht nicht mehr zu – sein Rand steht von selbst knapp darüber (#524).
+- **Möbel-Typliste:** Sie bot Geräte des Energie-Werkzeugs und noch nicht veröffentlichte Teile an (z. B. einen Kugelhahn), die es in der Bibliothek nicht gibt; jetzt bietet sie, was die Bibliothek anbietet (#530).
+- **Seitenleisten-Panel:** Mit Themes, die Abstände für Notch-Bereiche setzen, war es höher als das Fenster und unten abgeschnitten (#529 – danke an @brentgl für die genaue Meldung).
 
 ### So bekommst du das Update
 

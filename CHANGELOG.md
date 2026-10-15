@@ -20,6 +20,11 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - Daylight under roof windows also when the sun is on the other side or low (D340).
 - Pets sank into rugs, a dog lay half in the sofa, too little wandering (D507).
 - Double click on a cable point removes it (D410).
+- Cylinders lying along the depth looked hollow from the front, and one end of every lying cylinder was missing – e.g. the round mirror with light, a camera's lens (#534).
+- Floating roof windows in a slope over a lower floor's room show with that floor when the roof fades (#482).
+- A light well under a lawn, path or terrace drawn up to the house stands just above that surface instead of vanishing under it (#524).
+- The furniture type list offered devices of the energy tool and parts not released yet; it now offers what the library offers (#530).
+- The sidebar panel was taller than the window with themes that set safe-area insets (#529, thanks @brentgl).
 
 ## 1.18.1
 

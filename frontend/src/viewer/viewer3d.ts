@@ -540,6 +540,8 @@ export class FloorplanViewer {
   private roof: {
     group: Group;
     parts: { group: Group; floorId: string; rideId: string; base: number; lift: boolean; win: Group | null }[];
+    /** Roof windows over rooms of a lower floor: they follow that floor (#482). */
+    below: { floorId: string; win: Group }[];
     solid: MeshBasicMaterial;
     lines: LineBasicMaterial;
     glass: MeshBasicMaterial;
@@ -2068,6 +2070,7 @@ export class FloorplanViewer {
     const wins = new Group();
     const winSolid = themed(new MeshBasicMaterial({ vertexColors: true, side: DoubleSide }), this.themeUniform);
     const winLines = themed(new LineBasicMaterial({ vertexColors: true, transparent: true, blending: lineBlending(this.theme), depthWrite: false }), this.themeUniform, true);
+    const below: { floorId: string; win: Group }[] = [];
     const parts = geos.map((geo) => {
       const part = new Group();
       part.add(new Mesh(geo.solid.geometry(), solid), new LineSegments(geo.lines.geometry(), lines));
@@ -2095,12 +2098,19 @@ export class FloorplanViewer {
         win.add(new Mesh(geo.win.solid.geometry(), winSolid), new LineSegments(geo.win.lines.geometry(), winLines));
         wins.add(win);
       }
+      for (const [floorId, w] of geo.winBelow ?? []) {
+        if (!w.solid.count) continue;
+        const g = new Group();
+        g.add(new Mesh(w.solid.geometry(), winSolid), new LineSegments(w.lines.geometry(), winLines));
+        wins.add(g);
+        below.push({ floorId, win: g });
+      }
       return { group: part, floorId: geo.floor.id, rideId: roofRider(this.building!, geo.floor, geo.sections ?? []), base: geo.base, lift: geo.lift !== false, win };
     });
     group.renderOrder = 8;
     this.scene.add(group);
     this.scene.add(wins);
-    this.roof = { group, parts, solid, lines, glass, live, lives, wins, winSolid, winLines };
+    this.roof = { group, parts, below, solid, lines, glass, live, lives, wins, winSolid, winLines };
     this.placeRoof();
   }
 
@@ -2134,6 +2144,13 @@ export class FloorplanViewer {
         part.win.position.y = fv.floor.elevation + ride.y + part.base + (part.lift ? apart * ROOF_GAP : 0);
         part.win.visible = fv.group.visible && fv.o > 0.5 && this.wallMode !== "cut";
       }
+    }
+    // windows in a slope over a lower floor: with that floor, wherever it glides
+    for (const w of roof.below) {
+      const fv = this.floorMap.get(w.floorId);
+      if (!fv) continue;
+      w.win.position.y = fv.floor.elevation + fv.y;
+      w.win.visible = fv.group.visible && fv.o > 0.5 && this.wallMode !== "cut";
     }
     roof.solid.opacity = this.roofO;
     roof.solid.depthWrite = this.roofO > 0.9;
