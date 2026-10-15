@@ -1506,9 +1506,17 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     case "waste_bin":
       wasteBin(b, w, d, h, binShape(f), binColors(f, householdCountry()));
       break;
-    case "mailbox":
+    case "mailbox": {
+      // like the other built-in wall models it is drawn at its own height (a wall mailbox at 1 m, a bank at 0.75 m)
+      const p0 = buf.p.length;
+      const l0 = lines.p.length;
       mailbox(b, w, d, h, mailboxShape(f));
+      const lift = builtinBase(f);
+      for (let i = p0 + 1; i < buf.p.length; i += 3) buf.p[i] += lift;
+      for (let i = l0 + 1; i < lines.p.length; i += 3) lines.p[i] += lift;
+      if (lift > 0) return; // hangs on the wall: no shadow on the floor
       break;
+    }
     case "awning":
       // drawn with its moving fabric and arms by pushAwning (it runs in and out with its cover)
       return;
