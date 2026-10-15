@@ -1,5 +1,8 @@
 """Start views of the house, a floor and a room (#206, #282)."""
 
+import pytest
+import voluptuous as vol
+
 from custom_components.neonplan3d.schema import (
     FURNITURE_SCHEMA,
     HOLOGRAM_SCHEMA,
@@ -82,3 +85,35 @@ def test_pool_depth_rim_and_port_depth() -> None:
     out = OUTDOOR_SCHEMA({**pool, "depth": 1.5, "rim": 0.2})
     assert (out["depth"], out["rim"]) == (1.5, 0.2)
     assert POOL_PORT_SCHEMA({"id": "i", "kind": "inlet", "x": 1, "z": 0, "depth": 0.3})["depth"] == 0.3
+
+
+def test_household_fields_are_kept_and_checked() -> None:
+    """A waste bin keeps its kind, colours and calendar; a mailbox its door; wrong values are refused."""
+    base = {
+        "id": "b1",
+        "type": "waste_bin",
+        "x": 1,
+        "z": 1,
+        "rotation": 0,
+        "w": 0.58,
+        "d": 0.73,
+        "h": 1.07,
+        "variant": None,
+    }
+    out = FURNITURE_SCHEMA(
+        {
+            **base,
+            "bin_kind": "paper",
+            "bin_color": "#1f4fa8",
+            "bin_lid": None,
+            "bin_source": "calendar.abfall",
+            "bin_match": "Papier",
+        }
+    )
+    assert out["bin_kind"] == "paper" and out["bin_source"] == "calendar.abfall"
+    assert "bin_kind" not in FURNITURE_SCHEMA(base)
+    mail = FURNITURE_SCHEMA({**base, "type": "mailbox", "mailbox_door": "binary_sensor.door"})
+    assert mail["mailbox_door"] == "binary_sensor.door"
+    for bad in ({"bin_kind": "nuclear"}, {"bin_color": "blue"}):
+        with pytest.raises(vol.Invalid):
+            FURNITURE_SCHEMA({**base, **bad})

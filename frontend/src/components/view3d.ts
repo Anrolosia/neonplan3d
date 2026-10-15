@@ -32,6 +32,7 @@ import { carState, type CarState, roomClimateValue,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
+import { binColors, binDue, fetchPickups, hassCountry, mailboxPost, setHouseholdCountry, wasteCalendars, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
 import { fieldFace, fieldSize } from "../solar.ts";
 import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, type PoolPipe, type SolarField, POOL_DEVICES } from "../model.ts";
@@ -98,7 +99,7 @@ import { load3d } from "../load3d.ts";
 import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
-import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Furniture, type Pet, type StartView } from "../model.ts";
+import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -438,6 +439,10 @@ export class Fp3dView3d extends LitElement {
   private linkedRegistry: HomeAssistant["entities"] | undefined;
   /** Entities of electric furniture (TV, fridge, …). */
   private furnitureLinks = new Map<string, FurnitureLinks>();
+  /** Haushalt Pro: the pickups of the waste calendars (fetched every 10 minutes while bins read one). */
+  private pickups = new Map<string, Pickup[]>();
+  private pickupKey = "";
+  private householdTimer: ReturnType<typeof setInterval> | undefined;
   /** Room values of the current heatmap (for the legend). */
   private heatValues = new Map<string, number>();
   /** Entities whose state changes redraw markers, cables, people and floor labels. */
@@ -580,6 +585,9 @@ export class Fp3dView3d extends LitElement {
     this.trailTimer = undefined;
     clearInterval(this.holoTimer);
     this.holoTimer = undefined;
+    clearInterval(this.householdTimer);
+    this.householdTimer = undefined;
+    this.pickupKey = "";
     // back in the page (another dashboard view and back), the day curves are fetched and kept fresh again (#527)
     this.holoIds = "";
     clearTimeout(this.flashTimer);
@@ -691,6 +699,8 @@ export class Fp3dView3d extends LitElement {
   protected willUpdate(changed: PropertyValues): void {
     // this bundle's own copy of the ground: lamps and markers on a sloped lawn sit on it
     if (changed.has("building")) setTerrain(this.building ?? null);
+    // waste bins start from the colours usual in the Home Assistant's country
+    if (changed.has("hass") && this.hass) setHouseholdCountry(hassCountry(this.hass));
   }
 
   protected updated(changed: PropertyValues): void {
@@ -787,6 +797,7 @@ export class Fp3dView3d extends LitElement {
       this.linkedRegistry = hass.entities;
       this.findIndex = null;
       this.alertSrc = this.alerts ? alertSources(hass, b, this.weatherEntityId) : null;
+      this.watchHousehold(hass, b);
       this.watched = watchedEntities(hass, b, {
         openings: this.openingLinks,
         furniture: this.furnitureLinks,
@@ -2230,6 +2241,13 @@ export class Fp3dView3d extends LitElement {
             screens.set(f.id, v === "closed" ? { color: [1, 0.3, 0.25], level: 0.6 } : v === "filter" || v === "recirculate" ? { color: [0.3, 1, 0.6], level: poolLive.pump?.on ? 0.8 : 0.3 } : { color: [1, 0.62, 0.2], level: 0.85 });
           else if (f.type === "pool_dosing" && poolLive.pump?.on) screens.set(f.id, { color: [0.6, 0.9, 1], level: 0.5 });
         }
+        // Haushalt Pro: a bin glows the evening before its pickup, a mailbox while post lies in it
+        if (f.type === "waste_bin" || f.type === "mailbox") {
+          const hh = hasFeature("household") ? this.householdState(hass, floor, f) : null;
+          if (hh?.screen) screens.set(f.id, hh.screen);
+          if (hh?.marker) markers.push(hh.marker);
+          continue;
+        }
         const autoPro = f.type === "parking" && hasFeature("auto_pro") && !!f.car;
         const car = autoPro ? carState(hass, f) : null;
         const extraRef = f.type === "home_battery" ? f.soc : f.type === "wallbox" ? f.status : f.type === "parking" && car ? (f.car?.device ?? car.entities.soc) : null;
@@ -2367,6 +2385,86 @@ export class Fp3dView3d extends LitElement {
     }
     this.watchCameras(this.cameraScreens > 0 || !!this._through || this.cameraWall);
     return { markers, consumers, screens, targets };
+  }
+
+  /**
+   * Haushalt Pro: fetch the waste calendars' pickups now and every 10 minutes while bins read a calendar; the
+   * timer also lets the bins start and stop glowing at their hours (14:00 the day before, noon on the day).
+   */
+  private watchHousehold(hass: HomeAssistant, b: Building): void {
+    const items = b.floors.flatMap((f) => f.furniture).filter((f) => f.type === "waste_bin" || f.type === "mailbox");
+    const on = hasFeature("household") && items.length > 0 && !this.replay;
+    const calendars = on ? wasteCalendars(b.floors) : [];
+    const key = calendars.join(",");
+    if (!on) {
+      clearInterval(this.householdTimer);
+      this.householdTimer = undefined;
+      this.pickupKey = "";
+      return;
+    }
+    const fetch = async () => {
+      if (calendars.length) this.pickups = await fetchPickups(this.hass ?? hass, calendars);
+      this.syncDevices(true);
+    };
+    if (key !== this.pickupKey || !this.householdTimer) {
+      this.pickupKey = key;
+      clearInterval(this.householdTimer);
+      this.householdTimer = setInterval(() => !document.hidden && void fetch(), 600_000);
+      if (calendars.length) void fetchPickups(hass, calendars).then((p) => {
+        this.pickups = p;
+        this.syncDevices(true);
+      });
+    }
+  }
+
+  /** Haushalt Pro: how a bin or a mailbox shows now – its glow and its pin (with the days to the pickup, "post"). */
+  private householdState(hass: HomeAssistant, floor: Floor, f: Furniture): { screen?: ScreenState; marker?: DeviceMarker & { fromFurniture: boolean } } | null {
+    const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+    const rgb = (hex: string): [number, number, number] => {
+      const n = parseInt(hex.slice(1), 16);
+      return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+    };
+    // the pin shows while there is something to do (the bin goes out today or tomorrow, post lies in the box)
+    const pin = (id: string, text: string, active: boolean, icon: string, shown: boolean) => ({
+      id,
+      floorId: floor.id,
+      roomId: room?.id ?? null,
+      x: f.x,
+      z: f.z,
+      y: markerHeight(f) + mountBase(floor, f),
+      icon: f.icon ? mdiIcon(f.icon) : mdiIcon(icon),
+      name: f.name || furnitureName(hass, f.type),
+      ownName: f.name || undefined,
+      showName: !!f.show_name,
+      text,
+      active,
+      unavailable: false,
+      glow: null,
+      furnitureId: f.id,
+      show: f.marker ?? (shown ? ("always" as const) : undefined),
+      fromFurniture: true,
+    });
+    if (f.type === "waste_bin") {
+      const src = typeof f.bin_source === "string" && f.bin_source !== "none" ? f.bin_source : null;
+      if (!src) return null;
+      const due = binDue(f, hass, this.pickups);
+      if (!due) return null;
+      const text = due.days === 0 ? translate(hass, "bin_today") : due.days === 1 ? translate(hass, "bin_tomorrow") : translate(hass, "bin_in_days", { n: due.days });
+      // the lid's colour, a little brighter: the paper bin glows blue, the bio bin brown
+      const col = rgb(binColors(f)[1]).map((v) => Math.min(1, v * 1.4 + 0.15)) as [number, number, number];
+      return {
+        screen: due.glow ? { color: col, level: 1, faces: [{ part: "top", color: col, level: 1 }, { part: "band", color: col, level: 0.8 }] } : undefined,
+        marker: pin(`hh:${src}#${f.id}`, text, due.glow, "trash-can-outline", due.days <= 1),
+      };
+    }
+    const flag = typeof f.entity === "string" && f.entity !== "none" ? f.entity : null;
+    if (!flag) return null;
+    const post = mailboxPost(f, hass);
+    const amber: [number, number, number] = [1, 0.62, 0.15];
+    return {
+      screen: post ? { color: amber, level: 1, faces: [{ part: "top", color: amber, level: 1 }, { part: "band", color: amber, level: 0.8 }] } : undefined,
+      marker: pin(`hh:${flag}#${f.id}`, post ? translate(hass, "mailbox_post") : "", post, post ? "email-alert-outline" : "mailbox-outline", post),
+    };
   }
 
   /** Time travel: each running robot's way through the rooms it cleaned so far (their centres, in order). */
@@ -3460,6 +3558,13 @@ export class Fp3dView3d extends LitElement {
   private onDeviceTap(entityId: string, x = 0, y = 0): void {
     // trail pins and lamps without a light are drawn, but nothing of Home Assistant stands behind them
     if (entityId.startsWith("trail:") || entityId.startsWith("lamp:")) return;
+    // Haushalt Pro: a bin's or a mailbox's pin opens its calendar or sensor
+    if (entityId.startsWith("hh:")) {
+      const id = entityId.slice(3).split("#")[0];
+      if (this.ro) this.showInfo(id, x, y);
+      else openMoreInfo(this, id);
+      return;
+    }
     if (this.ro) {
       const b = this.building;
       const grid = b ? (b.energy.grid ?? deviceSensors(b, (f) => this.furnitureLinks?.get(f.id)?.power ?? null).grid) : null;

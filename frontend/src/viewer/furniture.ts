@@ -7,6 +7,7 @@ import { Color } from "three";
 import type { Furniture, Vec2 } from "../model.ts";
 import { builtinBase, stairsULayout, POOL_VALVE_Y } from "../model.ts";
 import { mountBase, packItem, packScreen, type PackItem } from "../packs.ts";
+import { binColors, binShape, householdCountry, mailboxShape, type BinShape, type MailboxShape } from "../household.ts";
 import type { Floor } from "../model.ts";
 import { ALWAYS, DEG, EDGE_TOP, GeoBuffer, LineBuffer, pushLoft, pushLyingCyl, pushPrism, shade } from "./geo.ts";
 
@@ -395,6 +396,117 @@ function fridge(b: Builder, w: number, d: number, h: number): void {
   const hx = w / 2 - 0.06;
   b.seg(hx, split + 0.08, d / 2 + 0.015, hx, split + 0.4, d / 2 + 0.015, EDGE_GLOW);
   b.seg(hx, split - 0.4, d / 2 + 0.015, hx, split - 0.08, d / 2 + 0.015, EDGE_GLOW);
+}
+
+/** A real colour toned into the neon look: darker for a body, a little brighter for a lid. */
+const tone = (hex: string, k: number) => shade(parseInt(hex.slice(1), 16), k).getHex();
+
+/**
+ * A waste bin in its shape and colours (household.ts): wheelie bins taper to the bottom and have their wheels and
+ * handle at the back (-z), a 1100 l container stands on four castors, a sack is tied at the top.
+ */
+function wasteBin(b: Builder, w: number, d: number, h: number, shape: BinShape, colors: [string, string]): void {
+  const body = tone(colors[0], 0.55);
+  const lid = tone(colors[1], 0.8);
+  const lidTop = tone(colors[1], 1);
+  if (shape === "bag") {
+    // a full sack: wider in the middle, gathered and tied at the top
+    b.loft([-w * 0.42, w * 0.42, -d * 0.4, d * 0.4], [-w / 2, w / 2, -d / 2, d / 2], 0, h * 0.55, body, body, EDGE_FAINT);
+    b.loft([-w / 2, w / 2, -d / 2, d / 2], [-w * 0.12, w * 0.12, -d * 0.12, d * 0.12], h * 0.55, h * 0.9, lid, lid, EDGE_FAINT);
+    b.cyl(0, 0, Math.min(w, d) * 0.1, h * 0.9, h, lidTop, lidTop, 8);
+    return;
+  }
+  if (shape === "caddy") {
+    b.loft([-w * 0.45, w * 0.45, -d * 0.45, d * 0.45], [-w / 2, w / 2, -d / 2, d / 2], 0, h * 0.85, body, body, EDGE_FURN);
+    b.box(-w / 2, w / 2, h * 0.85, h * 0.95, -d / 2, d / 2, lid, lidTop, EDGE_FAINT);
+    // the carrying handle over the lid
+    b.box(-w * 0.42, -w * 0.36, h * 0.95, h, -0.01, 0.01, lid);
+    b.box(w * 0.36, w * 0.42, h * 0.95, h, -0.01, 0.01, lid);
+    b.box(-w * 0.42, w * 0.42, h * 0.98, h, -0.01, 0.01, lid);
+    return;
+  }
+  if (shape === "underground") {
+    // only the column of an underground container stands out of the ground: a slot in front, the lid on top
+    const r = Math.min(w, d) * 0.32;
+    b.cyl(0, 0, r, 0, h * 0.9, body, body, 16, EDGE_FURN);
+    b.cyl(0, 0, r * 1.08, h * 0.9, h, lid, lidTop, 16, EDGE_FAINT);
+    b.box(-r * 0.5, r * 0.5, h * 0.62, h * 0.8, r * 0.7, r * 1.02, C.dark);
+    // the paved plate around it
+    b.box(-w / 2, w / 2, 0, 0.02, -d / 2, d / 2, C.metal, C.metal, EDGE_FAINT);
+    return;
+  }
+  if (shape === "bin1100") {
+    const cast = 0.14;
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) b.cyl(sx * (w / 2 - 0.12), sz * (d / 2 - 0.12), 0.05, 0, cast, C.dark, C.dark, 8);
+    b.loft([-w / 2 + 0.06, w / 2 - 0.06, -d / 2 + 0.06, d / 2 - 0.08], [-w / 2, w / 2, -d / 2, d / 2], cast, h - 0.1, body, body, EDGE_FURN);
+    // two lid halves, the front one a little lower (a rounded lid seen as two slopes)
+    b.loft([-w / 2, w / 2, -d / 2, 0], [-w / 2, w / 2, -d / 2, 0], h - 0.1, h, lid, lidTop, EDGE_FAINT);
+    b.loft([-w / 2, w / 2, 0, d / 2], [-w / 2, w / 2, 0, d / 2 - 0.05], h - 0.1, h - 0.03, lid, lidTop, EDGE_FAINT);
+    return;
+  }
+  // wheelie bins (120 l, 240 l, a multi-compartment bin): wheels and handle at the back
+  const wheel = Math.min(0.2, h * 0.19);
+  const back = -d / 2;
+  for (const sx of [-1, 1]) b.lyingCyl("x", sx * (w / 2 - 0.05), back + wheel / 2 + 0.01, 0, wheel, 0.05, wheel, C.dark, C.metal, 12);
+  b.loft([-w * 0.42, w * 0.42, back + 0.07, d / 2 - 0.05], [-w / 2 + 0.01, w / 2 - 0.01, back + 0.05, d / 2 - 0.01], 0.03, h - 0.05, body, body, EDGE_FURN);
+  // the lid reaches over the front; the handle runs along the back
+  b.box(-w / 2, w / 2, h - 0.05, h, back + 0.03, d / 2, lid, lidTop, EDGE_FAINT);
+  b.box(-w * 0.42, w * 0.42, h - 0.1, h - 0.02, back, back + 0.04, lid, lidTop);
+  if (shape === "multi") {
+    // the lid in two parts: a seam across it, and the front split for a second compartment
+    b.seg(-w / 2, h + 0.002, (back + d / 2) / 2, w / 2, h + 0.002, (back + d / 2) / 2, EDGE_GLOW);
+    b.seg(0, h * 0.25, d / 2 - 0.01, 0, h - 0.06, d / 2 - 0.01, EDGE_FAINT);
+  }
+}
+
+/** A mailbox in its local shape. */
+function mailbox(b: Builder, w: number, d: number, h: number, shape: MailboxShape): void {
+  const body = C.metal;
+  const top = shade(C.metal, 1.25).getHex();
+  const panel = shade(C.metal, 0.85).getHex();
+  if (shape === "pole") {
+    // the US mailbox on a post: a box with a round top lying lengthwise, a red flag on its side
+    const post = Math.min(0.09, w * 0.4);
+    const boxH = Math.min(0.24, h * 0.22);
+    b.box(-post / 2, post / 2, 0, h - boxH, -post / 2, post / 2, C.wood, C.woodTop, EDGE_FAINT);
+    b.box(-w / 2, w / 2, h - boxH, h - boxH * 0.45, -d / 2, d / 2, body, top, EDGE_FURN);
+    b.lyingCyl("z", 0, 0, h - boxH * 0.9, h, d, w, body, top, 14, EDGE_FURN);
+    b.box(w / 2, w / 2 + 0.015, h - boxH * 0.4, h + 0.08, -d * 0.1, -d * 0.04, 0x8a1c1c);
+    b.box(w / 2, w / 2 + 0.015, h + 0.02, h + 0.08, -d * 0.04, d * 0.12, 0x8a1c1c);
+    return;
+  }
+  if (shape === "pillar") {
+    // a post box on a pillar: the box on top, a newspaper roll below
+    const boxH = Math.min(0.4, h * 0.3);
+    b.box(-w * 0.2, w * 0.2, 0, h - boxH, -d * 0.2, d * 0.2, C.dark, C.dark, EDGE_FAINT);
+    b.lyingCyl("z", 0, 0, h - boxH - 0.2, h - boxH - 0.04, d * 0.9, 0.16, body, top, 12, EDGE_FAINT);
+    b.loft([-w / 2, w / 2, -d / 2, d / 2], [-w / 2, w / 2, -d / 2, d / 2 - 0.05], h - boxH, h, body, top, EDGE_FURN);
+    b.box(-w * 0.32, w * 0.32, h - 0.1, h - 0.08, d / 2 - 0.05, d / 2 - 0.04, C.dark);
+    return;
+  }
+  if (shape === "parcel") {
+    // a parcel box: a big door in front, a letter slot above
+    b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, body, top, EDGE_FURN);
+    b.box(-w / 2 + 0.04, w / 2 - 0.04, 0.08, h * 0.72, d / 2, d / 2 + 0.012, panel, top, EDGE_FAINT);
+    b.box(-w * 0.3, w * 0.3, h * 0.82, h * 0.86, d / 2, d / 2 + 0.01, C.dark);
+    return;
+  }
+  if (shape === "bank") {
+    // a mailbox bank: three by two boxes, each with its own slot
+    b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, body, top, EDGE_FURN);
+    for (let i = 0; i < 3; i++)
+      for (let j = 0; j < 2; j++) {
+        const x0 = -w / 2 + (w / 3) * i + 0.015;
+        const y0 = (h / 2) * j + 0.015;
+        b.box(x0, x0 + w / 3 - 0.03, y0, y0 + h / 2 - 0.03, d / 2, d / 2 + 0.01, panel, top, EDGE_FAINT);
+        b.box(x0 + 0.04, x0 + w / 3 - 0.07, y0 + h / 2 - 0.09, y0 + h / 2 - 0.07, d / 2 + 0.01, d / 2 + 0.014, C.dark);
+      }
+    return;
+  }
+  // a wall mailbox: a box with a slanted roof and the slot under it
+  b.box(-w / 2, w / 2, 0, h * 0.8, -d / 2, d / 2, body, top, EDGE_FURN);
+  b.loft([-w / 2, w / 2, -d / 2, d / 2 + 0.02], [-w / 2, w / 2, -d / 2, -d / 2 + 0.02], h * 0.8, h, body, top, EDGE_FURN);
+  b.box(-w * 0.36, w * 0.36, h * 0.66, h * 0.7, d / 2, d / 2 + 0.008, C.dark);
 }
 
 /** Smart side-by-side fridge without its doors (they move: see pushFridgeDoors): the body and, behind the doors, shelves. */
@@ -1390,6 +1502,12 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
       break;
     case "fridge_smart":
       fridgeSmart(b, w, d, h);
+      break;
+    case "waste_bin":
+      wasteBin(b, w, d, h, binShape(f), binColors(f, householdCountry()));
+      break;
+    case "mailbox":
+      mailbox(b, w, d, h, mailboxShape(f));
       break;
     case "awning":
       // drawn with its moving fabric and arms by pushAwning (it runs in and out with its cover)

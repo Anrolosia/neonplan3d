@@ -174,6 +174,18 @@ export interface Furniture {
   awning_time?: number | null;
   /** Awning: the cover counts the other way round (100 = in). */
   awning_invert?: boolean;
+  /** Waste bin: what goes in (decides its usual colours and its words in the waste calendar; null = rest). */
+  bin_kind?: "rest" | "bio" | "paper" | "plastic" | "glass" | "garden" | "recycling" | "other" | null;
+  /** Waste bin: its body colour ("#rrggbb"; null = the usual one of its kind in the country). */
+  bin_color?: string | null;
+  /** Waste bin: its lid colour ("#rrggbb"; null = like the body, or the country's usual lid). */
+  bin_lid?: string | null;
+  /** Haushalt Pro: the waste calendar (calendar.*) or a sensor with the next pickup of this bin. */
+  bin_source?: EntityRef;
+  /** Haushalt Pro: own words that find this bin's entries in the calendar (comma separated; null = by its kind). */
+  bin_match?: string | null;
+  /** Haushalt Pro, mailbox: the sensor of the door it is emptied through (post counts until it opens). */
+  mailbox_door?: EntityRef;
   /** An own symbol for the marker: a Material Design icon name without "mdi:" (null = by kind). */
   icon?: string | null;
   /** Linked entity, e.g. the TV's media player (null = automatic, "none" = none). */
@@ -1128,6 +1140,8 @@ export const FURNITURE_TYPES = [
   "fridge_smart",
   "stairwell",
   "awning",
+  "waste_bin",
+  "mailbox",
 ] as const;
 
 /** Furniture library sections (the editor lists them in this order). */
@@ -1141,6 +1155,7 @@ export const FURNITURE_GROUPS: Record<string, FurnitureType[]> = {
   work: ["desk", "worktop", "office_chair", "tall_cabinet", "coat_rack", "radiator", "ac_unit", "stairs", "stairs_u", "robot_vacuum"],
   vehicles: ["parking"],
   outdoor: ["awning"],
+  household: ["waste_bin", "mailbox"],
 };
 
 /** Energy devices: placed and set up in the Energy tool (stored like furniture, not in the library). */
@@ -1281,6 +1296,9 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
     case "awning":
       // the cassette over a terrace door
       return 2.3;
+    case "mailbox":
+      // a wall mailbox and a mailbox bank hang on the wall
+      return f.variant === "bank" ? 0.75 : f.variant === "pole" || f.variant === "pillar" || f.variant === "parcel" ? 0 : 1.0;
     case "inverter":
       return 1.1;
     case "wallbox":
@@ -1389,6 +1407,9 @@ export const FURNITURE_SIZE: Record<FurnitureType, [number, number, number]> = {
   ac_unit: [0.85, 0.22, 0.3],
   // width along the wall, the projection (how far it reaches out fully extended), the cassette
   awning: [3.0, 2.5, 0.22],
+  // a 240 l wheelie bin; a wall mailbox
+  waste_bin: [0.58, 0.73, 1.07],
+  mailbox: [0.38, 0.14, 0.34],
   robot_vacuum: [0.36, 0.5, 0.1],
   parking: [2.6, 5.2, 0.02],
   lamp_pendant: [0.4, 0.4, 0.8],

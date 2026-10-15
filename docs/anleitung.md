@@ -472,6 +472,14 @@ Unter **Möbel → Terrasse & Balkon** gibt es die **Markise**. Sie fährt in 3D
 - **Markise (Cover):** das Cover aus Home Assistant. Meldet es seine Position auch während der Fahrt, fährt die Markise in 3D langsam mit; meldet es nur „öffnet“/„schließt“, fährt sie in der **Laufzeit ganz aus**. Ein eigener **Positionssensor** geht auch. **Richtung umkehren** hilft bei Covers, die 100 % melden, wenn die Markise eingefahren ist.
 - **Volant:** die herunterhängende Stoffkante vorne, abschaltbar.
 
+### 4.23 Mülltonnen und Briefkästen
+
+Unter **Möbel → Haushalt** stehen **Mülltonne** und **Briefkasten**.
+
+- **Mülltonne – Bauform:** Rolltonne 120 l oder 240 l, Container 1100 l, Mehrkammer-Tonne, Sack, Eimer / Caddy oder Unterflur-Container (von dem nur die Einwurfsäule aus dem Boden ragt). Mit der Bauform setzt NeonPlan die üblichen Maße.
+- **Abfallart:** Restmüll, Bio, Papier, Verpackung, Glas, Garten, Recycling oder Sonstiges. Sie gibt der Tonne die Farben, die in deinem Land üblich sind (nach dem Land in Home Assistant: in Deutschland etwa Papier blau, Bio braun, Gelbe Tonne gelb; in Australien zeigt der Deckel die Sorte). **Farbe** und **Deckel** kannst du danach frei wählen.
+- **Briefkasten – Bauform:** Wandbriefkasten (hängt auf 1 m), Briefkasten auf Pfosten mit Fähnchen, Standbriefkasten mit Zeitungsfach, Paketbox oder Briefkastenanlage.
+
 ---
 
 ## 5. Die 3D-Ansicht

@@ -196,6 +196,9 @@ _VEHICLE_TYPE_SCHEMA = vol.Schema(
     {vol.Required("state"): vol.All(str, vol.Length(max=64)), vol.Required("vehicle"): vol.All(str, vol.Length(max=96))}
 )
 
+# the kinds of waste a bin can take (household.ts WASTE_KINDS)
+WASTE_KINDS = ["rest", "bio", "paper", "plastic", "glass", "garden", "recycling", "other"]
+
 FURNITURE_SCHEMA = vol.Schema(
     {
         vol.Required("id"): _ID,
@@ -262,6 +265,13 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("awning_position", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("awning_time", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=2, max=300))),
         vol.Optional("awning_invert", default=False): bool,
+        # household: a waste bin's kind and colours, its calendar (Haushalt Pro); a mailbox's emptying door
+        vol.Optional("bin_kind"): vol.Any(None, vol.In(WASTE_KINDS)),
+        vol.Optional("bin_color"): vol.Any(None, vol.Match(r"^#[0-9a-fA-F]{6}$")),
+        vol.Optional("bin_lid"): vol.Any(None, vol.Match(r"^#[0-9a-fA-F]{6}$")),
+        vol.Optional("bin_source"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("bin_match"): vol.Any(None, vol.All(str, vol.Length(max=120))),
+        vol.Optional("mailbox_door"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # LED strip: tilt about its length (degrees) and standing upright
         vol.Optional("tilt", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
         vol.Optional("upright", default=False): bool,

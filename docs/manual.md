@@ -472,6 +472,14 @@ Under **Furniture → Terrace & balcony** there is the **Awning**. In 3D it runs
 - **Awning (cover):** the cover from Home Assistant. If it reports its position while it runs, the awning runs out slowly in 3D; if it only says opening/closing, it moves at its **Run time fully out**. A separate **Position sensor** works too. **Reverse direction** helps with covers that report 100 % while the awning is in.
 - **Valance:** the fabric edge hanging at the front, can be switched off.
 
+### 4.23 Waste bins and mailboxes
+
+Under **Furniture → Household** you find the **waste bin** and the **mailbox**.
+
+- **Waste bin – shape:** wheelie bin 120 l or 240 l, 1100 l container, multi-compartment bin, bag, caddy / pail or underground container (only its column stands out of the ground). The shape sets the usual size.
+- **Waste:** general, food / organic, paper, packaging, glass, garden, recycling or other. It gives the bin the colours usual in your country (by the country set in Home Assistant: in Germany paper is blue and food waste brown, in the US recycling is blue; in Australia the lid tells the kind). **Colour** and **lid** can be changed freely afterwards.
+- **Mailbox – shape:** wall mailbox (hanging at 1 m), mailbox on a post with a flag, post box with a newspaper holder, parcel box or mailbox bank.
+
 ---
 
 ## 5. The 3D view
