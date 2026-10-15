@@ -50,7 +50,9 @@ function waterText(hass: HomeAssistant, v: number, unit: string): string {
 }
 
 interface HoloCard {
-  kind: "main" | "plant" | "device" | "media" | "car" | "pool";
+  kind: "main" | "plant" | "device" | "media" | "car" | "pool" | "bin";
+  /** Haushalt Pro: a waste bin that goes out – its colour and when ("Tomorrow"). */
+  bin?: { color: string; when: string };
   /** Pool Pro: the pool and what its entities report. */
   pool?: { area: string; state: PoolState };
   name: string;
@@ -472,6 +474,8 @@ export class Fp3dView3d extends LitElement {
   private pickups = new Map<string, Pickup[]>();
   private pickupKey = "";
   private householdTimer: ReturnType<typeof setInterval> | undefined;
+  /** Haushalt Pro: small holograms – bins that go out today or tomorrow, post, a thirsty plant (set by the furniture pass). */
+  private binHolos: { floorId: string; x: number; z: number; y: number; name: string; color: string; when: string }[] = [];
   /** Haushalt Pro: appliances that ended their program while the page is open ("finished" until the door opens). */
   private finished = new FinishedMemory();
   /** Haushalt Pro: looks again when an open fridge door reaches its limit. */
@@ -963,7 +967,7 @@ export class Fp3dView3d extends LitElement {
       const floorId = face.wall?.floorId ?? (face.unbounded ? (b.floors.find((f) => f.elevation === Math.min(...b.floors.map((x) => x.elevation)))?.id ?? b.floors[0].id) : [...b.floors].sort((p, q) => q.elevation - p.elevation)[0].id);
       return { p: [c[0] + face.n[0] * 0.05, c[1] + face.n[1] * 0.05, c[2] + face.n[2] * 0.05] as [number, number, number], n: [face.n[0], face.n[1], face.n[2]] as [number, number, number], floorId, size, roof: true, views: plantViews };
     };
-    const anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null }[] = [];
+    const anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null; near?: number }[] = [];
     const cards: HoloCard[] = [];
     const anyEnergy = summary.grid !== null || summary.battery !== null || summary.solar !== null;
     const free = holo.place === "free" && Number.isFinite(holo.x) && Number.isFinite(holo.z);
@@ -1224,6 +1228,16 @@ export class Fp3dView3d extends LitElement {
       }
       v.setPools(pieces);
     } else v.setPools([]);
+    // Haushalt Pro: a small hologram over every bin that goes out today or tomorrow (close up, floor views only)
+    if (hasFeature("household")) {
+      const holoSize = (b.settings.roof.hologram ?? DEFAULT_HOLOGRAM).size;
+      for (const bh of this.binHolos) {
+        const floor = b.floors.find((f) => f.id === bh.floorId);
+        if (!floor) continue;
+        anchors.push({ p: [bh.x, floor.elevation + bh.y + 0.45, bh.z], n: [0, 1, 0], floorId: bh.floorId, size: holoSize * 0.7, roof: false, views: "floor", near: 14 });
+        cards.push({ kind: "bin", name: bh.name, w: null, dayIds: [], battery: null, bin: { color: bh.color, when: bh.when } });
+      }
+    }
     v.setSound(sound);
     // walking: only the glass cards of the room one stands in (the others would float through the walls)
     const room = this._walk ? this.walkRoomPts : null;
@@ -1702,11 +1716,21 @@ export class Fp3dView3d extends LitElement {
   private renderHologram() {
     const e = this._energy;
     // the editor keeps the energy bar off but asks for the holograms in its energy tool
-    if (!(hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool")) || (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) || !(this.showEnergy || this.holograms) || !this.holoVisible()) return nothing;
+    if (!(hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool") || hasFeature("household")) || (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) || !(this.showEnergy || this.holograms) || !this.holoVisible()) return nothing;
     // the plants' cards belong to the house view – with a single floor that floor is the house view (#255)
     const house = this.floorId === null || (this.building?.floors.length ?? 0) <= 1;
     const plants = !!e && (e.solar !== null || e.grid !== null || e.battery !== null) && house;
-    return this._holos.map((card, i) => (card.kind === "pool" ? this.renderPoolCard(card, i) : card.kind === "car" ? this.renderCarCard(card, i) : card.kind === "media" ? this.renderMediaCard(card, i) : card.kind === "device" ? this.renderDeviceCard(card, i) : plants ? this.renderHoloCard(card, i, e!) : nothing));
+    return this._holos.map((card, i) => (card.kind === "pool" ? this.renderPoolCard(card, i) : card.kind === "bin" ? this.renderBinCard(card, i) : card.kind === "car" ? this.renderCarCard(card, i) : card.kind === "media" ? this.renderMediaCard(card, i) : card.kind === "device" ? this.renderDeviceCard(card, i) : plants ? this.renderHoloCard(card, i, e!) : nothing));
+  }
+
+  /** Haushalt Pro: a waste bin's small hologram – when it goes out, in the bin's colour. */
+  private renderBinCard(card: HoloCard, index: number) {
+    const b = card.bin!;
+    return html`<svg class="fp3d-holo-link" data-holo=${index} hidden aria-hidden="true" style="--bin:${b.color}"><line x1="0" y1="0" x2="0" y2="0" /><circle cx="0" cy="0" r="3" /></svg>
+      <div class="fp3d-holo fp3d-holo-bin ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="note" aria-label=${`${card.name}: ${b.when}`} style="--bin:${b.color}">
+        <div class="fp3d-holo-sheen"></div>
+        <div class="fp3d-holo-body"><b>${b.when}</b><span>${card.name}</span></div>
+      </div>`;
   }
 
   /** Auto Pro: the car's card – charge as a bar in its colour, range, charging power, lock and climate buttons. */
@@ -2259,6 +2283,7 @@ export class Fp3dView3d extends LitElement {
     // Haushalt Pro: what is due now, for the glass card
     const household = hasFeature("household");
     const today: HouseholdItem[] = [];
+    this.binHolos = [];
     // Pool Pro: what the (first) pool reports, for the devices of its technical room
     const poolFirst = hasFeature("pool") ? poolAreas(b.floors)[0] : undefined;
     const poolLive = poolFirst && this.building ? poolState(hass, poolLinksWithDevices(poolFirst.area.pool, this.building.floors)) : poolFirst ? poolState(hass, poolFirst.area.pool) : null;
@@ -2511,31 +2536,10 @@ export class Fp3dView3d extends LitElement {
 
   /** Haushalt Pro: how a bin or a mailbox shows now – its glow and its pin (with the days to the pickup, "post"). */
   private householdState(hass: HomeAssistant, floor: Floor, f: Furniture): { screen?: ScreenState; marker?: DeviceMarker & { fromFurniture: boolean }; item?: HouseholdItem } | null {
-    const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
     const rgb = (hex: string): [number, number, number] => {
       const n = parseInt(hex.slice(1), 16);
       return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
     };
-    // the pin shows while there is something to do (the bin goes out today or tomorrow, post lies in the box)
-    const pin = (id: string, text: string, active: boolean, icon: string, shown: boolean) => ({
-      id,
-      floorId: floor.id,
-      roomId: room?.id ?? null,
-      x: f.x,
-      z: f.z,
-      y: markerHeight(f) + mountBase(floor, f),
-      icon: f.icon ? mdiIcon(f.icon) : mdiIcon(icon),
-      name: f.name || furnitureName(hass, f.type),
-      ownName: f.name || undefined,
-      showName: !!f.show_name,
-      text,
-      active,
-      unavailable: false,
-      glow: null,
-      furnitureId: f.id,
-      show: f.marker ?? (shown ? ("always" as const) : undefined),
-      fromFurniture: true,
-    });
     if (f.type === "waste_bin") {
       const src = typeof f.bin_source === "string" && f.bin_source !== "none" ? f.bin_source : null;
       if (!src) return null;
@@ -2549,33 +2553,33 @@ export class Fp3dView3d extends LitElement {
       const grey = top - Math.min(...lid) < 0.12;
       const col = (grey ? [0.92, 0.95, 1] : lid.map((v) => Math.min(1, (v / Math.max(0.001, top)) * 1.05))) as [number, number, number];
       const label = f.name || translate(hass, `bin_kind_${f.bin_kind ?? "rest"}` as Parameters<typeof translate>[1]);
-      return {
-        // out tomorrow (or today): the lid glows, a column of light rises and a ring lies on the floor around it
-        screen: due.glow ? { color: col, level: 0.85, faces: [{ part: "lid", color: col, level: 0.85 }, { part: "beacon", color: col, level: 0.85 }] } : undefined,
-        marker: pin(`hh:${src}#${f.id}`, text, due.glow, "trash-can-outline", due.days <= 1),
-        item: due.days <= 1 ? { icon: "trash-can-outline", text: `${label}: ${text}`, entity: src, hot: due.glow } : undefined,
-      };
+      // out today or tomorrow: a small hologram over the bin in its colour (close up only) – no glow, no pin
+      if (due.days <= 1) {
+        const hex = `#${col.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`;
+        this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name: label, color: hex, when: text });
+      }
+      return { item: due.days <= 1 ? { icon: "trash-can-outline", text: `${label}: ${text}`, entity: src, hot: due.glow } : undefined };
     }
     if (f.type !== "mailbox") {
-      // a plant: thirsty – orange, its pin asks for water
+      // a plant: thirsty – an orange band and a small hologram asking for water
       const thirsty = plantThirsty(f, hass);
       const orange: [number, number, number] = [1, 0.55, 0.12];
       const name = f.name || furnitureName(hass, f.type);
-      return thirsty
-        ? {
-            screen: { color: orange, level: 0.9, faces: [{ part: "band", color: orange, level: 0.9 }] },
-            marker: pin(`hh:${f.moisture}#${f.id}`, translate(hass, "hh_thirsty"), true, "watering-can-outline", true),
-            item: { icon: "watering-can-outline", text: translate(hass, "hh_plant", { name }), entity: (f.moisture as string) ?? null, hot: true },
-          }
-        : null;
+      if (!thirsty) return null;
+      this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name, color: "#ff8c1f", when: translate(hass, "hh_thirsty") });
+      return {
+        screen: { color: orange, level: 0.9, faces: [{ part: "band", color: orange, level: 0.9 }] },
+        item: { icon: "watering-can-outline", text: translate(hass, "hh_plant", { name }), entity: (f.moisture as string) ?? null, hot: true },
+      };
     }
     const flag = typeof f.entity === "string" && f.entity !== "none" ? f.entity : null;
     if (!flag) return null;
     const post = mailboxPost(f, hass);
     const amber: [number, number, number] = [1, 0.62, 0.15];
+    // post: the box glows and a small hologram says so
+    if (post) this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name: f.name || furnitureName(hass, f.type), color: "#ffb547", when: translate(hass, "mailbox_post") });
     return {
       screen: post ? { color: amber, level: 1, faces: [{ part: "top", color: amber, level: 1 }, { part: "band", color: amber, level: 0.8 }] } : undefined,
-      marker: pin(`hh:${flag}#${f.id}`, post ? translate(hass, "mailbox_post") : "", post, post ? "email-alert-outline" : "mailbox-outline", post),
       item: post ? { icon: "email-alert-outline", text: f.name ? `${f.name}: ${translate(hass, "mailbox_post")}` : translate(hass, "mailbox_post"), entity: flag, hot: true } : undefined,
     };
   }
@@ -3904,6 +3908,34 @@ export class Fp3dView3d extends LitElement {
         display: block;
         position: relative;
         min-height: 200px;
+      }
+      .fp3d-holo.fp3d-holo-bin {
+        border-color: color-mix(in srgb, var(--bin) 70%, transparent);
+        box-shadow: 0 0 18px color-mix(in srgb, var(--bin) 45%, transparent), inset 0 0 12px color-mix(in srgb, var(--bin) 25%, transparent);
+        background: color-mix(in srgb, var(--bin) 14%, rgba(8, 14, 28, 0.72));
+        min-width: 0;
+        width: auto;
+      }
+      .fp3d-holo-bin .fp3d-holo-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        padding: 6px 12px;
+        white-space: nowrap;
+      }
+      .fp3d-holo-bin b {
+        font-size: 15px;
+        color: var(--bin);
+        text-shadow: 0 0 8px color-mix(in srgb, var(--bin) 60%, transparent);
+      }
+      .fp3d-holo-bin span {
+        font-size: 11px;
+        opacity: 0.8;
+      }
+      .fp3d-holo-link[style*="--bin"] line,
+      .fp3d-holo-link[style*="--bin"] circle {
+        stroke: var(--bin);
       }
       .fp3d-bin-info {
         display: flex;
