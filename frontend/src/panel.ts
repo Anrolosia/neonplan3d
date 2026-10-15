@@ -1087,9 +1087,11 @@ export class Floorplan3dPanel extends LitElement {
       }
       :host {
         display: block;
-        /* HA gives the custom panel's parent no explicit height, so 100% collapses. */
-        height: 100vh;
-        height: 100dvh;
+        /* HA gives the custom panel's parent no explicit height, so 100% collapses. The parent may pad itself by the
+           screen's safe areas (notches; some themes set them on every screen): those are taken off, or the panel is
+           taller than the window and its bottom is cut off (#529). */
+        height: calc(100vh - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px));
+        height: calc(100dvh - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px));
         background: var(--fp3d-bg);
       }
       .fp3d-app {

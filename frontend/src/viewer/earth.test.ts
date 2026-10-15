@@ -63,6 +63,23 @@ test("a window can do without its light well, and its rim can stand above the gr
   assert.ok(Math.abs(top(earthOf(b, 0)!) - level - 0.1) < 1e-6);
 });
 
+test("a light well under a lawn or a terrace drawn up to the house shows its rim above that surface (#524)", () => {
+  const win = { id: "w", room_id: "k", edge: 0, offset: 5, width: 1, type: "window", sill: 1.65, height: 0.5, hinge: "left", leaves: 1, swing: "in", contact2: null } as Opening;
+  const top = (g: NonNullable<ReturnType<typeof earthOf>>) => Math.max(...g.lines.p.filter((_, i) => i % 3 === 1));
+  const b = house();
+  b.floors[0].openings = [win];
+  const bare = top(earthOf(b, 0)!);
+  // the garden on the ground floor, all round the house
+  const area = (type: "lawn" | "terrace") => ({ id: "g", type, points: [[-5, -5], [15, -5], [15, 13], [-5, 13]] }) as never;
+  b.floors[1].outdoor = [area("lawn")];
+  assert.ok(Math.abs(top(earthOf(b, 0)!) - bare - (0.012 + 0.02)) < 1e-6);
+  b.floors[1].outdoor = [area("terrace")];
+  assert.ok(Math.abs(top(earthOf(b, 0)!) - bare - (0.12 + 0.02)) < 1e-6);
+  // a rim set higher by hand stays
+  b.floors[0].openings = [{ ...win, well_rim: 0.3 }];
+  assert.ok(Math.abs(top(earthOf(b, 0)!) - bare - 0.3) < 1e-6);
+});
+
 test("a raised house (the ground lower, no cellar) stands on a plinth; on a flat plot it gets none", () => {
   const flat = house();
   flat.floors = [flat.floors[1]];

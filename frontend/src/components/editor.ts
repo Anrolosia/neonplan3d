@@ -4486,6 +4486,16 @@ export class Fp3dEditor extends LitElement {
     /></label>`;
   }
 
+  /**
+   * The built-in types offered in a furniture item's type list: what the library offers (#530 – devices of the energy
+   * tool, Pool Pro parts not released yet and the stairwell are no furniture to switch to), plus the item's own type.
+   */
+  private typeChoices(current: string): string[] {
+    const shown = new Set<string>(Object.values(FURNITURE_GROUPS).flat());
+    if (hasFeature("fridge_smart")) shown.add("fridge_smart");
+    return FURNITURE_TYPES.filter((t) => shown.has(t) || t === current);
+  }
+
   /** Furniture that can stand for a placed device of this kind (a speaker for a media player, a lamp for a light …). */
   private furnitureFor(entityId: string): { type: string; label: string }[] {
     const kind = kindOf(entityId);
@@ -10161,7 +10171,7 @@ export class Fp3dEditor extends LitElement {
         <label class="fp3d-field fp3d-wide"
           >${this.t("furniture_type")}
           <select ?disabled=${!admin} @change=${(e: Event) => this.updateFurniture({ type: (e.target as HTMLSelectElement).value })}>
-            ${FURNITURE_TYPES.map((t) => html`<option value=${t} ?selected=${t === f.type}>${this.t(`furn_${t}` as I18nKey)}</option>`)}
+            ${this.typeChoices(f.type).map((t) => html`<option value=${t} ?selected=${t === f.type}>${this.t(`furn_${t}` as I18nKey)}</option>`)}
             ${(this.packs ?? [])
               .filter((pack) => pack.items.length)
               .map(
