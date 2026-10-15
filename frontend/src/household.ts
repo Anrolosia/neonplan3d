@@ -9,6 +9,24 @@
  */
 import type { EntityRef, Furniture } from "./model.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
+import { packItem } from "./packs.ts";
+
+/** A line of the glass card "Today in the household": an icon (mdi name), its text, the entity a tap opens. */
+export interface HouseholdItem {
+  icon: string;
+  text: string;
+  entity: string | null;
+  /** Something to do now (glows): drawn in amber. */
+  hot?: boolean;
+}
+
+/** A pack item that is a plant: most of its parts are leaves or a pot. */
+export function isPackPlant(type: string): boolean {
+  const item = packItem(type);
+  if (!item || item.light) return false;
+  const green = item.parts.filter((p) => p.color === "plant").length;
+  return green > 0 && green + item.parts.filter((p) => p.color === "pot").length >= item.parts.length / 2;
+}
 
 export const BIN_SHAPES = ["bin120", "bin240", "bin1100", "multi", "bag", "caddy", "underground"] as const;
 export type BinShape = (typeof BIN_SHAPES)[number];
@@ -292,5 +310,138 @@ export function mailboxPost(f: Pick<Furniture, "entity" | "mailbox_door">, hass:
 export function householdEntities(f: Furniture): EntityRef[] {
   if (f.type === "waste_bin") return [f.bin_source ?? null];
   if (f.type === "mailbox") return [f.entity ?? null, f.mailbox_door ?? null];
-  return [];
+  return householdExtras(f);
+}
+
+// ---------------------------------------------------------------- Haushalt Pro, part 2: plants, appliances, upkeep, fridge
+
+/** The number of an entity's state, when it is one. */
+const num = (st: HassEntity | undefined): number | null => {
+  const n = st ? Number(st.state) : NaN;
+  return Number.isFinite(n) ? n : null;
+};
+
+/**
+ * Whether a plant is thirsty: a plant.* entity reporting a moisture problem (the core plant integration's `problem`
+ * attribute, the Plant Monitor's `moisture_status`), or a moisture sensor below its minimum (null: 20 %).
+ */
+export function plantThirsty(f: Pick<Furniture, "moisture" | "moisture_min">, hass: HomeAssistant): boolean {
+  const id = typeof f.moisture === "string" && f.moisture !== "none" ? f.moisture : null;
+  const st = id ? hass.states[id] : undefined;
+  if (!id || !st) return false;
+  if (id.startsWith("plant.")) {
+    const a = st.attributes as Record<string, unknown>;
+    const problem = String(a.problem ?? "").toLowerCase();
+    const status = String(a.moisture_status ?? "").toLowerCase();
+    return status === "low" || (st.state === "problem" && problem.includes("moisture") && !problem.includes("high"));
+  }
+  const v = num(st);
+  return v !== null && v < (f.moisture_min ?? 20);
+}
+
+/** Minutes left of a program: a number (minutes, or with its unit s/h), an end time (timestamp) or "H:MM(:SS)". */
+export function remainingMinutes(st: HassEntity | undefined, now = Date.now()): number | null {
+  if (!st || st.state === "unavailable" || st.state === "unknown") return null;
+  const s = String(st.state).trim();
+  const unit = String(st.attributes.unit_of_measurement ?? "min").toLowerCase();
+  if (/^-?\d+(\.\d+)?$/.test(s)) {
+    const v = Number(s);
+    const m = unit === "s" ? v / 60 : unit === "h" ? v * 60 : v;
+    return Math.max(0, Math.round(m));
+  }
+  const hm = /^(\d+):(\d{2})(?::(\d{2}))?$/.exec(s);
+  if (hm) return Number(hm[1]) * 60 + Number(hm[2]) + Math.round(Number(hm[3] ?? 0) / 60);
+  const t = Date.parse(s);
+  if (Number.isFinite(t) && /\d{4}-\d{2}-\d{2}T/.test(s)) return Math.max(0, Math.round((t - now) / 60000));
+  return null;
+}
+
+/** States of an appliance or its program sensor that mean the program has ended. */
+const FINISHED = new Set(["finished", "end", "ended", "done", "complete", "completed", "program_finished", "programfinished", "fertig", "beendet", "ende", "termine", "finito", "klaar", "klar", "valmis"]);
+
+export function isFinishedState(st: HassEntity | undefined): boolean {
+  if (!st) return false;
+  const s = String(st.state).toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, "_");
+  return FINISHED.has(s);
+}
+
+/** Text of the minutes left: "23 min", "1:05 h". */
+export function remainingText(min: number): string {
+  return min >= 60 ? `${Math.floor(min / 60)}:${String(min % 60).padStart(2, "0")} h` : `${min} min`;
+}
+
+/**
+ * Whether a consumable or a service is due: a binary sensor that is on (a filter to change, salt empty), a number at
+ * or below its threshold (percent or days left; null: 10), a date or timestamp that is reached.
+ */
+export function serviceDue(f: Pick<Furniture, "service" | "service_min">, hass: HomeAssistant, now = new Date()): boolean {
+  const id = typeof f.service === "string" && f.service !== "none" ? f.service : null;
+  const st = id ? hass.states[id] : undefined;
+  if (!id || !st || st.state === "unavailable" || st.state === "unknown") return false;
+  if (id.startsWith("binary_sensor.") || id.startsWith("input_boolean.")) return st.state === "on";
+  const v = num(st);
+  if (v !== null) return v <= (f.service_min ?? 10);
+  const d = dayOf(st.state);
+  return !!d && d.getTime() <= startOfDay(now).getTime();
+}
+
+/** The door sensors of an item (a fridge's two doors, an appliance's door). */
+export const doorsOf = (f: Pick<Furniture, "door_left" | "door_right">): string[] => [f.door_left, f.door_right].filter((x): x is string => typeof x === "string" && x !== "none");
+const isOpen = (st: HassEntity | undefined) => !!st && (st.state === "on" || st.state === "open");
+
+/** A fridge door open longer than its limit (null: 2 minutes): the door's entity, else null. */
+export function fridgeOpenTooLong(f: Pick<Furniture, "door_left" | "door_right" | "door_alarm">, hass: HomeAssistant, now = Date.now()): string | null {
+  const limit = (f.door_alarm ?? 2) * 60_000;
+  for (const id of doorsOf(f)) {
+    const st = hass.states[id];
+    if (isOpen(st) && st?.last_changed && now - Date.parse(st.last_changed) >= limit) return id;
+  }
+  return null;
+}
+
+/** When the next open fridge door would cross its limit (ms from now), to look again then; null when none will. */
+export function nextFridgeCheck(items: readonly Furniture[], hass: HomeAssistant, now = Date.now()): number | null {
+  let next: number | null = null;
+  for (const f of items) {
+    if (f.type !== "fridge" && f.type !== "fridge_smart") continue;
+    for (const id of doorsOf(f)) {
+      const st = hass.states[id];
+      if (!isOpen(st) || !st?.last_changed) continue;
+      const left = Date.parse(st.last_changed) + (f.door_alarm ?? 2) * 60_000 - now;
+      if (left > 0 && (next === null || left < next)) next = left;
+    }
+  }
+  return next;
+}
+
+/**
+ * Remembers which appliances ended their program while the page was open ("finished" until their door opens, they
+ * run again or 12 hours pass) – for appliances that say nothing but stop drawing power.
+ */
+export class FinishedMemory {
+  private running = new Map<string, boolean>();
+  private ended = new Map<string, number>();
+
+  /** Tell the memory how the item is now; whether it shows as finished. */
+  update(id: string, running: boolean, doorOpenedSince: (t: number) => boolean, now = Date.now()): boolean {
+    const was = this.running.get(id);
+    this.running.set(id, running);
+    if (running) {
+      this.ended.delete(id);
+      return false;
+    }
+    if (was === true) this.ended.set(id, now);
+    const t = this.ended.get(id);
+    if (t === undefined) return false;
+    if (now - t > 12 * 3600_000 || doorOpenedSince(t)) {
+      this.ended.delete(id);
+      return false;
+    }
+    return true;
+  }
+}
+
+/** The household's entity fields of part 2, for the watched list. */
+export function householdExtras(f: Furniture): EntityRef[] {
+  return [f.moisture ?? null, f.remaining ?? null, f.service ?? null];
 }

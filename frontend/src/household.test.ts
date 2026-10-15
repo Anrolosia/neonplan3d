@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { binColors, binDue, binGlows, mailboxBase, mailboxPost, pickupsOf, sensorDays, wasteCalendars, wasteColors, wasteMatches } from "./household.ts";
+import { binColors, binDue, binGlows, FinishedMemory, fridgeOpenTooLong, isFinishedState, mailboxBase, mailboxPost, nextFridgeCheck, pickupsOf, plantThirsty, remainingMinutes, remainingText, sensorDays, serviceDue, wasteCalendars, wasteColors, wasteMatches } from "./household.ts";
 import type { Furniture } from "./model.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
@@ -105,4 +105,68 @@ test("bins start from the colours of their country; own colours win; a wall mail
   assert.deepEqual(binColors({ bin_kind: "paper", bin_color: "#112233", bin_lid: "#ff0000" }, "DE"), ["#112233", "#ff0000"]);
   assert.equal(mailboxBase({ variant: null }), 1);
   assert.equal(mailboxBase({ variant: "pole" }), 0);
+});
+
+test("a plant is thirsty: a plant entity's moisture problem, or a sensor below its minimum", () => {
+  assert.equal(plantThirsty({ moisture: "plant.monstera" }, hassOf(st("plant.monstera", "problem", { problem: "moisture low" }))), true);
+  assert.equal(plantThirsty({ moisture: "plant.monstera" }, hassOf(st("plant.monstera", "problem", { problem: "moisture high" }))), false);
+  assert.equal(plantThirsty({ moisture: "plant.monstera" }, hassOf(st("plant.monstera", "ok", { moisture_status: "Low" }))), true);
+  assert.equal(plantThirsty({ moisture: "sensor.soil" }, hassOf(st("sensor.soil", "12"))), true);
+  assert.equal(plantThirsty({ moisture: "sensor.soil", moisture_min: 10 }, hassOf(st("sensor.soil", "12"))), false);
+  assert.equal(plantThirsty({ moisture: "none" }, hassOf()), false);
+});
+
+test("the time left of a program: minutes, seconds, hours, an end time, H:MM", () => {
+  const now = Date.parse("2026-10-15T12:00:00Z");
+  assert.equal(remainingMinutes(st("sensor.left", "23"), now), 23);
+  assert.equal(remainingMinutes(st("sensor.left", "1380", { unit_of_measurement: "s" }), now), 23);
+  assert.equal(remainingMinutes(st("sensor.left", "1.5", { unit_of_measurement: "h" }), now), 90);
+  assert.equal(remainingMinutes(st("sensor.end", "2026-10-15T12:45:00+00:00", { device_class: "timestamp" }), now), 45);
+  assert.equal(remainingMinutes(st("sensor.left", "1:05"), now), 65);
+  assert.equal(remainingMinutes(st("sensor.left", "unavailable"), now), null);
+  assert.equal(remainingText(23), "23 min");
+  assert.equal(remainingText(65), "1:05 h");
+  assert.ok(isFinishedState(st("sensor.program", "Finished")));
+  assert.ok(isFinishedState(st("sensor.program", "Beendet")));
+  assert.ok(isFinishedState(st("sensor.program", "Terminé")));
+  assert.ok(!isFinishedState(st("sensor.program", "run")));
+});
+
+test("a service is due: a binary sensor on, a number at its threshold, a date reached", () => {
+  const now = new Date(2026, 9, 15, 10, 0);
+  assert.equal(serviceDue({ service: "binary_sensor.salt" }, hassOf(st("binary_sensor.salt", "on")), now), true);
+  assert.equal(serviceDue({ service: "binary_sensor.salt" }, hassOf(st("binary_sensor.salt", "off")), now), false);
+  assert.equal(serviceDue({ service: "sensor.filter" }, hassOf(st("sensor.filter", "8")), now), true);
+  assert.equal(serviceDue({ service: "sensor.filter", service_min: 5 }, hassOf(st("sensor.filter", "8")), now), false);
+  assert.equal(serviceDue({ service: "input_datetime.filter" }, hassOf(st("input_datetime.filter", "2026-10-14")), now), true);
+  assert.equal(serviceDue({ service: "input_datetime.filter" }, hassOf(st("input_datetime.filter", "2026-11-01")), now), false);
+});
+
+test("a fridge door warns after its limit, and the view knows when to look again", () => {
+  const now = Date.parse("2026-10-15T12:00:00Z");
+  const fridge = { id: "k", type: "fridge", door_left: "binary_sensor.fridge" } as Furniture;
+  const hass = (state: string, since: string) => hassOf(st("binary_sensor.fridge", state, {}, since));
+  assert.equal(fridgeOpenTooLong(fridge, hass("on", "2026-10-15T11:59:00Z"), now), null);
+  assert.equal(fridgeOpenTooLong(fridge, hass("on", "2026-10-15T11:57:00Z"), now), "binary_sensor.fridge");
+  assert.equal(fridgeOpenTooLong({ ...fridge, door_alarm: 5 }, hass("on", "2026-10-15T11:57:00Z"), now), null);
+  assert.equal(fridgeOpenTooLong(fridge, hass("off", "2026-10-15T11:00:00Z"), now), null);
+  assert.equal(nextFridgeCheck([fridge], hass("on", "2026-10-15T11:59:30Z"), now), 90_000);
+  assert.equal(nextFridgeCheck([fridge], hass("off", "2026-10-15T11:59:30Z"), now), null);
+});
+
+test("an appliance that stopped while the page was open shows finished until its door opens", () => {
+  const m = new FinishedMemory();
+  const t0 = 1_000_000;
+  const shut = () => false;
+  assert.equal(m.update("w", false, shut, t0), false);
+  assert.equal(m.update("w", true, shut, t0 + 1000), false);
+  assert.equal(m.update("w", false, shut, t0 + 2000), true);
+  assert.equal(m.update("w", false, shut, t0 + 60_000), true);
+  // the door opened after it ended
+  assert.equal(m.update("w", false, (t) => t < t0 + 100_000, t0 + 120_000), false);
+  assert.equal(m.update("w", false, shut, t0 + 130_000), false);
+  // twelve hours later it forgets
+  m.update("x", true, shut, t0);
+  m.update("x", false, shut, t0 + 1000);
+  assert.equal(m.update("x", false, shut, t0 + 13 * 3600_000), false);
 });

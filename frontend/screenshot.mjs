@@ -104,6 +104,12 @@ const HOUSEHOLD_SCRIPT = `
   put('mailbox', 11.4, 9.6, 180, { variant: 'pillar', w: 0.42, d: 0.36, h: 1.3 });
   put('mailbox', 12.4, 9.6, 180, { variant: 'parcel', w: 0.6, d: 0.55, h: 1.1 });
   put('mailbox', 13.5, 9.6, 180, { variant: 'bank', w: 0.95, d: 0.3, h: 0.7 });
+  // the plant is thirsty, the washer tells its time left, the fridge's water filter is due
+  for (const m of e._doc.floors.flatMap((x) => x.furniture)) {
+    if (m.type === 'plant') m.moisture = 'sensor.monstera_feuchte';
+    if (m.type === 'washer') m.remaining = 'sensor.waschmaschine_restzeit';
+    if (m.type === 'fridge') m.service = 'binary_sensor.kuehlschrank_filter';
+  }
   e.setDoc(structuredClone(e._doc));
 `;
 
@@ -382,6 +388,7 @@ const shots = [
   { name: "site-demo", query: "?site&lang=en", width: 1280, height: 800 },
   { name: "site-demo-phone", query: "?site&lang=de", width: 390, height: 844 },
   { name: "view-household", query: "", width: 1600, height: 1000, editor: true, editorScript: HOUSEHOLD_SCRIPT, then3d: "Erdgeschoss", camera: { target: { x: 12, y: 0.6, z: 7.8 }, radius: 7, phi: 0.95 }, afterWait: 1500 },
+  { name: "view-household-card", query: "", width: 1280, height: 800, editor: true, editorScript: HOUSEHOLD_SCRIPT, then3d: "Erdgeschoss", afterWait: 1500 },
   { name: "editor-household-bin", query: "", width: 1280, height: 1100, editor: true, editorScript: HOUSEHOLD_SCRIPT + " setTimeout(() => { e._roomId = 'garage'; e._furnitureId = e._doc.floors[0].furniture.find((m) => m.type === 'waste_bin' && m.bin_kind === 'paper').id; }, 500);", scrollSide: true, afterWait: 900 },
 ];
 

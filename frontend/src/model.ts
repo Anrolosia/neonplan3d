@@ -186,6 +186,18 @@ export interface Furniture {
   bin_match?: string | null;
   /** Haushalt Pro, mailbox: the sensor of the door it is emptied through (post counts until it opens). */
   mailbox_door?: EntityRef;
+  /** Haushalt Pro, plant: a plant.* entity or a soil moisture sensor; thirsty below `moisture_min`. */
+  moisture?: EntityRef;
+  /** Haushalt Pro, plant: the moisture (%) below which it is thirsty (null = 20). */
+  moisture_min?: number | null;
+  /** Haushalt Pro, washer, dryer, dishwasher: the time left (minutes, an end time or "H:MM"). */
+  remaining?: EntityRef;
+  /** Haushalt Pro: a consumable or service of the item (a filter, salt, rinse aid): due when on, at or below `service_min`, or its date. */
+  service?: EntityRef;
+  /** Haushalt Pro: the number (percent or days left) at or below which the service is due (null = 10). */
+  service_min?: number | null;
+  /** Haushalt Pro, fridge: minutes a door may stand open before it warns (null = 2). */
+  door_alarm?: number | null;
   /** An own symbol for the marker: a Material Design icon name without "mdi:" (null = by kind). */
   icon?: string | null;
   /** Linked entity, e.g. the TV's media player (null = automatic, "none" = none). */

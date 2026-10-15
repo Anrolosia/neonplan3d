@@ -114,6 +114,23 @@ def test_household_fields_are_kept_and_checked() -> None:
     assert "bin_kind" not in FURNITURE_SCHEMA(base)
     mail = FURNITURE_SCHEMA({**base, "type": "mailbox", "mailbox_door": "binary_sensor.door"})
     assert mail["mailbox_door"] == "binary_sensor.door"
-    for bad in ({"bin_kind": "nuclear"}, {"bin_color": "blue"}):
+    extras = FURNITURE_SCHEMA(
+        {
+            **base,
+            "type": "washer",
+            "remaining": "sensor.left",
+            "service": "binary_sensor.salt",
+            "service_min": 5,
+            "moisture": None,
+            "door_alarm": 3,
+        }
+    )
+    assert (extras["remaining"], extras["service"], extras["service_min"], extras["door_alarm"]) == (
+        "sensor.left",
+        "binary_sensor.salt",
+        5,
+        3,
+    )
+    for bad in ({"bin_kind": "nuclear"}, {"bin_color": "blue"}, {"moisture_min": 150}, {"door_alarm": 0}):
         with pytest.raises(vol.Invalid):
             FURNITURE_SCHEMA({**base, **bad})

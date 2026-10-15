@@ -272,6 +272,13 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("bin_source"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("bin_match"): vol.Any(None, vol.All(str, vol.Length(max=120))),
         vol.Optional("mailbox_door"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # Haushalt Pro: a plant's moisture, an appliance's time left, a service, a fridge's door alarm
+        vol.Optional("moisture"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("moisture_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=100))),
+        vol.Optional("remaining"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("service"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("service_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=1000))),
+        vol.Optional("door_alarm"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.5, max=120))),
         # LED strip: tilt about its length (degrees) and standing upright
         vol.Optional("tilt", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
         vol.Optional("upright", default=False): bool,

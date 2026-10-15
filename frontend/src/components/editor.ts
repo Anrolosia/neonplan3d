@@ -20,7 +20,7 @@ import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, labOn, manualUrl, released, shopUrl, UNRELEASED } from "../features.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
-import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, MAILBOX_SHAPES, MAILBOX_SIZE, mailboxShape, WASTE_KINDS, wasteColors } from "../household.ts";
+import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlant, MAILBOX_SHAPES, MAILBOX_SIZE, mailboxShape, WASTE_KINDS, wasteColors } from "../household.ts";
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
@@ -10243,7 +10243,7 @@ export class Fp3dEditor extends LitElement {
             >
           </div>`
         : nothing}
-      ${isElectric(f.type) ? this.renderFurnitureLinks(f) : !NO_STATE_TYPES.has(f.type) ? html`<div class="fp3d-form fp3d-links">${this.renderStateLinks(f)}</div>` : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing} ${f.type === "waste_bin" || f.type === "mailbox" ? this.renderHouseholdForm(f) : nothing}
+      ${isElectric(f.type) ? this.renderFurnitureLinks(f) : !NO_STATE_TYPES.has(f.type) ? html`<div class="fp3d-form fp3d-links">${this.renderStateLinks(f)}</div>` : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing} ${f.type === "waste_bin" || f.type === "mailbox" ? this.renderHouseholdForm(f) : this.renderHouseholdExtras(f)}
       ${f.type.startsWith("pack:mastershort.vehicles:") && this.isAdmin
         ? html`<section>
             <p class="fp3d-sub">${this.t("vehicle_to_spot_hint")}</p>
@@ -10701,6 +10701,54 @@ export class Fp3dEditor extends LitElement {
             ${this.entitySelect(this.t("mailbox_door"), f.mailbox_door ?? null, undefined, doors, (v) => this.updateFurniture({ mailbox_door: v === "none" ? null : v }))}
             <p class="fp3d-sub fp3d-wide">${this.t("mailbox_hint")}</p>`
         : teaser}
+    </div>`;
+  }
+
+  /**
+   * Haushalt Pro on other items: a plant's moisture, a washer's time left and door, a fridge's door warning, and a
+   * consumable or service for every electric item. A teaser on plants, appliances and fridges while it is locked.
+   */
+  private renderHouseholdExtras(f: Furniture) {
+    const plant = f.type === "plant" || isPackPlant(f.type);
+    const appliance = f.type === "washer" || f.type === "dryer" || f.type === "dishwasher";
+    const fridge = f.type === "fridge" || f.type === "fridge_smart";
+    const electric = isElectric(f.type);
+    if (!plant && !electric) return nothing;
+    if (!hasFeature("household")) {
+      if (!released("household") || !(plant || appliance || fridge)) return nothing;
+      const lang = this.hass?.language;
+      return html`<section class="fp3d-teaser">
+        <div class="fp3d-teaser-head">
+          <b>🏠 ${this.t("pro_name_household")}</b>
+          <a class="fp3d-btn fp3d-primary" href=${isBeta("household") ? supporterUrl(lang) : shopUrl(lang)} target="_blank" rel="noopener">${this.t(isBeta("household") ? "beta_become" : "pro_unlock")}</a>
+        </div>
+        <p class="fp3d-sub">${this.t(plant ? "hh_teaser_plant" : fridge ? "hh_teaser_fridge" : "hh_teaser_appliance")}</p>
+      </section>`;
+    }
+    const sensors = this.entityOptions((id) => id.startsWith("sensor."));
+    const doors = this.entityOptions((id) => id.startsWith("binary_sensor."));
+    const services = this.entityOptions((id) => ["sensor.", "binary_sensor.", "input_boolean.", "input_datetime.", "input_number."].some((d) => id.startsWith(d)));
+    const ref = (v: string | null) => (v === "none" ? null : v);
+    return html`<div class="fp3d-form fp3d-links">
+      <p class="fp3d-sub fp3d-wide"><b>🏠 ${this.t("pro_name_household")}</b></p>
+      ${plant
+        ? html`${this.entitySelect(this.t("hh_moisture"), f.moisture ?? null, undefined, this.entityOptions((id) => id.startsWith("plant.") || id.startsWith("sensor.")), (v) => this.updateFurniture({ moisture: ref(v) }))}
+            ${this.num(this.t("hh_moisture_min"), f.moisture_min ?? 20, (v) => this.updateFurniture({ moisture_min: Math.max(0, Math.min(100, Math.round(v))) }), 1)}`
+        : nothing}
+      ${appliance
+        ? html`${this.entitySelect(this.t("hh_remaining"), f.remaining ?? null, undefined, sensors, (v) => this.updateFurniture({ remaining: ref(v) }))}
+            ${this.entitySelect(this.t("hh_door"), f.door_left ?? null, undefined, doors, (v) => this.updateFurniture({ door_left: ref(v) }))}
+            <p class="fp3d-sub fp3d-wide">${this.t("hh_appliance_hint")}</p>`
+        : nothing}
+      ${fridge
+        ? html`${f.type === "fridge" ? this.entitySelect(this.t("hh_fridge_door"), f.door_left ?? null, undefined, doors, (v) => this.updateFurniture({ door_left: ref(v) })) : nothing}
+            ${this.num(this.t("hh_door_alarm"), f.door_alarm ?? 2, (v) => this.updateFurniture({ door_alarm: Math.max(0.5, Math.min(120, v)) }), 0.5)}`
+        : nothing}
+      ${electric
+        ? html`${this.entitySelect(this.t("hh_service_entity"), f.service ?? null, undefined, services, (v) => this.updateFurniture({ service: ref(v) }))}
+            ${f.service && f.service !== "none" ? this.num(this.t("hh_service_min"), f.service_min ?? 10, (v) => this.updateFurniture({ service_min: Math.max(0, v) }), 1) : nothing}
+            <p class="fp3d-sub fp3d-wide">${this.t("hh_service_hint")}</p>`
+        : nothing}
     </div>`;
   }
 
