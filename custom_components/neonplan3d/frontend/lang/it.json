@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Con un indicatore (ad es. un input_boolean «posta» impostato da un'automazione) la cassetta si illumina finché è attivo. Con sportello di inserimento e di prelievo si illumina quando è arrivata posta dopo l'ultimo svuotamento.",
  "mailbox_post": "Posta",
  "pro_name_household": "Casa Pro",
- "pro_feature_household": "Casa Pro: bidoni illuminati la sera prima della raccolta, cassetta con posta, piante assetate; lavatrice, asciugatrice e lavastoviglie mostrano tempo residuo e «Finito!»; filtri e consumabili da cambiare in giallo; avviso frigorifero aperto; scheda «Oggi in casa»",
+ "pro_feature_household": "Casa Pro: bidoni illuminati la sera prima della raccolta, cassetta con posta, piante assetate; lavatrice, asciugatrice e lavastoviglie mostrano tempo residuo e «Finito!»; filtri e consumabili da cambiare in giallo; avviso frigorifero aperto; scheda «Oggi in casa»; in più il frigorifero smart (side-by-side, porte con sensori)",
  "household_teaser_bin": "Con Casa Pro il bidone si illumina la sera prima della raccolta – dal tuo calendario dei rifiuti.",
  "household_teaser_mail": "Con Casa Pro la cassetta si illumina appena arriva la posta – finché non viene svuotata.",
  "hh_title": "Oggi in casa",

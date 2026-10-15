@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Merkillä (esim. automaation asettama input_boolean \"posti\") laatikko hehkuu niin kauan kuin se on päällä. Luukun ja tyhjennysoven kanssa se hehkuu, kun postia on tullut viimeisen tyhjennyksen jälkeen.",
  "mailbox_post": "Postia",
  "pro_name_household": "Kotitalous Pro",
- "pro_feature_household": "Kotitalous Pro: jäteastiat hehkuvat tyhjennystä edeltävänä iltana, postilaatikko postin tullessa, kasvit janoisina; pesukone, kuivausrumpu ja astianpesukone näyttävät jäljellä olevan ajan ja ”Valmis!”; suodattimet ja kulutusosat keltaisena; jääkaapin oven varoitus; kortti ”Tänään kotona”",
+ "pro_feature_household": "Kotitalous Pro: jäteastiat hehkuvat tyhjennystä edeltävänä iltana, postilaatikko postin tullessa, kasvit janoisina; pesukone, kuivausrumpu ja astianpesukone näyttävät jäljellä olevan ajan ja ”Valmis!”; suodattimet ja kulutusosat keltaisena; jääkaapin oven varoitus; kortti ”Tänään kotona”; lisäksi älyjääkaappi (side-by-side, ovet antureilla)",
  "household_teaser_bin": "Kotitalous Pro:lla astia hehkuu tyhjennystä edeltävänä iltana – jätekalenterisi mukaan.",
  "household_teaser_mail": "Kotitalous Pro:lla postilaatikko hehkuu heti, kun postia on tullut – kunnes se tyhjennetään.",
  "hh_title": "Tänään kotona",

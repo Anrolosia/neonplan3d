@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Con un indicador (p. ej. un input_boolean «correo» que activa una automatización) el buzón brilla mientras está activo. Con trampilla y puerta de recogida brilla cuando ha llegado correo después del último vaciado.",
  "mailbox_post": "Correo",
  "pro_name_household": "Hogar Pro",
- "pro_feature_household": "Hogar Pro: contenedores que brillan la víspera de la recogida, buzón con correo, plantas con sed; lavadora, secadora y lavavajillas muestran el tiempo restante y «¡Listo!»; filtros y consumibles pendientes en amarillo; aviso de nevera abierta; tarjeta «Hoy en casa»",
+ "pro_feature_household": "Hogar Pro: contenedores que brillan la víspera de la recogida, buzón con correo, plantas con sed; lavadora, secadora y lavavajillas muestran el tiempo restante y «¡Listo!»; filtros y consumibles pendientes en amarillo; aviso de nevera abierta; tarjeta «Hoy en casa»; además la nevera inteligente (americana, puertas con sensores)",
  "household_teaser_bin": "Con Hogar Pro el contenedor brilla la víspera de la recogida, según tu calendario.",
  "household_teaser_mail": "Con Hogar Pro el buzón brilla en cuanto hay correo, hasta que se vacía.",
  "hh_title": "Hoy en casa",

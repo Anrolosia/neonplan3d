@@ -4493,7 +4493,8 @@ export class Fp3dEditor extends LitElement {
    */
   private typeChoices(current: string): string[] {
     const shown = new Set<string>(Object.values(FURNITURE_GROUPS).flat());
-    if (hasFeature("fridge_smart")) shown.add("fridge_smart");
+    // the smart fridge: its own pack, or Haushalt Pro
+    if (hasFeature("fridge_smart") || hasFeature("household")) shown.add("fridge_smart");
     return FURNITURE_TYPES.filter((t) => shown.has(t) || t === current);
   }
 
@@ -11312,8 +11313,8 @@ export class Fp3dEditor extends LitElement {
         this.librarySection(
           `group:${group}`,
           this.t(`furn_group_${group}` as I18nKey),
-          // the smart fridge is exclusive: only an installed pack with the feature "fridge_smart" offers it
-          [...types, ...(group === "kitchen" && hasFeature("fridge_smart") ? ["fridge_smart"] : [])].map((t) => ({ type: t, label: this.t(`furn_${t}` as I18nKey), search: translate(EN_HASS, `furn_${t}` as I18nKey) })),
+          // the smart fridge is exclusive: an installed pack with the feature "fridge_smart", or Haushalt Pro, offers it
+          [...types, ...(group === "kitchen" && (hasFeature("fridge_smart") || hasFeature("household")) ? ["fridge_smart"] : [])].map((t) => ({ type: t, label: this.t(`furn_${t}` as I18nKey), search: translate(EN_HASS, `furn_${t}` as I18nKey) })),
           q,
         ),
       )}

@@ -2542,11 +2542,15 @@ export class Fp3dView3d extends LitElement {
       const due = binDue(f, hass, this.pickups, new Date(), { from: this.building?.settings.household?.bin_from, until: this.building?.settings.household?.bin_until });
       if (!due) return null;
       const text = due.days === 0 ? translate(hass, "bin_today") : due.days === 1 ? translate(hass, "bin_tomorrow") : translate(hass, "bin_in_days", { n: due.days });
-      // the lid's colour, a little brighter: the paper bin glows blue, the bio bin brown
-      const col = rgb(binColors(f)[1]).map((v) => Math.min(1, v * 1.4 + 0.15)) as [number, number, number];
+      // the lid's colour at full strength in its own hue (the paper bin glows blue, the bio bin amber); a grey or
+      // black lid glows white
+      const lid = rgb(binColors(f)[1]);
+      const top = Math.max(...lid);
+      const grey = top - Math.min(...lid) < 0.12;
+      const col = (grey ? [0.92, 0.95, 1] : lid.map((v) => Math.min(1, (v / Math.max(0.001, top)) * 1.05))) as [number, number, number];
       const label = f.name || translate(hass, `bin_kind_${f.bin_kind ?? "rest"}` as Parameters<typeof translate>[1]);
       return {
-        screen: due.glow ? { color: col, level: 1, faces: [{ part: "top", color: col, level: 1 }, { part: "band", color: col, level: 0.8 }] } : undefined,
+        screen: due.glow ? { color: col, level: 0.85, faces: [{ part: "lid", color: col, level: 0.85 }] } : undefined,
         marker: pin(`hh:${src}#${f.id}`, text, due.glow, "trash-can-outline", due.days <= 1),
         item: due.days <= 1 ? { icon: "trash-can-outline", text: `${label}: ${text}`, entity: src, hot: due.glow } : undefined,
       };

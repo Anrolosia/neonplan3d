@@ -251,7 +251,7 @@ export interface ScreenState {
   plain?: boolean;
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners"; color: [number, number, number]; level: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid"; color: [number, number, number]; level: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -2843,8 +2843,9 @@ export class FloorplanViewer {
           const inner = [Q(x0, -d / 2 + 0.03), Q(x1, -d / 2 + 0.03), Q(x1, d / 2 - 0.03), Q(x0, d / 2 - 0.03)];
           buf.tri(inner[0], inner[2], inner[1], col);
           buf.tri(inner[0], inner[3], inner[2], col);
-          const g = 0.12 + 0.1 * face.level;
-          const halo = col.clone().multiplyScalar(0.5);
+          // "lid": a lid lit from inside (a waste bin) with a narrow seam, not the wide halo of a lit top
+          const g = face.part === "lid" ? 0.025 + 0.02 * face.level : 0.12 + 0.1 * face.level;
+          const halo = col.clone().multiplyScalar(face.part === "lid" ? 0.7 : 0.5);
           const outer = [Q(x0 - g, -d / 2 - g, y + 0.004), Q(x1 + g, -d / 2 - g, y + 0.004), Q(x1 + g, d / 2 + g, y + 0.004), Q(x0 - g, d / 2 + g, y + 0.004)];
           for (let i = 0; i < 4; i++) {
             const j = (i + 1) % 4;

@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Med et flagg (f.eks. en input_boolean «post» fra en automasjon) lyser postkassen så lenge det er på. Med innkastluke og uttaksluke lyser den når det har kommet post etter siste tømming.",
  "mailbox_post": "Post",
  "pro_name_household": "Husholdning Pro",
- "pro_feature_household": "Husholdning Pro: dunker lyser kvelden før tømming, postkassen ved post, planter ved tørst; vaskemaskin, tørketrommel og oppvaskmaskin viser gjenstående tid og «Ferdig!»; filtre og forbruksdeler gult; varsel ved åpent kjøleskap; kort «I dag i hjemmet»",
+ "pro_feature_household": "Husholdning Pro: dunker lyser kvelden før tømming, postkassen ved post, planter ved tørst; vaskemaskin, tørketrommel og oppvaskmaskin viser gjenstående tid og «Ferdig!»; filtre og forbruksdeler gult; varsel ved åpent kjøleskap; kort «I dag i hjemmet»; pluss det smarte kjøleskapet (side-by-side, dører med sensorer)",
  "household_teaser_bin": "Med Husholdning Pro lyser dunken kvelden før tømming – fra tømmekalenderen din.",
  "household_teaser_mail": "Med Husholdning Pro lyser postkassen så snart det er post – til den er tømt.",
  "hh_title": "I dag i hjemmet",

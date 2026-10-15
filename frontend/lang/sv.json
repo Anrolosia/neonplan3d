@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Med en flagga (t.ex. en input_boolean \"post\" från en automation) lyser brevlådan så länge den är på. Med inkastlucka och uttagslucka lyser den när post kommit efter senaste tömningen.",
  "mailbox_post": "Post",
  "pro_name_household": "Hushåll Pro",
- "pro_feature_household": "Hushåll Pro: tunnor lyser kvällen före tömning, brevlådan vid post, växter vid törst; tvättmaskin, torktumlare och diskmaskin visar återstående tid och \"Klar!\"; filter och förbrukning gult; varning vid öppet kylskåp; kort \"Idag i hemmet\"",
+ "pro_feature_household": "Hushåll Pro: tunnor lyser kvällen före tömning, brevlådan vid post, växter vid törst; tvättmaskin, torktumlare och diskmaskin visar återstående tid och \"Klar!\"; filter och förbrukning gult; varning vid öppet kylskåp; kort \"Idag i hemmet\"; plus det smarta kylskåpet (side-by-side, dörrar med sensorer)",
  "household_teaser_bin": "Med Hushåll Pro lyser kärlet kvällen före tömning – från din sophämtningskalender.",
  "household_teaser_mail": "Med Hushåll Pro lyser brevlådan så fort det finns post – tills den tömts.",
  "hh_title": "Idag i hemmet",

@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Jelzővel (pl. automatizálás által beállított „posta” input_boolean) a postaláda addig világít, amíg az be van kapcsolva. Bedobó fedéllel és kivételi ajtóval akkor világít, ha az utolsó ürítés után posta érkezett.",
  "mailbox_post": "Posta",
  "pro_name_household": "Háztartás Pro",
- "pro_feature_household": "Háztartás Pro: a kukák a gyűjtés előtti estén világítanak, a postaláda postánál, a növények szomjasan; mosó-, szárító- és mosogatógép mutatja a hátralévő időt és a „Kész!” jelzést; esedékes szűrők sárgán; nyitott hűtő figyelmeztet; „Ma a háztartásban” kártya",
+ "pro_feature_household": "Háztartás Pro: a kukák a gyűjtés előtti estén világítanak, a postaláda postánál, a növények szomjasan; mosó-, szárító- és mosogatógép mutatja a hátralévő időt és a „Kész!” jelzést; esedékes szűrők sárgán; nyitott hűtő figyelmeztet; „Ma a háztartásban” kártya; plusz az okoshűtő (side-by-side, ajtók érzékelőkkel)",
  "household_teaser_bin": "A Háztartás Pro-val a kuka a gyűjtés előtti estén világít – a hulladéknaptárad alapján.",
  "household_teaser_mail": "A Háztartás Pro-val a postaláda világít, amint posta érkezik – amíg ki nem ürítik.",
  "hh_title": "Ma a háztartásban",

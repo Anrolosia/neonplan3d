@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Avec un indicateur (p. ex. un input_boolean « courrier » mis par une automatisation), la boîte s'allume tant qu'il est actif. Avec clapet et porte de retrait, elle s'allume quand du courrier est arrivé après le dernier relevé.",
  "mailbox_post": "Courrier",
  "pro_name_household": "Ménage Pro",
- "pro_feature_household": "Ménage Pro : poubelles allumées la veille du ramassage, boîte aux lettres quand il y a du courrier, plantes assoiffées ; lave-linge, sèche-linge et lave-vaisselle montrent le temps restant et « Terminé ! » ; filtres et consommables à changer en jaune ; alerte porte du réfrigérateur ; carte « Aujourd'hui à la maison »",
+ "pro_feature_household": "Ménage Pro : poubelles allumées la veille du ramassage, boîte aux lettres quand il y a du courrier, plantes assoiffées ; lave-linge, sèche-linge et lave-vaisselle montrent le temps restant et « Terminé ! » ; filtres et consommables à changer en jaune ; alerte porte du réfrigérateur ; carte « Aujourd'hui à la maison » ; en plus le réfrigérateur connecté (américain, portes avec capteurs)",
  "household_teaser_bin": "Avec Ménage Pro, la poubelle s'allume la veille du ramassage – d'après ton calendrier des déchets.",
  "household_teaser_mail": "Avec Ménage Pro, la boîte aux lettres s'allume dès qu'il y a du courrier – jusqu'au relevé.",
  "hh_title": "Aujourd'hui à la maison",

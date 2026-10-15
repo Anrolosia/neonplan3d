@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Z zastavico (npr. input_boolean »pošta« iz avtomatizacije) nabiralnik sveti, dokler je vklopljena. Z loputo in vratci za praznjenje sveti, ko je po zadnjem praznjenju prišla pošta.",
  "mailbox_post": "Pošta",
  "pro_name_household": "Gospodinjstvo Pro",
- "pro_feature_household": "Gospodinjstvo Pro: smetnjaki svetijo večer pred odvozom, nabiralnik ob pošti, rastline ob žeji; pralni, sušilni in pomivalni stroj kažejo preostali čas in »Končano!«; filtri in potrošni deli rumeno; opozorilo za odprt hladilnik; kartica »Danes v gospodinjstvu«",
+ "pro_feature_household": "Gospodinjstvo Pro: smetnjaki svetijo večer pred odvozom, nabiralnik ob pošti, rastline ob žeji; pralni, sušilni in pomivalni stroj kažejo preostali čas in »Končano!«; filtri in potrošni deli rumeno; opozorilo za odprt hladilnik; kartica »Danes v gospodinjstvu«; poleg tega pametni hladilnik (side-by-side, vrata s senzorji)",
  "household_teaser_bin": "Z Gospodinjstvo Pro smetnjak sveti večer pred odvozom – iz tvojega koledarja odvoza.",
  "household_teaser_mail": "Z Gospodinjstvo Pro nabiralnik zasveti, ko pride pošta – dokler ga ne izpraznite.",
  "hh_title": "Danes v gospodinjstvu",

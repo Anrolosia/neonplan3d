@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Ze znacznikiem (np. input_boolean „poczta” z automatyzacji) skrzynka świeci, dopóki jest włączony. Z klapką i drzwiczkami odbioru świeci, gdy po ostatnim opróżnieniu przyszła poczta.",
  "mailbox_post": "Poczta",
  "pro_name_household": "Dom Pro",
- "pro_feature_household": "Dom Pro: pojemniki świecą wieczorem przed odbiorem, skrzynka przy poczcie, rośliny przy pragnieniu; pralka, suszarka i zmywarka pokazują pozostały czas i „Gotowe!”; filtry i materiały na żółto; ostrzeżenie o otwartej lodówce; karta „Dziś w domu”",
+ "pro_feature_household": "Dom Pro: pojemniki świecą wieczorem przed odbiorem, skrzynka przy poczcie, rośliny przy pragnieniu; pralka, suszarka i zmywarka pokazują pozostały czas i „Gotowe!”; filtry i materiały na żółto; ostrzeżenie o otwartej lodówce; karta „Dziś w domu”; do tego inteligentna lodówka (side-by-side, drzwi z czujnikami)",
  "household_teaser_bin": "Z Dom Pro pojemnik świeci wieczorem przed odbiorem – z twojego harmonogramu.",
  "household_teaser_mail": "Z Dom Pro skrzynka świeci, gdy tylko przyjdzie poczta – aż do opróżnienia.",
  "hh_title": "Dziś w domu",

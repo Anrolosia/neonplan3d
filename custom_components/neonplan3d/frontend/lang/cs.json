@@ -1804,7 +1804,7 @@
  "mailbox_hint": "S příznakem (např. input_boolean „pošta“ z automatizace) schránka svítí, dokud je zapnutý. S vhazovací klapkou a vybíracími dvířky svítí, když po posledním vybrání přišla pošta.",
  "mailbox_post": "Pošta",
  "pro_name_household": "Domácnost Pro",
- "pro_feature_household": "Domácnost Pro: popelnice svítí večer před svozem, schránka při poště, rostliny při žízni; pračka, sušička a myčka ukazují zbývající čas a „Hotovo!“; filtry a spotřební díly žlutě; varování u otevřené lednice; karta „Dnes v domácnosti“",
+ "pro_feature_household": "Domácnost Pro: popelnice svítí večer před svozem, schránka při poště, rostliny při žízni; pračka, sušička a myčka ukazují zbývající čas a „Hotovo!“; filtry a spotřební díly žlutě; varování u otevřené lednice; karta „Dnes v domácnosti“; navíc chytrá lednice (side-by-side, dveře se senzory)",
  "household_teaser_bin": "S Domácnost Pro svítí popelnice večer před svozem – podle tvého svozového kalendáře.",
  "household_teaser_mail": "S Domácnost Pro svítí schránka, jakmile přijde pošta – dokud není vybrána.",
  "hh_title": "Dnes v domácnosti",

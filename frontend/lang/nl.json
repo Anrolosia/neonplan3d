@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Met een vlag (bijv. een input_boolean \"post\" uit een automatisering) licht de brievenbus op zolang die aan staat. Met klep en uitneemdeur licht hij op als er post kwam na de laatste keer legen.",
  "mailbox_post": "Post",
  "pro_name_household": "Huishouden Pro",
- "pro_feature_household": "Huishouden Pro: containers lichten op de avond voor het ophalen, de brievenbus bij post, planten bij dorst; wasmachine, droger en vaatwasser tonen resterende tijd en „Klaar!”; filters en verbruiksartikelen geel; waarschuwing bij open koelkast; kaart „Vandaag in huis”",
+ "pro_feature_household": "Huishouden Pro: containers lichten op de avond voor het ophalen, de brievenbus bij post, planten bij dorst; wasmachine, droger en vaatwasser tonen resterende tijd en „Klaar!”; filters en verbruiksartikelen geel; waarschuwing bij open koelkast; kaart „Vandaag in huis”; plus de slimme koelkast (side-by-side, deuren met sensoren)",
  "household_teaser_bin": "Met Huishouden Pro licht de container op de avond voor het ophalen op – uit je afvalkalender.",
  "household_teaser_mail": "Met Huishouden Pro licht de brievenbus op zodra er post is – tot hij geleegd is.",
  "hh_title": "Vandaag in huis",

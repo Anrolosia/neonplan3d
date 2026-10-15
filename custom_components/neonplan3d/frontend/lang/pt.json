@@ -1804,7 +1804,7 @@
  "mailbox_hint": "Com um indicador (p. ex. um input_boolean «correio» de uma automação) a caixa acende enquanto estiver ligado. Com aba e porta de recolha acende quando chegou correio depois da última recolha.",
  "mailbox_post": "Correio",
  "pro_name_household": "Casa Pro",
- "pro_feature_household": "Casa Pro: contentores acesos na véspera da recolha, caixa do correio com correio, plantas com sede; máquina de lavar, secar e loiça mostram o tempo restante e «Pronto!»; filtros e consumíveis em amarelo; aviso de frigorífico aberto; cartão «Hoje em casa»",
+ "pro_feature_household": "Casa Pro: contentores acesos na véspera da recolha, caixa do correio com correio, plantas com sede; máquina de lavar, secar e loiça mostram o tempo restante e «Pronto!»; filtros e consumíveis em amarelo; aviso de frigorífico aberto; cartão «Hoje em casa»; e ainda o frigorífico inteligente (side-by-side, portas com sensores)",
  "household_teaser_bin": "Com Casa Pro o contentor acende-se na véspera da recolha – a partir do teu calendário.",
  "household_teaser_mail": "Com Casa Pro a caixa acende assim que chega correio – até ser esvaziada.",
  "hh_title": "Hoje em casa",
