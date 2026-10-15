@@ -52,7 +52,7 @@ function waterText(hass: HomeAssistant, v: number, unit: string): string {
 interface HoloCard {
   kind: "main" | "plant" | "device" | "media" | "car" | "pool" | "bin";
   /** Haushalt Pro: a waste bin that goes out – its colour and when ("Tomorrow"). */
-  bin?: { color: string; when: string };
+  bin?: { color: string; when: string; soon: boolean };
   /** Pool Pro: the pool and what its entities report. */
   pool?: { area: string; state: PoolState };
   name: string;
@@ -475,7 +475,7 @@ export class Fp3dView3d extends LitElement {
   private pickupKey = "";
   private householdTimer: ReturnType<typeof setInterval> | undefined;
   /** Haushalt Pro: small holograms – bins that go out today or tomorrow, post, a thirsty plant (set by the furniture pass). */
-  private binHolos: { floorId: string; x: number; z: number; y: number; name: string; color: string; when: string }[] = [];
+  private binHolos: { floorId: string; x: number; z: number; y: number; name: string; color: string; when: string; soon?: boolean }[] = [];
   /** Haushalt Pro: appliances that ended their program while the page is open ("finished" until the door opens). */
   private finished = new FinishedMemory();
   /** Haushalt Pro: looks again when an open fridge door reaches its limit. */
@@ -1235,8 +1235,8 @@ export class Fp3dView3d extends LitElement {
         const floor = b.floors.find((f) => f.id === bh.floorId);
         if (!floor) continue;
         // a small tag sitting on the lid, always there: tiny from afar, a little larger close up
-        anchors.push({ p: [bh.x, floor.elevation + bh.y + 0.04, bh.z], n: [0, 1, 0], floorId: bh.floorId, size: holoSize * 0.45, roof: false, views: "all" });
-        cards.push({ kind: "bin", name: bh.name, w: null, dayIds: [], battery: null, bin: { color: bh.color, when: bh.when } });
+        anchors.push({ p: [bh.x, floor.elevation + bh.y + 0.04, bh.z], n: [0, 1, 0], floorId: bh.floorId, size: holoSize * 0.75, roof: false, views: "all" });
+        cards.push({ kind: "bin", name: bh.name, w: null, dayIds: [], battery: null, bin: { color: bh.color, when: bh.when, soon: !!bh.soon } });
       }
     }
     v.setSound(sound);
@@ -1736,7 +1736,7 @@ export class Fp3dView3d extends LitElement {
   /** Haushalt Pro: a waste bin's small hologram – when it goes out, in the bin's colour. */
   private renderBinCard(card: HoloCard, index: number) {
     const b = card.bin!;
-    return html`<div class="fp3d-holo fp3d-holo-bin ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="note" aria-label=${`${card.name}: ${b.when}`} style="--bin:${b.color}">
+    return html`<div class="fp3d-holo fp3d-holo-bin ${b.soon ? "" : "fp3d-holo-later"} ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="note" aria-label=${`${card.name}: ${b.when}`} style="--bin:${b.color}">
       <div class="fp3d-holo-body"><b>${b.when}</b><span>${card.name}</span></div>
     </div>`;
   }
@@ -2561,11 +2561,9 @@ export class Fp3dView3d extends LitElement {
       const grey = top - Math.min(...lid) < 0.12;
       const col = (grey ? [0.92, 0.95, 1] : lid.map((v) => Math.min(1, (v / Math.max(0.001, top)) * 1.05))) as [number, number, number];
       const label = f.name || translate(hass, `bin_kind_${f.bin_kind ?? "rest"}` as Parameters<typeof translate>[1]);
-      // out today or tomorrow: a small hologram over the bin in its colour (close up only) – no glow, no pin
-      if (due.days <= 1) {
-        const hex = `#${col.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`;
-        this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name: label, color: hex, when: text });
-      }
+      // a tag on the bin in its colour: when it goes out ("Tomorrow", "in 3 days"); today and tomorrow stand out
+      const hex = `#${col.map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`;
+      this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name: label, color: hex, when: text, soon: due.days <= 1 });
       return { item: due.days <= 1 ? { icon: "trash-can-outline", text: `${label}: ${text}`, entity: src, hot: due.glow } : undefined };
     }
     if (f.type !== "mailbox") {
@@ -2574,7 +2572,7 @@ export class Fp3dView3d extends LitElement {
       const orange: [number, number, number] = [1, 0.55, 0.12];
       const name = f.name || furnitureName(hass, f.type);
       if (!thirsty) return null;
-      this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name, color: "#ff8c1f", when: translate(hass, "hh_thirsty") });
+      this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name, color: "#ff8c1f", when: translate(hass, "hh_thirsty"), soon: true });
       return {
         screen: { color: orange, level: 0.9, faces: [{ part: "band", color: orange, level: 0.9 }] },
         item: { icon: "watering-can-outline", text: translate(hass, "hh_plant", { name }), entity: (f.moisture as string) ?? null, hot: true },
@@ -2585,7 +2583,7 @@ export class Fp3dView3d extends LitElement {
     const post = mailboxPost(f, hass);
     const amber: [number, number, number] = [1, 0.62, 0.15];
     // post: the box glows and a small hologram says so
-    if (post) this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name: f.name || furnitureName(hass, f.type), color: "#ffb547", when: translate(hass, "mailbox_post") });
+    if (post) this.binHolos.push({ floorId: floor.id, x: f.x, z: f.z, y: mountBase(floor, f) + f.h, name: f.name || furnitureName(hass, f.type), color: "#ffb547", when: translate(hass, "mailbox_post"), soon: true });
     return {
       screen: post ? { color: amber, level: 1, faces: [{ part: "top", color: amber, level: 1 }, { part: "band", color: amber, level: 0.8 }] } : undefined,
       item: post ? { icon: "email-alert-outline", text: f.name ? `${f.name}: ${translate(hass, "mailbox_post")}` : translate(hass, "mailbox_post"), entity: flag, hot: true } : undefined,
@@ -3936,13 +3934,21 @@ export class Fp3dView3d extends LitElement {
         padding: 3px 8px;
         white-space: nowrap;
       }
+      .fp3d-holo.fp3d-holo-later {
+        opacity: 0.72;
+        box-shadow: none;
+        background: rgba(8, 14, 28, 0.7);
+      }
+      .fp3d-holo-later b {
+        text-shadow: none;
+      }
       .fp3d-holo-bin b {
-        font-size: 15px;
+        font-size: 17px;
         color: var(--bin);
         text-shadow: 0 0 8px color-mix(in srgb, var(--bin) 60%, transparent);
       }
       .fp3d-holo-bin span {
-        font-size: 11px;
+        font-size: 12px;
         opacity: 0.8;
       }
       .fp3d-holo-link[style*="--bin"] line,
