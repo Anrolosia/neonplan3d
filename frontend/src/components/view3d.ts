@@ -1228,13 +1228,14 @@ export class Fp3dView3d extends LitElement {
       }
       v.setPools(pieces);
     } else v.setPools([]);
-    // Haushalt Pro: a small hologram over every bin that goes out today or tomorrow (close up, floor views only)
+    // Haushalt Pro: a small tag on every bin that goes out today or tomorrow (and on a mailbox with post, a thirsty plant)
     if (hasFeature("household")) {
       const holoSize = (b.settings.roof.hologram ?? DEFAULT_HOLOGRAM).size;
       for (const bh of this.binHolos) {
         const floor = b.floors.find((f) => f.id === bh.floorId);
         if (!floor) continue;
-        anchors.push({ p: [bh.x, floor.elevation + bh.y + 0.45, bh.z], n: [0, 1, 0], floorId: bh.floorId, size: holoSize * 0.7, roof: false, views: "floor", near: 14 });
+        // a small tag sitting on the lid, always there: tiny from afar, a little larger close up
+        anchors.push({ p: [bh.x, floor.elevation + bh.y + 0.04, bh.z], n: [0, 1, 0], floorId: bh.floorId, size: holoSize * 0.45, roof: false, views: "all" });
         cards.push({ kind: "bin", name: bh.name, w: null, dayIds: [], battery: null, bin: { color: bh.color, when: bh.when } });
       }
     }
@@ -1666,6 +1667,13 @@ export class Fp3dView3d extends LitElement {
     if (el.hidden !== hidden) el.hidden = hidden;
     if (link && link.hasAttribute("hidden") !== hidden) link.toggleAttribute("hidden", hidden);
     if (!on) return;
+    if (card?.kind === "bin") {
+      // a tag: centred on its point (the lid), standing on it, no link line
+      const t = scale * 0.8;
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${t.toFixed(3)}) translate(-50%, -100%)`;
+      if (link && !link.hasAttribute("hidden")) link.toggleAttribute("hidden", true);
+      return;
+    }
     const s = scale * 0.8;
     const dx = 34 * s;
     const dy = 46 * s;
@@ -1715,8 +1723,10 @@ export class Fp3dView3d extends LitElement {
    */
   private renderHologram() {
     const e = this._energy;
+    // Haushalt Pro's tags (bins, post, a thirsty plant) are no energy holograms: they show on their own
+    const tagsOnly = () => this._holos.map((card, i) => (card.kind === "bin" ? this.renderBinCard(card, i) : nothing));
     // the editor keeps the energy bar off but asks for the holograms in its energy tool
-    if (!(hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool") || hasFeature("household")) || (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) || !(this.showEnergy || this.holograms) || !this.holoVisible()) return nothing;
+    if (!(hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool") || hasFeature("household")) || (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) || !(this.showEnergy || this.holograms) || !this.holoVisible()) return hasFeature("household") ? tagsOnly() : nothing;
     // the plants' cards belong to the house view – with a single floor that floor is the house view (#255)
     const house = this.floorId === null || (this.building?.floors.length ?? 0) <= 1;
     const plants = !!e && (e.solar !== null || e.grid !== null || e.battery !== null) && house;
@@ -1726,11 +1736,9 @@ export class Fp3dView3d extends LitElement {
   /** Haushalt Pro: a waste bin's small hologram – when it goes out, in the bin's colour. */
   private renderBinCard(card: HoloCard, index: number) {
     const b = card.bin!;
-    return html`<svg class="fp3d-holo-link" data-holo=${index} hidden aria-hidden="true" style="--bin:${b.color}"><line x1="0" y1="0" x2="0" y2="0" /><circle cx="0" cy="0" r="3" /></svg>
-      <div class="fp3d-holo fp3d-holo-bin ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="note" aria-label=${`${card.name}: ${b.when}`} style="--bin:${b.color}">
-        <div class="fp3d-holo-sheen"></div>
-        <div class="fp3d-holo-body"><b>${b.when}</b><span>${card.name}</span></div>
-      </div>`;
+    return html`<div class="fp3d-holo fp3d-holo-bin ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="note" aria-label=${`${card.name}: ${b.when}`} style="--bin:${b.color}">
+      <div class="fp3d-holo-body"><b>${b.when}</b><span>${card.name}</span></div>
+    </div>`;
   }
 
   /** Auto Pro: the car's card – charge as a bar in its colour, range, charging power, lock and climate buttons. */
@@ -3916,12 +3924,16 @@ export class Fp3dView3d extends LitElement {
         min-width: 0;
         width: auto;
       }
+      .fp3d-holo.fp3d-holo-bin {
+        border-radius: 8px;
+        pointer-events: none;
+      }
       .fp3d-holo-bin .fp3d-holo-body {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1px;
-        padding: 6px 12px;
+        gap: 0;
+        padding: 3px 8px;
         white-space: nowrap;
       }
       .fp3d-holo-bin b {
