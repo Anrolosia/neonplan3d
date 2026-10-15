@@ -2550,7 +2550,8 @@ export class Fp3dView3d extends LitElement {
       const col = (grey ? [0.92, 0.95, 1] : lid.map((v) => Math.min(1, (v / Math.max(0.001, top)) * 1.05))) as [number, number, number];
       const label = f.name || translate(hass, `bin_kind_${f.bin_kind ?? "rest"}` as Parameters<typeof translate>[1]);
       return {
-        screen: due.glow ? { color: col, level: 0.85, faces: [{ part: "lid", color: col, level: 0.85 }] } : undefined,
+        // out tomorrow (or today): the lid glows, a column of light rises and a ring lies on the floor around it
+        screen: due.glow ? { color: col, level: 0.85, faces: [{ part: "lid", color: col, level: 0.85 }, { part: "beacon", color: col, level: 0.85 }] } : undefined,
         marker: pin(`hh:${src}#${f.id}`, text, due.glow, "trash-can-outline", due.days <= 1),
         item: due.days <= 1 ? { icon: "trash-can-outline", text: `${label}: ${text}`, entity: src, hot: due.glow } : undefined,
       };

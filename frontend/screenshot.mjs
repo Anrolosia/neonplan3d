@@ -110,6 +110,8 @@ const HOUSEHOLD_SCRIPT = `
     if (m.type === 'washer') m.remaining = 'sensor.waschmaschine_restzeit';
     if (m.type === 'fridge') m.service = 'binary_sensor.kuehlschrank_filter';
   }
+  // tomorrow's bins glow all day (whatever time the shot is taken)
+  e._doc.settings.household = { bin_from: 0, bin_until: 12 };
   e.setDoc(structuredClone(e._doc));
 `;
 

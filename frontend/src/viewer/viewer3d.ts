@@ -251,7 +251,7 @@ export interface ScreenState {
   plain?: boolean;
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid"; color: [number, number, number]; level: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon"; color: [number, number, number]; level: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -2831,6 +2831,38 @@ export class FloorplanViewer {
               // the screen material is double-sided: one winding is enough (both would add up twice)
               buf.tri(p00, p10, p11, col);
               buf.tri(p00, p11, p01, col);
+            }
+            continue;
+          }
+          if (face.part === "beacon") {
+            // a beacon for something to do (a waste bin that goes out): a column of light rising from its top and
+            // a ring of light on the floor around it, fading out (the screen layer adds light: black is none)
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.25 + 0.45 * face.level))) as [number, number, number]);
+            const dark = new Color(0, 0, 0);
+            const top = base + h + 0.01;
+            const rise = 0.6 + 0.6 * face.level;
+            const r = Math.min(Math.abs(w), d) * 0.38;
+            // two crossed planes: seen from any side
+            for (const [ax, az] of [[r, 0], [0, r]] as const) {
+              const a = P(-ax, top, -az);
+              const b = P(ax, top, az);
+              const c = P(ax * 0.4, top + rise, az * 0.4);
+              const e = P(-ax * 0.4, top + rise, -az * 0.4);
+              buf.tri(a, b, c, col, col, dark);
+              buf.tri(a, c, e, col, dark, dark);
+            }
+            // the ring on the floor (the item's own floor, not its mount height)
+            const fy = mountBase(fv.floor, { ...f, mount_y: 0 }) + 0.012;
+            const hw = Math.abs(w) / 2 + 0.03;
+            const hd = d / 2 + 0.03;
+            const out = 0.22 + 0.18 * face.level;
+            const ring = (sx: number, sz: number, o: number) => P(sx * (hw + o), fy, sz * (hd + o));
+            const corners: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+            for (let i = 0; i < 4; i++) {
+              const [ax, az] = corners[i];
+              const [bx, bz] = corners[(i + 1) % 4];
+              buf.tri(ring(ax, az, 0), ring(bx, bz, 0), ring(bx, bz, out), col, col, dark);
+              buf.tri(ring(ax, az, 0), ring(bx, bz, out), ring(ax, az, out), col, dark, dark);
             }
             continue;
           }
