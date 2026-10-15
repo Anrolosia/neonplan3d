@@ -101,9 +101,8 @@ class Builder {
     const along = axis === "x" ? cx : cz;
     const across = axis === "x" ? cz : cx;
     const at = (a: number, c: number): Vec2 => (axis === "x" ? this.tf(a, c) : this.tf(c, a));
-    const p0 = this.buf.p.length;
+    // the faces are turned outwards in world space already (also when the builder mirrors)
     pushLyingCyl(this.buf, at, along - len / 2, along + len / 2, across, cy, r, side, cap, n);
-    if (this.mirrored) flipWinding(this.buf, p0);
     if (edges) {
       for (const a of [along - len / 2, along + len / 2]) {
         for (let i = 0; i < n; i++) {

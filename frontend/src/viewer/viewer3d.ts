@@ -540,6 +540,8 @@ export class FloorplanViewer {
   private roof: {
     group: Group;
     parts: { group: Group; floorId: string; rideId: string; base: number; lift: boolean; win: Group | null }[];
+    /** Roof windows over rooms of a lower floor: they follow that floor (#482). */
+    below: { floorId: string; win: Group }[];
     solid: MeshBasicMaterial;
     lines: LineBasicMaterial;
     glass: MeshBasicMaterial;
@@ -970,7 +972,8 @@ export class FloorplanViewer {
         ((c as Mesh).material as Material | undefined)?.dispose?.();
       }
       const mine = list.filter((s) => s.floorId === fv.floor.id);
-      const y = fv.floor.elevation + 0.03;
+      // in the floor's own coordinates: its group already stands at the floor's elevation (#521)
+      const y = 0.03;
       for (const src of mine) {
         if (!src.playing) continue;
         // three rings per speaker, staggered; the frame loop scales and fades them
@@ -2067,6 +2070,7 @@ export class FloorplanViewer {
     const wins = new Group();
     const winSolid = themed(new MeshBasicMaterial({ vertexColors: true, side: DoubleSide }), this.themeUniform);
     const winLines = themed(new LineBasicMaterial({ vertexColors: true, transparent: true, blending: lineBlending(this.theme), depthWrite: false }), this.themeUniform, true);
+    const below: { floorId: string; win: Group }[] = [];
     const parts = geos.map((geo) => {
       const part = new Group();
       part.add(new Mesh(geo.solid.geometry(), solid), new LineSegments(geo.lines.geometry(), lines));
@@ -2094,12 +2098,19 @@ export class FloorplanViewer {
         win.add(new Mesh(geo.win.solid.geometry(), winSolid), new LineSegments(geo.win.lines.geometry(), winLines));
         wins.add(win);
       }
+      for (const [floorId, w] of geo.winBelow ?? []) {
+        if (!w.solid.count) continue;
+        const g = new Group();
+        g.add(new Mesh(w.solid.geometry(), winSolid), new LineSegments(w.lines.geometry(), winLines));
+        wins.add(g);
+        below.push({ floorId, win: g });
+      }
       return { group: part, floorId: geo.floor.id, rideId: roofRider(this.building!, geo.floor, geo.sections ?? []), base: geo.base, lift: geo.lift !== false, win };
     });
     group.renderOrder = 8;
     this.scene.add(group);
     this.scene.add(wins);
-    this.roof = { group, parts, solid, lines, glass, live, lives, wins, winSolid, winLines };
+    this.roof = { group, parts, below, solid, lines, glass, live, lives, wins, winSolid, winLines };
     this.placeRoof();
   }
 
@@ -2133,6 +2144,13 @@ export class FloorplanViewer {
         part.win.position.y = fv.floor.elevation + ride.y + part.base + (part.lift ? apart * ROOF_GAP : 0);
         part.win.visible = fv.group.visible && fv.o > 0.5 && this.wallMode !== "cut";
       }
+    }
+    // windows in a slope over a lower floor: with that floor, wherever it glides
+    for (const w of roof.below) {
+      const fv = this.floorMap.get(w.floorId);
+      if (!fv) continue;
+      w.win.position.y = fv.floor.elevation + fv.y;
+      w.win.visible = fv.group.visible && fv.o > 0.5 && this.wallMode !== "cut";
     }
     roof.solid.opacity = this.roofO;
     roof.solid.depthWrite = this.roofO > 0.9;
@@ -2507,7 +2525,6 @@ export class FloorplanViewer {
       const under = roofWindowRoom(b, face, w);
       if (!face || !under || under.floor.id !== fv.floor.id) continue;
       const facing = face.n[0] * sunDir[0] + face.n[1] * sunDir[1] + face.n[2] * sunDir[2];
-      if (facing < 0.05) continue;
       // lower left, lower right, upper right, upper left; the blind comes down from the top edge
       const [a, c, d, e] = under.corners;
       const cover = Math.min(1, this.roofWindows.get(w.id)?.cover ?? 0);
@@ -2515,35 +2532,39 @@ export class FloorplanViewer {
       const mix = (p: number[], q: number[], t: number) => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t, p[2] + (q[2] - p[2]) * t];
       const top0 = mix(e, a, cover);
       const top1 = mix(d, c, cover);
+      const ri = fv.floor.rooms.findIndex((r) => r.id === under.roomId);
+      if (ri < 0) continue;
+      const lit = fv.floor.rooms.filter((r, i) => zones[i] === zones[ri] && r.points.length >= 3).map((r) => r.points);
+      // a patch on the floor from the glass's four corners, kept inside the room (and rooms open to it)
+      const patch = (g: number[][], col: Color) => {
+        const at = (s: number, t: number) => mix(mix(g[0], g[1], s), mix(g[3], g[2], s), t);
+        const n = 6;
+        for (let i = 0; i < n; i++) {
+          for (let j = 0; j < n; j++) {
+            const m = at((i + 0.5) / n, (j + 0.5) / n);
+            if (!lit.some((pts) => pointInPolygon([m[0], m[2]], pts))) continue;
+            const p0 = at(i / n, j / n);
+            const p1 = at((i + 1) / n, j / n);
+            const p2 = at((i + 1) / n, (j + 1) / n);
+            const p3 = at(i / n, (j + 1) / n);
+            buf.tri(p0, p1, p2, col, col, col);
+            buf.tri(p0, p2, p3, col, col, col);
+          }
+        }
+      };
+      // daylight from the sky: a soft patch straight under the window, also when the sun is on the other side
+      // of the roof or so low that its patch would fall onto the walls of a small room (D340)
+      const below = (p: number[]): number[] => [p[0], 0.019, p[2]];
+      const sky = 0.06 * day;
+      patch([below(a), below(c), below(top1), below(top0)], new Color(0.75 * sky, 0.85 * sky, 1 * sky));
+      if (facing < 0.05) continue;
       // a point of the glass, followed down the sun's rays to the floor (at most 7 m away)
       const ground = (p: number[]): number[] => {
         const t = Math.min(7, (p[1] - fv.floor.elevation) / Math.tan(el));
         return [p[0] - toSun[0] * t, 0.02, p[2] - toSun[1] * t];
       };
-      const g = [ground(a), ground(c), ground(top1), ground(top0)];
-      const ri = fv.floor.rooms.findIndex((r) => r.id === under.roomId);
-      if (ri < 0) continue;
-      const lit = fv.floor.rooms.filter((r, i) => zones[i] === zones[ri] && r.points.length >= 3).map((r) => r.points);
       const k = 0.16 * day * Math.min(1, facing * 1.5);
-      const col = new Color(1 * k, 0.84 * k, 0.6 * k);
-      const at = (s: number, t: number) => {
-        const lo = mix(g[0], g[1], s);
-        const hi = mix(g[3], g[2], s);
-        return mix(lo, hi, t);
-      };
-      const n = 6;
-      for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-          const m = at((i + 0.5) / n, (j + 0.5) / n);
-          if (!lit.some((pts) => pointInPolygon([m[0], m[2]], pts))) continue;
-          const p0 = at(i / n, j / n);
-          const p1 = at((i + 1) / n, j / n);
-          const p2 = at((i + 1) / n, (j + 1) / n);
-          const p3 = at(i / n, (j + 1) / n);
-          buf.tri(p0, p1, p2, col, col, col);
-          buf.tri(p0, p2, p3, col, col, col);
-        }
-      }
+      patch([ground(a), ground(c), ground(top1), ground(top0)], new Color(1 * k, 0.84 * k, 0.6 * k));
     }
   }
 

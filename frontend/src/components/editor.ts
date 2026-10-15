@@ -117,6 +117,7 @@ import {
   type ScreenPicture,
   STAIR_TYPES,
   setTerrain,
+  groundLevel,
 } from "../model.ts";
 import { controls, tokens } from "../styles.ts";
 import "./entity-picker.ts";
@@ -1345,6 +1346,8 @@ export class Fp3dEditor extends LitElement {
     }
     if (this.pointers.size > 2) return;
     if (e.button === 1 || e.button === 2 || !this.floor) {
+      // the right button: dragged it moves the plan, a click without moving opens the item's menu (D518)
+      if (e.button === 2) this.rightPress = { at: local, target: e.target as Element, moved: false };
       this.drag = { kind: "pan", last: local };
       return;
     }
@@ -1425,8 +1428,8 @@ export class Fp3dEditor extends LitElement {
           const i = pt.lastIndexOf(":");
           const id = pt.slice(0, i);
           const index = Number(pt.slice(i + 1));
-          // a double click takes the point out (two points stay at least)
-          if (e.detail >= 2) {
+          // a double click takes the point out (one point stays at least)
+          if (this.doubleTap(e, `cable:${pt}`)) {
             this.change((d) => {
               const c = d.settings.roof.cables?.find((x) => x.id === id);
               if (c && c.points.length > 1) c.points.splice(index, 1);
@@ -1712,6 +1715,10 @@ export class Fp3dEditor extends LitElement {
   }
 
   private onPointerMove(e: PointerEvent): void {
+    if (this.rightPress && !this.rightPress.moved) {
+      const p = this.localPoint(e);
+      if (Math.hypot(p[0] - this.rightPress.at[0], p[1] - this.rightPress.at[1]) > 5) this.rightPress.moved = true;
+    }
     if (this.pressStart) {
       const p = this.localPoint(e);
       if (Math.hypot(p[0] - this.pressStart[0], p[1] - this.pressStart[1]) > 8) {
@@ -2250,6 +2257,13 @@ export class Fp3dEditor extends LitElement {
   }
 
   private onPointerUp(e: PointerEvent): void {
+    const right = this.rightPress;
+    this.rightPress = null;
+    if (right && e.button === 2) {
+      // the browser's contextmenu event (before or after this) stays quiet; a click without moving opens the menu
+      this.rightUp = performance.now();
+      if (!right.moved && e.type !== "pointercancel" && (this._tool === "select" || this._tool === "furniture")) this.openContext(right.target, right.at);
+    }
     clearTimeout(this.pressTimer);
     this.pressStart = null;
     this.fixedPan = false;
@@ -3726,13 +3740,16 @@ export class Fp3dEditor extends LitElement {
             if (!st) return this.entitySelect(this.t("solar_entity"), f.entity ?? null, undefined, power, (v) => set({ entity: v === "none" ? null : v }));
             // each inverter by its own name, else its entity's name, numbered across the house only as a last resort (#213)
             const linked = this.hass ? furnitureEntities(this.hass, this._doc.floors) : null;
-            const inverters = this._doc.floors
-              .flatMap((fl) => fl.furniture.filter((m) => m.type === "inverter").map((m) => ({ m, fl })))
-              .map(({ m, fl }, i) => {
-                const entity = linked?.get(m.id)?.entity;
-                const own = m.name?.trim() || (entity && this.hass ? entityName(this.hass, entity) : "");
-                return { id: m.id, label: `${own || `${this.t("furn_inverter")} ${i + 1}`} · ${fl.name}` };
-              });
+            // the inverters, and the batteries with a solar input of their own (a power station, D410)
+            const named = (type: "inverter" | "home_battery") =>
+              this._doc.floors
+                .flatMap((fl) => fl.furniture.filter((m) => m.type === type).map((m) => ({ m, fl })))
+                .map(({ m, fl }, i) => {
+                  const entity = linked?.get(m.id)?.entity;
+                  const own = m.name?.trim() || (entity && this.hass ? entityName(this.hass, entity) : "");
+                  return { id: m.id, label: `${own || `${this.t(`furn_${type}`)} ${i + 1}`} · ${fl.name}` };
+                });
+            const inverters = [...named("inverter"), ...named("home_battery")];
             return html`<label class="fp3d-field fp3d-wide"
                 >${this.t("solar_string_name")}
                 <input type="text" ?disabled=${!admin} .value=${st.name} @change=${(e: Event) => this.updateSolarString({ name: (e.target as HTMLInputElement).value.trim() || st.name })}
@@ -4229,6 +4246,8 @@ export class Fp3dEditor extends LitElement {
 
   private onContextMenu(e: MouseEvent): void {
     e.preventDefault();
+    // a mouse's right button is handled on its release (drag = move the plan); this is a long press on a tablet
+    if (this.rightPress || performance.now() - this.rightUp < 600) return;
     if (this._tool !== "select" && this._tool !== "furniture") return;
     this.drag = null;
     this.openContext(e.target as Element, this.localPoint(e as PointerEvent));
@@ -4465,6 +4484,16 @@ export class Fp3dEditor extends LitElement {
           set(Math.abs(v - 1) < 0.001 ? null : v);
         }}
     /></label>`;
+  }
+
+  /**
+   * The built-in types offered in a furniture item's type list: what the library offers (#530 – devices of the energy
+   * tool, Pool Pro parts not released yet and the stairwell are no furniture to switch to), plus the item's own type.
+   */
+  private typeChoices(current: string): string[] {
+    const shown = new Set<string>(Object.values(FURNITURE_GROUPS).flat());
+    if (hasFeature("fridge_smart")) shown.add("fridge_smart");
+    return FURNITURE_TYPES.filter((t) => shown.has(t) || t === current);
   }
 
   /** Furniture that can stand for a placed device of this kind (a speaker for a media player, a lamp for a light …). */
@@ -7688,7 +7717,7 @@ export class Fp3dEditor extends LitElement {
     if (this._runMode || !this.isAdmin) return;
     e.stopPropagation();
     const nodeAt = poolNodeAt(this._doc, c.floor, c.pool);
-    if (e.detail >= 2) {
+    if (this.doubleTap(e, `runpt:${pipeId}:${i}`)) {
       this.changePool(c.pool.id, (l) => {
         const q = l.pipes?.find((x) => x.id === pipeId);
         if (!q) return;
@@ -7758,7 +7787,7 @@ export class Fp3dEditor extends LitElement {
     if (this._runMode || !this.isAdmin) return;
     e.stopPropagation();
     this._runSel = { pipe: pipeId, pt: null };
-    if (e.detail >= 2) {
+    if (this.doubleTap(e, `fitting:${id}`)) {
       this.changePool(c.pool.id, (l) => {
         const q = l.pipes?.find((x) => x.id === pipeId);
         if (q?.fittings) q.fittings = q.fittings.filter((x) => x.id !== id);
@@ -8065,7 +8094,7 @@ export class Fp3dEditor extends LitElement {
       if (pt) {
         const [pipe, i] = split(pt);
         // a double click takes the corner point out
-        if (e.detail >= 2)
+        if (this.doubleTap(e, `pipept:${pt}`))
           this.change((_, f) => {
             const q = f.outdoor.find((x) => x.id === a.id)?.pool?.pipes?.find((x) => x.id === pipe);
             q?.points.splice(i, 1);
@@ -9417,6 +9446,22 @@ export class Fp3dEditor extends LitElement {
     /></label>`;
   }
 
+  /** The right mouse button held down: where, on what, and whether it was dragged (then it moved the plan). */
+  private rightPress: { at: [number, number]; target: Element; moved: boolean } | null = null;
+  /** When the right button was last released (its contextmenu event then stays quiet). */
+  private rightUp = -1e9;
+
+  /** The last press on a point, to tell a double click (a pointerdown's `detail` stays 0 in Chrome, D410). */
+  private lastTap: { key: string; at: number } | null = null;
+
+  /** Whether this press is the second of a double click on the same point (within 450 ms). */
+  private doubleTap(e: PointerEvent, key: string): boolean {
+    const now = performance.now();
+    const twice = e.detail >= 2 || (this.lastTap?.key === key && now - this.lastTap.at < 450);
+    this.lastTap = twice ? null : { key, at: now };
+    return twice;
+  }
+
   /** A tap in the 3D pane: select there, and fold the sidebar away (the bar under the pane has the essentials). */
   private selectFrom3d(kind: "room" | "furniture" | "device", id: string | null): void {
     this.selectItem(kind, id);
@@ -10080,6 +10125,13 @@ export class Fp3dEditor extends LitElement {
               ${this.t("contact_invert")}</label
             >`
           : nothing}
+        ${o.type === "window" && this.floor && o.sill < groundLevel(this.floor) - 0.05
+          ? html`<label class="fp3d-check fp3d-wide" title=${this.t("well_hint")}
+                ><input type="checkbox" .checked=${o.well !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateOpening({ well: (ev.target as HTMLInputElement).checked ? undefined : false })} />
+                ${this.t("well")}</label
+              >
+              ${o.well !== false ? this.len(this.t("well_rim"), o.well_rim ?? 0, (v) => this.updateOpening({ well_rim: Math.max(-0.3, Math.min(1, v)) || null }), 0.01, -0.3) : nothing}`
+          : nothing}
         ${o.type === "window"
           ? html`<label class="fp3d-check fp3d-wide" title=${this.t("rain_ignore_hint")}
               ><input type="checkbox" .checked=${!!o.rain_ignore} ?disabled=${!admin} @change=${(ev: Event) => this.updateOpening({ rain_ignore: (ev.target as HTMLInputElement).checked || undefined })} />
@@ -10119,7 +10171,7 @@ export class Fp3dEditor extends LitElement {
         <label class="fp3d-field fp3d-wide"
           >${this.t("furniture_type")}
           <select ?disabled=${!admin} @change=${(e: Event) => this.updateFurniture({ type: (e.target as HTMLSelectElement).value })}>
-            ${FURNITURE_TYPES.map((t) => html`<option value=${t} ?selected=${t === f.type}>${this.t(`furn_${t}` as I18nKey)}</option>`)}
+            ${this.typeChoices(f.type).map((t) => html`<option value=${t} ?selected=${t === f.type}>${this.t(`furn_${t}` as I18nKey)}</option>`)}
             ${(this.packs ?? [])
               .filter((pack) => pack.items.length)
               .map(
@@ -10136,8 +10188,8 @@ export class Fp3dEditor extends LitElement {
           </select></label
         >
         ${this.len(this.t("x"), f.x, (v) => this.updateFurniture({ x: v }))} ${this.len(this.t("z"), f.z, (v) => this.updateFurniture({ z: v }))}
-        ${this.len(this.t("width"), f.w, (v) => this.updateFurniture({ w: Math.max(0.05, v) }), 0.01, 0.05)}
-        ${this.len(this.t("depth"), f.d, (v) => this.updateFurniture({ d: Math.max(0.05, v) }), 0.01, 0.05)}
+        ${this.len(this.t("width"), f.w, (v) => this.updateFurniture({ w: Math.max(0.01, v) }), 0.01, 0.01)}
+        ${this.len(this.t("depth"), f.d, (v) => this.updateFurniture({ d: Math.max(0.01, v) }), 0.01, 0.01)}
         ${this.len(this.t("height_m"), f.h, (v) => this.updateFurniture({ h: Math.max(0.005, v) }), 0.01, 0)}
         ${this.num(this.t("rotation"), f.rotation, (v) => this.updateFurniture({ rotation: ((v % 360) + 360) % 360 }), 1)}
         ${isLamp(f.type)

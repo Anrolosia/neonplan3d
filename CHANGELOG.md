@@ -4,6 +4,28 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.18.2
+
+### New
+
+- Light wells: per window off (*Light well*) and *Rim above the ground* (#524).
+- A solar string can end at a battery with its own solar input (power station) (D410).
+- Right (or middle) mouse button pans the plan; a right click without moving still opens the menu (D518).
+- Furniture width and depth down to 1 cm (D520).
+
+### Fixed
+
+- Sound rings on upper floors floated above the speakers (#521).
+- Energy cards' day curve stopped after the view left the page once; refresh on tablet wake; no drop to zero at the end (#527).
+- Daylight under roof windows also when the sun is on the other side or low (D340).
+- Pets sank into rugs, a dog lay half in the sofa, too little wandering (D507).
+- Double click on a cable point removes it (D410).
+- Cylinders lying along the depth looked hollow from the front, and one end of every lying cylinder was missing – e.g. the round mirror with light, a camera's lens (#534).
+- Floating roof windows in a slope over a lower floor's room show with that floor when the roof fades (#482).
+- A light well under a lawn, path or terrace drawn up to the house stands just above that surface instead of vanishing under it (#524).
+- The furniture type list offered devices of the energy tool and parts not released yet; it now offers what the library offers (#530).
+- The sidebar panel was taller than the window with themes that set safe-area insets (#529, thanks @brentgl).
+
 ## 1.18.1
 
 ### New
