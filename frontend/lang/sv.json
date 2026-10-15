@@ -1789,7 +1789,7 @@
  "bin_lid": "Lock",
  "bin_source": "Sophämtningskalender eller sensor",
  "bin_match": "Ord i kalendern (tomt: efter avfallet)",
- "bin_hint": "Kärlet lyser från kl. 14 dagen före till kl. 12 på tömningsdagen; dess markör visar när det är dags. I en kalender (t.ex. från Waste Collection Schedule) söks orden för avfallet; en sensor kan ge dagarna kvar eller datumet.",
+ "bin_hint": "Kärlet lyser från vald tid dagen före till tiden på tömningsdagen (för alla); markören visar \"Idag\" eller \"I morgon\", tryck på kärlet visar kommande tömningar. I en kalender (t.ex. Waste Collection Schedule) söks orden för avfallet; en sensor kan ge dagarna eller datumet.",
  "bin_today": "I dag",
  "bin_tomorrow": "I morgon",
  "bin_in_days": "om {n} dagar",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Med Hushåll Pro visar apparaten återstående tid och \"Klar!\" tills luckan öppnas.",
  "hh_teaser_fridge": "Med Hushåll Pro varnar NeonPlan när kylskåpsdörren står öppen för länge.",
  "card_household": "Idag i hemmet",
- "card_household_hint": "Hushåll Pro: kort med tunnor, post, klara apparater, törstiga växter och underhåll"
+ "card_household_hint": "Hushåll Pro: kort med tunnor, post, klara apparater, törstiga växter och underhåll",
+ "bin_from": "Lys från (klockan, dagen före)",
+ "bin_until": "till (klockan, tömningsdagen)",
+ "bin_none": "Ingen tömning i sikte"
 }

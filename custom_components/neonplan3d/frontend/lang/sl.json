@@ -1789,7 +1789,7 @@
  "bin_lid": "Pokrov",
  "bin_source": "Koledar odvoza ali senzor",
  "bin_match": "Beseda v koledarju (prazno: glede na odpadke)",
- "bin_hint": "Smetnjak sveti dan pred odvozom od 14. ure do 12. ure na dan odvoza; njegova oznaka pove, kdaj je na vrsti. V koledarju (npr. iz Waste Collection Schedule) se iščejo besede njegovih odpadkov; senzor lahko poda dneve do odvoza ali datum.",
+ "bin_hint": "Smetnjak sveti dan prej od izbrane ure do ure na dan odvoza (za vse); oznaka pokaže »Danes« ali »Jutri«, dotik smetnjaka pokaže naslednje odvoze. V koledarju (npr. Waste Collection Schedule) se iščejo besede njegovih odpadkov; senzor lahko poda dneve ali datum.",
  "bin_today": "Danes",
  "bin_tomorrow": "Jutri",
  "bin_in_days": "čez {n} dni",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Z Gospodinjstvo Pro naprava pokaže preostali čas in »Končano!«, dokler se vrata ne odprejo.",
  "hh_teaser_fridge": "Z Gospodinjstvo Pro NeonPlan opozori, ko so vrata hladilnika predolgo odprta.",
  "card_household": "Danes v gospodinjstvu",
- "card_household_hint": "Gospodinjstvo Pro: kartica s smetnjaki, pošto, končanimi napravami, žejnimi rastlinami in vzdrževanjem"
+ "card_household_hint": "Gospodinjstvo Pro: kartica s smetnjaki, pošto, končanimi napravami, žejnimi rastlinami in vzdrževanjem",
+ "bin_from": "Svetenje od (ura, dan prej)",
+ "bin_until": "do (ura, na dan odvoza)",
+ "bin_none": "Ni odvoza na vidiku"
 }

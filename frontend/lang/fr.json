@@ -1789,7 +1789,7 @@
  "bin_lid": "Couvercle",
  "bin_source": "Calendrier des déchets ou capteur",
  "bin_match": "Mot du calendrier (vide : selon le déchet)",
- "bin_hint": "La poubelle s'allume la veille à partir de 14 h jusqu'à midi le jour du ramassage ; son repère indique la prochaine collecte. Un calendrier (p. ex. de Waste Collection Schedule) est parcouru avec les mots de son déchet ; un capteur peut donner les jours restants ou la date.",
+ "bin_hint": "La poubelle s'allume la veille à l'heure choisie jusqu'à l'heure du jour du ramassage (pour toutes) ; son repère indique « Aujourd'hui » ou « Demain », un appui sur la poubelle montre les prochaines collectes. Un calendrier (p. ex. Waste Collection Schedule) est parcouru avec les mots de son déchet ; un capteur peut donner les jours restants ou la date.",
  "bin_today": "Aujourd'hui",
  "bin_tomorrow": "Demain",
  "bin_in_days": "dans {n} jours",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Avec Ménage Pro, l'appareil montre son temps restant et « Terminé ! » jusqu'à l'ouverture de la porte.",
  "hh_teaser_fridge": "Avec Ménage Pro, NeonPlan avertit quand la porte du réfrigérateur reste ouverte trop longtemps.",
  "card_household": "Aujourd'hui à la maison",
- "card_household_hint": "Ménage Pro : carte avec poubelles, courrier, appareils terminés, plantes assoiffées et entretien"
+ "card_household_hint": "Ménage Pro : carte avec poubelles, courrier, appareils terminés, plantes assoiffées et entretien",
+ "bin_from": "Allumer dès (heure, la veille)",
+ "bin_until": "jusqu'à (heure, jour du ramassage)",
+ "bin_none": "Aucun ramassage prévu"
 }

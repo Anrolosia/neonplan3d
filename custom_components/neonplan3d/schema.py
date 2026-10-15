@@ -717,6 +717,17 @@ SETTINGS_SCHEMA = vol.Schema(
         # sunlight through the windows as patches on the floor
         vol.Optional("sun_patches", default=True): bool,
         # fun pack "Halloween": the ghost floating through the house (on unless switched off)
+        # Haushalt Pro: the hours a waste bin glows (from the day before, until on the day)
+        vol.Optional("household"): vol.Any(
+            None,
+            vol.Schema(
+                {
+                    vol.Optional("bin_from"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
+                    vol.Optional("bin_until"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
+                },
+                extra=vol.ALLOW_EXTRA,
+            ),
+        ),
         vol.Optional("halloween", default=None): vol.Any(
             None, vol.Schema({vol.Optional("ghost", default=True): bool}, extra=vol.ALLOW_EXTRA)
         ),

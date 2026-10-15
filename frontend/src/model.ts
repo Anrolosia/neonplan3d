@@ -622,6 +622,8 @@ export interface BuildingSettings {
   sun_patches?: boolean;
   /** The ground around the house: its height and the earth around cellars. */
   terrain?: Terrain | null;
+  /** Haushalt Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12). */
+  household?: { bin_from?: number | null; bin_until?: number | null } | null;
   /** Fun pack "Halloween": the ghost that floats through the house now and then (on unless switched off). */
   halloween?: { ghost?: boolean } | null;
   /** Plan lock: rooms, walls, doors, windows and outdoor areas cannot be moved by accident. */

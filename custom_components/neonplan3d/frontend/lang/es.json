@@ -1789,7 +1789,7 @@
  "bin_lid": "Tapa",
  "bin_source": "Calendario de recogida o sensor",
  "bin_match": "Palabra del calendario (vacío: según el residuo)",
- "bin_hint": "El contenedor brilla desde las 14 h del día anterior hasta las 12 h del día de recogida; su marcador indica cuándo toca. En un calendario (p. ej. de Waste Collection Schedule) se buscan las palabras de su residuo; un sensor puede dar los días que faltan o la fecha.",
+ "bin_hint": "El contenedor brilla desde la hora elegida del día anterior hasta la hora del día de recogida (para todos); su marcador indica «Hoy» o «Mañana», al tocarlo muestra las próximas recogidas. En un calendario (p. ej. Waste Collection Schedule) se buscan las palabras de su residuo; un sensor puede dar los días o la fecha.",
  "bin_today": "Hoy",
  "bin_tomorrow": "Mañana",
  "bin_in_days": "en {n} días",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Con Hogar Pro el aparato muestra su tiempo restante y «¡Listo!» hasta que se abre la puerta.",
  "hh_teaser_fridge": "Con Hogar Pro NeonPlan avisa cuando la puerta de la nevera está abierta demasiado tiempo.",
  "card_household": "Hoy en casa",
- "card_household_hint": "Hogar Pro: tarjeta con contenedores, correo, aparatos terminados, plantas sedientas y mantenimiento"
+ "card_household_hint": "Hogar Pro: tarjeta con contenedores, correo, aparatos terminados, plantas sedientas y mantenimiento",
+ "bin_from": "Brillar desde (hora, el día antes)",
+ "bin_until": "hasta (hora, día de recogida)",
+ "bin_none": "Sin recogida a la vista"
 }

@@ -1789,7 +1789,7 @@
  "bin_lid": "Tampa",
  "bin_source": "Calendário de recolha ou sensor",
  "bin_match": "Palavra no calendário (vazio: pelo resíduo)",
- "bin_hint": "O contentor acende-se na véspera a partir das 14 h até às 12 h do dia da recolha; o seu marcador indica quando é. Num calendário (p. ex. do Waste Collection Schedule) procuram-se as palavras do seu resíduo; um sensor pode dar os dias que faltam ou a data.",
+ "bin_hint": "O contentor acende-se na véspera a partir da hora escolhida até à hora do dia da recolha (para todos); o marcador diz «Hoje» ou «Amanhã», tocar no contentor mostra as próximas recolhas. Num calendário (p. ex. Waste Collection Schedule) procuram-se as palavras do seu resíduo; um sensor pode dar os dias ou a data.",
  "bin_today": "Hoje",
  "bin_tomorrow": "Amanhã",
  "bin_in_days": "daqui a {n} dias",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Com Casa Pro o aparelho mostra o tempo restante e «Pronto!» até a porta abrir.",
  "hh_teaser_fridge": "Com Casa Pro o NeonPlan avisa quando a porta do frigorífico fica aberta demasiado tempo.",
  "card_household": "Hoje em casa",
- "card_household_hint": "Casa Pro: cartão com contentores, correio, aparelhos prontos, plantas com sede e manutenção"
+ "card_household_hint": "Casa Pro: cartão com contentores, correio, aparelhos prontos, plantas com sede e manutenção",
+ "bin_from": "Acender a partir de (hora, na véspera)",
+ "bin_until": "até (hora, no dia da recolha)",
+ "bin_none": "Sem recolha à vista"
 }

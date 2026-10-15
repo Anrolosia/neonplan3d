@@ -1789,7 +1789,7 @@
  "bin_lid": "Capac",
  "bin_source": "Calendar de colectare sau senzor",
  "bin_match": "Cuvânt din calendar (gol: după deșeu)",
- "bin_hint": "Pubela se aprinde din ziua dinainte de la ora 14 până la ora 12 în ziua colectării; marcajul ei arată când urmează. Într-un calendar (de ex. Waste Collection Schedule) se caută cuvintele deșeului; un senzor poate da zilele rămase sau data.",
+ "bin_hint": "Pubela se aprinde din ziua dinainte de la ora aleasă până la ora din ziua colectării (pentru toate); marcajul arată „Azi” sau „Mâine”, o atingere pe pubelă arată următoarele colectări. Într-un calendar (de ex. Waste Collection Schedule) se caută cuvintele deșeului; un senzor poate da zilele sau data.",
  "bin_today": "Azi",
  "bin_tomorrow": "Mâine",
  "bin_in_days": "în {n} zile",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Cu Gospodărie Pro aparatul arată timpul rămas și „Gata!” până se deschide ușa.",
  "hh_teaser_fridge": "Cu Gospodărie Pro NeonPlan avertizează când ușa frigiderului stă deschisă prea mult.",
  "card_household": "Azi în casă",
- "card_household_hint": "Gospodărie Pro: card cu pubele, poștă, aparate gata, plante însetate și întreținere"
+ "card_household_hint": "Gospodărie Pro: card cu pubele, poștă, aparate gata, plante însetate și întreținere",
+ "bin_from": "Lumină de la (ora, cu o zi înainte)",
+ "bin_until": "până la (ora, în ziua colectării)",
+ "bin_none": "Nicio colectare în curând"
 }

@@ -1789,7 +1789,7 @@
  "bin_lid": "Låg",
  "bin_source": "Affaldskalender eller sensor",
  "bin_match": "Ord i kalenderen (tomt: efter affaldet)",
- "bin_hint": "Spanden lyser fra kl. 14 dagen før til kl. 12 på tømningsdagen; dens markør viser, hvornår den skal ud. En kalender (fx fra Waste Collection Schedule) gennemsøges for ordene for dens affald; en sensor kan give dagene til tømning eller datoen.",
+ "bin_hint": "Spanden lyser fra det valgte klokkeslæt dagen før til klokkeslættet på tømningsdagen (for alle); markøren viser \"I dag\" eller \"I morgen\", et tryk på spanden viser de næste tømninger. En kalender (fx Waste Collection Schedule) gennemsøges for ordene for affaldet; en sensor kan give dagene eller datoen.",
  "bin_today": "I dag",
  "bin_tomorrow": "I morgen",
  "bin_in_days": "om {n} dage",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Med Husholdning Pro viser apparatet resttiden og \"Færdig!\", til lågen åbnes.",
  "hh_teaser_fridge": "Med Husholdning Pro advarer NeonPlan, når køleskabsdøren står åben for længe.",
  "card_household": "I dag i hjemmet",
- "card_household_hint": "Husholdning Pro: kort med spande, post, færdige apparater, tørstige planter og vedligehold"
+ "card_household_hint": "Husholdning Pro: kort med spande, post, færdige apparater, tørstige planter og vedligehold",
+ "bin_from": "Lys fra (klokken, dagen før)",
+ "bin_until": "til (klokken, tømningsdagen)",
+ "bin_none": "Ingen tømning i sigte"
 }

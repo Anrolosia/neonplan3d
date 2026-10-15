@@ -226,9 +226,30 @@ export interface BinDue {
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const daysBetween = (a: Date, b: Date) => Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / 86400_000);
 
+/** From which hour the day before a bin glows, until which hour on the day (the house's settings; 14 and 12). */
+export interface BinHours {
+  from?: number | null;
+  until?: number | null;
+}
+
 /** When a pickup lies `days` away: whether the bin glows at this time of day. */
-export function binGlows(days: number, now: Date): boolean {
-  return (days === 1 && now.getHours() >= 14) || (days === 0 && now.getHours() < 12);
+export function binGlows(days: number, now: Date, hours: BinHours = {}): boolean {
+  const from = hours.from ?? 14;
+  const until = hours.until ?? 12;
+  const h = now.getHours() + now.getMinutes() / 60;
+  return (days === 1 && h >= from) || (days === 0 && h < until);
+}
+
+/** The next pickups of a bin (up to `n`; a sensor knows only its next one), for the tap on the bin. */
+export function binNext(f: Pick<Furniture, "bin_kind" | "bin_source" | "bin_match">, hass: HomeAssistant, pickups: ReadonlyMap<string, Pickup[]>, now = new Date(), n = 3): Pickup[] {
+  const src = typeof f.bin_source === "string" && f.bin_source !== "none" ? f.bin_source : null;
+  if (!src) return [];
+  if (src.startsWith("calendar.")) {
+    const today = startOfDay(now);
+    return (pickups.get(src) ?? []).filter((p) => p.day >= today && wasteMatches(p.summary, f.bin_kind ?? "rest", f.bin_match)).slice(0, n);
+  }
+  const due = binDue(f, hass, pickups, now);
+  return due ? [{ day: due.day, summary: due.summary }] : [];
 }
 
 /**
@@ -236,7 +257,7 @@ export function binGlows(days: number, now: Date): boolean {
  * state is the days left ("2"), a date ("2026-10-16") or a timestamp; Waste Collection Schedule's `daysTo` attribute
  * counts too. Null without a source or a pickup in sight.
  */
-export function binDue(f: Pick<Furniture, "bin_kind" | "bin_source" | "bin_match">, hass: HomeAssistant, pickups: ReadonlyMap<string, Pickup[]>, now = new Date()): BinDue | null {
+export function binDue(f: Pick<Furniture, "bin_kind" | "bin_source" | "bin_match">, hass: HomeAssistant, pickups: ReadonlyMap<string, Pickup[]>, now = new Date(), hours: BinHours = {}): BinDue | null {
   const src = typeof f.bin_source === "string" && f.bin_source !== "none" ? f.bin_source : null;
   if (!src) return null;
   const today = startOfDay(now);
@@ -244,19 +265,19 @@ export function binDue(f: Pick<Furniture, "bin_kind" | "bin_source" | "bin_match
     const next = (pickups.get(src) ?? []).find((p) => p.day >= today && wasteMatches(p.summary, f.bin_kind ?? "rest", f.bin_match));
     if (!next) return null;
     const days = daysBetween(today, next.day);
-    // past noon on the day the bin is emptied: look at the one after
-    if (days === 0 && now.getHours() >= 12) {
+    // past the glow's end on the day the bin is emptied: look at the one after
+    if (days === 0 && now.getHours() + now.getMinutes() / 60 >= (hours.until ?? 12)) {
       const later = (pickups.get(src) ?? []).find((p) => p.day > today && wasteMatches(p.summary, f.bin_kind ?? "rest", f.bin_match));
-      if (later) return { days: daysBetween(today, later.day), day: later.day, summary: later.summary, glow: binGlows(daysBetween(today, later.day), now) };
+      if (later) return { days: daysBetween(today, later.day), day: later.day, summary: later.summary, glow: binGlows(daysBetween(today, later.day), now, hours) };
     }
-    return { days, day: next.day, summary: next.summary, glow: binGlows(days, now) };
+    return { days, day: next.day, summary: next.summary, glow: binGlows(days, now, hours) };
   }
   const st = hass.states[src];
   if (!st) return null;
   const days = sensorDays(st, now);
   if (days === null || days < 0) return null;
   const day = new Date(today.getTime() + days * 86400_000);
-  return { days, day, summary: String(st.attributes.friendly_name ?? ""), glow: binGlows(days, now) };
+  return { days, day, summary: String(st.attributes.friendly_name ?? ""), glow: binGlows(days, now, hours) };
 }
 
 /** Days until the pickup a sensor tells: a number, a date or a timestamp, or Waste Collection Schedule's `daysTo`. */

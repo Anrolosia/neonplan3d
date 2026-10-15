@@ -1789,7 +1789,7 @@
  "bin_lid": "Fedél",
  "bin_source": "Hulladéknaptár vagy érzékelő",
  "bin_match": "Szó a naptárban (üres: a hulladék szerint)",
- "bin_hint": "A kuka a gyűjtés előtti napon 14 órától a gyűjtés napján délig világít; a jelölője mutatja, mikor esedékes. A naptárban (pl. Waste Collection Schedule) a hulladékfajta szavait keresi; érzékelő a hátralévő napokat vagy a dátumot adhatja.",
+ "bin_hint": "A kuka az előző napon a beállított órától a gyűjtés napján a megadott óráig világít (minden kukára); a jelölő „Ma” vagy „Holnap” feliratot mutat, a kukára koppintva látszanak a következő időpontok. A naptárban (pl. Waste Collection Schedule) a hulladékfajta szavait keresi; érzékelő a napokat vagy a dátumot adhatja.",
  "bin_today": "Ma",
  "bin_tomorrow": "Holnap",
  "bin_in_days": "{n} nap múlva",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "A Háztartás Pro-val a készülék mutatja a hátralévő időt és a „Kész!” jelzést, amíg ki nem nyitják az ajtót.",
  "hh_teaser_fridge": "A Háztartás Pro-val a NeonPlan figyelmeztet, ha a hűtő ajtaja túl sokáig nyitva marad.",
  "card_household": "Ma a háztartásban",
- "card_household_hint": "Háztartás Pro: kártya kukákkal, postával, kész készülékekkel, szomjas növényekkel és karbantartással"
+ "card_household_hint": "Háztartás Pro: kártya kukákkal, postával, kész készülékekkel, szomjas növényekkel és karbantartással",
+ "bin_from": "Világítás kezdete (óra, előző nap)",
+ "bin_until": "vége (óra, gyűjtés napján)",
+ "bin_none": "Nincs közeli gyűjtés"
 }

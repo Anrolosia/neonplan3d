@@ -1789,7 +1789,7 @@
  "bin_lid": "Coperchio",
  "bin_source": "Calendario dei rifiuti o sensore",
  "bin_match": "Parola nel calendario (vuoto: secondo il rifiuto)",
- "bin_hint": "Il bidone si illumina dalle 14 del giorno prima fino alle 12 del giorno di raccolta; il suo segnaposto dice quando tocca. In un calendario (ad es. di Waste Collection Schedule) si cercano le parole del suo rifiuto; un sensore può dare i giorni mancanti o la data.",
+ "bin_hint": "Il bidone si illumina dall'ora scelta del giorno prima fino all'ora del giorno di raccolta (per tutti); il segnaposto dice «Oggi» o «Domani», toccando il bidone si vedono le prossime raccolte. In un calendario (ad es. Waste Collection Schedule) si cercano le parole del suo rifiuto; un sensore può dare i giorni o la data.",
  "bin_today": "Oggi",
  "bin_tomorrow": "Domani",
  "bin_in_days": "tra {n} giorni",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Con Casa Pro l'apparecchio mostra il tempo residuo e «Finito!» finché non si apre lo sportello.",
  "hh_teaser_fridge": "Con Casa Pro NeonPlan avvisa quando la porta del frigorifero resta aperta troppo a lungo.",
  "card_household": "Oggi in casa",
- "card_household_hint": "Casa Pro: scheda con bidoni, posta, apparecchi finiti, piante assetate e manutenzione"
+ "card_household_hint": "Casa Pro: scheda con bidoni, posta, apparecchi finiti, piante assetate e manutenzione",
+ "bin_from": "Accendere dalle (ora, giorno prima)",
+ "bin_until": "fino alle (ora, giorno di raccolta)",
+ "bin_none": "Nessuna raccolta in vista"
 }

@@ -1789,7 +1789,7 @@
  "bin_lid": "Pokrywa",
  "bin_source": "Harmonogram odbioru lub czujnik",
  "bin_match": "Słowo w kalendarzu (puste: według odpadu)",
- "bin_hint": "Pojemnik świeci dzień przed odbiorem od 14:00 do 12:00 w dniu odbioru; jego znacznik pokazuje, kiedy jest kolej. W kalendarzu (np. z Waste Collection Schedule) szukane są słowa jego odpadu; czujnik może podać dni do odbioru lub datę.",
+ "bin_hint": "Pojemnik świeci dzień wcześniej od wybranej godziny do godziny w dniu odbioru (dla wszystkich); znacznik pokazuje „Dziś” lub „Jutro”, dotknięcie pojemnika pokazuje kolejne terminy. W kalendarzu (np. Waste Collection Schedule) szukane są słowa jego odpadu; czujnik może podać dni lub datę.",
  "bin_today": "Dziś",
  "bin_tomorrow": "Jutro",
  "bin_in_days": "za {n} dni",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Z Dom Pro urządzenie pokazuje pozostały czas i „Gotowe!”, aż do otwarcia drzwi.",
  "hh_teaser_fridge": "Z Dom Pro NeonPlan ostrzega, gdy drzwi lodówki są otwarte zbyt długo.",
  "card_household": "Dziś w domu",
- "card_household_hint": "Dom Pro: karta z pojemnikami, pocztą, gotowymi urządzeniami, spragnionymi roślinami i konserwacją"
+ "card_household_hint": "Dom Pro: karta z pojemnikami, pocztą, gotowymi urządzeniami, spragnionymi roślinami i konserwacją",
+ "bin_from": "Świecenie od (godz., dzień wcześniej)",
+ "bin_until": "do (godz., w dniu odbioru)",
+ "bin_none": "Brak odbioru w najbliższym czasie"
 }

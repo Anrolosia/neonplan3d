@@ -1789,7 +1789,7 @@
  "bin_lid": "Lokk",
  "bin_source": "Tømmekalender eller sensor",
  "bin_match": "Ord i kalenderen (tomt: etter avfallet)",
- "bin_hint": "Dunken lyser fra kl. 14 dagen før til kl. 12 på tømmedagen; markøren viser når den skal ut. En kalender (f.eks. fra Waste Collection Schedule) søkes etter ordene for avfallet; en sensor kan gi dagene igjen eller datoen.",
+ "bin_hint": "Dunken lyser fra valgt klokkeslett dagen før til klokkeslettet på tømmedagen (for alle); markøren viser «I dag» eller «I morgen», trykk på dunken viser neste tømminger. En kalender (f.eks. Waste Collection Schedule) søkes etter ordene for avfallet; en sensor kan gi dagene eller datoen.",
  "bin_today": "I dag",
  "bin_tomorrow": "I morgen",
  "bin_in_days": "om {n} dager",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Med Husholdning Pro viser apparatet gjenstående tid og «Ferdig!» til døra åpnes.",
  "hh_teaser_fridge": "Med Husholdning Pro varsler NeonPlan når kjøleskapsdøra står åpen for lenge.",
  "card_household": "I dag i hjemmet",
- "card_household_hint": "Husholdning Pro: kort med dunker, post, ferdige apparater, tørste planter og vedlikehold"
+ "card_household_hint": "Husholdning Pro: kort med dunker, post, ferdige apparater, tørste planter og vedlikehold",
+ "bin_from": "Lys fra (klokka, dagen før)",
+ "bin_until": "til (klokka, tømmedagen)",
+ "bin_none": "Ingen tømming i sikte"
 }

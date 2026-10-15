@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { binColors, binDue, binGlows, FinishedMemory, fridgeOpenTooLong, isFinishedState, mailboxBase, mailboxPost, nextFridgeCheck, pickupsOf, plantThirsty, remainingMinutes, remainingText, sensorDays, serviceDue, wasteCalendars, wasteColors, wasteMatches } from "./household.ts";
+import { binColors, binDue, binGlows, binNext, FinishedMemory, fridgeOpenTooLong, isFinishedState, mailboxBase, mailboxPost, nextFridgeCheck, pickupsOf, plantThirsty, remainingMinutes, remainingText, sensorDays, serviceDue, wasteCalendars, wasteColors, wasteMatches } from "./household.ts";
 import type { Furniture } from "./model.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
@@ -169,4 +169,20 @@ test("an appliance that stopped while the page was open shows finished until its
   m.update("x", true, shut, t0);
   m.update("x", false, shut, t0 + 1000);
   assert.equal(m.update("x", false, shut, t0 + 13 * 3600_000), false);
+});
+
+test("the glow hours can be set for the house; a tap on a bin lists its next pickups", () => {
+  assert.equal(binGlows(1, new Date(2026, 9, 15, 9, 0), { from: 8 }), true);
+  assert.equal(binGlows(1, new Date(2026, 9, 15, 7, 30), { from: 8 }), false);
+  assert.equal(binGlows(0, new Date(2026, 9, 15, 15, 0), { until: 18 }), true);
+  const pickups = new Map([["calendar.abfall", pickupsOf([
+    { summary: "Papier", start: { date: "2026-10-15" } },
+    { summary: "Bio", start: { date: "2026-10-16" } },
+    { summary: "Papier", start: { date: "2026-10-29" } },
+    { summary: "Papier", start: { date: "2026-11-12" } },
+    { summary: "Papier", start: { date: "2026-11-26" } },
+  ])]]);
+  const next = binNext({ bin_kind: "paper", bin_source: "calendar.abfall" }, hassOf(), pickups, new Date(2026, 9, 15, 18, 0));
+  assert.deepEqual(next.map((p) => p.day.getDate()), [15, 29, 12]);
+  assert.deepEqual(binNext({ bin_kind: "paper", bin_source: "sensor.p" }, hassOf(st("sensor.p", "3")), pickups, new Date(2026, 9, 15, 18, 0)).map((p) => p.day.getDate()), [18]);
 });

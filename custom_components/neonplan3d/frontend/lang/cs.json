@@ -1789,7 +1789,7 @@
  "bin_lid": "Víko",
  "bin_source": "Svozový kalendář nebo senzor",
  "bin_match": "Slovo v kalendáři (prázdné: podle odpadu)",
- "bin_hint": "Popelnice svítí den před svozem od 14 hodin do poledne v den svozu; její značka ukazuje, kdy je na řadě. V kalendáři (např. z Waste Collection Schedule) se hledají slova jejího odpadu; senzor může dát dny do svozu nebo datum.",
+ "bin_hint": "Popelnice svítí den předem od zvolené hodiny do hodiny v den svozu (pro všechny); značka ukazuje „Dnes“ nebo „Zítra“, klepnutí na popelnici ukáže další termíny. V kalendáři (např. Waste Collection Schedule) se hledají slova jejího odpadu; senzor může dát dny nebo datum.",
  "bin_today": "Dnes",
  "bin_tomorrow": "Zítra",
  "bin_in_days": "za {n} dní",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "S Domácnost Pro ukazuje spotřebič zbývající čas a „Hotovo!“, dokud se neotevřou dvířka.",
  "hh_teaser_fridge": "S Domácnost Pro NeonPlan varuje, když jsou dveře lednice otevřené příliš dlouho.",
  "card_household": "Dnes v domácnosti",
- "card_household_hint": "Domácnost Pro: karta s popelnicemi, poštou, hotovými spotřebiči, žíznivými rostlinami a údržbou"
+ "card_household_hint": "Domácnost Pro: karta s popelnicemi, poštou, hotovými spotřebiči, žíznivými rostlinami a údržbou",
+ "bin_from": "Svítit od (hodin, den předem)",
+ "bin_until": "do (hodin, v den svozu)",
+ "bin_none": "Žádný svoz v dohledu"
 }

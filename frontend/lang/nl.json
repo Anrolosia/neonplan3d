@@ -1789,7 +1789,7 @@
  "bin_lid": "Deksel",
  "bin_source": "Afvalkalender of sensor",
  "bin_match": "Woord in de kalender (leeg: volgens afvalsoort)",
- "bin_hint": "De container licht op vanaf 14:00 de dag ervoor tot 12:00 op de ophaaldag; zijn markering toont wanneer hij aan de beurt is. In een kalender (bijv. van Waste Collection Schedule) wordt naar de woorden van zijn afvalsoort gezocht; een sensor kan het aantal dagen of de datum geven.",
+ "bin_hint": "De container licht op vanaf het gekozen uur de dag ervoor tot het uur op de ophaaldag (voor alle); de markering toont „Vandaag” of „Morgen”, tikken op de container toont de volgende ophaaldagen. In een kalender (bijv. Waste Collection Schedule) wordt naar de woorden van zijn afvalsoort gezocht; een sensor kan de dagen of de datum geven.",
  "bin_today": "Vandaag",
  "bin_tomorrow": "Morgen",
  "bin_in_days": "over {n} dagen",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Met Huishouden Pro toont het apparaat de resterende tijd en „Klaar!” tot de deur opengaat.",
  "hh_teaser_fridge": "Met Huishouden Pro waarschuwt NeonPlan als de koelkastdeur te lang openstaat.",
  "card_household": "Vandaag in huis",
- "card_household_hint": "Huishouden Pro: kaart met containers, post, klare apparaten, dorstige planten en onderhoud"
+ "card_household_hint": "Huishouden Pro: kaart met containers, post, klare apparaten, dorstige planten en onderhoud",
+ "bin_from": "Oplichten vanaf (uur, dag ervoor)",
+ "bin_until": "tot (uur, ophaaldag)",
+ "bin_none": "Geen ophaling in zicht"
 }

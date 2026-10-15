@@ -1789,7 +1789,7 @@
  "bin_lid": "Kansi",
  "bin_source": "Jätekalenteri tai anturi",
  "bin_match": "Sana kalenterissa (tyhjä: jätelajin mukaan)",
- "bin_hint": "Astia hehkuu tyhjennystä edeltävänä päivänä klo 14 alkaen tyhjennyspäivän klo 12 asti; sen merkki kertoo, milloin on vuoro. Kalenterista (esim. Waste Collection Schedule) etsitään jätelajin sanoja; anturi voi antaa päivät tyhjennykseen tai päivämäärän.",
+ "bin_hint": "Astia hehkuu edellisenä päivänä valitusta kellonajasta tyhjennyspäivän kellonaikaan asti (kaikille astioille); merkki näyttää ”Tänään” tai ”Huomenna”, astian napautus näyttää seuraavat tyhjennykset. Kalenterista (esim. Waste Collection Schedule) etsitään jätelajin sanoja; anturi voi antaa päivät tai päivämäärän.",
  "bin_today": "Tänään",
  "bin_tomorrow": "Huomenna",
  "bin_in_days": "{n} päivän päästä",
@@ -1831,5 +1831,8 @@
  "hh_teaser_appliance": "Kotitalous Pro:lla laite näyttää jäljellä olevan ajan ja ”Valmis!”, kunnes ovi avataan.",
  "hh_teaser_fridge": "Kotitalous Pro:lla NeonPlan varoittaa, kun jääkaapin ovi on liian kauan auki.",
  "card_household": "Tänään kotona",
- "card_household_hint": "Kotitalous Pro: kortti, jossa astiat, posti, valmiit laitteet, janoiset kasvit ja huollot"
+ "card_household_hint": "Kotitalous Pro: kortti, jossa astiat, posti, valmiit laitteet, janoiset kasvit ja huollot",
+ "bin_from": "Hehku alkaen (klo, edellisenä päivänä)",
+ "bin_until": "asti (klo, tyhjennyspäivänä)",
+ "bin_none": "Ei tyhjennystä näkyvissä"
 }

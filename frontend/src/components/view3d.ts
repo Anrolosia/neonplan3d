@@ -32,7 +32,7 @@ import { carState, type CarState, roomClimateValue,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
-import { binColors, binDue, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, serviceDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type Pickup } from "../household.ts";
+import { binColors, binDue, binNext, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, serviceDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
 import { fieldFace, fieldSize } from "../solar.ts";
 import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, type PoolPipe, type SolarField, POOL_DEVICES } from "../model.ts";
@@ -231,6 +231,7 @@ export class Fp3dView3d extends LitElement {
     _alerts: { state: true },
     _household: { state: true },
     _hhFolded: { state: true },
+    _binInfo: { state: true },
     householdCard: { attribute: false },
     _sceneFired: { state: true },
     replay: { attribute: false },
@@ -393,6 +394,9 @@ export class Fp3dView3d extends LitElement {
   /** Haushalt Pro: what is due in the household now (the glass card "Today in the household"). */
   private declare _household: HouseholdItem[];
   private declare _hhFolded: boolean;
+  /** Haushalt Pro: the bin tapped – its next pickups in a small pop-up. */
+  private declare _binInfo: { furnitureId: string; x: number; y: number } | null;
+  private binInfoTimer: ReturnType<typeof setTimeout> | undefined;
   /** The glass card "Today in the household" (Haushalt Pro; the dashboard card can switch it off). */
   declare householdCard: boolean;
   private alertSrc: AlertSources | null = null;
@@ -557,6 +561,7 @@ export class Fp3dView3d extends LitElement {
     this._alerts = [];
     this._household = [];
     this._hhFolded = readFlag("neonplan3d.hhFolded");
+    this._binInfo = null;
     this.householdCard = true;
     this.scenes = true;
     this._sceneFired = null;
@@ -2288,6 +2293,9 @@ export class Fp3dView3d extends LitElement {
           const hh = household ? this.householdState(hass, floor, f) : null;
           if (hh?.screen) screens.set(f.id, hh.screen);
           if (hh?.marker) markers.push(hh.marker);
+          // a tap on the bin itself shows its next pickups (on the mailbox or the plant: their sensor)
+          const src = f.type === "waste_bin" ? f.bin_source : f.type === "mailbox" ? f.entity : f.moisture;
+          if (household && typeof src === "string" && src !== "none") targets.set(f.id, `hh:${src}#${f.id}`);
           if (hh?.item) today.push(hh.item);
           if (!plant) continue;
         }
@@ -2531,7 +2539,7 @@ export class Fp3dView3d extends LitElement {
     if (f.type === "waste_bin") {
       const src = typeof f.bin_source === "string" && f.bin_source !== "none" ? f.bin_source : null;
       if (!src) return null;
-      const due = binDue(f, hass, this.pickups);
+      const due = binDue(f, hass, this.pickups, new Date(), { from: this.building?.settings.household?.bin_from, until: this.building?.settings.household?.bin_until });
       if (!due) return null;
       const text = due.days === 0 ? translate(hass, "bin_today") : due.days === 1 ? translate(hass, "bin_tomorrow") : translate(hass, "bin_in_days", { n: due.days });
       // the lid's colour, a little brighter: the paper bin glows blue, the bio bin brown
@@ -3049,6 +3057,28 @@ export class Fp3dView3d extends LitElement {
     if (this.floorId !== item.floorId) this.fire("floor-tap", { floorId: item.floorId });
     // after the host has switched the floor (its own camera flight starts first)
     setTimeout(() => this.viewer?.focus(item.floorId, item.x, item.z, item.y, item.entity), 120);
+  }
+
+  /** Haushalt Pro: the bin tapped – its kind and its next pickups ("Tomorrow", "Thu 23.10."). */
+  private renderBinInfo() {
+    const i = this._binInfo;
+    const hass = this.hass;
+    const f = i && this.building?.floors.flatMap((x) => x.furniture).find((m) => m.id === i.furnitureId);
+    if (!i || !hass || !f) return nothing;
+    const next = binNext(f, hass, this.pickups);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const when = (d: Date) => {
+      const days = Math.round((d.getTime() - today.getTime()) / 86400_000);
+      return days === 0 ? translate(hass, "bin_today") : days === 1 ? translate(hass, "bin_tomorrow") : d.toLocaleDateString(hass.language || undefined, { weekday: "short", day: "numeric", month: "numeric" });
+    };
+    const label = f.name || translate(hass, `bin_kind_${f.bin_kind ?? "rest"}` as Parameters<typeof translate>[1]);
+    return html`<div class="fp3d-swipe fp3d-info fp3d-bin-info" style="left:${i.x}px;top:${i.y}px" @click=${() => (this._binInfo = null)}>
+      <span>🗑 ${label}</span>
+      ${next.length
+        ? next.map((p) => html`<b>${when(p.day)}${p.summary && p.summary !== label ? html` <small>· ${p.summary}</small>` : nothing}</b>`)
+        : html`<b>${translate(hass, "bin_none")}</b>`}
+    </div>`;
   }
 
   /** Haushalt Pro: the glass card "Today in the household" – what is due, tapped it opens the entity. */
@@ -3677,10 +3707,15 @@ export class Fp3dView3d extends LitElement {
   private onDeviceTap(entityId: string, x = 0, y = 0): void {
     // trail pins and lamps without a light are drawn, but nothing of Home Assistant stands behind them
     if (entityId.startsWith("trail:") || entityId.startsWith("lamp:")) return;
-    // Haushalt Pro: a bin's or a mailbox's pin opens its calendar or sensor
+    // Haushalt Pro: a bin shows its next pickups; a mailbox's or a plant's pin opens its sensor
     if (entityId.startsWith("hh:")) {
-      const id = entityId.slice(3).split("#")[0];
-      if (this.ro) this.showInfo(id, x, y);
+      const [id, furnitureId] = entityId.slice(3).split("#");
+      const bin = this.building?.floors.flatMap((f) => f.furniture).find((f) => f.id === furnitureId && f.type === "waste_bin");
+      if (bin) {
+        this._binInfo = { furnitureId, x, y };
+        clearTimeout(this.binInfoTimer);
+        this.binInfoTimer = setTimeout(() => (this._binInfo = null), 6000);
+      } else if (this.ro) this.showInfo(id, x, y);
       else openMoreInfo(this, id);
       return;
     }
@@ -3843,7 +3878,7 @@ export class Fp3dView3d extends LitElement {
       style=${style}
     >
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
-      ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
+      ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
@@ -3864,6 +3899,16 @@ export class Fp3dView3d extends LitElement {
         display: block;
         position: relative;
         min-height: 200px;
+      }
+      .fp3d-bin-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        cursor: pointer;
+      }
+      .fp3d-bin-info small {
+        opacity: 0.7;
+        font-weight: 400;
       }
       .fp3d-hh {
         position: absolute;

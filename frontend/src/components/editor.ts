@@ -10631,6 +10631,13 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** Awning: its fall, the valance, a position sensor, its run time and the other direction (with the cover above). */
+  /** Haushalt Pro: the house's household settings (the hours the bins glow – for all bins). */
+  private setHousehold(patch: NonNullable<Building["settings"]["household"]>): void {
+    const next = structuredClone(this._doc);
+    next.settings.household = { ...(next.settings.household ?? {}), ...patch };
+    this.setDoc(next);
+  }
+
   /**
    * Waste bin and mailbox: shape and colours for everyone; the waste calendar and the post sensors with Haushalt Pro
    * (a teaser while it is locked).
@@ -10684,6 +10691,8 @@ export class Fp3dEditor extends LitElement {
                 >${this.t("bin_match")}
                 <input type="text" .value=${f.bin_match ?? ""} placeholder=${this.t(`bin_kind_${kind}` as I18nKey)} ?disabled=${!admin}
                   @change=${(e: Event) => this.updateFurniture({ bin_match: (e.target as HTMLInputElement).value.trim() || null })} /></label>
+              ${this.num(this.t("bin_from"), this._doc.settings.household?.bin_from ?? 14, (v) => this.setHousehold({ bin_from: Math.max(0, Math.min(24, v)) }), 0.5)}
+              ${this.num(this.t("bin_until"), this._doc.settings.household?.bin_until ?? 12, (v) => this.setHousehold({ bin_until: Math.max(0, Math.min(24, v)) }), 0.5)}
               <p class="fp3d-sub fp3d-wide">${this.t("bin_hint")}</p>`
           : teaser}
       </div>`;
