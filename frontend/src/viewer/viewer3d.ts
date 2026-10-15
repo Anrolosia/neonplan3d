@@ -54,7 +54,7 @@ import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
+import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -251,7 +251,7 @@ export interface ScreenState {
   plain?: boolean;
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners"; color: [number, number, number]; level: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon"; color: [number, number, number]; level: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -553,7 +553,7 @@ export class FloorplanViewer {
     winLines: LineBasicMaterial;
   } | null = null;
   /** The hologram's anchor: a point on the solar field (building coordinates) and the field's normal. */
-  private anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null }[] = [];
+  private anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null; near?: number }[] = [];
   /** Told where the anchor lies on screen after every frame, how large the hologram should be and whether its front faces the camera. */
   private anchorCb: ((index: number, x: number, y: number, visible: boolean, scale: number, facing: boolean) => void) | null = null;
   /** Energie Pro: production level (0..1) per solar field; the overlays animate while any is above zero. */
@@ -914,7 +914,7 @@ export class FloorplanViewer {
    * The holograms' anchors: points on the solar fields with their normals (they ride up with the roof and
    * show in the house view only), and points over devices (shown on their floor as well).
    */
-  setAnchors(anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null }[]): void {
+  setAnchors(anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null; near?: number }[]): void {
     this.anchors = anchors;
     this.labelsDirty = true;
     this.invalidate();
@@ -1375,6 +1375,48 @@ export class FloorplanViewer {
     this.invalidate();
   }
 
+  /**
+   * Awnings: how far each is out now and where it is going. A reported position is followed smoothly (a cover that
+   * reports while it runs shows the awning run out slowly); without one it runs at its run time while it says
+   * opening or closing.
+   */
+  private awnings = new Map<string, { cur: number; to: number; speed: number }>();
+
+  setAwnings(states: Map<string, { out: number | null; moving: -1 | 0 | 1; time: number }>): void {
+    for (const [id, a] of states) {
+      const st = this.awnings.get(id) ?? { cur: a.out ?? 0, to: a.out ?? 0, speed: 0 };
+      if (a.out === null) {
+        st.to = a.moving > 0 ? 1 : 0;
+        st.speed = 1 / Math.max(2, a.time);
+      } else {
+        st.to = a.out;
+        st.speed = 0;
+      }
+      this.awnings.set(id, st);
+    }
+    for (const id of [...this.awnings.keys()]) if (!states.has(id)) this.awnings.delete(id);
+    this.invalidate();
+  }
+
+  private stepAwnings(dt: number): Set<string> {
+    const touched = new Set<string>();
+    // a reported position: eased over about a second, so steps of a moving cover read as a smooth run (dt in ms)
+    const k = 1 - Math.exp(-dt / 450);
+    for (const [id, st] of this.awnings) {
+      const d = st.to - st.cur;
+      if (Math.abs(d) < 0.002) {
+        if (d !== 0) {
+          st.cur = st.to;
+          touched.add(id);
+        }
+        continue;
+      }
+      st.cur = st.speed > 0 ? st.cur + Math.sign(d) * Math.min(Math.abs(d), (st.speed * dt) / 1000) : st.cur + d * k;
+      touched.add(id);
+    }
+    return touched;
+  }
+
   private stepFridges(dt: number): boolean {
     const k = 1 - Math.exp(-dt / OPENING_TAU);
     const touched = new Set<string>();
@@ -1392,6 +1434,7 @@ export class FloorplanViewer {
         touched.add(id);
       }
     }
+    for (const id of this.stepAwnings(dt)) touched.add(id);
     if (!touched.size) return false;
     for (const fv of this.floors) if (fv.floor.furniture.some((f) => touched.has(f.id))) this.buildFridges(fv);
     return true;
@@ -1404,6 +1447,8 @@ export class FloorplanViewer {
       const st = this.fridges.get(f.id);
       pushFridgeDoors(buf, f, mountBase(fv.floor, f), st?.l ?? 0, st?.r ?? 0);
     }
+    // awnings ride in the same mesh: they run out and in with their cover
+    for (const f of fv.floor.furniture) if (f.type === "awning") pushAwning(buf, f, mountBase(fv.floor, f), this.awnings.get(f.id)?.cur ?? 0);
     fv.fridgeMesh.geometry.dispose();
     fv.fridgeMesh.geometry = buf.geometry();
     fv.fridgeMesh.visible = buf.count > 0;
@@ -2789,6 +2834,38 @@ export class FloorplanViewer {
             }
             continue;
           }
+          if (face.part === "beacon") {
+            // a beacon for something to do (a waste bin that goes out): a column of light rising from its top and
+            // a ring of light on the floor around it, fading out (the screen layer adds light: black is none)
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.25 + 0.45 * face.level))) as [number, number, number]);
+            const dark = new Color(0, 0, 0);
+            const top = base + h + 0.01;
+            const rise = 0.6 + 0.6 * face.level;
+            const r = Math.min(Math.abs(w), d) * 0.38;
+            // two crossed planes: seen from any side
+            for (const [ax, az] of [[r, 0], [0, r]] as const) {
+              const a = P(-ax, top, -az);
+              const b = P(ax, top, az);
+              const c = P(ax * 0.4, top + rise, az * 0.4);
+              const e = P(-ax * 0.4, top + rise, -az * 0.4);
+              buf.tri(a, b, c, col, col, dark);
+              buf.tri(a, c, e, col, dark, dark);
+            }
+            // the ring on the floor (the item's own floor, not its mount height)
+            const fy = mountBase(fv.floor, { ...f, mount_y: 0 }) + 0.012;
+            const hw = Math.abs(w) / 2 + 0.03;
+            const hd = d / 2 + 0.03;
+            const out = 0.22 + 0.18 * face.level;
+            const ring = (sx: number, sz: number, o: number) => P(sx * (hw + o), fy, sz * (hd + o));
+            const corners: [number, number][] = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+            for (let i = 0; i < 4; i++) {
+              const [ax, az] = corners[i];
+              const [bx, bz] = corners[(i + 1) % 4];
+              buf.tri(ring(ax, az, 0), ring(bx, bz, 0), ring(bx, bz, out), col, col, dark);
+              buf.tri(ring(ax, az, 0), ring(bx, bz, out), ring(ax, az, out), col, dark, dark);
+            }
+            continue;
+          }
           const x0 = face.part === "right" ? 0.03 : -Math.abs(w) / 2 + 0.03;
           const x1 = face.part === "left" ? -0.03 : Math.abs(w) / 2 - 0.03;
           const y = base + (face.part === "bottom" ? h * 0.45 : h) + 0.006;
@@ -2798,8 +2875,9 @@ export class FloorplanViewer {
           const inner = [Q(x0, -d / 2 + 0.03), Q(x1, -d / 2 + 0.03), Q(x1, d / 2 - 0.03), Q(x0, d / 2 - 0.03)];
           buf.tri(inner[0], inner[2], inner[1], col);
           buf.tri(inner[0], inner[3], inner[2], col);
-          const g = 0.12 + 0.1 * face.level;
-          const halo = col.clone().multiplyScalar(0.5);
+          // "lid": a lid lit from inside (a waste bin) with a narrow seam, not the wide halo of a lit top
+          const g = face.part === "lid" ? 0.025 + 0.02 * face.level : 0.12 + 0.1 * face.level;
+          const halo = col.clone().multiplyScalar(face.part === "lid" ? 0.7 : 0.5);
           const outer = [Q(x0 - g, -d / 2 - g, y + 0.004), Q(x1 + g, -d / 2 - g, y + 0.004), Q(x1 + g, d / 2 + g, y + 0.004), Q(x0 - g, d / 2 + g, y + 0.004)];
           for (let i = 0; i < 4; i++) {
             const j = (i + 1) % 4;
@@ -4013,6 +4091,11 @@ export class FloorplanViewer {
         const p = new Vector3(a.p[0], a.p[1] + (fv?.y ?? 0) + (a.roof && (this.floorId === null || this.floors.length <= 1) ? (1 - this.roofO) * 2.2 : 0), a.p[2]);
         const toCamera = this.camera.position.clone().sub(p);
         const dist = toCamera.length();
+        // a small card that only shows close up (a waste bin's): hidden while the camera is farther away
+        if (a.near !== undefined && dist > a.near) {
+          this.anchorCb!(i, 0, 0, false, 1, true);
+          return;
+        }
         const facing = toCamera.normalize().dot(new Vector3(a.n[0], a.n[1], a.n[2])) >= 0;
         v.copy(p).project(this.camera);
         const off = v.z > 1 || Math.abs(v.x) > 1.3 || Math.abs(v.y) > 1.3;
@@ -4064,8 +4147,9 @@ export class FloorplanViewer {
       if (!pin) continue;
       const fv = this.floorMap.get(d.floorId);
       // device markers belong to the floor and room views; the house view only shows floor labels –
-      // except what a camera detects right now: that is worth a pin on the whole house too
-      const alert = d.id.startsWith("detect:");
+      // except what a camera detects right now and (Haushalt Pro) a bin that goes out or post in the box: those
+      // are worth a pin on the whole house too
+      const alert = d.id.startsWith("detect:") || (d.id.startsWith("hh:") && d.active);
       if (!fv || (house && !alert) || fv.to < 0.99 || fv.o < 0.9 || d.pin === false || this.otherFloor(fv)) {
         this.place(pin, null);
         continue;

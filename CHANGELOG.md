@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.19.0
+
+### New
+
+- Awnings: folding-arm, drop-arm, vertical/ZIP, pergola/conservatory, side awning; run out and in with their cover (D170, D274, D502).
+- Waste bins and mailboxes for everyone (Furniture → Household): bin shapes, colours by country, mailbox shapes.
+- Household Pro (beta, first for supporters): bins from the waste calendar or a sensor with tags on their lids, post in the mailbox, thirsty plants, time left and "done" of washer, dryer and dishwasher, services due, fridge door warning, smart fridge, glass card "Today in the household".
+- Import page (beta): plans from Sweet Home 3D, RoomPlan scans, DXF, glTF/OBJ/STL, Floorplanner, Valetudo and an AI format to a NeonPlan file in the browser.
+
+### Improved
+
+- Colour pickers show their colour as a swatch.
+
 ## 1.18.2
 
 ### New

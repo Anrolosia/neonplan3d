@@ -463,6 +463,23 @@ Ein **Keller** ist eine Etage mit negativer **Höhe über Boden**, etwa −2,6 m
 
 **Kellerfenster:** Im Formular eines Fensters setzt **Kellerfenster** die passende Größe – 100 × 50 cm, 25 cm unter der Decke. Liegt ein Fenster unter dem Gelände, bekommt es in 3D von selbst einen **Lichtschacht** mit Gitterrost. Im Fensterformular nimmt der Haken **Lichtschacht** ihn wieder weg (etwa wenn außen ein Weg vorbeiführt); **Rand über dem Gelände** hebt Rand und Gitter an, damit ein Kies- oder Plattenweg ums Haus sie nicht verdeckt. Liegt im Garten-Werkzeug ein Rasen, Weg oder eine Terrasse bis ans Haus über dem Schacht, steht sein Rand von selbst knapp über dieser Fläche.
 
+### 4.22 Markisen
+
+Unter **Möbel → Terrasse & Balkon** gibt es die **Markise**. Sie fährt in 3D mit ihrem Cover aus und ein – wie ein Rollladen.
+
+- **Art:** **Gelenkarm** (die Klassiker über der Terrasse), **Fallarm** (Balkon, Fenster – die Arme schwenken nach vorn und unten), **Senkrecht / ZIP** (das Tuch fährt in Seitenschienen senkrecht herunter), **Pergola / Wintergarten** (fester Rahmen mit Pfosten, das Tuch fährt oben aus) und **Seitenmarkise** (Sichtschutz, aus einem Pfosten zur Seite gezogen). Mit der Art setzt NeonPlan passende Maße, die du danach anpasst.
+- **Größe:** Breite ist die Markise entlang der Wand, Tiefe der Ausfall ganz ausgefahren (beim Fallarm die Armlänge, bei der Pergola bis zu den Pfosten). Die Rückseite des Rahmens kommt an die Hauswand; **Höhe über Boden** ist die Unterkante der Kassette (bei der Seitenmarkise die Höhe des Tuchs). **Neigung** ist das Gefälle des Tuchs.
+- **Markise (Cover):** das Cover aus Home Assistant. Meldet es seine Position auch während der Fahrt, fährt die Markise in 3D langsam mit; meldet es nur „öffnet“/„schließt“, fährt sie in der **Laufzeit ganz aus**. Ein eigener **Positionssensor** geht auch. **Richtung umkehren** hilft bei Covers, die 100 % melden, wenn die Markise eingefahren ist.
+- **Volant:** die herunterhängende Stoffkante vorne, abschaltbar.
+
+### 4.23 Mülltonnen und Briefkästen
+
+Unter **Möbel → Haushalt** stehen **Mülltonne** und **Briefkasten**.
+
+- **Mülltonne – Bauform:** Rolltonne 120 l oder 240 l, Container 1100 l, Mehrkammer-Tonne, Sack, Eimer / Caddy oder Unterflur-Container (von dem nur die Einwurfsäule aus dem Boden ragt). Mit der Bauform setzt NeonPlan die üblichen Maße.
+- **Abfallart:** Restmüll, Bio, Papier, Verpackung, Glas, Garten, Recycling oder Sonstiges. Sie gibt der Tonne die Farben, die in deinem Land üblich sind (nach dem Land in Home Assistant: in Deutschland etwa Papier blau, Bio braun, Gelbe Tonne gelb; in Australien zeigt der Deckel die Sorte). **Farbe** und **Deckel** kannst du danach frei wählen.
+- **Briefkasten – Bauform:** Wandbriefkasten (hängt auf 1 m), Briefkasten auf Pfosten mit Fähnchen, Standbriefkasten mit Zeitungsfach, Paketbox oder Briefkastenanlage.
+
 ---
 
 ## 5. Die 3D-Ansicht
@@ -819,6 +836,20 @@ Nicht dabei sind Kamerabilder (der Recorder speichert keine) sowie Personen und 
 
 **Voraussetzungen:** der Recorder von Home Assistant (er läuft standardmäßig) und Home Assistant nach dem Update einmal neu gestartet. Wie weit der Verlauf zurückreicht, bestimmt `purge_keep_days` des Recorders (Standard 10 Tage); die Zeitreise braucht davon 24 Stunden, für die ganze Woche mindestens 7 Tage. Wer die Woche nutzen will, lässt `purge_keep_days` also bei 7 oder mehr.
 
+### 6.8 Haushalt Pro (Beta)
+
+> **Beta, zuerst für Supporter:** Haushalt Pro testen zuerst die Supporter (mit dem [Supporter-Pass](https://mastershort.de/neonplan3d/unterstuetzer/) ist es dabei). Rückmeldungen gern auf Discord in **#beta-feedback** oder auf GitHub.
+
+Haushalt Pro zeigt im Haus, was im Haushalt ansteht – dort, wo es passiert. Die Mülltonnen und Briefkästen selbst gibt es für alle (Kapitel 4.23); Haushalt Pro bringt sie und andere Geräte zum Leben. Die Felder dazu stehen im Formular des Möbels unter **🏠 Haushalt Pro**.
+
+- **Mülltonnen:** Wähle unter **Abfallkalender oder Sensor** einen Kalender (z. B. von *Waste Collection Schedule*) oder einen Sensor. Aus einem Kalender sucht NeonPlan die Einträge nach den Wörtern der Abfallart heraus (Papier, Bio, Gelber Sack, PMD, GFT, Recycling … in vielen Sprachen); passt das nicht, trägst du ein eigenes **Stichwort** ein. Ein Sensor darf die Tage bis zur Abholung, ein Datum oder „morgen“/„in 3 Tagen“ melden. Jede Tonne mit Termin trägt ein kleines **Schildchen** auf dem Deckel – „Heute“, „Morgen“, „in 3 Tagen“ – in ihrer Farbe; heute und morgen stehen hervor. Ein Tipp auf die Tonne zeigt die nächsten Termine. **Leuchten ab / bis** legt fest, ab wann am Vortag bis wann am Abholtag eine Tonne als „dran“ gilt (für alle Tonnen).
+- **Briefkasten:** Ein **Sensor für Post** – ein Merker (z. B. ein input_boolean „Post da“ aus einer Automation) oder die Einwurfklappe – und optional der **Sensor der Entnahmetür**. Liegt Post drin, leuchtet der Briefkasten und zeigt „Post da“, bis er geleert wurde.
+- **Pflanzen:** Eine Pflanze (plant.*) oder ein Feuchtesensor; unter dem eingestellten Wert (Standard 20 %) zeigt sie „Durst“.
+- **Waschmaschine, Trockner, Spüler:** Mit einem **Restzeit-Sensor** zeigt die Markierung „noch 23 min“; danach „Fertig!“, bis die Tür aufgeht (**Tür-Sensor**) oder das Gerät wieder läuft. „Fertig“ erkennt NeonPlan am Zustand des Geräts (finished, beendet …) oder daran, dass es zu laufen aufgehört hat.
+- **Wartung und Verbrauchsteile:** An jedem elektrischen Möbel kann ein Sensor für Filter, Salz oder Klarspüler stehen – ein Binärsensor (an = fällig), eine Zahl (Prozent oder Tage übrig, fällig ab dem eingestellten Wert) oder ein Datum. Fällig leuchtet das Gerät gelb.
+- **Kühlschrank:** Steht eine Tür länger offen als eingestellt (Standard 2 Minuten), warnt NeonPlan oben im Bild. Dazu gehört der **Smart-Kühlschrank** (Side-by-Side mit beweglichen Türen) in der Möbel-Bibliothek.
+- **Heute im Haushalt:** Eine Glaskarte oben rechts listet, was gerade ansteht – Tonnen heute und morgen, Post, fertige Geräte, durstige Pflanzen, fällige Wartung, offene Kühlschranktüren. Ein Tipp öffnet das Gerät, der Kopf klappt sie ein. In der Dashboard-Karte schaltet `household_card: false` sie ab.
+
 ---
 
 ## 7. Erweiterungen, Shop und Möbel-Packs
@@ -1001,6 +1032,8 @@ Unter **Sicherung** im Editor:
 - **Komplett-Backup:** **Alles sichern (Plan, Bilder, Packs)** speichert eine Datei mit dem Plan, allen Hintergrund- und Bildschirmbildern und den installierten Packs. **Komplett-Backup wiederherstellen …** spielt sie in dieselbe oder eine andere Installation zurück. Jedes Pack wird dabei erneut geprüft. Packs, die für eine andere Installation signiert sind, holst du dort über die Shop-Verbindung neu. Der Lizenzschlüssel ist nicht in der Datei.
 
 Das normale Backup von Home Assistant sichert NeonPlan 3D ebenfalls vollständig mit.
+
+**Aus anderen Programmen übernehmen:** Die **Import-Seite** (<https://neonplan3d.mastershort.de/import/>, auch unter **Sicherung → Zur Import-Seite**) macht aus Plänen anderer Programme eine NeonPlan-Datei: Sweet Home 3D (`.sh3d`), iPhone-/iPad-Scans mit LiDAR (RoomPlan-JSON), CAD-Zeichnungen (`.dxf`), 3D-Modelle aus Blender, SketchUp & Co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner und Valetudo-Saugroboterkarten. Sie zeigt eine Vorschau mit Räumen, Türen, Fenstern und Möbeln, lässt Räume umbenennen und je nach Format Einheit, Layer oder Etagenhöhen einstellen; die Datei bleibt dabei auf deinem Computer. Die heruntergeladene Datei lädst du hier mit **Importieren …**. Wer sich den Plan lieber von einer KI schreiben lässt, findet die Vorlage dafür in [docs/ai-import.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/ai-import.md); die Import-Seite prüft und repariert das Ergebnis.
 
 ---
 

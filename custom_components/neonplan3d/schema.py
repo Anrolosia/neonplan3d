@@ -196,6 +196,9 @@ _VEHICLE_TYPE_SCHEMA = vol.Schema(
     {vol.Required("state"): vol.All(str, vol.Length(max=64)), vol.Required("vehicle"): vol.All(str, vol.Length(max=96))}
 )
 
+# the kinds of waste a bin can take (household.ts WASTE_KINDS)
+WASTE_KINDS = ["rest", "bio", "paper", "plastic", "glass", "garden", "recycling", "other"]
+
 FURNITURE_SCHEMA = vol.Schema(
     {
         vol.Required("id"): _ID,
@@ -256,6 +259,26 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("color_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # mirrored left-right
         vol.Optional("mirror", default=False): bool,
+        # awning: the fabric's fall (degrees), the valance, a position sensor, its run time and the other direction
+        vol.Optional("awning_pitch", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=80))),
+        vol.Optional("awning_valance", default=True): bool,
+        vol.Optional("awning_position", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("awning_time", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=2, max=300))),
+        vol.Optional("awning_invert", default=False): bool,
+        # household: a waste bin's kind and colours, its calendar (Haushalt Pro); a mailbox's emptying door
+        vol.Optional("bin_kind"): vol.Any(None, vol.In(WASTE_KINDS)),
+        vol.Optional("bin_color"): vol.Any(None, vol.Match(r"^#[0-9a-fA-F]{6}$")),
+        vol.Optional("bin_lid"): vol.Any(None, vol.Match(r"^#[0-9a-fA-F]{6}$")),
+        vol.Optional("bin_source"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("bin_match"): vol.Any(None, vol.All(str, vol.Length(max=120))),
+        vol.Optional("mailbox_door"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # Haushalt Pro: a plant's moisture, an appliance's time left, a service, a fridge's door alarm
+        vol.Optional("moisture"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("moisture_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=100))),
+        vol.Optional("remaining"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("service"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("service_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=1000))),
+        vol.Optional("door_alarm"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.5, max=120))),
         # LED strip: tilt about its length (degrees) and standing upright
         vol.Optional("tilt", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
         vol.Optional("upright", default=False): bool,
@@ -694,6 +717,17 @@ SETTINGS_SCHEMA = vol.Schema(
         # sunlight through the windows as patches on the floor
         vol.Optional("sun_patches", default=True): bool,
         # fun pack "Halloween": the ghost floating through the house (on unless switched off)
+        # Haushalt Pro: the hours a waste bin glows (from the day before, until on the day)
+        vol.Optional("household"): vol.Any(
+            None,
+            vol.Schema(
+                {
+                    vol.Optional("bin_from"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
+                    vol.Optional("bin_until"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
+                },
+                extra=vol.ALLOW_EXTRA,
+            ),
+        ),
         vol.Optional("halloween", default=None): vol.Any(
             None, vol.Schema({vol.Optional("ghost", default=True): bool}, extra=vol.ALLOW_EXTRA)
         ),

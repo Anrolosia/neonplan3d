@@ -40,6 +40,8 @@ const editorConfig = (viewerHash) => ({
 const timeTravelConfig = { ...common, entryPoints: ["src/timetravel/entry.ts"], outfile: `${out}/neonplan3d-timetravel.js` };
 // the fun packs (pets …) only load when one is unlocked and switched on; three.js is lent by the 3D bundle
 const funConfig = { ...common, entryPoints: ["src/fun/entry.ts"], outfile: `${out}/neonplan3d-fun.js` };
+// the import page of the website (other programs' plans to NeonPlan, in the browser): not part of the integration
+const importConfig = { ...common, entryPoints: ["src/import/app.ts"], outfile: "../site/import/neonplan-import.js" };
 // The main bundle loads the 3D bundle with a hash of its content in the URL, so a new 3D bundle is
 // never taken from the browser cache (the integration version only changes after a restart).
 // the frontend knows its own version, to notice a backend that still runs an older one
@@ -100,7 +102,10 @@ function copyFonts() {
 // card editor 225 KB on 2026-10-13 for the floor menu texts
 // main 560 KB on 2026-10-13 for the Halloween gift notice, the extension badge and the cellar texts
 // editor 790 KB on 2026-10-13 for the tidied toolbar (tool and view menus)
-const BUDGET = { "neonplan3d.js": 560 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 760 * 1024, "neonplan3d-editor.js": 790 * 1024, "neonplan3d-card-editor.js": 225 * 1024 };
+// editor 800 KB on 2026-10-14 for the awning (form, sensors) and the 1.18.2 fixes
+// main 570 KB, 3D 770 KB and card editor 230 KB on 2026-10-14 for the awnings (five kinds) and their texts
+// main 590 KB, editor 820 KB, card editor 235 KB on 2026-10-15 for the household (bins, mailboxes, Haushalt Pro) and its texts
+const BUDGET = { "neonplan3d.js": 590 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 770 * 1024, "neonplan3d-editor.js": 820 * 1024, "neonplan3d-card-editor.js": 235 * 1024 };
 
 copyFonts();
 if (watch) {
@@ -113,6 +118,7 @@ if (watch) {
   await build(cardEditorConfig);
   await build(timeTravelConfig);
   await build(funConfig);
+  await build(importConfig);
   await build(mainConfig(hashOf(viewerConfig.outfile), hashOf(editor.outfile), hashOf(cardEditorConfig.outfile), hashOf(timeTravelConfig.outfile), hashOf(funConfig.outfile)));
   let over = false;
   for (const [file, limit] of Object.entries(BUDGET)) {
@@ -121,5 +127,9 @@ if (watch) {
     over ||= !ok;
     console.log(`${ok ? "ok  " : "OVER"} ${file}: ${(size / 1024).toFixed(1)} KB (budget ${limit / 1024} KB)`);
   }
+  // the import page loads once on a website, not on a wall tablet
+  const importSize = statSync(importConfig.outfile).size;
+  over ||= importSize > 160 * 1024;
+  console.log(`${importSize <= 160 * 1024 ? "ok  " : "OVER"} site/import/neonplan-import.js: ${(importSize / 1024).toFixed(1)} KB (budget 160 KB)`);
   if (over) process.exit(1);
 }

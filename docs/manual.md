@@ -463,6 +463,23 @@ A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Without a 
 
 **Cellar window:** in a window's form, **Cellar window** sets the right size – 100 × 50 cm, 25 cm under the ceiling. A window below the ground gets a **light well** with a grate in 3D by itself. In the window form, the tick **Light well** takes it away again (e.g. where a path runs past outside); **Rim above the ground** raises the rim and grate so a gravel or paved path around the house does not cover them. Where a lawn, path or terrace of the garden tool reaches over the well up to the house, its rim stands just above that surface by itself.
 
+### 4.22 Awnings
+
+Under **Furniture → Terrace & balcony** there is the **Awning**. In 3D it runs out and in with its cover – like a blind.
+
+- **Kind:** **Folding-arm** (the classic over a terrace), **Drop-arm** (balcony, window – the arms swing out and down), **Vertical / ZIP** (the fabric runs straight down in side rails), **Pergola / conservatory** (a fixed frame with posts, the fabric runs out on top) and **Side awning** (a privacy screen pulled out sideways from a post). Choosing a kind sets its usual sizes, which you then adjust.
+- **Size:** width is the awning along the wall, depth its projection fully out (for a drop-arm the arm length, for a pergola up to the posts). The back of the frame goes against the house wall; **Height above the floor** is the cassette's underside (for a side awning the fabric's height). **Fall** is the fabric's slope.
+- **Awning (cover):** the cover from Home Assistant. If it reports its position while it runs, the awning runs out slowly in 3D; if it only says opening/closing, it moves at its **Run time fully out**. A separate **Position sensor** works too. **Reverse direction** helps with covers that report 100 % while the awning is in.
+- **Valance:** the fabric edge hanging at the front, can be switched off.
+
+### 4.23 Waste bins and mailboxes
+
+Under **Furniture → Household** you find the **waste bin** and the **mailbox**.
+
+- **Waste bin – shape:** wheelie bin 120 l or 240 l, 1100 l container, multi-compartment bin, bag, caddy / pail or underground container (only its column stands out of the ground). The shape sets the usual size.
+- **Waste:** general, food / organic, paper, packaging, glass, garden, recycling or other. It gives the bin the colours usual in your country (by the country set in Home Assistant: in Germany paper is blue and food waste brown, in the US recycling is blue; in Australia the lid tells the kind). **Colour** and **lid** can be changed freely afterwards.
+- **Mailbox – shape:** wall mailbox (hanging at 1 m), mailbox on a post with a flag, post box with a newspaper holder, parcel box or mailbox bank.
+
 ---
 
 ## 5. The 3D view
@@ -819,6 +836,20 @@ Not included are camera pictures (the recorder keeps none) and people and their 
 
 **Requirements:** Home Assistant's recorder (it runs by default) and Home Assistant restarted once after the update. How far back the history reaches is set by the recorder's `purge_keep_days` (default 10 days); time travel needs 24 hours of it, the whole week at least 7 days. If you want the week, keep `purge_keep_days` at 7 or more.
 
+### 6.8 Household Pro (beta)
+
+> **Beta, first for supporters:** Household Pro is tested by supporters first (it comes with the [Supporter Pass](https://mastershort.de/en/neonplan3d/supporters/)). Feedback is welcome on Discord in **#beta-feedback** or on GitHub.
+
+Household Pro shows what is due in the household, right where it happens. The waste bins and mailboxes themselves are for everyone (chapter 4.23); Household Pro brings them and other appliances to life. Its fields are in the item's form under **🏠 Household Pro**.
+
+- **Waste bins:** under **Waste calendar or sensor** pick a calendar (e.g. from *Waste Collection Schedule*) or a sensor. In a calendar NeonPlan finds the entries by the words of the bin's waste (paper, food, packaging, PMD, recycling … in many languages); if that does not fit, enter a **word** of your own. A sensor may report the days to the pickup, a date or "tomorrow"/"in 3 days". Every bin with a pickup wears a small **tag** on its lid – "Today", "Tomorrow", "in 3 days" – in its colour; today and tomorrow stand out. A tap on the bin shows its next pickups. **Glow from / until** sets from when the day before until when on pickup day a bin counts as due (for all bins).
+- **Mailbox:** a **post sensor** – a flag (e.g. an input_boolean "post" set by an automation) or the letter flap – and optionally the **sensor of the emptying door**. While post is in it, the mailbox glows and shows "Post" until it is emptied.
+- **Plants:** a plant (plant.*) or a moisture sensor; below the set value (default 20 %) it shows "Thirsty".
+- **Washer, dryer, dishwasher:** with a **time-left sensor** the pin shows "23 min left"; afterwards "Done!" until the door opens (**door sensor**) or it runs again. NeonPlan tells "done" from the appliance's state (finished, done …) or from it having stopped running.
+- **Service and consumables:** any electric item can have a sensor for a filter, salt or rinse aid – a binary sensor (on = due), a number (percent or days left, due at the set value) or a date. When due the item glows yellow.
+- **Fridge:** when a door stands open longer than set (default 2 minutes), NeonPlan warns at the top of the view. The **smart fridge** (side-by-side with moving doors) in the furniture library comes with it.
+- **Today in the household:** a glass card at the top right lists what is due – bins today and tomorrow, post, finished appliances, thirsty plants, services due, open fridge doors. A tap opens the device, its header folds it. In the dashboard card `household_card: false` switches it off.
+
 ---
 
 ## 7. Extensions, shop and furniture packs
@@ -1001,6 +1032,8 @@ Under **Backup** in the editor:
 - **Full backup:** **Back up everything (plan, pictures, packs)** saves one file with the plan, every background and screen picture and the installed packs. **Restore a full backup …** brings it back into the same or another installation. Every pack is checked again. Packs signed for another installation are fetched there again through the shop connection. The licence key is not in the file.
 
 Home Assistant's own backup includes NeonPlan 3D completely as well.
+
+**From other programs:** the **import page** (<https://neonplan3d.mastershort.de/import/>, also under **Backup → To the import page**) turns plans of other programs into a NeonPlan file: Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models from Blender, SketchUp & co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner and Valetudo robot vacuum maps. It shows a preview with rooms, doors, windows and furniture, lets you rename rooms and, depending on the format, set the unit, the layers or the floor levels; the file stays on your computer. Load the downloaded file here with **Import …**. If you would rather let an AI write the plan, the template is in [docs/ai-import.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/ai-import.md); the import page checks and repairs the result.
 
 ---
 
