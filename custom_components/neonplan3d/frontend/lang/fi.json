@@ -205,7 +205,7 @@
  "backup_imported": "Tuotu.",
  "backup_hint": "Taustakuvat eivät sisälly tiedostoon.",
  "backup_other_hint": "Pohjapiirros Sweet Home 3D:stä, iPhone-skannauksesta, CAD:stä (DXF), Blenderistä/SketchUpista tai robotti-imurin kartasta?",
- "backup_other": "Tuontisivulle",
+ "backup_other": "Tuontisivulle (Beta)",
  "backup_full": "Täysi varmuuskopio",
  "backup_full_export": "Varmuuskopioi kaikki (suunnitelma, kuvat, paketit)",
  "backup_full_import": "Palauta täysi varmuuskopio …",

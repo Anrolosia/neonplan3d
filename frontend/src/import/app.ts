@@ -10,6 +10,7 @@ import type { LayerRole } from "./dxf.ts";
 
 const DE = {
   title: "Plan importieren",
+  beta: "Beta – noch im Test. Klappt etwas nicht, schick uns die Datei gern mit einer kurzen Beschreibung auf GitHub (Issues) oder Discord.",
   lead: "Bring deinen Grundriss aus einem anderen Programm in NeonPlan 3D – Räume, Wände, Türen, Fenster und Möbel. Die Datei bleibt auf deinem Computer: alles läuft hier im Browser.",
   drop: "Datei hierher ziehen oder klicken",
   formats: "Sweet Home 3D (.sh3d) · iPhone-/iPad-Scan mit RoomPlan (.json) · CAD (.dxf) · 3D-Modell aus Blender, SketchUp & Co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo-Saugroboterkarte (.json) · NeonPlan-Importformat oder ein NeonPlan-Plan von einer KI (.json)",
@@ -81,6 +82,7 @@ const DE = {
 };
 const EN: typeof DE = {
   title: "Import a plan",
+  beta: "Beta – still being tested. If something goes wrong, please send us the file with a short note on GitHub (issues) or Discord.",
   lead: "Bring your floor plan from another program into NeonPlan 3D – rooms, walls, doors, windows and furniture. The file stays on your computer: everything runs here in the browser.",
   drop: "Drop a file here or click",
   formats: "Sweet Home 3D (.sh3d) · iPhone/iPad scan with RoomPlan (.json) · CAD (.dxf) · 3D model from Blender, SketchUp & co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo robot vacuum map (.json) · NeonPlan import format or a NeonPlan plan written by an AI (.json)",
@@ -325,10 +327,11 @@ function render(): void {
   root.innerHTML = `
     <header>
       <a class="brand" href="../">NeonPlan 3D</a>
-      <h1>${esc(t.title)}</h1>
+      <h1>${esc(t.title)} <span class="beta">Beta</span></h1>
       <button class="lang" data-lang="${lang === "de" ? "en" : "de"}">${lang === "de" ? "English" : "Deutsch"}</button>
     </header>
     <p class="lead">${esc(t.lead)}</p>
+    <p class="beta-note">${esc(t.beta)}</p>
     <label class="drop ${state.busy ? "busy" : ""}" id="drop">
       <input type="file" id="file" accept=".sh3d,.dxf,.json,.fml,.glb,.gltf,.obj,.stl">
       <span class="big">${esc(state.busy ? t.reading : state.name ? state.name : t.drop)}</span>

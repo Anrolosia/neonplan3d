@@ -205,7 +205,7 @@
  "backup_imported": "已导入。",
  "backup_hint": "背景图片不包含在文件中。",
  "backup_other_hint": "来自 Sweet Home 3D、iPhone 扫描、CAD（DXF）、Blender/SketchUp 或扫地机器人地图的平面图？",
- "backup_other": "前往导入页面",
+ "backup_other": "前往导入页面 (Beta)",
  "backup_full": "完整备份",
  "backup_full_export": "备份全部（平面图、图片、扩展包）",
  "backup_full_import": "还原完整备份…",

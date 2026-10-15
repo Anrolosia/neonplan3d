@@ -205,7 +205,7 @@
  "backup_imported": "Importado.",
  "backup_hint": "Las imágenes de fondo no forman parte del archivo.",
  "backup_other_hint": "¿Un plano de Sweet Home 3D, un escaneo de iPhone, CAD (DXF), Blender/SketchUp o un mapa de robot aspirador?",
- "backup_other": "A la página de importación",
+ "backup_other": "A la página de importación (Beta)",
  "backup_full": "Copia completa",
  "backup_full_export": "Guardar todo (plano, imágenes, packs)",
  "backup_full_import": "Restaurar una copia completa …",

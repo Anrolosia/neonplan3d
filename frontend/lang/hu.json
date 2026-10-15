@@ -205,7 +205,7 @@
  "backup_imported": "Importálva.",
  "backup_hint": "A háttérképek nem részei a fájlnak.",
  "backup_other_hint": "Alaprajz Sweet Home 3D-ből, iPhone-szkenből, CAD-ből (DXF), Blenderből/SketchUpból vagy robotporszívó-térképből?",
- "backup_other": "Az importálási oldalra",
+ "backup_other": "Az importálási oldalra (Beta)",
  "backup_full": "Teljes biztonsági mentés",
  "backup_full_export": "Minden mentése (terv, képek, csomagok)",
  "backup_full_import": "Teljes mentés visszaállítása …",

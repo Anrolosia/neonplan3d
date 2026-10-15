@@ -205,7 +205,7 @@
  "backup_imported": "Importert.",
  "backup_hint": "Bakgrunnsbilete er ikkje med i fila.",
  "backup_other_hint": "Ei planteikning frå Sweet Home 3D, ei iPhone-skanning, CAD (DXF), Blender/SketchUp eller eit robotstøvsugarkart?",
- "backup_other": "Til importsida",
+ "backup_other": "Til importsida (Beta)",
  "backup_full": "Full sikkerheitskopi",
  "backup_full_export": "Ta sikkerheitskopi av alt (plan, bilete, pakkar)",
  "backup_full_import": "Gjenopprett ein full sikkerheitskopi …",

@@ -22,7 +22,7 @@ export type Gated = Feature | FreeFeature;
  * unlocked (the tester has the pack) or the lab switch is on (localStorage "neonplan3d.lab" = "1").
  * A release takes a feature off this list.
  */
-export const UNRELEASED: readonly Gated[] = ["pool", "household", "diagnostics"];
+export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics"];
 
 export function labOn(): boolean {
   try {
@@ -73,7 +73,7 @@ const MANUAL_FEATURE: Record<string, { de: string; en: string }> = {
   auto_pro: { de: "pro-erweiterungen/#66-auto-pro", en: "pro-add-ons/#66-auto-pro" },
   time_travel: { de: "pro-erweiterungen/#67-zeitreise", en: "pro-add-ons/#67-time-travel" },
   pool: { de: "pro-erweiterungen/#68-pool-pro", en: "pro-add-ons/#68-pool-pro" },
-  household: { de: "pro-erweiterungen/#69-haushalt-pro", en: "pro-add-ons/#69-household-pro" },
+  household: { de: "pro-erweiterungen/#68-haushalt-pro-beta", en: "pro-add-ons/#68-household-pro-beta" },
   extensions: { de: "erweiterungen-shop-moebel-packs/", en: "extensions-shop-furniture-packs/" },
 };
 
