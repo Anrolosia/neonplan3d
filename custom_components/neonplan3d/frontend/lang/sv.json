@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terrass och balkong",
  "awning_cover": "Markis (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Gångtid (s)",
+ "motor_invert_hint": "För covers som rapporterar 100 % när gardinen är stängd eller duken nere.",
  "awning_pitch": "Lutning (°)",
  "awning_time": "Körtid helt ute (s)",
  "awning_position": "Positionssensor (valfri)",

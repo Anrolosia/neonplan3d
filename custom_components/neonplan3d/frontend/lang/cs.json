@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terasa a balkon",
  "awning_cover": "Markýza (cover)",
  "motor_cover": "Pohon (cover)",
+ "motor_time": "Doba chodu (s)",
+ "motor_invert_hint": "Pro covery, které hlásí 100 %, když je závěs zatažený nebo plátno dole.",
  "awning_pitch": "Sklon (°)",
  "awning_time": "Doba vyjetí naplno (s)",
  "awning_position": "Snímač polohy (volitelný)",

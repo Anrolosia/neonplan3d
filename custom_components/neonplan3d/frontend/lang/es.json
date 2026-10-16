@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terraza y balcón",
  "awning_cover": "Toldo (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Tiempo de recorrido (s)",
+ "motor_invert_hint": "Para covers que indican 100 % con la cortina cerrada o la pantalla abajo.",
  "awning_pitch": "Inclinación (°)",
  "awning_time": "Tiempo de salida completa (s)",
  "awning_position": "Sensor de posición (opcional)",

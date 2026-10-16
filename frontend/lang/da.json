@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terrasse og altan",
  "awning_cover": "Markise (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Køretid (s)",
+ "motor_invert_hint": "Til covers, der melder 100 %, når gardinet er trukket for eller lærredet er nede.",
  "awning_pitch": "Hældning (°)",
  "awning_time": "Køretid helt ud (s)",
  "awning_position": "Positionssensor (valgfri)",

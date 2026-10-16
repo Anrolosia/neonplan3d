@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terrasse og balkong",
  "awning_cover": "Markise (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Køyretid (s)",
+ "motor_invert_hint": "For covers som melder 100 % når gardina er trekt for eller lerretet er nede.",
  "awning_pitch": "Helling (°)",
  "awning_time": "Køyretid heilt ut (s)",
  "awning_position": "Posisjonssensor (valfri)",

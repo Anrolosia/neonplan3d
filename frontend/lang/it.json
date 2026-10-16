@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terrazza e balcone",
  "awning_cover": "Tenda da sole (cover)",
  "motor_cover": "Motore (cover)",
+ "motor_time": "Tempo di corsa (s)",
+ "motor_invert_hint": "Per i cover che indicano 100 % con la tenda chiusa o lo schermo abbassato.",
  "awning_pitch": "Inclinazione (°)",
  "awning_time": "Tempo di apertura completa (s)",
  "awning_position": "Sensore di posizione (facoltativo)",

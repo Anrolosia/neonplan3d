@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terrasse et balcon",
  "awning_cover": "Store banne (cover)",
  "motor_cover": "Moteur (cover)",
+ "motor_time": "Durée de course (s)",
+ "motor_invert_hint": "Pour les covers qui indiquent 100 % quand le rideau est fermé ou l'écran descendu.",
  "awning_pitch": "Inclinaison (°)",
  "awning_time": "Durée de sortie complète (s)",
  "awning_position": "Capteur de position (facultatif)",

@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Taras i balkon",
  "awning_cover": "Markiza (cover)",
  "motor_cover": "Napęd (cover)",
+ "motor_time": "Czas przejazdu (s)",
+ "motor_invert_hint": "Dla coverów, które podają 100 %, gdy zasłona jest zasunięta lub ekran opuszczony.",
  "awning_pitch": "Nachylenie (°)",
  "awning_time": "Czas pełnego wysunięcia (s)",
  "awning_position": "Czujnik położenia (opcjonalnie)",

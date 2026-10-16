@@ -3,7 +3,7 @@
 ### New
 
 - **Garage door from a switch:** a garage door can follow a **switch or input_boolean** that drives it (on = open, a tap in 3D switches it) – for a relay instead of a cover. Idea from the fork of @diegood.
-- **Curtains and projection screens that move (#511):** the **motorised curtain** (pack *Architecture & fit-out*) now opens to both sides with its cover, as far as its position says. The **roll-down projection screen** (pack *Home cinema*) rolls up and down. The screen can now be linked to its motor's cover. Thanks to everyone who asked, by issue and by mail.
+- **Curtains and projection screens that move (#511):** the **motorised curtain** (pack *Architecture & fit-out*) now opens to both sides with its cover, as far as its position says. The **roll-down projection screen** (pack *Home cinema*) rolls up and down. The screen can now be linked to its motor's cover. Like an awning, both take a live position sensor (as for blinds), a run time and **Reverse direction**. Thanks to everyone who asked, by issue and by mail.
 
 ### Fixed
 
@@ -27,7 +27,7 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 ### Neu
 
 - **Garagentor über einen Schalter:** Ein Garagentor kann einem **Schalter oder input_boolean** folgen, der es antreibt (an = offen, Antippen in 3D schaltet ihn) – für ein Relais statt eines Covers. Idee aus dem Fork von @diegood.
-- **Vorhänge und Leinwände, die sich bewegen (#511):** Der **motorisierte Vorhang** (Pack *Architektur & Ausbau*) öffnet sich jetzt mit seinem Cover zu beiden Seiten, so weit seine Position sagt. Die **ausrollbare Leinwand** (Pack *Heimkino*) fährt hoch und runter. Die Leinwand lässt sich jetzt mit dem Cover ihres Motors verknüpfen. Danke an alle, die per Issue und Mail gefragt haben.
+- **Vorhänge und Leinwände, die sich bewegen (#511):** Der **motorisierte Vorhang** (Pack *Architektur & Ausbau*) öffnet sich jetzt mit seinem Cover zu beiden Seiten, so weit seine Position sagt. Die **ausrollbare Leinwand** (Pack *Heimkino*) fährt hoch und runter. Die Leinwand lässt sich jetzt mit dem Cover ihres Motors verknüpfen. Wie die Markise nehmen beide einen Live-Positionssensor (wie bei Rollläden), eine Laufzeit und **Richtung umkehren**. Danke an alle, die per Issue und Mail gefragt haben.
 
 ### Behoben
 

@@ -9,7 +9,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### New
 
 - A garage door can follow a switch or input_boolean that drives it (on = open, a tap switches it) – idea from diegood's fork.
-- Motorised curtains (Architecture pack) open to both sides and the roll-down projection screen (Home cinema pack) rolls up and down with their cover's position; a screen can now be linked to its motor's cover (#511).
+- Motorised curtains (Architecture pack) open to both sides and the roll-down projection screen (Home cinema pack) rolls up and down with their cover's position; a screen can now be linked to its motor's cover; both take a live position sensor, a run time and "Reverse direction" (#511).
 
 ### Fixed
 

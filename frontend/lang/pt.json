@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terraço e varanda",
  "awning_cover": "Toldo (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Tempo de curso (s)",
+ "motor_invert_hint": "Para covers que indicam 100 % com a cortina fechada ou a tela em baixo.",
  "awning_pitch": "Inclinação (°)",
  "awning_time": "Tempo de abertura total (s)",
  "awning_position": "Sensor de posição (opcional)",

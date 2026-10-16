@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terasz és erkély",
  "awning_cover": "Napellenző (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Futási idő (s)",
+ "motor_invert_hint": "Olyan coverekhez, amelyek 100 %-ot jeleznek, amikor a függöny zárva vagy a vászon lent van.",
  "awning_pitch": "Dőlés (°)",
  "awning_time": "Teljes kinyitás ideje (s)",
  "awning_position": "Pozícióérzékelő (opcionális)",

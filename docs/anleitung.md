@@ -892,10 +892,10 @@ Die mittlere Kachelreihe zeigt die Pro-Erweiterungen. Aktive tragen ein ✓, ges
 | Kinderzimmer, Büro & Gaming, Garten & Terrasse, Garage & Werkstatt, Fitness, Smart-Home & Technik | Möbel und Geräte für den jeweiligen Bereich |
 | Fahrzeuge | Autos, Transporter, Motorräder und mehr für Stellplätze |
 | Treppen & Geländer (16) | Gerade, L- und U-Treppen, gerade Treppen unten offen, viertelgewendelt oder mit Eckpodest, offene U-Treppe zweimal viertelgewendelt, Wendeltreppe, Raumspartreppe, Außentreppe, Podest, Geländer aus Metall, Glas und Holz |
-| Heimkino & Hi-Fi | Leinwand, Beamer, Lautsprecher, Subwoofer, AV-Receiver, Plattenspieler, Kinosessel, Smart Speaker und Smart Displays – Geräte leuchten beim Abspielen; die ausrollbare Leinwand fährt mit dem Cover ihres Motors hoch und runter |
+| Heimkino & Hi-Fi | Leinwand, Beamer, Lautsprecher, Subwoofer, AV-Receiver, Plattenspieler, Kinosessel, Smart Speaker und Smart Displays – Geräte leuchten beim Abspielen; die ausrollbare Leinwand fährt mit dem Cover ihres Motors hoch und runter (Laufzeit, Positionssensor und Richtung umkehren wie beim Vorhang) |
 | Hauswirtschaft & Haustechnik | Therme, Wärmepumpe, Pufferspeicher, Lüftung, Zählerschrank, Wasserenthärter, Gefriertruhe, Bügelstation |
 | Haustiere | Kratzbaum, Hundebett, Futterautomat, Trinkbrunnen, Katzenklo, Käfige, Aquarium und Terrarium mit Licht |
-| Architektur & Ausbau | Säulen, Balken, Schornstein, Kamin, Glastrennwand, Schiebewand, Lichtvoute, LED-Nische, Podest, motorisierter Vorhang (öffnet sich mit seinem Cover) |
+| Architektur & Ausbau | Säulen, Balken, Schornstein, Kamin, Glastrennwand, Schiebewand, Lichtvoute, LED-Nische, Podest, motorisierter Vorhang (öffnet sich mit seinem Cover; unter **Antrieb (Cover)** dazu Laufzeit, ein Live-Positionssensor wie bei Rollläden und **Richtung umkehren**) |
 
 Geräte in Packs haben eine kleine Leuchtfläche (Display, Status-LED): Verknüpft mit einem Media-Player, Schalter oder Licht leuchtet sie, solange das Gerät läuft; ein Aquarium leuchtet in der Farbe seines Lichts.
 

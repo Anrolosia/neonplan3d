@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terasa in balkon",
  "awning_cover": "Tenda (cover)",
  "motor_cover": "Pogon (cover)",
+ "motor_time": "Čas vožnje (s)",
+ "motor_invert_hint": "Za coverje, ki javljajo 100 %, ko je zavesa zaprta ali platno spuščeno.",
  "awning_pitch": "Naklon (°)",
  "awning_time": "Čas do polnega izvleka (s)",
  "awning_position": "Senzor položaja (izbirno)",

@@ -892,10 +892,10 @@ The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked o
 | Kids, Office & gaming, Garden & terrace, Garage & workshop, Fitness, Smart home & tech | Furniture and devices for each area |
 | Vehicles | Cars, vans, motorbikes and more for parking spots |
 | Stairs & railings (16) | Straight, L- and U-shaped stairs, straight stairs open below, with winders or with a corner landing at the foot, open U-stairs with two quarter turns, spiral stairs, space-saver stairs, outdoor steps, landing, railings in metal, glass and wood |
-| Home cinema & hi-fi | Screen, projector, speakers, subwoofer, AV receiver, turntable, cinema seats, smart speakers and smart displays – devices glow while playing; the roll-down screen goes up and down with its motor's cover |
+| Home cinema & hi-fi | Screen, projector, speakers, subwoofer, AV receiver, turntable, cinema seats, smart speakers and smart displays – devices glow while playing; the roll-down screen goes up and down with its motor's cover (run time, position sensor and reverse direction as for the curtain) |
 | Utility & building services | Boiler, heat pump, buffer tank, ventilation, meter cabinet, water softener, chest freezer, ironing station |
 | Pets | Cat tree, dog bed, feeder, water fountain, litter box, cages, aquarium and terrarium with light |
-| Architecture & fit-out | Columns, beams, chimney, fireplace, glass partition, sliding wall, light cove, LED niche, platform, motorised curtain (opens with its cover) |
+| Architecture & fit-out | Columns, beams, chimney, fireplace, glass partition, sliding wall, light cove, LED niche, platform, motorised curtain (opens with its cover; under **Motor (cover)** also run time, a live position sensor as for blinds and **Reverse direction**) |
 
 Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 

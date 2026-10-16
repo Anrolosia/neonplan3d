@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "露台与阳台",
  "awning_cover": "遮阳篷（窗帘实体）",
  "motor_cover": "电机（cover）",
+ "motor_time": "运行时间（秒）",
+ "motor_invert_hint": "适用于窗帘关闭或幕布放下时报告 100% 的 cover。",
  "awning_pitch": "倾角（°）",
  "awning_time": "完全伸出所需时间（秒）",
  "awning_position": "位置传感器（可选）",

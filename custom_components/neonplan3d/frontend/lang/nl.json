@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terras en balkon",
  "awning_cover": "Zonnescherm (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Looptijd (s)",
+ "motor_invert_hint": "Voor covers die 100 % melden als het gordijn dicht of het scherm beneden is.",
  "awning_pitch": "Helling (°)",
  "awning_time": "Looptijd helemaal uit (s)",
  "awning_position": "Positiesensor (optioneel)",

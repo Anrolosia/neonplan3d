@@ -1474,6 +1474,8 @@
  "furn_group_outdoor": "Terasă și balcon",
  "awning_cover": "Copertină (cover)",
  "motor_cover": "Motor (cover)",
+ "motor_time": "Timp de deplasare (s)",
+ "motor_invert_hint": "Pentru cover-uri care raportează 100 % când perdeaua e trasă sau ecranul e jos.",
  "awning_pitch": "Înclinare (°)",
  "awning_time": "Timp de ieșire completă (s)",
  "awning_position": "Senzor de poziție (opțional)",
