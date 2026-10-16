@@ -26,6 +26,10 @@ export const UNRELEASED: readonly Gated[] = ["pool", "diagnostics"];
 
 export function labOn(): boolean {
   try {
+    // "?fp3d_lab=1" in the address bar switches it on (and "=0" off) – easier than the browser console on a tablet
+    const flag = new URLSearchParams(location.search).get("fp3d_lab");
+    if (flag === "1") localStorage.setItem("neonplan3d.lab", "1");
+    else if (flag === "0") localStorage.removeItem("neonplan3d.lab");
     return localStorage.getItem("neonplan3d.lab") === "1";
   } catch {
     return false;
