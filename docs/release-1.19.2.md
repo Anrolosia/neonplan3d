@@ -13,7 +13,6 @@
 ### Fixed
 
 - **Heatmap with sunshine (#558):** the warm patch of sunlight under a window covered a room's temperature colour, so a cool room could look warm. In the heatmap the patch now steps aside. Thanks @frops83 for the patient screenshots!
-- **Furniture preview with the 3D view beside the plan:** the little picture of an item showed beside or below the library instead of next to the item. It is back in its place – reported on Discord, thanks!
 
 ### How to update
 
@@ -36,7 +35,6 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 ### Behoben
 
 - **Heatmap bei Sonnenschein (#558):** Der warme Sonnenfleck unter einem Fenster überdeckte die Temperaturfarbe eines Raums, ein kühler Raum konnte so warm aussehen. In der Heatmap tritt der Fleck jetzt zurück. Danke an @frops83 für die geduldigen Screenshots!
-- **Möbel-Vorschau mit „3D daneben“:** Das kleine Vorschaubild eines Möbels erschien neben oder unter der Bibliothek statt am Möbel. Jetzt sitzt es wieder an seinem Platz – gemeldet im Discord, danke!
 
 ### So bekommst du das Update
 
