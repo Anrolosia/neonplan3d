@@ -51,7 +51,10 @@ export interface ProjectionSurface {
 
 interface Projector {
   id: string;
+  /** The newest picture asked for, and whether one is on its way (a slow camera never has two loads at once). */
   url: string;
+  loading: boolean;
+  shown: string;
   texture: Texture | null;
   aspect: number;
   camera: PerspectiveCamera;
@@ -60,11 +63,13 @@ interface Projector {
   uniforms: { uProjMat: { value: Matrix4 }; uProjTex: { value: Texture | null }; uDepth: { value: Texture | null }; uNearFar: { value: [number, number] } };
   overlays: Map<string, Mesh>;
   poseKey: string;
+  noPoseLogged?: boolean;
 }
 
 export class CameraProjections {
   private projectors = new Map<string, Projector>();
   private loader = new TextureLoader();
+  private loggedIds = "";
   private depthMaterial = new MeshBasicMaterial({ colorWrite: false, side: DoubleSide });
 
   private onChange: () => void;
@@ -89,6 +94,8 @@ export class CameraProjections {
         p = {
           id,
           url: "",
+          loading: false,
+          shown: "",
           texture: null,
           aspect: 16 / 9,
           camera: new PerspectiveCamera(60, 16 / 9, NEAR, 40),
@@ -101,25 +108,49 @@ export class CameraProjections {
         p.camera.layers.set(PROJECTION_LAYER);
         this.projectors.set(id, p);
       }
-      if (p.url !== url) {
-        p.url = url;
-        const proj = p;
-        this.loader.load(url, (tex) => {
-          if (this.projectors.get(id) !== proj || proj.url !== url) {
-            tex.dispose();
-            return;
-          }
-          tex.colorSpace = SRGBColorSpace;
-          const img = tex.image as { width?: number; height?: number } | undefined;
-          if (img?.width && img.height) proj.aspect = img.width / img.height;
-          proj.texture?.dispose();
-          proj.texture = tex;
-          proj.uniforms.uProjTex.value = tex;
-          proj.poseKey = "";
-          this.onChange();
-        });
-      }
+      p.url = url;
+      this.fetch(p);
     }
+    const ids = [...this.projectors.keys()].join(",");
+    if (ids !== this.loggedIds) {
+      this.loggedIds = ids;
+      console.info(`NeonPlan lab: camera projection for ${this.projectors.size} camera(s)`, ids);
+    }
+  }
+
+  /** Load the newest picture unless one is still on its way; a picture that arrives is always shown. */
+  private fetch(p: Projector): void {
+    if (p.loading || p.url === p.shown || !p.url) return;
+    const url = p.url;
+    p.loading = true;
+    this.loader.load(
+      url,
+      (tex) => {
+        p.loading = false;
+        p.shown = url;
+        if (this.projectors.get(p.id) !== p) {
+          tex.dispose();
+          return;
+        }
+        tex.colorSpace = SRGBColorSpace;
+        const img = tex.image as { width?: number; height?: number } | undefined;
+        if (img?.width && img.height) p.aspect = img.width / img.height;
+        if (!p.texture) console.info(`NeonPlan lab: first picture of ${p.id}`, img?.width, "x", img?.height);
+        p.texture?.dispose();
+        p.texture = tex;
+        p.uniforms.uProjTex.value = tex;
+        p.poseKey = "";
+        this.onChange();
+        // a newer picture was asked for meanwhile: fetch it now
+        this.fetch(p);
+      },
+      undefined,
+      () => {
+        p.loading = false;
+        p.shown = url;
+        console.warn(`NeonPlan lab: the picture of ${p.id} could not be loaded`);
+      },
+    );
   }
 
   /**
@@ -129,6 +160,10 @@ export class CameraProjections {
   update(renderer: WebGLRenderer, scene: Scene, surfaces: readonly ProjectionSurface[], poseOf: (id: string) => ProjectorPose | null, layoutKey: string): void {
     for (const p of this.projectors.values()) {
       const pose = p.texture ? poseOf(p.id) : null;
+      if (p.texture && !pose && !p.noPoseLogged) {
+        p.noPoseLogged = true;
+        console.warn(`NeonPlan lab: ${p.id} is not drawn as a camera in 3D (no position), so its picture is not cast`);
+      }
       if (!pose) {
         for (const o of p.overlays.values()) o.visible = false;
         continue;
