@@ -1473,6 +1473,7 @@
  "furn_awning": "Markiisi",
  "furn_group_outdoor": "Terassi ja parveke",
  "awning_cover": "Markiisi (cover)",
+ "motor_cover": "Moottori (cover)",
  "awning_pitch": "Kaltevuus (°)",
  "awning_time": "Ajoaika kokonaan ulos (s)",
  "awning_position": "Asentoanturi (valinnainen)",

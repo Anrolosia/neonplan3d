@@ -1473,6 +1473,7 @@
  "furn_awning": "Zonnescherm",
  "furn_group_outdoor": "Terras en balkon",
  "awning_cover": "Zonnescherm (cover)",
+ "motor_cover": "Motor (cover)",
  "awning_pitch": "Helling (°)",
  "awning_time": "Looptijd helemaal uit (s)",
  "awning_position": "Positiesensor (optioneel)",

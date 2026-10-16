@@ -1473,6 +1473,7 @@
  "furn_awning": "Markiza",
  "furn_group_outdoor": "Taras i balkon",
  "awning_cover": "Markiza (cover)",
+ "motor_cover": "Napęd (cover)",
  "awning_pitch": "Nachylenie (°)",
  "awning_time": "Czas pełnego wysunięcia (s)",
  "awning_position": "Czujnik położenia (opcjonalnie)",

@@ -1473,6 +1473,7 @@
  "furn_awning": "Markise",
  "furn_group_outdoor": "Terrasse og altan",
  "awning_cover": "Markise (cover)",
+ "motor_cover": "Motor (cover)",
  "awning_pitch": "Hældning (°)",
  "awning_time": "Køretid helt ud (s)",
  "awning_position": "Positionssensor (valgfri)",

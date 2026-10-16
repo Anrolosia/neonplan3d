@@ -1473,6 +1473,7 @@
  "furn_awning": "Tenda",
  "furn_group_outdoor": "Terasa in balkon",
  "awning_cover": "Tenda (cover)",
+ "motor_cover": "Pogon (cover)",
  "awning_pitch": "Naklon (°)",
  "awning_time": "Čas do polnega izvleka (s)",
  "awning_position": "Senzor položaja (izbirno)",

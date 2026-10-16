@@ -1473,6 +1473,7 @@
  "furn_awning": "遮阳篷",
  "furn_group_outdoor": "露台与阳台",
  "awning_cover": "遮阳篷（窗帘实体）",
+ "motor_cover": "电机（cover）",
  "awning_pitch": "倾角（°）",
  "awning_time": "完全伸出所需时间（秒）",
  "awning_position": "位置传感器（可选）",

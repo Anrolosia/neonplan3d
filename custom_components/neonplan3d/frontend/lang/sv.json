@@ -1473,6 +1473,7 @@
  "furn_awning": "Markis",
  "furn_group_outdoor": "Terrass och balkong",
  "awning_cover": "Markis (cover)",
+ "motor_cover": "Motor (cover)",
  "awning_pitch": "Lutning (°)",
  "awning_time": "Körtid helt ute (s)",
  "awning_position": "Positionssensor (valfri)",

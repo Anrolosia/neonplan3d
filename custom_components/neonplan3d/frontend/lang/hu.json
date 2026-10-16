@@ -1473,6 +1473,7 @@
  "furn_awning": "Napellenző",
  "furn_group_outdoor": "Terasz és erkély",
  "awning_cover": "Napellenző (cover)",
+ "motor_cover": "Motor (cover)",
  "awning_pitch": "Dőlés (°)",
  "awning_time": "Teljes kinyitás ideje (s)",
  "awning_position": "Pozícióérzékelő (opcionális)",
