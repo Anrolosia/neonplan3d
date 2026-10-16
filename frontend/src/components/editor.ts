@@ -1082,6 +1082,18 @@ export class Fp3dEditor extends LitElement {
   }
 
   protected updated(): void {
+    // the item preview is placed in window coordinates; with the 3D view beside the plan an ancestor becomes its
+    // containing block (a transform or filter), so "fixed" no longer means the window: measure and correct once
+    const preview = this._preview ? this.renderRoot.querySelector<HTMLElement>(".fp3d-preview") : null;
+    if (preview && this._preview) {
+      const r = preview.getBoundingClientRect();
+      const dx = r.left - this._preview.left;
+      const dy = r.top - this._preview.top;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+        preview.style.left = `${parseFloat(preview.style.left) - dx}px`;
+        preview.style.top = `${parseFloat(preview.style.top) - dy}px`;
+      }
+    }
     // ?selected only sets an option's selectedness until the user picks one in that select; after that a
     // reused <select> (another room, another item) would keep showing the old pick: follow the attribute
     for (const option of this.renderRoot.querySelectorAll<HTMLOptionElement>("select option[selected]")) {
