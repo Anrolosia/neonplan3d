@@ -166,6 +166,7 @@ async def async_fetch_catalog(hass: HomeAssistant, key: str, instance: str) -> d
         "offers": _offers(data.get("offers")),
         "loyalty": _loyalty(data.get("loyalty")),
         "supporter": _supporter(data.get("supporter")),
+        "newsletter": _newsletter(data.get("newsletter")),
     }
 
 
@@ -212,6 +213,14 @@ def _loyalty(raw: Any) -> dict[str, Any] | None:
     return {"code": code, "percent": percent}
 
 
+def _newsletter(raw: Any) -> dict[str, Any] | None:
+    """The shop's invitation to its newsletter (with the taster packs as a thank-you): only for customers who have
+    not signed up yet; the link leads to the sign-up with double opt-in."""
+    if not isinstance(raw, dict) or not _https(raw.get("url")):
+        return None
+    return {"url": _https(raw.get("url"))}
+
+
 def _supporter(raw: Any) -> dict[str, Any] | None:
     """A Supporter-Pass holder's Discord code: typed into /supporter on Discord, it unlocks the supporter
     role and the beta channels there."""
@@ -246,6 +255,7 @@ def status(data: FloorplanData, instance: str) -> dict[str, Any]:
         "offers": lic.get("offers", []) if key else [],
         "loyalty": lic.get("loyalty") if key else None,
         "supporter": lic.get("supporter") if key else None,
+        "newsletter": lic.get("newsletter") if key else None,
         "updates": lic.get("updates", []),
     }
 
@@ -262,6 +272,7 @@ async def async_activate(hass: HomeAssistant, data: FloorplanData, key: str) -> 
         "offers": catalog["offers"],
         "loyalty": catalog["loyalty"],
         "supporter": catalog["supporter"],
+        "newsletter": catalog["newsletter"],
         "checked_at": time.time(),
         "error": None,
     }
@@ -278,6 +289,7 @@ async def async_remove(hass: HomeAssistant, data: FloorplanData) -> dict[str, An
         "offers": [],
         "loyalty": None,
         "supporter": None,
+        "newsletter": None,
         "checked_at": None,
         "error": None,
     }
@@ -346,6 +358,7 @@ async def async_refresh(hass: HomeAssistant, data: FloorplanData, install_update
             "offers": catalog["offers"],
             "loyalty": catalog["loyalty"],
             "supporter": catalog["supporter"],
+            "newsletter": catalog["newsletter"],
             "checked_at": time.time(),
             "error": None,
         }

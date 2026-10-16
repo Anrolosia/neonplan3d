@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## Unreleased
+
+### New
+
+- Extensions: customers with a shop key who have not subscribed to the newsletter see a small box – signing up (double opt-in) brings the four taster packs (living room, kitchen, bedroom, bathroom, 4 items each) to their key; the shop sends the link only while they are not subscribed, "Don't show again" hides it.
+
 ## 1.19.1
 
 ### New
