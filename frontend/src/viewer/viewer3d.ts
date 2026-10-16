@@ -1297,6 +1297,8 @@ export class FloorplanViewer {
       for (const fv of this.floors) {
         fv.glowSig = "";
         this.buildGlow(fv);
+        fv.sunSig = "";
+        this.buildSun(fv);
       }
     }
   }
@@ -2580,7 +2582,8 @@ export class FloorplanViewer {
     }
     fv.sunMesh.geometry.dispose();
     fv.sunMesh.geometry = buf.geometry();
-    fv.sunMesh.visible = buf.count > 0;
+    // the heatmap reads the floors' colours: no warm patch of sunlight on top of them (#558)
+    fv.sunMesh.visible = buf.count > 0 && !this.roomTint;
   }
 
   /**

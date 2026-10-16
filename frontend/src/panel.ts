@@ -488,7 +488,10 @@ export class Floorplan3dPanel extends LitElement {
     getLicense(this.hass)
       .then((lic) => {
         this._shopConnected = !!lic.active;
-        this._newOffers = lic.active ? unseenOffers(lic.offers ?? []).length : 0;
+        // "3 new" (shop offers) only for customers who bought something: a free user is not nudged on the tab, the
+        // offers still wait under Extensions (fun packs and taster packs are gifts, not purchases)
+        const bought = (lic.packs ?? []).some((p) => !/^(mastershort\.)?fun_|_sample$/.test(p.id));
+        this._newOffers = lic.active && bought ? unseenOffers(lic.offers ?? []).length : 0;
         this._readyPacks = lic.active ? unseenUpdates(lic.updates ?? []).length + (lic.packs ?? []).filter((p) => p.installed === null).length : 0;
       })
       .catch(() => undefined);

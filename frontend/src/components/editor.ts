@@ -10808,7 +10808,19 @@ export class Fp3dEditor extends LitElement {
   private renderMotionFields(f: Furniture) {
     const admin = this.isAdmin;
     const sensors = this.entityOptions((id) => id.startsWith("sensor.") || id.startsWith("input_number.") || id.startsWith("number."));
-    return html`${this.num(this.t("motor_time"), f.awning_time ?? 20, (v) => this.updateFurniture({ awning_time: Math.max(2, Math.min(300, Math.round(v))) }), 1)}
+    const side = f.variant === "left" || f.variant === "right" ? f.variant : "both";
+    return html`${packMotion(f.type) === "curtain"
+        ? html`<label class="fp3d-field fp3d-wide"
+            >${this.t("curtain_side")}
+            <select ?disabled=${!admin} @change=${(e: Event) => {
+              const v = (e.target as HTMLSelectElement).value;
+              this.updateFurniture({ variant: v === "both" ? null : v });
+            }}>
+              ${(["both", "left", "right"] as const).map((k) => html`<option value=${k} ?selected=${side === k}>${this.t(`curtain_side_${k}`)}</option>`)}
+            </select></label
+          >`
+        : nothing}
+      ${this.num(this.t("motor_time"), f.awning_time ?? 20, (v) => this.updateFurniture({ awning_time: Math.max(2, Math.min(300, Math.round(v))) }), 1)}
       ${this.entitySelect(this.t("awning_position"), f.awning_position ?? null, undefined, sensors, (v) => this.updateFurniture({ awning_position: v === "none" ? null : v }))}
       <label class="fp3d-check fp3d-wide" title=${this.t("motor_invert_hint")}
         ><input type="checkbox" .checked=${!!f.awning_invert} ?disabled=${!admin} @change=${(ev: Event) => this.updateFurniture({ awning_invert: (ev.target as HTMLInputElement).checked })} />

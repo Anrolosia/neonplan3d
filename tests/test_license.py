@@ -233,6 +233,17 @@ async def test_a_pack_that_newly_belongs_to_the_customer_is_announced_once(
     await lic.async_install(hass, hass.data[DOMAIN], gift["id"])
     assert "neonplan3d_pack_mastershort.fun_halloween" in dismissed
 
+    # four taster packs at once: one notice for all of them, gone once one is installed
+    samples = [
+        {"id": f"mastershort.{n}_sample", "name": n, "release": 1, "url": "https://shop/s"}
+        for n in ("living", "kitchen", "bedroom", "bath")
+    ]
+    notices.clear()
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{lic.SHOP_API}/catalog", json={"licensee": "Anna", "packs": [living, gift, *samples]})
+    await lic.async_refresh(hass, hass.data[DOMAIN], install_updates=False)
+    assert notices == [("neonplan3d_packs_new", "NeonPlan 3D: 4 new packs are ready")]
+
 
 async def test_a_pack_bound_elsewhere_is_refused_on_import(hass: HomeAssistant, hass_ws_client, monkeypatch) -> None:
     private, keys = _key()

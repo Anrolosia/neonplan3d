@@ -4,11 +4,21 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
-## Unreleased
+## 1.19.2
 
 ### New
 
+- Motorised curtain: **Opens to** both sides, or only to the left or right (#511, wish of frops83).
 - Extensions: customers with a shop key who have not subscribed to the newsletter see a small box – signing up (double opt-in) brings the four taster packs (living room, kitchen, bedroom, bathroom, 4 items each) to their key; the shop sends the link only while they are not subscribed, "Don't show again" hides it.
+
+### Improved
+
+- Several packs that turn up at once (e.g. the four taster packs) are announced in one Home Assistant notification instead of one each.
+- The "new" badge on the Extensions tab only shows shop offers to customers who have bought something; gifts (fun and taster packs) do not count.
+
+### Fixed
+
+- Heatmap: the warm patch of sunlight under a window no longer covers a room's temperature colour (#558, thanks frops83).
 
 ## 1.19.1
 
