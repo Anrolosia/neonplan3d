@@ -88,7 +88,7 @@ import { HEAT_SCALES, heatColor, heatGradient, roomValues, type HeatMode } from 
 import { furnitureName } from "../furniture-names.ts";
 import { fetchImage, saveBuilding } from "../api.ts";
 import { formatNumber, translate, type I18nKey } from "../i18n.ts";
-import { getPacks, isPackCooktop, isPackType, isRobotVacuum, mountBase, packItem, packsVersion } from "../packs.ts";
+import { getPacks, isPackCooktop, isPackType, isRobotVacuum, mountBase, packItem, packMotion, packsVersion } from "../packs.ts";
 import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from "../parking.ts";
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
@@ -2437,7 +2437,8 @@ export class Fp3dView3d extends LitElement {
           const vol = typeof st.attributes.volume_level === "number" ? st.attributes.volume_level : 0.5;
           screens.set(f.id, { color: appColor(st) ?? [0.22, 0.88, 1], level: 0.5 + 0.5 * vol, ring: true, plain: true });
         }
-        if (st && hasScreen(f.type) && !isPackCooktop(f.type)) {
+        // a roll-down screen driven by a cover moves (pushPackMotion) instead of lighting up while it is "open" (#511)
+        if (st && hasScreen(f.type) && !isPackCooktop(f.type) && !(packMotion(f.type) && kindOf(st.entity_id) === "cover")) {
           // without the "screens" feature a screen is only lit or dark: no app colour, no picture
           const live = hasFeature("screens");
           // a light (an aquarium, a lit panel) glows in its own colour, other entities in the neon cyan

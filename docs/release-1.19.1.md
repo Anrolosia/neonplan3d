@@ -1,8 +1,9 @@
-**NeonPlan 3D 1.19.1** is a round of fixes for 1.19.0, with three ideas from forks: the flat roof sits on its walls again, awnings show where they are as soon as the card opens, blinds stay outside, a sliding gate moves its door – and old Fire tablets get the roof back.
+**NeonPlan 3D 1.19.1** is a round of fixes for 1.19.0, with three ideas from forks and moving curtains: the flat roof sits on its walls again, awnings show where they are as soon as the card opens, blinds stay outside, a sliding gate moves its door – and old Fire tablets get the roof back.
 
 ### New
 
 - **Garage door from a switch:** a garage door can follow a **switch or input_boolean** that drives it (on = open, a tap in 3D switches it) – for a relay instead of a cover. Idea from the fork of @diegood.
+- **Curtains and projection screens that move (#511):** the **motorised curtain** (pack *Architecture & fit-out*) now opens to both sides with its cover, as far as its position says. The **roll-down projection screen** (pack *Home cinema*) rolls up and down. The screen can now be linked to its motor's cover. Thanks to everyone who asked, by issue and by mail.
 
 ### Fixed
 
@@ -21,11 +22,12 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ---
 
-**NeonPlan 3D 1.19.1** ist eine Runde Fixes für 1.19.0, mit drei Ideen aus Forks: Das Flachdach sitzt wieder auf den Wänden, Markisen zeigen sofort, wo sie stehen, Rollläden bleiben außen, ein Schiebetor bewegt seine Tür – und alte Fire-Tablets bekommen ihr Dach zurück.
+**NeonPlan 3D 1.19.1** ist eine Runde Fixes für 1.19.0, mit drei Ideen aus Forks und Vorhängen, die sich bewegen: Das Flachdach sitzt wieder auf den Wänden, Markisen zeigen sofort, wo sie stehen, Rollläden bleiben außen, ein Schiebetor bewegt seine Tür – und alte Fire-Tablets bekommen ihr Dach zurück.
 
 ### Neu
 
 - **Garagentor über einen Schalter:** Ein Garagentor kann einem **Schalter oder input_boolean** folgen, der es antreibt (an = offen, Antippen in 3D schaltet ihn) – für ein Relais statt eines Covers. Idee aus dem Fork von @diegood.
+- **Vorhänge und Leinwände, die sich bewegen (#511):** Der **motorisierte Vorhang** (Pack *Architektur & Ausbau*) öffnet sich jetzt mit seinem Cover zu beiden Seiten, so weit seine Position sagt. Die **ausrollbare Leinwand** (Pack *Heimkino*) fährt hoch und runter. Die Leinwand lässt sich jetzt mit dem Cover ihres Motors verknüpfen. Danke an alle, die per Issue und Mail gefragt haben.
 
 ### Behoben
 
