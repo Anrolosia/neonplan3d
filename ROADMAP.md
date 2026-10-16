@@ -1,76 +1,98 @@
 # NeonPlan 3D – Roadmap
 
-What comes next. The order follows your wishes (issues and 👍 in [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas)) and may change. There are deliberately no fixed dates – a feature ships when it is good. Everything keeps running on old, weak wall tablets.
+What comes next. The order follows your wishes (issues, Discord and 👍 in [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas)) and may change. There are deliberately no fixed dates – a feature ships when it is good. Everything keeps running on old, weak wall tablets.
 
 *Deutsch weiter unten.*
 
-**Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
+**Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## Free – coming next
+## ✅ Recently done (1.13 – 1.19)
+
+- **Time travel** (Pro): replay the last days in the house – now for everyone in the shop.
+- **Walk through the house** at eye level, with keys or a touch stick.
+- **Wall view:** a wall from the front, furniture slides along and up it.
+- **Cellar and ground:** semi-basement, building pit, plinth, cellar windows, light wells.
+- **Pools** in free shapes and above-ground pools, a balcony type, rain from your own weather station, power outage warning.
+- **Awnings** (five kinds), **waste bins and mailboxes**, **air conditioner**, glowing cooktops, ceiling height per room, free L/U sofas and U-stairs, lamps under roof slopes, feet and inches.
+- **Motorised curtains and roll-down screens** that move with their cover, **garage doors via a switch**.
+- **Household Pro** (beta, supporters first): bins with pickup tags, post in the mailbox, thirsty plants, washer and dryer time left.
+- **Import page** (beta): Sweet Home 3D, iPhone LiDAR scans, DXF and more into a NeonPlan plan.
+- **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
+- A tidied-up editor, furniture blocks and multi-select, 18 languages.
+
+## 🔨 Next up (1.20 and 1.21)
 
 | Topic | What it is about | Wish |
 |---|---|---|
-| Height per room and split levels | Ceiling height and height above ground per room on one floor (a garage with 5 m, an extension a few steps lower), spots follow; split-level homes: floors that overlap in height shown together in the editor, conflicts marked in red | #30, discussion #113 |
+| Outdoor areas like rooms | Give the garden, terrace or balcony a name and a Home Assistant area: a tap opens it like a room, with its lights, sockets, irrigation and outdoor sensors | #100, #59, discussion #80 |
+| Light between floors | A lamp over the stairs or a floor opening lights the floor below as well | #570 |
+| Pets walk around furniture | Cats and dogs from the fun pack find their way round sofas and tables instead of through them | idea from a fork (Thundras) |
+| Wall switches | A switch plate with 1–4 keys on the wall, each key switches its own light, blind or fan, with a small LED; optionally a light ring in the lamp's colour | Discord, idea from the CasaNeon fork |
+| Wall sockets | 1–4 sockets in one frame, each with its own switch and power reading – several sockets in one room for the same plug | Discord |
+| Ceiling fans | Blades that turn with the fan's speed, the light separately | Discord, idea from a fork (ProvUK) |
+| Even faster on old tablets | Fewer redraws, calmer warning pulses, a lower resolution on weak devices by itself | – |
+
+## Free – planned
+
+| Topic | What it is about | Wish |
+|---|---|---|
+| Height per room and split levels | Height above ground per room on one floor (an extension a few steps lower); split-level homes shown together in the editor | #30, discussion #113 |
 | Area within a room | A part of a room (a shelf, a corner) as its own Home Assistant area without walls of its own | Facebook |
-| Outdoor areas like rooms | Link garden, terrace, pool to a Home Assistant area; a tap opens them, their devices and sensors are found; sensor values outside without a fake room | #100, #59, discussion #80 |
-| Free-form outdoor areas | Point by point like rooms, with round corners for beds and paths | #97, discussions #31, #34 |
+| Round corners outside | Beds and paths with rounded corners | #97, discussions #31, #34 |
 | Lift-and-slide door | Fixed and moving glass panel, side selectable, two blinds too | #79, discussions #53, #72 |
-| Lamps under roof slopes | Ceiling lamps follow the roof underside, height adjustable | #168 |
-| Wall thermostat | Placed on the wall, linked to a climate entity or heating group | #55 |
-| Alarm system | Alarmo and other alarm panels, showing the triggering sensor | #92, discussion #78 |
+| Wall thermostat | A free thermostat on the wall, linked to a climate entity or heating group | #55 |
+| Alarm system | Alarmo and other alarm panels, armed state per zone, showing the triggering sensor | #92, discussion #78 |
 | Walls | Thickness per part of a wall, measure inner dimensions | #162 |
-| Free stairs and sofas | U-stairs and L/U sofa as simple basic models without a pack | #61 |
-| Turn solar fields | Own rotation and tilt, east-west racks too | #106, discussion #69 |
+| Turn solar fields | Own rotation and tilt on roofs, east-west racks | #106, discussion #69 |
 | Lamps with several bulbs | Single bulbs of one lamp separately | #5 |
 | Stairs going down | Stairs into a cellar that is not drawn | discussion #111 |
-| Seasonal heatmap | Winter/summer profile, climate entities as a source | #33 |
-| Feet and inches | Units following Home Assistant's setting | discussion #117 |
-| Keyboard in 3D | Arrow keys, later a walk-through mode | #171 |
-| Sun with shadows | Real shadows by the sun's position, a visible sun and moon | #126 |
+| Seasonal heatmap | Winter/summer profile for the colours | #33 |
+| Sun with shadows | Real shadows by the sun's position | #126 |
 | Curved walls | Wall arcs, windows follow | #63 |
-| Roofs | Gable at one end and hip at the other in one section; windows in dormers; windows with a slanted top under the slope; a roof flush against a wall; a chimney through the roof | #209, discussions #207, #203, #172 |
-| Blinds and covers | Interior blinds (inside the glass), several cover entities per window, Somfy "My" position | discussions #112, #197, #204 |
-| Driveway gates and garden gates | Driveway gates (swing or sliding, one or two leaves) and gates in fences and walls (garden gate, side door without a lintel), linked to the gate opener (a cover, lock or switch entity) and a contact – they open and close live in 3D, a tap opens or closes them (with a question first) | discussion #175, #297 |
-| Doors with locks | Electronic door locks and garage doors opened by a switch, with lock/unlock and open buttons | discussion #173 |
-| Scenes and menu | Scenes higher up in the room panel; main menu/favourites open at start and larger; own buttons light up while on; an own tap action per device (a script, scene or automation, e.g. the TV starts "TV mode") | #188, discussions #174, #196 |
-| Small tablets and phones | Zoom in the start view, larger 3D and room card on small tablets, keep the camera when switching floors, a compact editor menu on phones | #191, #206, discussions #190, #200 |
-| Layers | Show or hide a floor as a layer (e.g. all trees) with an eye button, see-through trees that fade when they stand in the way | #191 |
-| Devices alike | Every electric piece of furniture switches and shows its power the same way | #198 |
-| Visibility condition | An item shows only while a helper or condition is on (e.g. seasonal decoration) | discussion #169 |
-| Picture frame | A frame with your own picture and an adjustable border | discussion #164 |
-| Device cards by hand | Move a device card by hand when devices stand close together | discussion #194 |
+| Roofs | Gable at one end and hip at the other; windows in dormers; windows with a slanted top under the slope; a roof flush against a wall; a chimney through the roof | #209, #466, discussions #207, #203, #172 |
+| Blinds and covers | Interior blinds, several cover entities per window, Somfy "My" position | discussions #112, #197, #204 |
+| Driveway gates and garden gates | Swing or sliding gates and gates in fences and walls, moving live with their opener, a tap opens them (with a question first) | discussion #175, #297 |
+| Doors with locks | A lock on a door: lock, unlock and open from 3D | discussion #173 |
+| Scenes and menu | Scenes higher up in the room panel, a larger start menu, an own tap action per device (a script or scene) | discussions #174, #196 |
+| Small tablets and phones | Larger room card on small tablets, a compact editor menu on phones | #191, discussions #190, #200 |
+| Layers | Show or hide groups (e.g. all trees) with an eye button, trees that fade when they stand in the way | #191 |
+| Visibility condition | An item shows only while a helper is on (e.g. seasonal decoration) | discussion #169 |
+| Picture frame | A frame with your own picture | discussion #164 |
+| Device cards by hand | Move any device card by hand when devices stand close together | discussion #194 |
 
-## Pro add-ons – planned
+## Pro add-ons
 
-Available today: **Camera Cockpit**, **Weather outside**, **Live screens**, **Energy Pro**, **Sound & Cinema**, **Car Pro**. Owners get improvements of their add-ons for free.
+Available: **Camera Cockpit**, **Weather outside**, **Live screens**, **Energy Pro**, **Sound & Cinema**, **Car Pro**, **Time travel** and **Household Pro** (beta, supporters first – for everyone after the beta). Owners get improvements of their add-ons for free.
+
+**Planned:**
 
 | Add-on | What it brings |
 |---|---|
-| **Time travel** – coming in 1.13 | A time slider replays the last 24 hours (later 7 days) in the house: lights, doors, windows, blinds, motion, heating, weather, with event markers – "what happened yesterday at 3 am?" View only, nothing is switched |
-| **Room climate Pro** | A flowing climate map from all sensors, mould risk per room, ventilation hints, heating curves |
-| **Tech Pro** | Wi-Fi map, network devices with their state, system health (discussion #54) |
-| **Garden & Pool Pro** | Irrigation with zones and spray animation, robot mower paths, pool with temperature and pump (discussion #76) |
-| **Household Pro** | Waste bins with collection calendar and reminder, washing machine done, parcel arrived, water the plants (discussion #84) |
+| **Room climate Pro** | A flowing climate map from all sensors, mould risk per room, ventilation hints ("open the window now"), heating curves |
+| **Tech Pro** | Wi-Fi coverage, network devices and servers with their state (e.g. Proxmox VMs at the server rack), batteries running low, system health (discussion #54) |
+| **Garden Pro** | Irrigation with zones and spray animation, robot mower paths, rain barrel with fill level (discussion #76) |
 | **Light designer** | Set lamps in 3D and save them as a scene, copy a mood from room to room |
-| **3D Print Pro** | Your printer live: a card with the model picture, progress, time left and "done at", layer, temperatures and filament colours; the print grows on the bed, the head moves, a "done" effect – for Bambu Lab, OctoPrint, Klipper/Moonraker and PrusaLink (discussions #115, #136) |
-| **Furniture studio** | Build your own furniture in the editor from templates: cabinets in any width with drawers and doors, lamps, shelves, devices with a display – for the furniture no pack has (discussions #222, #27, #229) |
+| **3D Print Pro** | Your printer live: progress, time left, temperatures, the print growing on the bed – Bambu Lab, OctoPrint, Klipper, PrusaLink (discussions #115, #136) |
+| **Furniture studio** | Your own furniture for everything no pack has (discussions #222, #27, #229) |
 
-Updates for existing add-ons:
-- **Energy Pro:** house balance and plant cards in floor views too (#193), gas and water meters with their own cable colours, heat pump with heat flow, 7-day history.
-- **Car Pro:** opening doors and hatches, departure time, charging cable to the wallbox, distance while away.
+**Updates for existing add-ons:**
+- **Energy Pro:** gas and water with their own cable colours, heat pump with heat flow, 7-day history.
+- **Car Pro:** opening doors and hatches, departure time, charging cable to the wallbox.
 - **Camera Cockpit:** pan/tilt from 3D, doorbell.
-- **Sound & Cinema:** more sources and favourites per speaker.
+- **Sound & Cinema:** favourites per speaker.
+- **Household Pro:** after the beta for everyone in the shop; holographic plant card.
 
 ## Furniture packs – planned
 
-- **Season & Decoration** – Christmas tree with fairy lights, Advent wreath, outdoor light chains, pumpkins and Easter (before Christmas).
-- **Smart Home release 2** – siren, access point, smoke detectors, wall thermostat, dehumidifier, cube lamp, ceiling fans (discussions #44, #45, #57, #124).
-- **Building services update** – air conditioners indoor and outdoor units, water tank with fill level (discussions #118, #138).
-- **Wellness** – sauna with temperature, hot tub, infrared cabin (discussion #176).
-- **Garden release 4** – awning, water feature with light (discussion #170).
-- **Kitchen release 3** – coffee machine and more appliances (discussion #167).
-- **Vehicles release 2** – motorbike, camper van, trailer, e-bike, opening doors.
-- Later: **Outdoor kitchen & terrace**, **Workshop**, **Japandi & Scandi**, **Loft & Industrial**, **Indoor greenery**, **Music & Studio**.
+- **Season & Decoration** – Christmas tree with fairy lights, Advent wreath, outdoor light chains, Easter (before Christmas).
+- **Stairs & railings** – the open U-stair with two quarter turns as wished (#547).
+- **Smart Home & Tech** – server rack with status LEDs (idea from the CasaNeon fork).
+- **Office & Gaming** – 3D printer workstation (idea from the CasaNeon fork), office container with drawers, gaming PC with LED fans.
+- **Building services** – air conditioner outdoor unit, water tank with fill level (discussions #118, #138).
+- **Wellness** – infrared cabin, sauna and hot tub with temperature (discussion #176).
+- **Garden** – water feature with light, garden swing, concrete wall and gabions (discussion #170, Discord).
+- **Vehicles** – opening doors.
+- Later: **Outdoor kitchen & terrace**, **Workshop**, **Japandi & Scandi**, **Loft & Industrial**, **Indoor greenery**, **Music & Studio** (e-piano, mixing desk).
 
 Owners get new releases of their packs automatically and for free.
 
@@ -78,77 +100,96 @@ Owners get new releases of their packs automatically and for free.
 
 # NeonPlan 3D – Roadmap (Deutsch)
 
-Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issues und 👍 in [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas)) und kann sich ändern. Feste Termine gibt es bewusst nicht – eine Funktion kommt, wenn sie gut ist. Alles läuft weiter auch auf alten, schwachen Wandtablets.
+Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issues, Discord und 👍 in [Discussions → Ideen](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas)) und kann sich ändern. Feste Termine gibt es bewusst nicht – eine Funktion kommt, wenn sie gut ist. Alles läuft weiter auch auf alten, schwachen Wandtablets.
 
-**Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
+**Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
+## ✅ Zuletzt erledigt (1.13 – 1.19)
 
----
+- **Zeitreise** (Pro): die letzten Tage im Haus zurückspulen – jetzt für alle im Shop.
+- **Rundgang durchs Haus** auf Augenhöhe, mit Tasten oder Touch-Stick.
+- **Wandansicht:** eine Wand von vorn, Möbel daran verschieben und anheben.
+- **Keller und Gelände:** Souterrain, Baugrube, Sockel, Kellerfenster, Lichtschächte.
+- **Pools** in freier Form und Aufstellpools, Balkon als eigener Typ, Regen von der eigenen Wetterstation, Stromausfall-Warnung.
+- **Markisen** (fünf Arten), **Mülltonnen und Briefkästen**, **Klimagerät**, glühende Kochfelder, Deckenhöhe je Raum, L-/U-Sofa und U-Treppe kostenlos, Lampen unter Dachschrägen, Zoll und Fuß.
+- **Motorisierte Vorhänge und ausrollbare Leinwände**, die mit ihrem Cover fahren, **Garagentore per Schalter**.
+- **Haushalt Pro** (Beta, zuerst für Supporter): Mülltonnen mit Abhol-Schildchen, Post im Briefkasten, durstige Pflanzen, Restzeit von Waschmaschine und Trockner.
+- **Import-Seite** (Beta): Sweet Home 3D, iPhone-LiDAR-Scans, DXF und mehr werden zum NeonPlan-Plan.
+- **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
+- Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## Kostenlos – als Nächstes
+## 🔨 Als Nächstes (1.20 und 1.21)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
-| Höhe je Raum und Split-Level | Deckenhöhe und Höhe über Boden je Raum auf einer Etage (Garage mit 5 m, Anbau ein paar Stufen tiefer), Spots folgen; Split-Level-Häuser: Etagen, die sich in der Höhe überschneiden, im Editor gemeinsam sehen, Konflikte rot markiert | #30, Diskussion #113 |
+| Außenflächen wie Räume | Garten, Terrasse oder Balkon bekommen einen Namen und einen Home-Assistant-Bereich: Antippen öffnet sie wie einen Raum, mit Licht, Steckdosen, Bewässerung und Außensensoren | #100, #59, Diskussion #80 |
+| Licht zwischen Etagen | Eine Lampe über der Treppe oder einer Deckenöffnung leuchtet auch in die Etage darunter | #570 |
+| Haustiere laufen um Möbel herum | Katzen und Hunde aus dem Fun-Pack finden ihren Weg um Sofa und Tisch statt hindurch | Idee aus einem Fork (Thundras) |
+| Wandschalter | Eine Schalterplatte mit 1–4 Tasten an der Wand, jede Taste schaltet ihr eigenes Licht, ihren Rollladen oder Ventilator, mit kleiner LED; auf Wunsch ein Leuchtring in der Lampenfarbe | Discord, Idee aus dem Fork CasaNeon |
+| Wandsteckdosen | 1–4 Steckdosen in einem Rahmen, jede mit eigenem Schalter und Verbrauch – auch mehrere Steckdosen im Raum für denselben Stecker | Discord |
+| Deckenventilatoren | Flügel, die sich mit der Stufe des Ventilators drehen, das Licht getrennt | Discord, Idee aus einem Fork (ProvUK) |
+| Noch schneller auf alten Tablets | Weniger Neuberechnungen, ruhigeres Pulsieren der Warnungen, auf schwachen Geräten von selbst eine niedrigere Auflösung | – |
+
+## Kostenlos – geplant
+
+| Thema | Worum es geht | Wunsch |
+|---|---|---|
+| Höhe je Raum und Split-Level | Höhe über Boden je Raum auf einer Etage (Anbau ein paar Stufen tiefer); Split-Level-Häuser im Editor gemeinsam sehen | #30, Diskussion #113 |
 | Bereich im Raum | Ein Teil eines Raums (ein Regal, eine Ecke) als eigener Home-Assistant-Bereich ohne eigene Wände | Facebook |
-| Außenflächen wie Räume | Garten, Terrasse, Pool einem Home-Assistant-Bereich zuordnen; antippen öffnet sie, ihre Geräte und Sensoren werden gefunden; Sensorwerte draußen ohne Schein-Raum | #100, #59, Diskussion #80 |
-| Außenflächen frei zeichnen | Punkt für Punkt wie Räume, mit runden Ecken für Beete und Wege | #97, Diskussionen #31, #34 |
+| Runde Ecken draußen | Beete und Wege mit abgerundeten Ecken | #97, Diskussionen #31, #34 |
 | Hebe-Schiebetür | Festes und bewegliches Glasfeld, Seite wählbar, auch mit zwei Rollläden | #79, Diskussionen #53, #72 |
-| Lampen unter Dachschrägen | Deckenleuchten folgen der Dachunterseite, Höhe einstellbar | #168 |
-| Wandthermostat | Zum Platzieren an der Wand, verknüpft mit Klima oder Heizgruppe | #55 |
-| Alarmanlage | Alarmo und andere Alarm-Panels mit Anzeige des auslösenden Sensors | #92, Diskussion #78 |
-| Wände | Dicke je Teilstück einer Wand, Innenmaße (Wand zu Wand) messen | #162 |
-| Treppen und Sofas frei | U-Treppe und L-/U-Sofa als einfache Grundmodelle ohne Pack | #61 |
-| Solarfelder drehen | Eigene Drehung und Neigung, auch Ost-West-Aufständerung | #106, Diskussion #69 |
+| Wandthermostat | Ein kostenloses Thermostat an der Wand, verknüpft mit Klima oder Heizgruppe | #55 |
+| Alarmanlage | Alarmo und andere Alarm-Panels, Scharf-Zustand je Zone, Anzeige des auslösenden Sensors | #92, Diskussion #78 |
+| Wände | Dicke je Teilstück einer Wand, Innenmaße messen | #162 |
+| Solarfelder drehen | Eigene Drehung und Neigung auf Dächern, Ost-West-Aufständerung | #106, Diskussion #69 |
 | Leuchten mit mehreren Leuchtmitteln | Einzelne Birnen einer Lampe getrennt | #5 |
 | Treppe nach unten | Treppe in einen Keller, der nicht gezeichnet ist | Diskussion #111 |
-| Heizkarte nach Jahreszeit | Winter-/Sommer-Profil, Klima-Entitäten als Quelle | #33 |
-| Zoll und Fuß | Maßeinheiten nach Home-Assistant-Einstellung | Diskussion #117 |
-| Tastatur in 3D | Pfeiltasten, später ein Rundgang-Modus | #171 |
-| Sonne mit Schatten | Echte Schatten nach Sonnenstand, sichtbare Sonne und Mond | #126 |
+| Heizkarte nach Jahreszeit | Winter-/Sommer-Profil für die Farben | #33 |
+| Sonne mit Schatten | Echte Schatten nach Sonnenstand | #126 |
 | Runde Wände | Wandbögen, Fenster folgen | #63 |
-| Dächer | Giebel an einem und Walm am anderen Ende eines Abschnitts; Fenster in Gauben; Fenster mit schräger Oberkante unter der Dachschräge; Dach bündig an eine Wand; Schornstein durchs Dach | #209, Diskussionen #207, #203, #172 |
-| Rollläden und Rollos | Rollos innen (hinter dem Glas), mehrere Rollladen-Entitäten je Fenster, Somfy-„My“-Position | Diskussionen #112, #197, #204 |
-| Einfahrtstore und Gartentore | Einfahrtstore (Dreh- oder Schiebetor, ein- oder zweiflügelig) und Tore in Zäunen und Mauern (Gartentor, Pforte ohne Sturz), verknüpft mit dem Torantrieb (Cover-, Schloss- oder Schalter-Entität) und einem Kontakt – sie fahren in 3D live auf und zu, ein Tipp öffnet oder schließt sie (mit Rückfrage) | Diskussion #175, #297 |
-| Türen mit Schloss | Elektrische Türschlösser und Garagentore per Schalter, mit Ver-/Entriegeln und Öffnen | Diskussion #173 |
-| Szenen und Menü | Szenen weiter oben im Raumfenster; Hauptmenü/Favoriten beim Start offen und größer; eigene Knöpfe leuchten, wenn sie an sind; eine eigene Tipp-Aktion je Gerät (Skript, Szene oder Automation, z. B. der Fernseher startet den „Fernseh-Modus“) | #188, Diskussionen #174, #196 |
-| Kleine Tablets und Handys | Zoom in der Startansicht, größere 3D-Ansicht und Raumkarte auf kleinen Tablets, Kamera beim Etagenwechsel behalten, kompaktes Editor-Menü auf dem Handy | #191, #206, Diskussionen #190, #200 |
-| Ebenen | Eine Etage als Ebene ein- und ausblenden (z. B. alle Bäume) per Augen-Knopf, durchscheinende Bäume, die ausblenden, wenn sie im Weg stehen | #191 |
-| Geräte einheitlich | Jedes elektrische Möbel schaltet und zeigt seine Leistung gleich | #198 |
-| Sichtbarkeitsbedingung | Ein Gegenstand erscheint nur, solange ein Helfer oder eine Bedingung an ist (z. B. Saison-Deko) | Diskussion #169 |
-| Bilderrahmen | Rahmen mit eigenem Bild und einstellbarem Rand | Diskussion #164 |
-| Gerätekarten von Hand | Eine Gerätekarte von Hand verschieben, wenn Geräte dicht beieinander stehen | Diskussion #194 |
+| Dächer | Giebel an einem und Walm am anderen Ende; Fenster in Gauben; Fenster mit schräger Oberkante unter der Dachschräge; Dach bündig an eine Wand; Schornstein durchs Dach | #209, #466, Diskussionen #207, #203, #172 |
+| Rollläden und Rollos | Rollos innen, mehrere Rollladen-Entitäten je Fenster, Somfy-„My“-Position | Diskussionen #112, #197, #204 |
+| Einfahrtstore und Gartentore | Dreh- oder Schiebetore und Tore in Zäunen und Mauern, die live mit ihrem Antrieb fahren, ein Tipp öffnet sie (mit Rückfrage) | Diskussion #175, #297 |
+| Türen mit Schloss | Ein Schloss an der Tür: Ver-/Entriegeln und Öffnen aus 3D | Diskussion #173 |
+| Szenen und Menü | Szenen weiter oben im Raumfenster, ein größeres Startmenü, eine eigene Tipp-Aktion je Gerät (Skript oder Szene) | Diskussionen #174, #196 |
+| Kleine Tablets und Handys | Größere Raumkarte auf kleinen Tablets, kompaktes Editor-Menü auf dem Handy | #191, Diskussionen #190, #200 |
+| Ebenen | Gruppen (z. B. alle Bäume) per Augen-Knopf ein- und ausblenden, Bäume, die ausblenden, wenn sie im Weg stehen | #191 |
+| Sichtbarkeitsbedingung | Ein Gegenstand erscheint nur, solange ein Helfer an ist (z. B. Saison-Deko) | Diskussion #169 |
+| Bilderrahmen | Ein Rahmen mit eigenem Bild | Diskussion #164 |
+| Gerätekarten von Hand | Jede Gerätekarte von Hand verschieben, wenn Geräte dicht beieinander stehen | Diskussion #194 |
 
-## Pro-Erweiterungen – geplant
+## Pro-Erweiterungen
 
-Bereits erhältlich: **Kamera-Cockpit**, **Wetter draußen**, **Bildschirme live**, **Energie Pro**, **Klang & Kino**, **Auto Pro**. Käufer bekommen Verbesserungen ihrer Erweiterungen kostenlos.
+Erhältlich: **Kamera-Cockpit**, **Wetter draußen**, **Bildschirme live**, **Energie Pro**, **Klang & Kino**, **Auto Pro**, **Zeitreise** und **Haushalt Pro** (Beta, zuerst für Supporter – nach der Beta für alle). Käufer bekommen Verbesserungen ihrer Erweiterungen kostenlos.
+
+**Geplant:**
 
 | Erweiterung | Was sie bringt |
 |---|---|
-| **Zeitreise** – kommt mit 1.13 | Ein Zeitregler spielt die letzten 24 Stunden (später 7 Tage) im Haus ab: Lichter, Türen, Fenster, Rollläden, Bewegung, Heizung, Wetter, mit Ereignis-Markern – „Was war gestern um 3 Uhr?“ Nur ansehen, nichts wird geschaltet |
-| **Raumklima Pro** | Fließende Klimakarte aus allen Sensoren, Schimmel-Risiko je Raum, Lüftungs-Hinweise, Heizverläufe |
-| **Technik Pro** | WLAN-Karte, Netzwerkgeräte mit Zustand, Systemzustand (Diskussion #54) |
-| **Garten & Pool Pro** | Bewässerung mit Zonen und Sprüh-Animation, Mähroboter-Bahnen, Pool mit Temperatur und Pumpe (Diskussion #76) |
-| **Haushalt Pro** | Mülltonnen mit Abfuhr-Kalender und Erinnerung, Waschmaschine fertig, Paket da, Pflanzen gießen (Diskussion #84) |
+| **Raumklima Pro** | Fließende Klimakarte aus allen Sensoren, Schimmel-Risiko je Raum, Lüftungs-Hinweise („jetzt Fenster auf“), Heizverläufe |
+| **Technik Pro** | WLAN-Abdeckung, Netzwerkgeräte und Server mit Zustand (z. B. Proxmox-VMs am Server-Rack), schwache Batterien, Systemzustand (Diskussion #54) |
+| **Garten Pro** | Bewässerung mit Zonen und Sprüh-Animation, Mähroboter-Bahnen, Regentonne mit Füllstand (Diskussion #76) |
 | **Licht-Designer** | Lampen in 3D einstellen und als Szene speichern, Stimmung von Raum zu Raum kopieren |
-| **3D-Druck Pro** | Dein Drucker live: Karte mit Modellbild, Fortschritt, Restzeit und „fertig um“, Schicht, Temperaturen und Filamentfarben; das Druckteil wächst auf dem Bett, der Kopf fährt, ein „fertig“-Effekt – für Bambu Lab, OctoPrint, Klipper/Moonraker und PrusaLink (Diskussionen #115, #136) |
-| **Möbel-Studio** | Eigene Möbel im Editor aus Vorlagen bauen: Schränke in jeder Breite mit Schubladen und Türen, Lampen, Regale, Geräte mit Display – für alles, was kein Pack hat (Diskussionen #222, #27, #229) |
+| **3D-Druck Pro** | Dein Drucker live: Fortschritt, Restzeit, Temperaturen, das Druckteil wächst auf dem Bett – Bambu Lab, OctoPrint, Klipper, PrusaLink (Diskussionen #115, #136) |
+| **Möbel-Studio** | Eigene Möbel für alles, was kein Pack hat (Diskussionen #222, #27, #229) |
 
-Updates für bestehende Erweiterungen:
-- **Energie Pro:** Hausbilanz und Anlagenkarten auch in Etagenansichten (#193), Gas- und Wasserzähler mit eigenen Leitungsfarben, Wärmepumpe mit Wärmefluss, 7-Tage-Verlauf.
-- **Auto Pro:** bewegliche Türen und Klappen, Abfahrtszeit, Ladekabel zur Wallbox, Entfernung unterwegs.
+**Updates für bestehende Erweiterungen:**
+- **Energie Pro:** Gas und Wasser mit eigenen Leitungsfarben, Wärmepumpe mit Wärmefluss, 7-Tage-Verlauf.
+- **Auto Pro:** bewegliche Türen und Klappen, Abfahrtszeit, Ladekabel zur Wallbox.
 - **Kamera-Cockpit:** Schwenken/Neigen aus 3D, Türklingel.
-- **Klang & Kino:** mehr Quellen und Favoriten je Lautsprecher.
+- **Klang & Kino:** Favoriten je Lautsprecher.
+- **Haushalt Pro:** nach der Beta für alle im Shop; holografische Pflanzenkarte.
 
 ## Möbel-Packs – geplant
 
-- **Saison & Deko** – Weihnachtsbaum mit Lichterkette, Adventskranz, Lichterketten außen, Kürbis und Ostern (vor Weihnachten).
-- **Smart Home Release 2** – Sirene, Access Point, Rauchmelder, Wandthermostat, Luftentfeuchter, Würfellampe, Deckenventilatoren (Diskussionen #44, #45, #57, #124).
-- **Haustechnik-Update** – Klimaanlagen innen und außen, Wassertank mit Füllstand (Diskussionen #118, #138).
-- **Wellness** – Sauna mit Temperatur, Whirlpool, Infrarotkabine (Diskussion #176).
-- **Garten Release 4** – Markise, Wasserspiel mit Licht (Diskussion #170).
-- **Küche Release 3** – Kaffeemaschine und mehr Geräte (Diskussion #167).
-- **Fahrzeuge Release 2** – Motorrad, Wohnmobil, Anhänger, E-Bike, Türen zum Öffnen.
-- Später: **Grillküche & Terrasse**, **Werkstatt**, **Japandi & Skandi**, **Loft & Industrial**, **Indoor-Grün**, **Musik & Atelier**.
+- **Saison & Deko** – Weihnachtsbaum mit Lichterkette, Adventskranz, Lichterketten außen, Ostern (vor Weihnachten).
+- **Treppen & Geländer** – die offene U-Treppe mit zwei Viertelwendelungen wie gewünscht (#547).
+- **Smart Home & Technik** – Server-Rack mit Status-LEDs (Idee aus dem Fork CasaNeon).
+- **Büro & Gaming** – 3D-Drucker-Arbeitsplatz (Idee aus dem Fork CasaNeon), Rollcontainer mit Schubladen, Gaming-PC mit LED-Lüftern.
+- **Haustechnik** – Klima-Außengerät, Wassertank mit Füllstand (Diskussionen #118, #138).
+- **Wellness** – Infrarotkabine, Sauna und Whirlpool mit Temperatur (Diskussion #176).
+- **Garten** – Wasserspiel mit Licht, Hollywoodschaukel, Betonmauer und Gabionen (Diskussion #170, Discord).
+- **Fahrzeuge** – Türen zum Öffnen.
+- Später: **Grillküche & Terrasse**, **Werkstatt**, **Japandi & Skandi**, **Loft & Industrial**, **Indoor-Grün**, **Musik & Atelier** (E-Piano, Mischpult).
 
 Käufer bekommen neue Releases ihrer Packs automatisch und kostenlos.
