@@ -9978,10 +9978,12 @@ export class Fp3dEditor extends LitElement {
     // sensors with a number for the live position of a blind
     const positions = this.entityOptions((id) => /^(sensor|number|input_number)\./.test(id) && Number.isFinite(Number(this.hass?.states[id]?.state)));
     // plain contacts, and handle sensors with three states (open / tilted / closed)
+    // a garage door may also be a switch or toggle helper (a relay that drives the door): on = open, a tap switches it
     const contacts = this.entityOptions(
       (id) =>
         (id.startsWith("binary_sensor.") && ["door", "window", "opening", "garage_door"].includes(dc(id) ?? "")) ||
-        (numberish(id) && windowPosition(this.hass?.states[id]) !== null),
+        (numberish(id) && windowPosition(this.hass?.states[id]) !== null) ||
+        (garage && /^(switch|input_boolean)\./.test(id)),
     );
     // handle sensors: text states (open / tilted / closed), a window_state attribute, or a telling name
     const handles = this.entityOptions((id) => {

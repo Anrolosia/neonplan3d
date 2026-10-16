@@ -227,7 +227,7 @@ Doors and windows can also be tapped in a wide band around the opening in the pl
 | **Tilt contact** | A second sensor that reports "tilted" |
 | **Tilt angle sensor** | Optional: a sensor reporting the tilt angle in degrees (e.g. the "Rotation" of a Shelly BLU Door/Window). The sash tilts exactly that far in 3D; **Angle that counts as fully tilted** (15° by default), an **Offset** for the value while closed and **counts the other way round** adapt it to the mounting. Above a small angle the window counts as tilted, also for the rain warning |
 | **Contact second leaf** | For double windows and doors |
-| **Garage door** | A garage door follows a cover entity or a contact (on = open; sensors reporting “open”/“closed” work too). Its open part lies under the ceiling |
+| **Garage door** | A garage door follows a cover entity or a contact (on = open; sensors reporting “open”/“closed” work too). A **switch or input_boolean** that drives the door works as the contact too: on = open, a tap in 3D switches it. Its open part lies under the ceiling. A gate or garage-door cover on a **door** (e.g. a sliding gate) moves the door leaf instead of a roller shutter |
 
 NeonPlan 3D matches covers and contacts through the area automatically. You can change them by hand at any time.
 

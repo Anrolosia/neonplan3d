@@ -227,7 +227,7 @@ Türen und Fenster lassen sich im Plan auch an einem breiten Streifen um die Öf
 | **Kippkontakt** | Ein zweiter Sensor, der „gekippt“ meldet |
 | **Kippwinkel-Sensor** | Optional: ein Sensor, der den Kippwinkel in Grad liefert (z. B. „Rotation“ eines Shelly BLU Door/Window). Der Flügel kippt in 3D genau so weit; **Winkel für „ganz gekippt“** (Standard 15°), ein **Offset** für den Wert bei geschlossenem Fenster und **andersherum zählen** passen ihn an die Montage an. Ab einem kleinen Winkel gilt das Fenster als gekippt, auch für die Regenwarnung |
 | **Kontakt zweiter Flügel** | Für zweiflügelige Fenster und Türen |
-| **Garagentor** | Ein Garagentor folgt einer Cover-Entität oder einem Kontakt (an = offen; auch Sensoren, die „open“/„closed“ melden). Der offene Teil liegt dann unter der Decke |
+| **Garagentor** | Ein Garagentor folgt einer Cover-Entität oder einem Kontakt (an = offen; auch Sensoren, die „open“/„closed“ melden). Als Kontakt geht auch ein **Schalter oder input_boolean**, der das Tor antreibt: an = offen, Antippen in 3D schaltet ihn. Der offene Teil liegt dann unter der Decke. Ein Tor- oder Garagen-Cover an einer **Tür** (z. B. ein Schiebetor) bewegt das Türblatt statt eines Rollladens |
 
 Rollläden und Kontakte ordnet NeonPlan 3D über den Bereich automatisch zu. Du kannst sie jederzeit von Hand ändern.
 

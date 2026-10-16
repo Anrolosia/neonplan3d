@@ -121,6 +121,15 @@ if (watch) {
   await build(importConfig);
   await build(mainConfig(hashOf(viewerConfig.outfile), hashOf(editor.outfile), hashOf(cardEditorConfig.outfile), hashOf(timeTravelConfig.outfile), hashOf(funConfig.outfile)));
   let over = false;
+  // old Fire-tablet WebViews (Chrome before 91, e.g. Fully Kiosk on a Fire 7) throw on an optional call with spread
+  // arguments, `a?.b(...x)` – the roof failed there; lowering the target for it would cost ~11 KB, so it is banned
+  for (const file of Object.keys(BUDGET)) {
+    const hit = readFileSync(`${out}/${file}`, "utf8").match(/\?\.(?:[\w$]+)?\(\.\.\./);
+    if (hit) {
+      over = true;
+      console.log(`OLD-WEBVIEW ${file}: "${hit[0]}" breaks Chrome < 91 – write it as "if (a.b) a.b(...x)"`);
+    }
+  }
   for (const [file, limit] of Object.entries(BUDGET)) {
     const size = statSync(`${out}/${file}`).size;
     const ok = size <= limit;

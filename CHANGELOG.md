@@ -6,7 +6,15 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## 1.19.1
 
+### New
+
+- A garage door can follow a switch or input_boolean that drives it (on = open, a tap switches it) – idea from diegood's fork.
+
 ### Fixed
+
+- Old wall tablets (Fire tablets with a WebView before Chrome 91, e.g. Fully Kiosk) no longer fail on the roof; the build now refuses code those WebViews can't run – reported in diegood's fork.
+- The room light on the floor reaches every wall: no dark strips along walls off the light grid, e.g. in L-shaped rooms – found by Thundras.
+- Background images and restore points are written to JSON outside Home Assistant's event loop on newer HA versions – pointed out by hohoanganh.
 
 - A flat roof no longer floats about 13 cm above the walls once it is fully shown (#556, found by Cle2301).
 - An awning already out, or a smart fridge door already open, shows so as soon as the card opens (#546).
