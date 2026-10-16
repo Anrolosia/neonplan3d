@@ -827,7 +827,7 @@
  "supporter_title": "Tukija · Discord",
  "supporter_intro": "Kiitos, että tuet NeonPlan 3D:tä! Tällä koodilla avaat Discordissa roolin 💙 Supporter – näet silloin kanavan #beta-feedback ja testaat uudet laajennukset ensimmäisenä.",
  "supporter_open": "Avaa Discord",
- "supporter_how": "Näin: avaa Discord, kirjoita mille tahansa kanavalle /supporter {code} ja lähetä. Rooli tulee heti.",
+ "supporter_how": "Näin: kirjoita Discordiin /supporter (älä liitä), napsauta komentoa listasta, liitä koodi kenttään \"code\" ja paina Enter. Älä koskaan lähetä koodia tavallisena viestinä – kaikki näkevät sen.",
  "beta_yours": "Beta · sinulle tukijana",
  "beta_supporters": "Beta · ensin tukijoille",
  "beta_yours_hint": "Koska olet tukija, saat kokeilla tätä laajennusta etukäteen. Kerro Discordissa (kanava #beta-feedback), mikä toimii ja mikä ei.",

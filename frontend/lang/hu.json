@@ -827,7 +827,7 @@
  "supporter_title": "Támogató · Discord",
  "supporter_intro": "Köszönjük, hogy támogatod a NeonPlan 3D-t! Ezzel a kóddal feloldod a 💙 Supporter szerepet a Discordon – így látod a #beta-feedback csatornát, és elsőként próbálod ki az új bővítményeket.",
  "supporter_open": "Discord megnyitása",
- "supporter_how": "Így: nyisd meg a Discordot, írd be bármelyik csatornába: /supporter {code}, és küldd el. A szerep azonnal megjelenik.",
+ "supporter_how": "Így: a Discordban írd be: /supporter (ne illeszd be), kattints a parancsra a listában, illeszd a kódot a „code” mezőbe, és nyomj Entert. A kódot soha ne küldd sima üzenetként – mindenki látja.",
  "beta_yours": "Béta · neked mint támogatónak",
  "beta_supporters": "Béta · először a támogatóknak",
  "beta_yours_hint": "Mivel támogató vagy, előre kipróbálhatod ezt a bővítményt. Írd meg a Discordon (#beta-feedback csatorna), mi működik és mi nem.",

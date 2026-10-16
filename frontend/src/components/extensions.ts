@@ -347,7 +347,8 @@ export class Extensions extends LitElement {
           class="fp3d-btn"
           @click=${async () => {
             try {
-              await navigator.clipboard.writeText(`/supporter ${sup.code}`);
+              // the code alone: pasted as "/supporter CODE" Discord sends it as a plain message instead of running the command
+              await navigator.clipboard.writeText(sup.code);
               this._licenseMsg = { ok: true, text: this.t("license_copied") };
             } catch {
               /* no clipboard: the code stays readable */

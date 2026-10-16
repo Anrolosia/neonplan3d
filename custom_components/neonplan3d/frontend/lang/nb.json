@@ -827,7 +827,7 @@
  "supporter_title": "Supporter · Discord",
  "supporter_intro": "Takk for at du støtter NeonPlan 3D! Denne koden låser opp rollen 💙 Supporter på Discord – da ser du kanalen #beta-feedback og tester nye utvidelser først.",
  "supporter_open": "Åpne Discord",
- "supporter_how": "Slik: åpne Discord, skriv /supporter {code} i en hvilken som helst kanal og send. Rollen kommer med en gang.",
+ "supporter_how": "Slik: skriv /supporter i Discord (ikke lim inn), klikk på kommandoen i lista, lim inn koden i feltet «code» og trykk Enter. Send aldri koden som vanlig melding – alle kan se den.",
  "beta_yours": "Beta · for deg som supporter",
  "beta_supporters": "Beta · først for supportere",
  "beta_yours_hint": "Fordi du er supporter, kan du teste denne utvidelsen på forhånd. Si fra på Discord (kanal #beta-feedback) hva som fungerer og hva som ikke gjør det.",

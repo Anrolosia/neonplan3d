@@ -827,7 +827,7 @@
  "supporter_title": "Supporter · Discord",
  "supporter_intro": "¡Gracias por apoyar NeonPlan 3D! Este código desbloquea el rol 💙 Supporter en Discord: verás el canal #beta-feedback y probarás las nuevas extensiones primero.",
  "supporter_open": "Abrir Discord",
- "supporter_how": "Cómo: abre Discord, escribe /supporter {code} en cualquier canal y envíalo. El rol llega al instante.",
+ "supporter_how": "Cómo: en Discord escribe /supporter (no lo pegues), haz clic en el comando de la lista, pega el código en el campo «code» y pulsa Intro. Nunca envíes el código como mensaje normal: todos lo verían.",
  "beta_yours": "Beta · para ti como supporter",
  "beta_supporters": "Beta · primero para supporters",
  "beta_yours_hint": "Como eres supporter, puedes probar esta extensión antes. Cuéntanos en Discord (canal #beta-feedback) qué funciona y qué no.",

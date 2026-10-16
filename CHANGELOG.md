@@ -4,6 +4,16 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.19.1
+
+### Fixed
+
+- A flat roof no longer floats about 13 cm above the walls once it is fully shown (#556, found by Cle2301).
+- An awning already out, or a smart fridge door already open, shows so as soon as the card opens (#546).
+- A blind in an outer wall always sits outside, even when the window was filed under the neighbouring room (#542).
+- A gate or garage-door cover on a door moves the door's leaf instead of drawing a roller shutter over it (#544).
+- The supporter code's copy button copies the code alone, and the hint explains how to use /supporter in Discord.
+
 ## 1.19.0
 
 ### New

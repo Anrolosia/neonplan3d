@@ -827,7 +827,7 @@
  "supporter_title": "Podporovatel · Discord",
  "supporter_intro": "Díky, že podporuješ NeonPlan 3D! Tento kód odemkne na Discordu roli 💙 Supporter – uvidíš kanál #beta-feedback a nová rozšíření vyzkoušíš první.",
  "supporter_open": "Otevřít Discord",
- "supporter_how": "Jak na to: otevři Discord, do libovolného kanálu napiš /supporter {code} a odešli. Role přijde hned.",
+ "supporter_how": "Jak na to: v Discordu napiš /supporter (nevkládej), klikni na příkaz v nabídce, vlož kód do pole „code“ a stiskni Enter. Kód nikdy neposílej jako běžnou zprávu – uvidí ji každý.",
  "beta_yours": "Beta · pro tebe jako podporovatele",
  "beta_supporters": "Beta · nejdřív pro podporovatele",
  "beta_yours_hint": "Protože jsi podporovatel, můžeš toto rozšíření vyzkoušet předem. Napiš nám na Discordu (kanál #beta-feedback), co funguje a co ne.",

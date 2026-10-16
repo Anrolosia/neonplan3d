@@ -702,8 +702,14 @@ export function openingState(
     else cover = c.state === "closed" ? 1 : c.state === "opening" || c.state === "closing" ? 0.5 : 0;
   } else if (e.cover) cover = 0;
   if (type === "door") {
-    // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
     const p = pos(e.contact);
+    // a cover that is a gate, garage door or door is the door itself (a sliding gate on a sliding door): it moves the
+    // leaf – as far as its position says – and no blind is drawn (#544); the contact still wins when there is one
+    if (cover !== null && c && DOOR_COVERS.has(String(c.attributes.device_class ?? ""))) {
+      const leaf = p === null ? 1 - cover : p === "closed" ? 0 : 1;
+      return { open: leaf, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover: null, sensed: true };
+    }
+    // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
     return { open: p === null ? (e.shut ? 0 : DOOR_DEFAULT_OPEN) : p === "closed" ? 0 : 1, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover, sensed: p !== null || cover !== null };
   }
   if (type === "garage") {
