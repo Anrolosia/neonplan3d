@@ -266,7 +266,9 @@ export class CameraProjections {
           if (fp3dHere > fp3dSeen + 0.06 + 0.01 * fp3dHere) discard;
           vec4 fp3dPic = texture2D(uProjTex, fp3dUv);
           float fp3dEdge = smoothstep(0.0, 0.05, min(min(fp3dUv.x, 1.0 - fp3dUv.x), min(fp3dUv.y, 1.0 - fp3dUv.y)));
-          diffuseColor = vec4(fp3dPic.rgb, 0.94 * fp3dEdge);`,
+          // far away the picture fades out (what lies near the horizon would be smeared across the whole plot)
+          float fp3dFar = 1.0 - smoothstep(0.65 * uNearFar.y, uNearFar.y, fp3dHere);
+          diffuseColor = vec4(fp3dPic.rgb, 0.94 * fp3dEdge * fp3dFar);`,
         );
     };
     m.customProgramCacheKey = () => `fp3d-projection-${masks ? "fold" : "plain"}`;

@@ -1528,7 +1528,8 @@ export class FloorplanViewer {
       position: new Vector3(d.x, y, d.z),
       direction: new Vector3(-Math.sin(a) * Math.cos(tilt), -Math.sin(tilt), Math.cos(a) * Math.cos(tilt)),
       fov: Math.min(d.fov ?? (ceiling ? 120 : 90), 140),
-      reach: 40,
+      // as far as the camera's wedge reaches, a good deal further (the wedge is drawn short), at most 30 m
+      reach: Math.min(30, Math.max(8, (d.reach ?? (ceiling ? 3 : 4.5)) * 2.5)),
     };
   }
 
