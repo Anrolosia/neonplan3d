@@ -19,6 +19,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### Fixed
 
 - Heatmap: the warm patch of sunlight under a window no longer covers a room's temperature colour (#558, thanks frops83).
+- Furniture library: with the 3D view beside the plan, an item's preview picture showed beside or below the library instead of next to the item.
 
 ## 1.19.1
 
