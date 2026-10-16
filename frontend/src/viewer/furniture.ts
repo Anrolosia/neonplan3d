@@ -1774,8 +1774,8 @@ export function pushPackGlow(buf: GeoBuffer, item: PackItem, f: Pick<Furniture, 
  * (open = curtain drawn aside, screen rolled up). The curtain's panels gather towards both ends; the screen's cloth
  * and bar hang from the roller as far as it is down.
  */
-export function pushPackMotion(buf: GeoBuffer, item: PackItem, kind: PackMotion, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "mirror">, base: number, open: number): void {
-  const parts = packMotionParts(item, kind, open);
+export function pushPackMotion(buf: GeoBuffer, item: PackItem, kind: PackMotion, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "mirror" | "variant">, base: number, open: number): void {
+  const parts = packMotionParts(item, kind, open, f.variant === "left" || f.variant === "right" ? f.variant : "both");
   const a = f.rotation * DEG;
   const c = Math.cos(a);
   const s = Math.sin(a);
@@ -1785,15 +1785,16 @@ export function pushPackMotion(buf: GeoBuffer, item: PackItem, kind: PackMotion,
 }
 
 /** The moving parts of such an item where they are at `open` (in the item's fractions of its size). */
-export function packMotionParts(item: PackItem, kind: PackMotion, open: number): PackItem["parts"] {
+export function packMotionParts(item: PackItem, kind: PackMotion, open: number, side: "both" | "left" | "right" = "both"): PackItem["parts"] {
   const t = Math.min(1, Math.max(0, open));
   const moving = item.parts.filter((p) => packMovingPart(kind, p));
   let parts: PackItem["parts"];
   if (kind === "curtain") {
     // each panel keeps its width and moves outwards: fully open, the panels bunch up in the outer fifth of each half
     parts = moving.map((p) => {
-      // x is the part's centre as a share of the width, from -0.5 (left end) to 0.5 (right end)
-      const edge = Math.sign(p.x || 1) * 0.5;
+      // x is the part's centre as a share of the width, from -0.5 (left end) to 0.5 (right end, seen from the front);
+      // a curtain opening to one side gathers all its panels at that end (#511)
+      const edge = side === "left" ? -0.5 : side === "right" ? 0.5 : Math.sign(p.x || 1) * 0.5;
       return { ...p, x: edge - (edge - p.x) * (1 - 0.8 * t) };
     });
   } else {

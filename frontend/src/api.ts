@@ -172,6 +172,8 @@ export interface LicenseStatus {
   loyalty?: ShopLoyalty | null;
   /** Supporter-Pass holders: the code that unlocks the supporter role on Discord (/supporter). */
   supporter?: { code: string; until: string | null } | null;
+  /** The shop's newsletter invitation (taster packs as a thank-you): only while the customer has not signed up. */
+  newsletter?: { url: string } | null;
   /** Pack updates installed from the shop, newest last. */
   updates?: PackUpdate[];
 }

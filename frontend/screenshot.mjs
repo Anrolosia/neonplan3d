@@ -413,8 +413,10 @@ for (const shot of shots.filter((s) => !only || only.includes(s.name))) {
   const clickText = async (text) => {
     await page.evaluate((t) => {
       const find = (root) => {
-        // exact text, or the first part of a row button ("Flur" in "Flur 12,8 m²")
+        // exact text, or the first part of a row button ("Flur" in "Flur 12,8 m²"), or a tab with a badge behind its
+        // name ("✦ Erweiterungen" with "2 bereit")
         for (const el of root.querySelectorAll("button")) if (el.textContent.trim() === t || el.firstElementChild?.textContent.trim() === t) return el;
+        for (const el of root.querySelectorAll("button")) if (el.textContent.trim().startsWith(t)) return el;
         for (const el of root.querySelectorAll("*")) if (el.shadowRoot) {
           const hit = find(el.shadowRoot);
           if (hit) return hit;

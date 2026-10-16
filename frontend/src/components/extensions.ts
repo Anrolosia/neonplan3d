@@ -36,6 +36,7 @@ export class Extensions extends LitElement {
     _licenseBusy: { state: true },
     _licenseMsg: { state: true },
     _open: { state: true },
+    _nlState: { state: true },
   };
 
   declare hass: HomeAssistant | undefined;
@@ -49,6 +50,8 @@ export class Extensions extends LitElement {
   /** What runs right now: "activate", "refresh", "remove" or a pack id being installed. */
   private declare _licenseBusy: string | null;
   private declare _licenseMsg: { ok: boolean; text: string } | null;
+  /** The newsletter box: shown, opened (the sign-up page is open, waiting for the confirmation) or hidden for good. */
+  private declare _nlState: "show" | "opened" | "hidden";
   /** Long lists opened by the viewer (the shop's packs, the installed packs); closed, a bar sums them up. */
   private declare _open: Set<string>;
   private licenseLoading = false;
@@ -69,6 +72,42 @@ export class Extensions extends LitElement {
       // nothing remembered
     }
     this._open = new Set(open);
+    let nl: string | null = null;
+    try {
+      nl = localStorage.getItem("neonplan3d.ext.newsletter");
+    } catch {
+      // nothing remembered
+    }
+    this._nlState = nl === "hidden" || nl === "opened" ? nl : "show";
+  }
+
+  private setNewsletter(state: "opened" | "hidden"): void {
+    this._nlState = state;
+    try {
+      localStorage.setItem("neonplan3d.ext.newsletter", state);
+    } catch {
+      // a private window: for this visit only
+    }
+  }
+
+  /**
+   * The newsletter invitation: the shop sends its link only to customers who have not signed up yet (the fun-pack
+   * accounts above all); signing up (double opt-in) brings the four taster packs to the key. Once signed up the shop
+   * stops sending the link and the box goes away by itself; "Don't show again" hides it on this device.
+   */
+  private renderNewsletter() {
+    const nl = this._license?.active ? this._license.newsletter : null;
+    if (!nl || this._nlState === "hidden") return nothing;
+    return html`<section class="fp3d-ext-card fp3d-offers">
+      <h3>${this.t("nl_title")}</h3>
+      ${this._nlState === "opened"
+        ? html`<p class="fp3d-sub">${this.t("nl_after", { button: this.t("license_refresh") })}</p>`
+        : html`<p class="fp3d-sub">${this.t("nl_text")}</p>`}
+      <div class="fp3d-actions">
+        <a class="fp3d-btn fp3d-primary" style="text-decoration:none" href=${nl.url} target="_blank" rel="noopener" @click=${() => this.setNewsletter("opened")}>✉️ ${this.t("nl_button")}</a>
+        <button class="fp3d-btn" @click=${() => this.setNewsletter("hidden")}>${this.t("nl_hide")}</button>
+      </div>
+    </section>`;
   }
 
   private toggleOpen(key: string): void {
@@ -124,7 +163,7 @@ export class Extensions extends LitElement {
           <a class="fp3d-btn" href=${manualUrl(this.hass?.language, "extensions")} target="_blank" rel="noopener">📖 ${this.t("manual")}</a>
         </div>
       </header>
-      ${this.renderUpdates()} ${this.renderSupporter()} ${this.renderOffers()} ${this.renderShop()}
+      ${this.renderUpdates()} ${this.renderSupporter()} ${this.renderNewsletter()} ${this.renderOffers()} ${this.renderShop()}
       <section class="fp3d-ext-card">
         <h3>${this.t("ext_pro")}</h3>
         <div class="fp3d-ext-pro">
