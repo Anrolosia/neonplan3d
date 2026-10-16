@@ -26,6 +26,8 @@ import { makeFoldable, type FoldMasks } from "./fold.ts";
 /** Layer of the meshes that may block a camera's view (floors, walls and outdoor areas, the ground). */
 export const PROJECTION_LAYER = 5;
 const DEPTH_SIZE = 512;
+/** What lies closer to the lens than this (m) neither blocks the view nor gets the picture: the wall the camera hangs on. */
+const NEAR = 0.7;
 
 /** Where a camera hangs and where it looks, in world coordinates. */
 export interface ProjectorPose {
@@ -89,7 +91,7 @@ export class CameraProjections {
           url: "",
           texture: null,
           aspect: 16 / 9,
-          camera: new PerspectiveCamera(60, 16 / 9, 0.15, 40),
+          camera: new PerspectiveCamera(60, 16 / 9, NEAR, 40),
           target,
           matrix: new Matrix4(),
           uniforms: { uProjMat: { value: new Matrix4() }, uProjTex: { value: null }, uDepth: { value: target.depthTexture }, uNearFar: { value: [0.15, 40] } },
@@ -163,6 +165,9 @@ export class CameraProjections {
       cam.fov = (2 * Math.atan(Math.tan(h / 2) / p.aspect) * 180) / Math.PI;
       cam.aspect = p.aspect;
       cam.far = pose.reach;
+      // a camera usually sits just inside the wall it hangs on: the first stretch in front of the lens (the wall's
+      // thickness) is left out, or that wall would hide everything the camera sees outside
+      cam.near = NEAR;
       cam.position.copy(pose.position);
       cam.lookAt(pose.position.clone().add(pose.direction));
       cam.updateProjectionMatrix();
@@ -218,7 +223,7 @@ export class CameraProjections {
           `#include <color_fragment>
           if (vProj.w <= 0.0) discard;
           vec3 fp3dNdc = vProj.xyz / vProj.w;
-          if (abs(fp3dNdc.x) > 1.0 || abs(fp3dNdc.y) > 1.0 || fp3dNdc.z > 1.0) discard;
+          if (abs(fp3dNdc.x) > 1.0 || abs(fp3dNdc.y) > 1.0 || abs(fp3dNdc.z) > 1.0) discard;
           vec2 fp3dUv = fp3dNdc.xy * 0.5 + 0.5;
           // hidden from the camera (something nearer in its depth picture): no picture here; compared in metres
           float fp3dSeen = fp3dLinear(texture2D(uDepth, fp3dUv).x);

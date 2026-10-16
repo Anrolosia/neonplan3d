@@ -130,7 +130,7 @@ const PROJECTION_SCRIPT = `
   g.strokeStyle = '#ffeb3b'; g.lineWidth = 8; g.strokeRect(6, 6, 948, 528);
   e.hass.states['camera.garten'] = { entity_id: 'camera.garten', state: 'idle', attributes: { friendly_name: 'Garten Kamera', entity_picture: c.toDataURL('image/jpeg', 0.9) }, last_changed: '', last_updated: '', context: { id: '' } };
   const f = e._doc.floors[0];
-  f.placements.push({ entity_id: 'camera.garten', x: 4, z: -0.4, y: 2.6, mount: 'wall', rotation: 180, tilt: 32, fov: 100 });
+  f.placements.push({ entity_id: 'camera.garten', x: 4, z: 0.15, y: 2.4, mount: 'wall', rotation: 180, tilt: 32, fov: 100 });
   e.setDoc(structuredClone(e._doc));
 `;
 
