@@ -4,6 +4,24 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.19.1
+
+### New
+
+- A garage door can follow a switch or input_boolean that drives it (on = open, a tap switches it) – idea from diegood's fork.
+- Motorised curtains (Architecture pack) open to both sides and the roll-down projection screen (Home cinema pack) rolls up and down with their cover's position; a screen can now be linked to its motor's cover; both take a live position sensor, a run time and "Reverse direction" (#511).
+
+### Fixed
+
+- Old wall tablets (Fire tablets with a WebView before Chrome 91, e.g. Fully Kiosk) no longer fail on the roof; the build now refuses code those WebViews can't run – reported in diegood's fork.
+- The room light on the floor reaches every wall: no dark strips along walls off the light grid, e.g. in L-shaped rooms – found by Thundras.
+- Background images and restore points are written to JSON outside Home Assistant's event loop on newer HA versions – pointed out by hohoanganh.
+- A flat roof no longer floats about 13 cm above the walls once it is fully shown (#556, found by Cle2301).
+- An awning already out, or a smart fridge door already open, shows so as soon as the card opens (#546).
+- A blind in an outer wall always sits outside, even when the window was filed under the neighbouring room (#542).
+- A gate or garage-door cover on a door moves the door's leaf instead of drawing a roller shutter over it (#544).
+- The supporter code's copy button copies the code alone, and the hint explains how to use /supporter in Discord.
+
 ## 1.19.0
 
 ### New

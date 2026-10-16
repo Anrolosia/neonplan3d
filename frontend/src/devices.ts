@@ -3,7 +3,7 @@
 
 import type { Furniture, EntityRef, Floor, LampMount, Opening, Placement, RoofWindow, Room, Vec2 } from "./model.ts";
 import { centroid, pointInPolygon } from "./model.ts";
-import { isRobotVacuum, packScreen } from "./packs.ts";
+import { isRobotVacuum, packMotion, packScreen } from "./packs.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
 export type DeviceKind =
@@ -702,8 +702,14 @@ export function openingState(
     else cover = c.state === "closed" ? 1 : c.state === "opening" || c.state === "closing" ? 0.5 : 0;
   } else if (e.cover) cover = 0;
   if (type === "door") {
-    // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
     const p = pos(e.contact);
+    // a cover that is a gate, garage door or door is the door itself (a sliding gate on a sliding door): it moves the
+    // leaf – as far as its position says – and no blind is drawn (#544); the contact still wins when there is one
+    if (cover !== null && c && DOOR_COVERS.has(String(c.attributes.device_class ?? ""))) {
+      const leaf = p === null ? 1 - cover : p === "closed" ? 0 : 1;
+      return { open: leaf, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover: null, sensed: true };
+    }
+    // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
     return { open: p === null ? (e.shut ? 0 : DOOR_DEFAULT_OPEN) : p === "closed" ? 0 : 1, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover, sensed: p !== null || cover !== null };
   }
   if (type === "garage") {
@@ -854,21 +860,25 @@ export function awningStates(hass: HomeAssistant, floors: readonly Floor[]): Map
   const out = new Map<string, AwningState>();
   for (const floor of floors)
     for (const f of floor.furniture) {
-      if (f.type !== "awning") continue;
+      // a motorised curtain or roll-down screen from a pack follows its cover the same way (#511)
+      if (f.type !== "awning" && !packMotion(f.type)) continue;
       const id = f.entity && f.entity !== "none" ? f.entity : null;
       const st = id ? hass.states[id] : undefined;
-      const sensor = f.awning_position && f.awning_position !== "none" ? hass.states[f.awning_position] : undefined;
       const time = f.awning_time ?? 20;
       if (!st || isUnavailable(st)) {
         out.set(f.id, { out: 0, moving: 0, time });
         continue;
       }
       const flip = (v: number) => (f.awning_invert ? 1 - v : v);
-      const raw = sensor && Number.isFinite(Number(sensor.state)) ? Number(sensor.state) : st.attributes.current_position;
+      // a live position sensor (0–100 % or 0–1, like a blind's) wins over the cover's own position
+      const live = livePosition(hass, f.awning_position && f.awning_position !== "none" ? f.awning_position : null);
+      const raw = st.attributes.current_position;
       const moving: -1 | 0 | 1 = st.state === "opening" ? (f.awning_invert ? -1 : 1) : st.state === "closing" ? (f.awning_invert ? 1 : -1) : 0;
-      if (typeof raw === "number" && Number.isFinite(raw)) out.set(f.id, { out: flip(Math.min(1, Math.max(0, raw / 100))), moving: 0, time });
+      if (live !== null) out.set(f.id, { out: flip(live), moving: 0, time });
+      else if (typeof raw === "number" && Number.isFinite(raw)) out.set(f.id, { out: flip(Math.min(1, Math.max(0, raw / 100))), moving: 0, time });
       else if (moving) out.set(f.id, { out: null, moving, time });
-      else out.set(f.id, { out: flip(st.state === "open" ? 1 : 0), moving: 0, time });
+      // without a position: open (a cover) or on (a switch that drives it) is fully out
+      else out.set(f.id, { out: flip(st.state === "open" || st.state === "on" ? 1 : 0), moving: 0, time });
     }
   return out;
 }

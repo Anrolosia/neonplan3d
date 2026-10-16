@@ -128,7 +128,7 @@ import { deleteDiagnostics, getDiagnostics, setDiagnostics, type DiagnosticsStat
 import { load3d } from "../load3d.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
-import { furnitureSize, isElectric, isPackType, isRobotVacuum, mountBase, packDisplay, packItem, packItemName, packName, packType, setPacks, type FurniturePack } from "../packs.ts";
+import { furnitureSize, isElectric, isPackType, isRobotVacuum, mountBase, packDisplay, packItem, packItemName, packMotion, packName, packType, setPacks, type FurniturePack } from "../packs.ts";
 
 /** Items that can be fixed against moving. */
 type FixKind = "room" | "opening" | "furniture" | "device" | "wall" | "outdoor";
@@ -9978,10 +9978,12 @@ export class Fp3dEditor extends LitElement {
     // sensors with a number for the live position of a blind
     const positions = this.entityOptions((id) => /^(sensor|number|input_number)\./.test(id) && Number.isFinite(Number(this.hass?.states[id]?.state)));
     // plain contacts, and handle sensors with three states (open / tilted / closed)
+    // a garage door may also be a switch or toggle helper (a relay that drives the door): on = open, a tap switches it
     const contacts = this.entityOptions(
       (id) =>
         (id.startsWith("binary_sensor.") && ["door", "window", "opening", "garage_door"].includes(dc(id) ?? "")) ||
-        (numberish(id) && windowPosition(this.hass?.states[id]) !== null),
+        (numberish(id) && windowPosition(this.hass?.states[id]) !== null) ||
+        (garage && /^(switch|input_boolean)\./.test(id)),
     );
     // handle sensors: text states (open / tilted / closed), a window_state attribute, or a telling name
     const handles = this.entityOptions((id) => {
@@ -10802,6 +10804,18 @@ export class Fp3dEditor extends LitElement {
       <p class="fp3d-sub fp3d-wide">${this.t("awning_hint")}</p>`;
   }
 
+  /** A motorised curtain or roll-down screen from a pack (#511): run time, a live position sensor, the other direction. */
+  private renderMotionFields(f: Furniture) {
+    const admin = this.isAdmin;
+    const sensors = this.entityOptions((id) => id.startsWith("sensor.") || id.startsWith("input_number.") || id.startsWith("number."));
+    return html`${this.num(this.t("motor_time"), f.awning_time ?? 20, (v) => this.updateFurniture({ awning_time: Math.max(2, Math.min(300, Math.round(v))) }), 1)}
+      ${this.entitySelect(this.t("awning_position"), f.awning_position ?? null, undefined, sensors, (v) => this.updateFurniture({ awning_position: v === "none" ? null : v }))}
+      <label class="fp3d-check fp3d-wide" title=${this.t("motor_invert_hint")}
+        ><input type="checkbox" .checked=${!!f.awning_invert} ?disabled=${!admin} @change=${(ev: Event) => this.updateFurniture({ awning_invert: (ev.target as HTMLInputElement).checked })} />
+        ${this.t("awning_invert")}</label
+      >`;
+  }
+
   private renderFurnitureLinks(f: Furniture) {
     const ALARM_CLASSES = new Set(["smoke", "gas", "carbon_monoxide", "heat", "moisture", "safety", "sound", "problem"]);
     if (!this.hass) return nothing;
@@ -10822,10 +10836,13 @@ export class Fp3dEditor extends LitElement {
         ? // a lamp can follow a light or a plain switch (e.g. a relay that switches the ceiling light)
           /^(light|switch|input_boolean)\./.test(id)
         : tvLike
-          ? // a media player, or the smart plug an older TV is switched with
-            /^(media_player|switch|input_boolean|light)\./.test(id)
+          ? // a media player, or the smart plug an older TV is switched with; a roll-down screen also its motor's cover (#511)
+            /^(media_player|switch|input_boolean|light)\./.test(id) || (packMotion(f.type) === "screen" && id.startsWith("cover."))
           : f.type === "awning"
             ? id.startsWith("cover.")
+            : packMotion(f.type) === "curtain"
+            ? // a motorised curtain: its motor's cover (or a switch that drives it, #511)
+              /^(cover|switch|input_boolean)\./.test(id)
             : f.type === "radiator" || f.type === "ac_unit"
             ? id.startsWith("climate.")
             : isRobotVacuum(f.type)
@@ -10843,10 +10860,10 @@ export class Fp3dEditor extends LitElement {
     return html`<div class="fp3d-form fp3d-links">
         ${f.type === "grid_point"
           ? html`<p class="fp3d-sub fp3d-wide">${this.t("grid_point_hint")}</p>`
-          : this.entitySelect(this.t(lamp ? "furn_entity_light" : tvLike ? "furn_entity_tv" : f.type === "awning" ? "awning_cover" : f.type === "radiator" || f.type === "ac_unit" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
+          : this.entitySelect(this.t(lamp ? "furn_entity_light" : packMotion(f.type) ? "motor_cover" : tvLike ? "furn_entity_tv" : f.type === "awning" ? "awning_cover" : f.type === "radiator" || f.type === "ac_unit" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
-        ${f.type === "awning" ? this.renderAwningFields(f) : nothing}
+        ${f.type === "awning" ? this.renderAwningFields(f) : packMotion(f.type) ? this.renderMotionFields(f) : nothing}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type) ? this.renderStateLinks(f) : nothing}
         ${lamp && f.entity && f.entity !== "none"
           ? html`${this.entitySelect(this.t("furn_color_entity"), f.color_entity ?? null, undefined, this.entityOptions((id) => id.startsWith("light.") && id !== f.entity), (v) => this.updateFurniture({ color_entity: v === "none" ? null : v }))}

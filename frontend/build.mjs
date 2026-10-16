@@ -105,7 +105,7 @@ function copyFonts() {
 // editor 800 KB on 2026-10-14 for the awning (form, sensors) and the 1.18.2 fixes
 // main 570 KB, 3D 770 KB and card editor 230 KB on 2026-10-14 for the awnings (five kinds) and their texts
 // main 590 KB, editor 820 KB, card editor 235 KB on 2026-10-15 for the household (bins, mailboxes, Haushalt Pro) and its texts
-const BUDGET = { "neonplan3d.js": 590 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 770 * 1024, "neonplan3d-editor.js": 820 * 1024, "neonplan3d-card-editor.js": 235 * 1024 };
+const BUDGET = { "neonplan3d.js": 600 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 770 * 1024, "neonplan3d-editor.js": 820 * 1024, "neonplan3d-card-editor.js": 235 * 1024 };
 
 copyFonts();
 if (watch) {
@@ -121,6 +121,15 @@ if (watch) {
   await build(importConfig);
   await build(mainConfig(hashOf(viewerConfig.outfile), hashOf(editor.outfile), hashOf(cardEditorConfig.outfile), hashOf(timeTravelConfig.outfile), hashOf(funConfig.outfile)));
   let over = false;
+  // old Fire-tablet WebViews (Chrome before 91, e.g. Fully Kiosk on a Fire 7) throw on an optional call with spread
+  // arguments, `a?.b(...x)` – the roof failed there; lowering the target for it would cost ~11 KB, so it is banned
+  for (const file of Object.keys(BUDGET)) {
+    const hit = readFileSync(`${out}/${file}`, "utf8").match(/\?\.(?:[\w$]+)?\(\.\.\./);
+    if (hit) {
+      over = true;
+      console.log(`OLD-WEBVIEW ${file}: "${hit[0]}" breaks Chrome < 91 – write it as "if (a.b) a.b(...x)"`);
+    }
+  }
   for (const [file, limit] of Object.entries(BUDGET)) {
     const size = statSync(`${out}/${file}`).size;
     const ok = size <= limit;

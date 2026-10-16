@@ -227,7 +227,7 @@ Türen und Fenster lassen sich im Plan auch an einem breiten Streifen um die Öf
 | **Kippkontakt** | Ein zweiter Sensor, der „gekippt“ meldet |
 | **Kippwinkel-Sensor** | Optional: ein Sensor, der den Kippwinkel in Grad liefert (z. B. „Rotation“ eines Shelly BLU Door/Window). Der Flügel kippt in 3D genau so weit; **Winkel für „ganz gekippt“** (Standard 15°), ein **Offset** für den Wert bei geschlossenem Fenster und **andersherum zählen** passen ihn an die Montage an. Ab einem kleinen Winkel gilt das Fenster als gekippt, auch für die Regenwarnung |
 | **Kontakt zweiter Flügel** | Für zweiflügelige Fenster und Türen |
-| **Garagentor** | Ein Garagentor folgt einer Cover-Entität oder einem Kontakt (an = offen; auch Sensoren, die „open“/„closed“ melden). Der offene Teil liegt dann unter der Decke |
+| **Garagentor** | Ein Garagentor folgt einer Cover-Entität oder einem Kontakt (an = offen; auch Sensoren, die „open“/„closed“ melden). Als Kontakt geht auch ein **Schalter oder input_boolean**, der das Tor antreibt: an = offen, Antippen in 3D schaltet ihn. Der offene Teil liegt dann unter der Decke. Ein Tor- oder Garagen-Cover an einer **Tür** (z. B. ein Schiebetor) bewegt das Türblatt statt eines Rollladens |
 
 Rollläden und Kontakte ordnet NeonPlan 3D über den Bereich automatisch zu. Du kannst sie jederzeit von Hand ändern.
 
@@ -892,10 +892,10 @@ Die mittlere Kachelreihe zeigt die Pro-Erweiterungen. Aktive tragen ein ✓, ges
 | Kinderzimmer, Büro & Gaming, Garten & Terrasse, Garage & Werkstatt, Fitness, Smart-Home & Technik | Möbel und Geräte für den jeweiligen Bereich |
 | Fahrzeuge | Autos, Transporter, Motorräder und mehr für Stellplätze |
 | Treppen & Geländer (16) | Gerade, L- und U-Treppen, gerade Treppen unten offen, viertelgewendelt oder mit Eckpodest, offene U-Treppe zweimal viertelgewendelt, Wendeltreppe, Raumspartreppe, Außentreppe, Podest, Geländer aus Metall, Glas und Holz |
-| Heimkino & Hi-Fi | Leinwand, Beamer, Lautsprecher, Subwoofer, AV-Receiver, Plattenspieler, Kinosessel, Smart Speaker und Smart Displays – Geräte leuchten beim Abspielen |
+| Heimkino & Hi-Fi | Leinwand, Beamer, Lautsprecher, Subwoofer, AV-Receiver, Plattenspieler, Kinosessel, Smart Speaker und Smart Displays – Geräte leuchten beim Abspielen; die ausrollbare Leinwand fährt mit dem Cover ihres Motors hoch und runter (Laufzeit, Positionssensor und Richtung umkehren wie beim Vorhang) |
 | Hauswirtschaft & Haustechnik | Therme, Wärmepumpe, Pufferspeicher, Lüftung, Zählerschrank, Wasserenthärter, Gefriertruhe, Bügelstation |
 | Haustiere | Kratzbaum, Hundebett, Futterautomat, Trinkbrunnen, Katzenklo, Käfige, Aquarium und Terrarium mit Licht |
-| Architektur & Ausbau | Säulen, Balken, Schornstein, Kamin, Glastrennwand, Schiebewand, Lichtvoute, LED-Nische, Podest |
+| Architektur & Ausbau | Säulen, Balken, Schornstein, Kamin, Glastrennwand, Schiebewand, Lichtvoute, LED-Nische, Podest, motorisierter Vorhang (öffnet sich mit seinem Cover; unter **Antrieb (Cover)** dazu Laufzeit, ein Live-Positionssensor wie bei Rollläden und **Richtung umkehren**) |
 
 Geräte in Packs haben eine kleine Leuchtfläche (Display, Status-LED): Verknüpft mit einem Media-Player, Schalter oder Licht leuchtet sie, solange das Gerät läuft; ein Aquarium leuchtet in der Farbe seines Lichts.
 

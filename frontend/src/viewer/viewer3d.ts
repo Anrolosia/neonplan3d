@@ -54,7 +54,7 @@ import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
-import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, screenRect, pushFridgeDoors } from "./furniture.ts";
+import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -63,7 +63,7 @@ export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
 export const funLib = { Group, Mesh, MeshBasicMaterial, CanvasTexture, Color, PlaneGeometry, BufferGeometry: Geometry, Float32BufferAttribute, DoubleSide };
 
 export type { PipeTube };
-import { isCooktopZone, mountBase, packItem, setPacks, type FurniturePack } from "../packs.ts";
+import { isCooktopZone, mountBase, packItem, packMotion, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
 import { buildRoof, type RoofWindowState } from "./roof.ts";
 import { GROUND, groundFace, groundFloor, roofFaces, roofWindowRoom, wallFaces } from "../solar.ts";
@@ -306,6 +306,8 @@ const ROOF_GAP = 1.4;
 /** Opacity of the floors below the selected one. */
 const BELOW_OPACITY = 0.22;
 /** Time constant of the floor animation (ms); about 700 ms until settled. */
+/** The roof's opacity when fully shown (a touch of see-through); it then sits right on its walls. */
+const ROOF_OPACITY = 0.94;
 const FLOOR_TAU = 140;
 /** Grid cells across the ground texture. */
 const GROUND_CELLS = 32;
@@ -1365,13 +1367,16 @@ export class FloorplanViewer {
 
   /** Which doors of the smart fridges stand open; the doors swing there over a few frames. */
   setFridgeDoors(doors: Map<string, { left: boolean; right: boolean }>): void {
+    const fresh = new Set<string>();
     for (const [id, d] of doors) {
+      if (!this.fridges.has(id)) fresh.add(id);
       const st = this.fridges.get(id) ?? { l: d.left ? 1 : 0, r: d.right ? 1 : 0, tl: 0, tr: 0 };
       st.tl = d.left ? 1 : 0;
       st.tr = d.right ? 1 : 0;
       this.fridges.set(id, st);
     }
     for (const id of [...this.fridges.keys()]) if (!doors.has(id)) this.fridges.delete(id);
+    this.showFresh(fresh);
     this.invalidate();
   }
 
@@ -1383,7 +1388,9 @@ export class FloorplanViewer {
   private awnings = new Map<string, { cur: number; to: number; speed: number }>();
 
   setAwnings(states: Map<string, { out: number | null; moving: -1 | 0 | 1; time: number }>): void {
+    const fresh = new Set<string>();
     for (const [id, a] of states) {
+      if (!this.awnings.has(id)) fresh.add(id);
       const st = this.awnings.get(id) ?? { cur: a.out ?? 0, to: a.out ?? 0, speed: 0 };
       if (a.out === null) {
         st.to = a.moving > 0 ? 1 : 0;
@@ -1395,7 +1402,17 @@ export class FloorplanViewer {
       this.awnings.set(id, st);
     }
     for (const id of [...this.awnings.keys()]) if (!states.has(id)) this.awnings.delete(id);
+    this.showFresh(fresh);
     this.invalidate();
+  }
+
+  /**
+   * Fridge doors and awnings seen for the first time start where their entity says (an awning already out, a door
+   * already open) – nothing moves then, so their floor's mesh is rebuilt right away (#546).
+   */
+  private showFresh(fresh: Set<string>): void {
+    if (!fresh.size) return;
+    for (const fv of this.floors) if (fv.floor.furniture.some((f) => fresh.has(f.id))) this.buildFridges(fv);
   }
 
   private stepAwnings(dt: number): Set<string> {
@@ -1449,6 +1466,12 @@ export class FloorplanViewer {
     }
     // awnings ride in the same mesh: they run out and in with their cover
     for (const f of fv.floor.furniture) if (f.type === "awning") pushAwning(buf, f, mountBase(fv.floor, f), this.awnings.get(f.id)?.cur ?? 0);
+    // so do a motorised curtain and a roll-down screen from a pack (#511)
+    for (const f of fv.floor.furniture) {
+      const kind = packMotion(f.type);
+      const item = kind ? packItem(f.type) : undefined;
+      if (kind && item) pushPackMotion(buf, item, kind, f, mountBase(fv.floor, f), this.awnings.get(f.id)?.cur ?? 0);
+    }
     fv.fridgeMesh.geometry.dispose();
     fv.fridgeMesh.geometry = buf.geometry();
     fv.fridgeMesh.visible = buf.count > 0;
@@ -2159,6 +2182,11 @@ export class FloorplanViewer {
     this.placeRoof();
   }
 
+  /** How far the roof floats above its walls while it fades: none at all once it is fully shown (#556). */
+  private roofLift(): number {
+    return Math.max(0, 1 - this.roofO / ROOF_OPACITY) * 2.2;
+  }
+
   /**
    * The roof shows in the house view and sits on its floor; zooming in lifts and fades it, so the top
    * floor opens up. Returns true while it still moves.
@@ -2169,7 +2197,7 @@ export class FloorplanViewer {
     const zoom = this.keepRoof ? 1 : Math.min(1, Math.max(0, (this.controls.view.radius / this.houseRadius - 0.62) / 0.3));
     // a house with a single floor shows that floor as its house view, roof included (D208)
     const house = this.floorId === null || this.floors.length === 1;
-    const target = house && this.wallMode !== "cut" ? 0.94 * zoom : 0;
+    const target = house && this.wallMode !== "cut" ? ROOF_OPACITY * zoom : 0;
     const k = 1 - Math.exp(-dt / FLOOR_TAU);
     const before = this.roofO;
     this.roofO += (target - this.roofO) * k;
@@ -2183,7 +2211,7 @@ export class FloorplanViewer {
       // the same slopes, #202) and lifts off it the same way (it follows that floor's own glide)
       const ride = this.floorMap.get(part.rideId) ?? fv;
       const apart = ride.ty > 0 ? Math.min(1, ride.y / ride.ty) : this.explode && this.floorId === null ? 1 : 0;
-      part.group.position.y = fv.floor.elevation + ride.y + part.base + (1 - this.roofO) * 2.2 + (part.lift ? apart * ROOF_GAP : 0);
+      part.group.position.y = fv.floor.elevation + ride.y + part.base + this.roofLift() + (part.lift ? apart * ROOF_GAP : 0);
       // the windows stay in the slope over their floor's rooms while the roof lifts away (not in the cut view)
       if (part.win) {
         part.win.position.y = fv.floor.elevation + ride.y + part.base + (part.lift ? apart * ROOF_GAP : 0);
@@ -4088,7 +4116,7 @@ export class FloorplanViewer {
         }
         // the roof lifts and fades when the camera comes close: an anchor on it rides up with it
         // (in a floor view the roof is gone: its cards stay where the roof would be, #193)
-        const p = new Vector3(a.p[0], a.p[1] + (fv?.y ?? 0) + (a.roof && (this.floorId === null || this.floors.length <= 1) ? (1 - this.roofO) * 2.2 : 0), a.p[2]);
+        const p = new Vector3(a.p[0], a.p[1] + (fv?.y ?? 0) + (a.roof && (this.floorId === null || this.floors.length <= 1) ? this.roofLift() : 0), a.p[2]);
         const toCamera = this.camera.position.clone().sub(p);
         const dist = toCamera.length();
         // a small card that only shows close up (a waste bin's): hidden while the camera is farther away

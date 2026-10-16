@@ -402,6 +402,21 @@ test("an opening state knows whether a sensor reports it", () => {
   assert.equal(openingState(hass, { ...none, cover: "cover.tor" }, "garage").sensed, true);
 });
 
+test("a gate on a sliding door moves the leaf and draws no blind; a roller shutter on a door stays a blind (#544)", () => {
+  const hass = {
+    states: {
+      "cover.gate": { entity_id: "cover.gate", state: "open", attributes: { device_class: "gate", current_position: 40 } },
+      "cover.shutter": { entity_id: "cover.shutter", state: "open", attributes: { device_class: "shutter", current_position: 40 } },
+    },
+  } as unknown as HomeAssistant;
+  const none = { cover: null, contact: null, tilt: null, contact2: null, tilt2: null };
+  const gate = openingState(hass, { ...none, cover: "cover.gate" }, "door");
+  assert.equal(gate.cover, null);
+  assert.ok(Math.abs(gate.open - 0.4) < 1e-9);
+  const shutter = openingState(hass, { ...none, cover: "cover.shutter" }, "door");
+  assert.ok(Math.abs((shutter.cover ?? 0) - 0.6) < 1e-9);
+});
+
 test("a garage door reads its contact like a door, and an inverted contact flips open and closed (#329)", () => {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   const hass = {

@@ -6,7 +6,7 @@
 import { Color } from "three";
 import type { Furniture, Vec2 } from "../model.ts";
 import { builtinBase, stairsULayout, POOL_VALVE_Y } from "../model.ts";
-import { mountBase, packItem, packScreen, type PackItem } from "../packs.ts";
+import { mountBase, packItem, packMotion, packMovingPart, packScreen, type PackItem, type PackMotion } from "../packs.ts";
 import { binColors, binShape, householdCountry, mailboxShape, type BinShape, type MailboxShape } from "../household.ts";
 import type { Floor } from "../model.ts";
 import { ALWAYS, DEG, EDGE_TOP, GeoBuffer, LineBuffer, pushLoft, pushLyingCyl, pushPrism, shade } from "./geo.ts";
@@ -1671,7 +1671,9 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
     default: {
       const item = packItem(f.type);
       if (item) {
-        packModel(b, item, w, d, h, base, null);
+        // a motorised curtain's fabric or a roll-down screen's cloth is drawn with its cover's state (pushPackMotion)
+        const motion = packMotion(f.type);
+        packModel(b, item, w, d, h, base, null, null, motion ? (p) => packMovingPart(motion, p) : null);
         // items on furniture, walls or ceilings cast no shadow on the floor
         if (base > 0.05) return;
       } else b.box(-w / 2, w / 2, 0, h, -d / 2, d / 2, C.body, C.bodyTop, EDGE_FURN);
@@ -1689,9 +1691,20 @@ function packColor(value: string | undefined, top: boolean): number | null {
 }
 
 /** Model of a pack item: its parts scaled to the item's size; glowing parts take `glow` (a lit lamp). */
-function packModel(b: Builder, item: PackItem, w: number, d: number, h: number, base: number, glow: number | null, only: ((p: PackItem["parts"][number]) => boolean) | null = null): void {
+function packModel(
+  b: Builder,
+  item: PackItem,
+  w: number,
+  d: number,
+  h: number,
+  base: number,
+  glow: number | null,
+  only: ((p: PackItem["parts"][number]) => boolean) | null = null,
+  skip: ((p: PackItem["parts"][number]) => boolean) | null = null,
+): void {
   const onlyGlow = !!only;
   for (const q of item.parts) {
+    if (skip?.(q)) continue;
     // only some parts (the glowing ones of a speaker, a car's windows), a hair larger so they cover the item's own
     if (only && !only(q)) continue;
     const p = onlyGlow ? { ...q, glow: true, w: q.w + 0.006 / w, d: q.d + 0.006 / d, y: Math.max(0, q.y - 0.002 / h), h: q.h + 0.004 / h } : q;
@@ -1754,6 +1767,42 @@ export function pushPackGlow(buf: GeoBuffer, item: PackItem, f: Pick<Furniture, 
   const mx = f.mirror ? -1 : 1;
   const tf: Tf = (x, z) => [f.x + mx * x * c - z * s, f.z + mx * x * s + z * c];
   packModel(new Builder(buf, new LineBuffer(), tf), item, Math.max(0.05, f.w), Math.max(0.05, f.d), Math.max(0.005, f.h), base, color, pick);
+}
+
+/**
+ * The moving parts of a motorised curtain or roll-down screen from a pack (#511), `open` 0 … 1 as its cover reports
+ * (open = curtain drawn aside, screen rolled up). The curtain's panels gather towards both ends; the screen's cloth
+ * and bar hang from the roller as far as it is down.
+ */
+export function pushPackMotion(buf: GeoBuffer, item: PackItem, kind: PackMotion, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "mirror">, base: number, open: number): void {
+  const parts = packMotionParts(item, kind, open);
+  const a = f.rotation * DEG;
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  const mx = f.mirror ? -1 : 1;
+  const tf: Tf = (x, z) => [f.x + mx * x * c - z * s, f.z + mx * x * s + z * c];
+  packModel(new Builder(buf, new LineBuffer(), tf), { ...item, parts }, Math.max(0.05, f.w), Math.max(0.05, f.d), Math.max(0.005, f.h), base, null);
+}
+
+/** The moving parts of such an item where they are at `open` (in the item's fractions of its size). */
+export function packMotionParts(item: PackItem, kind: PackMotion, open: number): PackItem["parts"] {
+  const t = Math.min(1, Math.max(0, open));
+  const moving = item.parts.filter((p) => packMovingPart(kind, p));
+  let parts: PackItem["parts"];
+  if (kind === "curtain") {
+    // each panel keeps its width and moves outwards: fully open, the panels bunch up in the outer fifth of each half
+    parts = moving.map((p) => {
+      // x is the part's centre as a share of the width, from -0.5 (left end) to 0.5 (right end)
+      const edge = Math.sign(p.x || 1) * 0.5;
+      return { ...p, x: edge - (edge - p.x) * (1 - 0.8 * t) };
+    });
+  } else {
+    // the cloth hangs from its top edge (under the roller) and is as long as the screen is down
+    const top = Math.max(...moving.map((p) => p.y + p.h));
+    const down = Math.max(0.02, 1 - t);
+    parts = moving.map((p) => ({ ...p, y: top - (top - p.y) * down, h: p.h * down }));
+  }
+  return parts;
 }
 
 /** A pack lamp into the lamp buffer: glowing parts in the light's colour (`glow`), or dark when off. */
