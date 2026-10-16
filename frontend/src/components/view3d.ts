@@ -93,7 +93,7 @@ import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from 
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, manualUrl, shopUrl, type Feature } from "../features.ts";
+import { hasFeature, labOn, manualUrl, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
@@ -912,6 +912,7 @@ export class Fp3dView3d extends LitElement {
     v.setScreens(furniture.screens);
     v.setFridgeDoors(fridgeDoors(hass, b.floors));
     v.setAwnings(awningStates(hass, b.floors));
+    v.setProjections(this.projectedCameras(hass, b));
     v.setRobots(this.robotInfos(hass, b));
     // roof windows: sash and blind follow their contact and cover like windows do
     const roofWindows = new Map<string, { open: number; tilt: number; cover: number }>();
@@ -2509,7 +2510,7 @@ export class Fp3dView3d extends LitElement {
         if (picture) screens.set(f.id, { color: bg, level: 1, picture, plain: true });
       }
     }
-    this.watchCameras(this.cameraScreens > 0 || !!this._through || this.cameraWall);
+    this.watchCameras(this.cameraScreens > 0 || !!this._through || this.cameraWall || this.projecting);
     return { markers, consumers, screens, targets };
   }
 
@@ -2666,6 +2667,24 @@ export class Fp3dView3d extends LitElement {
   }
 
   /** While a screen shows a camera, its snapshot is fetched again every few seconds (slower on the tablet level). */
+  /** Lab prototype: cameras placed in the plan whose current picture is cast onto it. */
+  private projecting = false;
+
+  private projectedCameras(hass: HomeAssistant, b: Building): { id: string; url: string }[] {
+    const out: { id: string; url: string }[] = [];
+    if (labOn()) {
+      const ids = new Set(b.floors.flatMap((f) => f.placements.map((p) => p.entity_id)).filter((id) => kindOf(id) === "camera"));
+      for (const id of ids) {
+        const st = hass.states[id];
+        const picture = st?.attributes.entity_picture as string | undefined;
+        if (!picture || isUnavailable(st)) continue;
+        out.push({ id, url: picture.startsWith("data:") ? picture : `${picture}${picture.includes("?") ? "&" : "?"}fp3d=${this.cameraTick}` });
+      }
+    }
+    this.projecting = out.length > 0;
+    return out;
+  }
+
   private watchCameras(on: boolean): void {
     if (on && !this.cameraTimer) {
       this.cameraTimer = setInterval(() => {

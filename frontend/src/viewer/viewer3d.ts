@@ -54,6 +54,7 @@ import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoles, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
+import { CameraProjections, PROJECTION_LAYER, type ProjectionSurface, type ProjectorPose } from "./projection.ts";
 import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
@@ -1506,7 +1507,48 @@ export class FloorplanViewer {
     return fv ? fv.floor.elevation + fv.ty : 0;
   }
 
+  /** Lab prototype: cameras whose current picture is cast onto the plan (an empty list ends it). */
+  private projections = new CameraProjections(() => this.invalidate());
+
+  setProjections(list: readonly { id: string; url: string }[]): void {
+    this.projections.set(list);
+    this.invalidate();
+  }
+
+  /** Where a placed camera hangs and looks (as when looking through it), for its picture to be cast from there. */
+  private projectorPose(id: string): ProjectorPose | null {
+    const d = this.devices.find((m) => m.id === id && m.model);
+    const fv = d && this.floorMap.get(d.floorId);
+    if (!d || !fv || !fv.group.visible) return null;
+    const a = (d.rotation ?? 0) * DEG;
+    const ceiling = d.model === "camera_ceiling";
+    const tilt = Math.min(1.45, Math.max(0.05, (d.tilt ?? (ceiling ? 65 : 20)) * DEG));
+    const y = fv.floor.elevation + fv.ty + (ceiling ? fv.floor.height - 0.1 : d.y);
+    return {
+      position: new Vector3(d.x, y, d.z),
+      direction: new Vector3(-Math.sin(a) * Math.cos(tilt), -Math.sin(tilt), Math.cos(a) * Math.cos(tilt)),
+      fov: Math.min(d.fov ?? (ceiling ? 120 : 90), 140),
+      reach: 40,
+    };
+  }
+
+  /** Before a frame: the projected camera pictures follow the floors (pulled apart, rebuilt, faded). */
+  private updateProjections(): void {
+    const surfaces: ProjectionSurface[] = [];
+    for (const fv of this.floors) {
+      const visible = fv.group.visible && fv.o > 0.5;
+      for (const m of [fv.floorMesh, fv.wallMesh]) m.layers.enable(PROJECTION_LAYER);
+      surfaces.push({ key: `${fv.floor.id}:floor`, geometry: fv.floorMesh.geometry, parent: fv.group, masks: fv.mask, visible });
+      surfaces.push({ key: `${fv.floor.id}:walls`, geometry: fv.wallMesh.geometry, parent: fv.group, masks: fv.mask, visible });
+    }
+    this.ground.layers.enable(PROJECTION_LAYER);
+    surfaces.push({ key: "ground", geometry: this.ground.geometry, parent: this.ground, masks: null, visible: this.ground.visible });
+    const layout = this.floors.map((f) => `${f.floor.id}:${f.ty.toFixed(2)}:${f.floorMesh.geometry.uuid}:${f.wallMesh.geometry.uuid}`).join(";") + `|${this.ground.position.toArray().join(",")}`;
+    this.projections.update(this.renderer, this.scene, surfaces, (id) => this.projectorPose(id), layout);
+  }
+
   dispose(): void {
+    this.projections.dispose();
     this.disposed = true;
     cancelAnimationFrame(this.frame);
     clearTimeout(this.flowTimer);
@@ -3956,6 +3998,7 @@ export class FloorplanViewer {
     this.flowTime.value = this.flowSeconds();
     if (this.soundActive) this.animateSound(now);
     this.updateWalls();
+    if (this.projections.active) this.updateProjections();
     this.renderer.render(this.scene, this.camera);
     // labels are placed only when the view or something on it moved (style writes cost layout)
     if (this.viewChanged() || floorsMoving || this.labelsDirty) {

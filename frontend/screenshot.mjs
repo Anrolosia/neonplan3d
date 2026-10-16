@@ -115,6 +115,25 @@ const HOUSEHOLD_SCRIPT = `
   e.setDoc(structuredClone(e._doc));
 `;
 
+
+// lab prototype: a garden camera on the back wall casts a test picture (1 m squares, coloured bands) onto terrace and lawn
+const PROJECTION_SCRIPT = `
+  localStorage.setItem('neonplan3d.lab', '1');
+  const c = document.createElement('canvas'); c.width = 960; c.height = 540;
+  const g = c.getContext('2d');
+  const sky = g.createLinearGradient(0, 0, 0, 540); sky.addColorStop(0, '#5aa0d8'); sky.addColorStop(0.35, '#7fbf5a'); sky.addColorStop(1, '#3d7a2e');
+  g.fillStyle = sky; g.fillRect(0, 0, 960, 540);
+  for (let y = 200; y < 540; y += 34) for (let x = 0; x < 960; x += 34) if (((x + y) / 34) % 2 === 0) { g.fillStyle = 'rgba(255,255,255,0.18)'; g.fillRect(x, y, 34, 34); }
+  g.fillStyle = '#c9a77a'; g.fillRect(260, 330, 440, 210);
+  g.fillStyle = '#d2453a'; g.fillRect(420, 380, 120, 70);
+  g.fillStyle = '#ffffff'; g.font = 'bold 44px sans-serif'; g.fillText('KAMERA GARTEN', 300, 120);
+  g.strokeStyle = '#ffeb3b'; g.lineWidth = 8; g.strokeRect(6, 6, 948, 528);
+  e.hass.states['camera.garten'] = { entity_id: 'camera.garten', state: 'idle', attributes: { friendly_name: 'Garten Kamera', entity_picture: c.toDataURL('image/jpeg', 0.9) }, last_changed: '', last_updated: '', context: { id: '' } };
+  const f = e._doc.floors[0];
+  f.placements.push({ entity_id: 'camera.garten', x: 4, z: -0.4, y: 2.6, mount: 'wall', rotation: 180, tilt: 32, fov: 100 });
+  e.setDoc(structuredClone(e._doc));
+`;
+
 const shots = [
   { name: "view-house", query: "?fp3d_stats", width: 1280, height: 800 },
   { name: "promo-house", query: "", width: 1280, height: 800 },
@@ -389,6 +408,8 @@ const shots = [
   { name: "empty", query: "?empty", width: 1280, height: 800 },
   { name: "site-demo", query: "?site&lang=en", width: 1280, height: 800 },
   { name: "site-demo-phone", query: "?site&lang=de", width: 390, height: 844 },
+  { name: "view-projection", query: "", width: 1400, height: 900, editor: true, editorScript: PROJECTION_SCRIPT, then3d: "Erdgeschoss", camera: { target: { x: 4, y: 0.3, z: -3.5 }, radius: 11, phi: 0.95 }, afterWait: 2500 },
+  { name: "view-projection-top", query: "", width: 1400, height: 900, editor: true, editorScript: PROJECTION_SCRIPT, then3d: "Erdgeschoss", camera: { target: { x: 4, y: 0.3, z: -3.5 }, radius: 12, phi: 0.25 }, afterWait: 2500 },
   { name: "view-household", query: "", width: 1600, height: 1000, editor: true, editorScript: HOUSEHOLD_SCRIPT, then3d: "Erdgeschoss", camera: { target: { x: 12, y: 0.6, z: 7.8 }, radius: 7, phi: 0.95 }, afterWait: 1500 },
   { name: "view-household-card", query: "", width: 1280, height: 800, editor: true, editorScript: HOUSEHOLD_SCRIPT, then3d: "Erdgeschoss", afterWait: 1500 },
   { name: "editor-household-bin", query: "", width: 1280, height: 1100, editor: true, editorScript: HOUSEHOLD_SCRIPT + " setTimeout(() => { e._roomId = 'garage'; e._furnitureId = e._doc.floors[0].furniture.find((m) => m.type === 'waste_bin' && m.bin_kind === 'paper').id; }, 500);", scrollSide: true, afterWait: 900 },
