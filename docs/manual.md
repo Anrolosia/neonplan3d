@@ -1063,6 +1063,9 @@ Alexa Media Player does not set the volume on some Echos, or only with a delay, 
 **"Restart needed" appears at the top.**
 After an update the old version still runs in the background. Restart Home Assistant.
 
+**On an iPhone or iPad NeonPlan closes when I move or zoom with two fingers.**
+That is no crash: the Home Assistant app has gestures of its own. If a two-finger swipe has an action there (e.g. to the start page), the app runs it and leaves the page. In the app, set the two-finger gestures under **Settings → Companion App → Gestures** to **None**. It never happens in Safari.
+
 **A device is missing in a room's device list.**
 The room needs an area, and the device must belong to that area, either the device or the entity itself. If the entity sits under a device with several entities, it is behind "+n more". The search field finds it directly.
 
