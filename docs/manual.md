@@ -922,6 +922,7 @@ Switch them on and off under **🎈 Fun packs** afterwards.
 **Pets:** a cat, a rabbit or a dog – as a dachshund, pug, terrier, labrador or shepherd – lives in your 3D house. **+ Add a pet** sets one up: kind, breed (for dogs), name, fur and the floor it starts on. **Show the pets** switches all of them on and off; in the dashboard card the option **Show the pets** (YAML `pets: false`) leaves them out of that card, e.g. on the wall tablet.
 
 - The pets walk through the doors from room to room and **up and down the stairs** – they get around the whole house. A door whose contact reports it shut stops them; doors without a sensor count as open.
+- They walk **around furniture** instead of through it – round the sofa, table and cupboard; rugs, lamps and what hangs on a wall are no obstacle. Onto their place on the sofa or bed they hop at the end.
 - They rest at their favourite places: a cat walks up to a **sofa, an armchair or a bed** and jumps on from the front, a dog lies down in front of it. From the Pets pack, cats like the cat bed, cave and scratching tree, dogs the dog bed, basket and kennel; they drop by the **bowls**, the feeder and the water fountain.
 - **At night** (the sun in Home Assistant has set) they sleep curled up, with a little "z Z".
 - Colourful **fish** swim in the Pets pack's **aquariums**.

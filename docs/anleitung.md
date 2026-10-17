@@ -922,6 +922,7 @@ Unter **🎈 Fun-Packs** schaltest du sie danach ein und aus.
 **Haustiere:** Katze, Kaninchen oder Hund – als Dackel, Mops, Terrier, Labrador oder Schäferhund – leben in deinem 3D-Haus. **+ Haustier hinzufügen** legt ein Tier an: Art, Rasse (bei Hunden), Name, Fell und die Etage, auf der es startet. **Haustiere zeigen** schaltet alle auf einmal ein und aus; in der Dashboard-Karte blendet die Option **Haustiere zeigen** (YAML `pets: false`) sie für diese Karte aus, etwa am Wandtablet.
 
 - Die Tiere laufen durch die Türen von Raum zu Raum und **die Treppe hoch und runter** – so sind sie im ganzen Haus unterwegs. Eine Tür, deren Kontakt „zu“ meldet, ist für sie zu; Türen ohne Sensor gelten als offen.
+- Sie laufen **um Möbel herum** statt hindurch – um Sofa, Tisch und Schrank; Teppiche, Lampen und was an der Wand hängt, sind kein Hindernis. Auf ihren Platz auf dem Sofa oder Bett springen sie zum Schluss hinauf.
 - Sie ruhen an ihren Lieblingsplätzen: Die Katze läuft vor ein **Sofa, einen Sessel oder ein Bett** und springt von vorne hinauf, der Hund legt sich davor. Aus dem Pack Haustiere mögen Katzen Katzenbett, Katzenhöhle und Kratzbaum, Hunde Hundebett, Hundekorb und Hundehütte; am **Napf**, Futterautomaten und Trinkbrunnen schauen sie kurz vorbei.
 - **Nachts** (die Sonne in Home Assistant ist untergegangen) schlafen sie eingerollt, mit einem kleinen „z Z“.
 - In den **Aquarien** des Packs Haustiere schwimmen bunte **Fische**.
