@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Az utolsó pontból az elsőbe futó él nem rajzolódik ki – a házhoz támaszkodó kerítés vagy pergola.",
  "outdoor_bracing": "X-merevítés",
  "outdoor_cut": "Kivágás az alatta lévő területekből",
+ "outdoor_area_hint": "Területtel a felület szobaként működik: 3D-ben koppintva megnyílik a terület eszközeivel, szerepel a szobasávban, és viseli a nevét.",
  "outdoor_cut_hint": "Minden korábban rajzolt terület, amely ezt egészben tartalmazza, itt lyukat kap – tó vagy vadon terület a gyepben.",
  "outdoor_slope": "Lejtés (m)",
  "outdoor_slope_hint": "Szintkülönbség a magas éltől az alacsonyig; a magas él a magassági eltolásnál van. A területen álló lámpák követik.",

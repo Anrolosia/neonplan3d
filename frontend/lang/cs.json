@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Hrana z posledního bodu zpět k prvnímu se nekreslí – plot nebo pergola opřená o dům.",
  "outdoor_bracing": "Křížové vzpěry",
  "outdoor_cut": "Vyříznout z ploch pod ní",
+ "outdoor_area_hint": "S oblastí se plocha chová jako místnost: klepnutí ve 3D ji otevře se zařízeními oblasti, je v liště místností a nese svůj název.",
  "outdoor_cut_hint": "Každá dříve nakreslená plocha, která tuto celou obsahuje, tu dostane díru – jezírko nebo divoká plocha v trávníku.",
  "outdoor_slope": "Svah (m)",
  "outdoor_slope_hint": "Výškový rozdíl od horní hrany k dolní; horní hrana leží ve výškovém posunu. Lampy na ploše ho sledují.",

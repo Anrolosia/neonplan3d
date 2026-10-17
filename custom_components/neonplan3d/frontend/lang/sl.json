@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Rob od zadnje točke nazaj do prve se ne nariše – ograja ali pergola, naslonjena na hišo.",
  "outdoor_bracing": "Križno ojačanje",
  "outdoor_cut": "Izreži iz površin pod njo",
+ "outdoor_area_hint": "Z območjem deluje površina kot prostor: dotik v 3D jo odpre z napravami območja, je v vrstici prostorov in nosi svoje ime.",
  "outdoor_cut_hint": "Vsaka površina, narisana pred to, ki jo v celoti vsebuje, dobi tukaj luknjo – ribnik ali divji kotiček v trati.",
  "outdoor_slope": "Naklon (m)",
  "outdoor_slope_hint": "Višinska razlika od višjega do nižjega roba; višji rob je na zamiku višine. Svetilke na površini sledijo.",

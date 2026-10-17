@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "De rand van het laatste punt terug naar het eerste wordt niet getekend – een hek of pergola tegen het huis.",
  "outdoor_bracing": "X-verband",
  "outdoor_cut": "Uitsnijden uit de vlakken eronder",
+ "outdoor_area_hint": "Met een ruimte werkt het vlak als een kamer: een tik in 3D opent het met de apparaten van de ruimte, het staat in de kamerbalk en draagt zijn naam.",
  "outdoor_cut_hint": "Elk eerder getekend vlak dat dit helemaal bevat, krijgt hier een gat – een vijver of wild stuk in het gazon.",
  "outdoor_slope": "Helling (m)",
  "outdoor_slope_hint": "Hoogteverschil van de hoge naar de lage rand; de hoge rand ligt op de hoogteverschuiving. Lampen op het vlak volgen.",

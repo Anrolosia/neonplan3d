@@ -101,7 +101,7 @@ import { load3d } from "../load3d.ts";
 import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
-import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
+import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, zonesOf, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -2190,7 +2190,7 @@ export class Fp3dView3d extends LitElement {
     const b = this.building;
     const hass = this.hass;
     const floor = b?.floors.find((f) => f.id === floorId);
-    const room = floor?.rooms.find((r) => r.id === roomId);
+    const room = floor ? zonesOf(floor).find((r) => r.id === roomId) : undefined;
     if (!b || !hass || !floor || !room || this.ro) return;
     const ids = new Set(areaEntities(hass, room.area_id).filter((id) => kindOf(id) === "light"));
     for (const p of floor.placements) if (kindOf(p.entity_id) === "light" && pointInPolygon([p.x, p.z], room.points)) ids.add(p.entity_id);
@@ -2240,7 +2240,8 @@ export class Fp3dView3d extends LitElement {
     const info = new Map<string, string>();
     if (this.heatMode === "values") {
       for (const floor of b.floors)
-        for (const room of floor.rooms) {
+        // outdoor areas acting as rooms show their values too (the garden's temperature, #100)
+        for (const room of zonesOf(floor)) {
           const t = roomClimateValue(hass, floor, room, "temperature");
           const h = roomClimateValue(hass, floor, room, "humidity");
           const c = roomClimateValue(hass, floor, room, "co2");
@@ -3149,7 +3150,7 @@ export class Fp3dView3d extends LitElement {
   private renderScenes() {
     const b = this.building;
     if (!this.scenes || !this.roomId || this.panelOpen || !b || !this.hass || this.ro) return nothing;
-    const room = b.floors.flatMap((f) => f.rooms).find((r) => r.id === this.roomId);
+    const room = b.floors.flatMap((f) => zonesOf(f)).find((r) => r.id === this.roomId);
     const ids = room ? areaEntities(this.hass, room.area_id).filter((id) => kindOf(id) === "scene" || kindOf(id) === "script").slice(0, 6) : [];
     if (!ids.length) return nothing;
     const areaName = room?.area_id ? this.hass.areas?.[room.area_id]?.name : undefined;

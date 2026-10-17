@@ -17,7 +17,7 @@ import { THEMES, type Theme } from "./themes.ts";
 import { keepInRoom, snapToWall } from "./geometry/snap.ts";
 import { furnitureName } from "./furniture-names.ts";
 import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts";
-import { canLift, type LampMount } from "./model.ts";
+import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
@@ -813,8 +813,9 @@ export class Floorplan3dPanel extends LitElement {
         ${roomFloors.flatMap((f) => [
           // in the house view the rooms of every floor follow a small floor label; a room without a name has
           // no button (an empty chip would only take space, #370)
-          roomFloors.length > 1 && f.rooms.some((r) => r.name.trim()) ? html`<span class="fp3d-nav-floor">${f.name}</span>` : nothing,
-          ...f.rooms.filter((r) => r.name.trim()).map(
+          roomFloors.length > 1 && zonesOf(f).some((r) => r.name.trim()) ? html`<span class="fp3d-nav-floor">${f.name}</span>` : nothing,
+          // the rooms, then the outdoor areas acting as rooms (garden, terrace – #100)
+          ...zonesOf(f).filter((r) => r.name.trim()).map(
             (r) => html`<button
               class="fp3d-chip fp3d-room-chip"
               aria-pressed=${r.id === this._roomId}
@@ -894,8 +895,8 @@ export class Floorplan3dPanel extends LitElement {
               @camera-look=${(e: CustomEvent<{ entity: string }>) => this.view3d()?.lookThrough(e.detail.entity)}
               .hass=${this.tt.hass(this.hass)}
               ?readOnly=${tt}
-              .room=${b.floors.flatMap((f) => f.rooms).find((r) => r.id === this._roomId) ?? null}
-              .floor=${b.floors.find((f) => f.rooms.some((r) => r.id === this._roomId)) ?? null}
+              .room=${b.floors.flatMap((f) => zonesOf(f)).find((r) => r.id === this._roomId) ?? null}
+              .floor=${b.floors.find((f) => zonesOf(f).some((r) => r.id === this._roomId)) ?? null}
               .building=${b}
               .confirmEntities=${confirmEntities(this.hass, b.floors)}
               @close=${() => (this._roomId = null)}

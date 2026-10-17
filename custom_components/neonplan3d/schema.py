@@ -458,6 +458,9 @@ OUTDOOR_SCHEMA = vol.Schema(
         vol.Optional("rim", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=-0.5, max=2))),
         # Pool Pro: the pool's entities
         vol.Optional("pool", default=None): vol.Any(None, POOL_SCHEMA),
+        # an outdoor area like a room (#100): its name and Home Assistant area
+        vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=80))),
+        vol.Optional("area_id", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
     },
     extra=vol.ALLOW_EXTRA,
 )

@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Kanten fra det sidste punkt tilbage til det første tegnes ikke – et hegn eller en pergola, der støder op til huset.",
  "outdoor_bracing": "Krydsafstivning",
  "outdoor_cut": "Skær ud af områderne nedenunder",
+ "outdoor_area_hint": "Med et område bliver fladen som et rum: et tryk i 3D åbner den med områdets enheder, den står i rumlinjen og bærer sit navn.",
  "outdoor_cut_hint": "Alle områder, der er tegnet før dette, og som indeholder det helt, får et hul her – en dam eller vild natur i græsplænen.",
  "outdoor_slope": "Hældning (m)",
  "outdoor_slope_hint": "Højdeforskel fra den høje kant til den lave kant; den høje kant ligger ved højdeforskydningen. Lamper på området følger med.",

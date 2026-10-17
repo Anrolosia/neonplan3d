@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Kanten frå siste punkt tilbake til det første blir ikkje teikna – eit gjerde eller ein pergola som står inntil huset.",
  "outdoor_bracing": "Kryssavstiving",
  "outdoor_cut": "Skjer ut av områda under",
+ "outdoor_area_hint": "Med eit område blir flata som eit rom: eit trykk i 3D opnar ho med områdets einingar, ho står i romlinja og ber namnet sitt.",
  "outdoor_cut_hint": "Alle område teikna før dette som omsluttar det heilt, får eit hol her – ein dam eller ei villeng i plenen.",
  "outdoor_slope": "Helling (m)",
  "outdoor_slope_hint": "Høgdeskilnad frå høgaste til lågaste kant; den høge kanten ligg på høgdeforskyvinga. Lamper på området følgjer med.",

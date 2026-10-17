@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "L'arête du dernier point au premier n'est pas tracée : une clôture ou une pergola adossée à la maison.",
  "outdoor_bracing": "Contreventement en X",
  "outdoor_cut": "Découper des surfaces en dessous",
+ "outdoor_area_hint": "Avec une pièce HA, la surface devient comme une pièce : un appui en 3D l'ouvre avec les appareils de la pièce, elle figure dans la barre des pièces et porte son nom.",
  "outdoor_cut_hint": "Chaque surface tracée avant celle-ci et qui la contient entièrement reçoit un trou ici : un bassin ou une zone sauvage dans la pelouse.",
  "outdoor_slope": "Pente (m)",
  "outdoor_slope_hint": "Différence de hauteur du bord haut au bord bas ; le bord haut est au décalage de hauteur. Les lampes sur la surface suivent.",

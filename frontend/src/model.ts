@@ -17,6 +17,8 @@ export interface RoomClimate {
 export type WallHeight = number | null | (number | null)[];
 
 export interface Room {
+  /** An outdoor area acting as a room (made by outdoorZones, never stored among the rooms). */
+  outdoor?: boolean;
   /** Room temperature, humidity and CO2: chosen sensors instead of the automatic pick. */
   climate?: RoomClimate | null;
   id: string;
@@ -679,6 +681,22 @@ export function outdoorStanding(type: OutdoorType): boolean {
   return type === "hedge" || type === "fence" || type === "pergola";
 }
 
+/**
+ * Outdoor areas that act as rooms (#100): every flat area with a Home Assistant area (a garden, terrace, balcony, pool),
+ * as a room that is not stored among the rooms – it has no walls, but a chip, a tap target, a room panel with its
+ * area's devices and a name in 3D.
+ */
+export function outdoorZones(floor: Floor): Room[] {
+  return (floor.outdoor ?? [])
+    .filter((a) => a.area_id && a.points.length >= 3 && !outdoorStanding(a.type))
+    .map((a) => ({ id: a.id, name: (a.name ?? "").trim(), area_id: a.area_id ?? null, points: a.points, floor_material: "wood", outdoor: true }));
+}
+
+/** The rooms of a floor and its outdoor areas that act as rooms. */
+export function zonesOf(floor: Floor): Room[] {
+  return [...floor.rooms, ...outdoorZones(floor)];
+}
+
 /** The directions an area can fall towards: +x (right in the plan), −x, +z (down in the plan), −z. */
 export const SLOPE_DIRS = ["x", "-x", "z", "-z"] as const;
 export type SlopeDir = (typeof SLOPE_DIRS)[number];
@@ -804,6 +822,9 @@ export interface OutdoorArea {
   rim?: number | null;
   /** Pool Pro: the pool's entities (water temperature, heat pump, filter pump, light, pH, chlorine, cover). */
   pool?: PoolLinks | null;
+  /** Outdoor areas like rooms (#100): a name and a Home Assistant area – a tap opens it with its devices like a room. */
+  name?: string | null;
+  area_id?: string | null;
 }
 
 /** Pool Pro: the entities of a pool; a role left empty is searched by name ("pool"), "none" switches it off. */

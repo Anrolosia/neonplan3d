@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Krawędź od ostatniego punktu z powrotem do pierwszego nie jest rysowana – płot lub pergola oparta o dom.",
  "outdoor_bracing": "Stężenie krzyżowe",
  "outdoor_cut": "Wytnij z terenów pod spodem",
+ "outdoor_area_hint": "Z obszarem powierzchnia działa jak pokój: dotknięcie w 3D otwiera ją z urządzeniami obszaru, jest na pasku pokoi i nosi swoją nazwę.",
  "outdoor_cut_hint": "Każdy teren narysowany wcześniej, który w całości go zawiera, dostaje tu otwór – staw lub dzika łąka w trawniku.",
  "outdoor_slope": "Spadek (m)",
  "outdoor_slope_hint": "Różnica wysokości od wysokiej do niskiej krawędzi; wysoka krawędź leży na przesunięciu wysokości. Lampy na terenie podążają za nim.",

@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Kanten från sista punkten tillbaka till den första ritas inte – ett staket eller en pergola som lutar mot huset.",
  "outdoor_bracing": "X-förstärkning",
  "outdoor_cut": "Skär ut ur ytorna under",
+ "outdoor_area_hint": "Med ett område blir ytan som ett rum: ett tryck i 3D öppnar den med områdets enheter, den finns i rumsraden och bär sitt namn.",
  "outdoor_cut_hint": "Varje yta som ritats före den här och som helt innehåller den får ett hål här – en damm eller en vildväxt yta i gräsmattan.",
  "outdoor_slope": "Lutning (m)",
  "outdoor_slope_hint": "Höjdskillnad från den höga kanten till den låga; den höga kanten ligger på höjdförskjutningen. Lampor på ytan följer med.",

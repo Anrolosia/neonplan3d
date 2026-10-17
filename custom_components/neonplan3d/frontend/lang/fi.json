@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Reunaa viimeisestä pisteestä takaisin ensimmäiseen ei piirretä – taloa vasten nojaava aita tai pergola.",
  "outdoor_bracing": "X-tuenta",
  "outdoor_cut": "Leikkaa alla olevista alueista",
+ "outdoor_area_hint": "Alueen kanssa pinta toimii kuin huone: napautus 3D:ssä avaa sen alueen laitteineen, se on huonepalkissa ja näyttää nimensä.",
  "outdoor_cut_hint": "Jokainen ennen tätä piirretty alue, joka sisältää tämän kokonaan, saa tähän reiän – lampi tai luonnonniitty nurmikossa.",
  "outdoor_slope": "Kaltevuus (m)",
  "outdoor_slope_hint": "Korkeusero ylemmästä reunasta alempaan; ylempi reuna on korkeussiirtymän kohdalla. Alueen valaisimet seuraavat.",

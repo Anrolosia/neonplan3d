@@ -47,7 +47,7 @@ import {
 } from "three";
 import type { Building, Floor, Furniture, Room, StartView } from "../model.ts";
 import { recolorLamps, SHADE_SENTINEL, shadeFactors } from "./lamp-colors.ts";
-import { centroid, pointInPolygon, openingStyle, setTerrain, WALL_LAMP_Y } from "../model.ts";
+import { centroid, outdoorZones, pointInPolygon, openingStyle, setTerrain, WALL_LAMP_Y, zonesOf } from "../model.ts";
 import { buildEarth } from "./earth.ts";
 import { clampIntoRoom } from "../geometry/snap.ts";
 import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
@@ -800,8 +800,9 @@ export class FloorplanViewer {
       this.fit(700);
       return;
     }
-    const fv = this.floors.find((f) => f.floor.rooms.some((r) => r.id === roomId));
-    const room = fv?.floor.rooms.find((r) => r.id === roomId);
+    // a room, or an outdoor area acting as one (#100)
+    const fv = this.floors.find((f) => zonesOf(f.floor).some((r) => r.id === roomId));
+    const room = fv ? zonesOf(fv.floor).find((r) => r.id === roomId) : undefined;
     if (!fv || !room) return;
     // a room may open with a camera of its own (#282)
     const own = room.start_view;
@@ -2054,7 +2055,8 @@ export class FloorplanViewer {
       const prev = previous.get(floor.id);
       const roomPins: FloorView["roomPins"] = [];
       let bbox: FloorView["bbox"] = null;
-      for (const room of floor.rooms) {
+      // the rooms, and the outdoor areas acting as rooms (#100) with their names
+      for (const room of zonesOf(floor)) {
         const pin = document.createElement("button");
         pin.className = "fp3d-pin";
         pin.dataset.room = room.id;
@@ -2064,6 +2066,7 @@ export class FloorplanViewer {
         this.labels.append(pin);
         const [cx, cz] = centroid(room.points);
         roomPins.push({ pin, room, cx, cz });
+        if (room.outdoor) continue;
         for (const [x, z] of room.points) {
           bbox ??= { x0: x, x1: x, z0: z, z1: z };
           bbox.x0 = Math.min(bbox.x0, x);
@@ -3298,6 +3301,11 @@ export class FloorplanViewer {
         const id = inRange(fv.geo.furnitureTris, tri);
         const entity = id ? this.pickFurniture.get(id) : undefined;
         if (entity) return { entity };
+        // an outdoor area acting as a room (#100): its surface lies in the wall mesh; a tap on it opens it
+        if (!id && hit.face && hit.face.normal.y > 0.7) {
+          const zone = outdoorZones(fv.floor).find((z) => pointInPolygon([hit.point.x, hit.point.z], z.points));
+          if (zone) return { floorId: fv.floor.id, roomId: zone.id };
+        }
         // a wall: the tap stops at it unless it is see-through (cut away, or glass in the floor view)
         if (hit.face && !id) {
           const fold = (fv.wallMesh.geometry.getAttribute("fold") as Float32BufferAttribute | undefined)?.getX(hit.face.a) ?? 32;

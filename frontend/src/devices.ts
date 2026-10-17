@@ -251,7 +251,8 @@ export function roomClimateSensors(hass: HomeAssistant, floor: Floor | null, roo
   const here = placed.filter((p) => inRoom(p.x, p.z)).map((p) => p.entity_id);
   const elsewhere = new Set(placed.filter((p) => !inRoom(p.x, p.z)).map((p) => p.entity_id));
   const ids = [...new Set([...areaEntities(hass, room.area_id).filter((id) => !elsewhere.has(id)), ...here])];
-  const sensors = ids.filter((id) => id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === dc && isRoomClimateSensor(hass, id));
+  // outside (an outdoor area acting as a room, #100) the "outdoor" sensors are just the right ones
+  const sensors = ids.filter((id) => id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === dc && (room.outdoor || isRoomClimateSensor(hass, id)));
   if (sensors.length) return sensors;
   // no sensor of its own: a thermostat of the room tells its temperature (and humidity) too (#478)
   const attr = CLIMATE_ATTRS[key];

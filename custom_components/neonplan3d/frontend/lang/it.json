@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Il lato dall'ultimo punto al primo non viene disegnato: una recinzione o una pergola appoggiata alla casa.",
  "outdoor_bracing": "Controventatura a X",
  "outdoor_cut": "Ritaglia dalle aree sottostanti",
+ "outdoor_area_hint": "Con un'area la superficie funziona come una stanza: un tocco in 3D la apre con i dispositivi dell'area, compare nella barra delle stanze e porta il suo nome.",
  "outdoor_cut_hint": "Ogni area disegnata prima che la contiene per intero riceve qui un foro: un laghetto o un'area selvatica nel prato.",
  "outdoor_slope": "Pendenza (m)",
  "outdoor_slope_hint": "Dislivello dal bordo alto a quello basso; il bordo alto sta sullo scostamento in altezza. Le luci sull'area seguono.",

@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "A aresta do último ponto de volta ao primeiro não é desenhada – uma vedação ou pérgula encostada à casa.",
  "outdoor_bracing": "Travamento em X",
  "outdoor_cut": "Recortar das áreas por baixo",
+ "outdoor_area_hint": "Com uma área, a superfície funciona como uma divisão: um toque em 3D abre-a com os dispositivos da área, aparece na barra de divisões e mostra o seu nome.",
  "outdoor_cut_hint": "Todas as áreas desenhadas antes desta que a contêm por inteiro recebem aqui um buraco – um lago ou uma zona selvagem no relvado.",
  "outdoor_slope": "Inclinação (m)",
  "outdoor_slope_hint": "Diferença de altura entre a aresta alta e a aresta baixa; a aresta alta fica no desvio de altura. As lâmpadas na área acompanham.",

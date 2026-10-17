@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "Marginea de la ultimul punct înapoi la primul nu se desenează – un gard sau o pergolă sprijinită de casă.",
  "outdoor_bracing": "Contravântuire în X",
  "outdoor_cut": "Decupează din zonele de dedesubt",
+ "outdoor_area_hint": "Cu o zonă, suprafața funcționează ca o cameră: o atingere în 3D o deschide cu dispozitivele zonei, apare în bara de camere și își poartă numele.",
  "outdoor_cut_hint": "Fiecare zonă desenată înaintea acesteia care o conține în întregime primește aici o gaură – un iaz sau un colț sălbatic în gazon.",
  "outdoor_slope": "Pantă (m)",
  "outdoor_slope_hint": "Diferența de înălțime de la marginea înaltă la cea joasă; marginea înaltă stă la decalajul de înălțime. Lămpile de pe zonă urmează panta.",

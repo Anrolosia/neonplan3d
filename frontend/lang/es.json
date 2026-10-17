@@ -1175,6 +1175,7 @@
  "outdoor_open_hint": "La arista del último punto al primero no se dibuja: una valla o pérgola apoyada en la casa.",
  "outdoor_bracing": "Arriostramiento en X",
  "outdoor_cut": "Recortar de las zonas de abajo",
+ "outdoor_area_hint": "Con un área, la superficie actúa como una habitación: un toque en 3D la abre con los dispositivos del área, aparece en la barra de habitaciones y lleva su nombre.",
  "outdoor_cut_hint": "Cada zona dibujada antes que la contenga entera recibe aquí un hueco: un estanque o una zona silvestre en el césped.",
  "outdoor_slope": "Pendiente (m)",
  "outdoor_slope_hint": "Desnivel del borde alto al bajo; el borde alto queda en el desnivel. Las luces sobre la zona lo siguen.",

@@ -7,6 +7,7 @@ from custom_components.neonplan3d.schema import (
     FURNITURE_SCHEMA,
     HOLOGRAM_SCHEMA,
     OPENING_SCHEMA,
+    OUTDOOR_SCHEMA,
     ROOM_SCHEMA,
     SETTINGS_SCHEMA,
     START_VIEW_SCHEMA,
@@ -134,3 +135,12 @@ def test_household_fields_are_kept_and_checked() -> None:
     for bad in ({"bin_kind": "nuclear"}, {"bin_color": "blue"}, {"moisture_min": 150}, {"door_alarm": 0}):
         with pytest.raises(vol.Invalid):
             FURNITURE_SCHEMA({**base, **bad})
+
+
+def test_outdoor_area_keeps_its_name_and_area() -> None:
+    """An outdoor area acting as a room (#100) keeps its name and Home Assistant area; without them both are None."""
+    base = {"id": "g1", "type": "lawn", "points": [[0, 0], [4, 0], [4, 3]]}
+    out = OUTDOOR_SCHEMA({**base, "name": "Garten", "area_id": "garden"})
+    assert out["name"] == "Garten" and out["area_id"] == "garden"
+    plain = OUTDOOR_SCHEMA(base)
+    assert plain["name"] is None and plain["area_id"] is None
