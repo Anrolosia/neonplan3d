@@ -47,6 +47,24 @@ export function setVoiceHere(on: boolean): void {
   }
 }
 
+/** The Assist pipeline chosen for this device (null: Home Assistant's preferred one). */
+export function voicePipeline(): string | null {
+  try {
+    return localStorage.getItem("neonplan3d.voicePipeline");
+  } catch {
+    return null;
+  }
+}
+
+export function setVoicePipeline(id: string | null): void {
+  try {
+    if (id) localStorage.setItem("neonplan3d.voicePipeline", id);
+    else localStorage.removeItem("neonplan3d.voicePipeline");
+  } catch {
+    // private mode: nothing remembered
+  }
+}
+
 /** The probe closed: it does not open again in this tab. */
 export function micProbeDone(): void {
   try {

@@ -1048,6 +1048,8 @@ You need:
 - **The microphone allowed:** in Fully Kiosk under Web Content Settings → microphone access, plus the Android permission.
 - **An Assist pipeline with speech to text**, e.g. Home Assistant Cloud, Whisper or Speech-to-Phrase.
 
+NeonPlan uses Home Assistant's **preferred pipeline** (Settings → Voice assistants, the starred one). Under **Assist pipeline on this device** you can choose another one for each device.
+
 The microphone is only open while you speak. **🎙️ Test the microphone** in the same section checks everything step by step.
 
 ---

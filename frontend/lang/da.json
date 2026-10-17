@@ -1879,5 +1879,8 @@
  "card_voice": "Stemmestyring (mikrofonknap)",
  "card_voice_hint": "“Vis stuen” viser rummet, andre sætninger går til Assist. Kræver https og en tilladt mikrofon",
  "director_mic_test": "🎙️ Test mikrofonen",
- "director_mic_hint": "Tjekker https, mikrofonen og Assists talegenkendelse på denne enhed og viser, hvilket rum en sætning ville åbne. Intet bliver tændt eller slukket."
+ "director_mic_hint": "Tjekker https, mikrofonen og Assists talegenkendelse på denne enhed og viser, hvilket rum en sætning ville åbne. Intet bliver tændt eller slukket.",
+ "voice_pipeline": "Assist-pipeline på denne enhed",
+ "voice_pipeline_preferred": "Den foretrukne i Home Assistant",
+ "voice_pipeline_no_stt": "uden talegenkendelse"
 }

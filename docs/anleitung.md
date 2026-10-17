@@ -1048,6 +1048,8 @@ Dafür brauchst du:
 - **Freigabe des Mikrofons:** in Fully Kiosk unter Web Content Settings → Mikrofonzugriff, dazu die Android-Berechtigung.
 - **Eine Assist-Pipeline mit Spracherkennung**, z. B. Home Assistant Cloud, Whisper oder Speech-to-Phrase.
 
+NeonPlan nimmt die **bevorzugte Pipeline** aus Home Assistant (Einstellungen → Sprachassistenten, die mit dem Stern). Unter **Assist-Pipeline auf diesem Gerät** kannst du für jedes Gerät eine andere wählen.
+
 Das Mikrofon ist nur offen, solange du sprichst. **🎙️ Mikrofon testen** im selben Abschnitt prüft alles Schritt für Schritt.
 
 ---

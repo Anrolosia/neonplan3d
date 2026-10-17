@@ -24,7 +24,7 @@ import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlan
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
-import { setVoiceHere, voiceOnHere } from "../load-voice.ts";
+import { setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
@@ -10717,6 +10717,40 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
+  private voicePipes: { id: string; name: string; stt: boolean }[] | null = null;
+  private voicePipesAsked = false;
+
+  /** The Assist pipeline for this device's voice control: Home Assistant's preferred one, or one chosen here. */
+  private renderVoicePipeline() {
+    const hass = this.hass;
+    if (!hass) return nothing;
+    if (!this.voicePipesAsked) {
+      this.voicePipesAsked = true;
+      hass
+        .callWS<{ pipelines: { id: string; name: string; stt_engine: string | null }[] }>({ type: "assist_pipeline/pipeline/list" })
+        .then((res) => {
+          this.voicePipes = res.pipelines.map((p) => ({ id: p.id, name: p.name, stt: !!p.stt_engine }));
+          this.requestUpdate();
+        })
+        .catch(() => undefined);
+    }
+    const own = voicePipeline();
+    return html`<div class="fp3d-form">
+      <label class="fp3d-field fp3d-wide"
+        >${this.t("voice_pipeline")}
+        <select
+          @change=${(e: Event) => {
+            setVoicePipeline((e.target as HTMLSelectElement).value || null);
+            this.requestUpdate();
+          }}
+        >
+          <option value="" ?selected=${!own}>${this.t("voice_pipeline_preferred")}</option>
+          ${(this.voicePipes ?? []).map((p) => html`<option value=${p.id} ?selected=${own === p.id} ?disabled=${!p.stt}>${p.name}${p.stt ? "" : ` (${this.t("voice_pipeline_no_stt")})`}</option>`)}
+        </select></label
+      >
+    </div>`;
+  }
+
   /** Voice control: the microphone button on this device (a card has its own option), and the microphone test. */
   private renderVoice() {
     const here = voiceOnHere();
@@ -10737,6 +10771,7 @@ export class Fp3dEditor extends LitElement {
           ${this.t("voice_here")}</label
         >
       </div>
+      ${this.renderVoicePipeline()}
       <p class="fp3d-sub">${this.t("voice_needs")}</p>
       <div class="fp3d-actions">
         <button class="fp3d-btn" @click=${() => this.dispatchEvent(new CustomEvent("mic-probe", { bubbles: true, composed: true }))}>${this.t("director_mic_test")}</button>

@@ -1879,5 +1879,8 @@
  "card_voice": "Spraakbediening (microfoonknop)",
  "card_voice_hint": "„Toon de woonkamer” toont de kamer, andere zinnen gaan naar Assist. Vereist https en een toegestane microfoon",
  "director_mic_test": "🎙️ Microfoon testen",
- "director_mic_hint": "Controleert op dit apparaat https, de microfoon en de spraakherkenning van Assist, en toont welke kamer een zin zou openen. Er wordt niets geschakeld."
+ "director_mic_hint": "Controleert op dit apparaat https, de microfoon en de spraakherkenning van Assist, en toont welke kamer een zin zou openen. Er wordt niets geschakeld.",
+ "voice_pipeline": "Assist-pipeline op dit apparaat",
+ "voice_pipeline_preferred": "Voorkeur in Home Assistant",
+ "voice_pipeline_no_stt": "zonder spraakherkenning"
 }

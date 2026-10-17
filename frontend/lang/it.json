@@ -1879,5 +1879,8 @@
  "card_voice": "Comando vocale (pulsante microfono)",
  "card_voice_hint": "«Mostra il soggiorno» mostra la stanza, le altre frasi vanno ad Assist. Richiede https e un microfono consentito",
  "director_mic_test": "🎙️ Prova il microfono",
- "director_mic_hint": "Controlla su questo dispositivo https, il microfono e il riconoscimento vocale di Assist, e mostra quale stanza aprirebbe una frase. Non viene comandato nulla."
+ "director_mic_hint": "Controlla su questo dispositivo https, il microfono e il riconoscimento vocale di Assist, e mostra quale stanza aprirebbe una frase. Non viene comandato nulla.",
+ "voice_pipeline": "Pipeline Assist su questo dispositivo",
+ "voice_pipeline_preferred": "Quella preferita in Home Assistant",
+ "voice_pipeline_no_stt": "senza riconoscimento vocale"
 }

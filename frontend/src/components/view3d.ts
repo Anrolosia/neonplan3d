@@ -115,7 +115,7 @@ import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../
 import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
-import { loadVoice, micProbeAsked, micProbeDone } from "../load-voice.ts";
+import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
 import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
@@ -3726,7 +3726,7 @@ export class Fp3dView3d extends LitElement {
     say("wait", "…");
     try {
       const v = await loadVoice();
-      const text = await v.listenOnce(hass, () => say("listen", translate(hass, "voice_listen")));
+      const text = await v.listenOnce(hass, () => say("listen", translate(hass, "voice_listen")), voicePipeline());
       if (!text) {
         say("error", translate(hass, "voice_none"));
         return;

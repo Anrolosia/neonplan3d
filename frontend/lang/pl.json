@@ -1879,5 +1879,8 @@
  "card_voice": "Sterowanie głosem (przycisk mikrofonu)",
  "card_voice_hint": "„Pokaż salon” pokazuje pokój, inne zdania trafiają do Assist. Wymaga https i dozwolonego mikrofonu",
  "director_mic_test": "🎙️ Testuj mikrofon",
- "director_mic_hint": "Sprawdza na tym urządzeniu https, mikrofon i rozpoznawanie mowy Assist oraz pokazuje, który pokój otworzyłoby zdanie. Nic nie jest przełączane."
+ "director_mic_hint": "Sprawdza na tym urządzeniu https, mikrofon i rozpoznawanie mowy Assist oraz pokazuje, który pokój otworzyłoby zdanie. Nic nie jest przełączane.",
+ "voice_pipeline": "Potok Assist na tym urządzeniu",
+ "voice_pipeline_preferred": "Preferowany w Home Assistant",
+ "voice_pipeline_no_stt": "bez rozpoznawania mowy"
 }

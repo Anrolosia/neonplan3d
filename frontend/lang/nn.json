@@ -1879,5 +1879,8 @@
  "card_voice": "Talestyring (mikrofonknapp)",
  "card_voice_hint": "«Vis stova» viser rommet, andre setningar går til Assist. Krev https og ein tillaten mikrofon",
  "director_mic_test": "🎙️ Test mikrofonen",
- "director_mic_hint": "Sjekkar https, mikrofonen og talegjenkjenninga til Assist på denne eininga og viser kva rom ei setning ville opna. Ingenting vert styrt."
+ "director_mic_hint": "Sjekkar https, mikrofonen og talegjenkjenninga til Assist på denne eininga og viser kva rom ei setning ville opna. Ingenting vert styrt.",
+ "voice_pipeline": "Assist-pipeline på denne eininga",
+ "voice_pipeline_preferred": "Den føretrekte i Home Assistant",
+ "voice_pipeline_no_stt": "utan talegjenkjenning"
 }

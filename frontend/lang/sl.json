@@ -1879,5 +1879,8 @@
  "card_voice": "Glasovno upravljanje (gumb za mikrofon)",
  "card_voice_hint": "»Pokaži dnevno sobo« pokaže prostor, drugi stavki gredo v Assist. Potrebuje https in dovoljen mikrofon",
  "director_mic_test": "🎙️ Preizkusi mikrofon",
- "director_mic_hint": "Na tej napravi preveri https, mikrofon in prepoznavanje govora v Assistu ter pokaže, kateri prostor bi stavek odprl. Nič se ne preklopi."
+ "director_mic_hint": "Na tej napravi preveri https, mikrofon in prepoznavanje govora v Assistu ter pokaže, kateri prostor bi stavek odprl. Nič se ne preklopi.",
+ "voice_pipeline": "Cevovod Assist na tej napravi",
+ "voice_pipeline_preferred": "Prednostni v Home Assistantu",
+ "voice_pipeline_no_stt": "brez prepoznavanja govora"
 }

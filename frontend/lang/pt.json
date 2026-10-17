@@ -1879,5 +1879,8 @@
  "card_voice": "Controlo por voz (botão de microfone)",
  "card_voice_hint": "«Mostra a sala» mostra a divisão, outras frases vão para o Assist. Precisa de https e de um microfone autorizado",
  "director_mic_test": "🎙️ Testar o microfone",
- "director_mic_hint": "Verifica neste dispositivo https, o microfone e o reconhecimento de voz do Assist, e mostra que divisão uma frase abriria. Nada é acionado."
+ "director_mic_hint": "Verifica neste dispositivo https, o microfone e o reconhecimento de voz do Assist, e mostra que divisão uma frase abriria. Nada é acionado.",
+ "voice_pipeline": "Pipeline do Assist neste dispositivo",
+ "voice_pipeline_preferred": "O preferido no Home Assistant",
+ "voice_pipeline_no_stt": "sem reconhecimento de voz"
 }

@@ -1879,5 +1879,8 @@
  "card_voice": "Control por voz (botón de micrófono)",
  "card_voice_hint": "«Muestra el salón» muestra la habitación, las demás frases van a Assist. Necesita https y un micrófono permitido",
  "director_mic_test": "🎙️ Probar el micrófono",
- "director_mic_hint": "Comprueba en este dispositivo https, el micrófono y el reconocimiento de voz de Assist, y muestra qué habitación abriría una frase. No se acciona nada."
+ "director_mic_hint": "Comprueba en este dispositivo https, el micrófono y el reconocimiento de voz de Assist, y muestra qué habitación abriría una frase. No se acciona nada.",
+ "voice_pipeline": "Canalización de Assist en este dispositivo",
+ "voice_pipeline_preferred": "La preferida en Home Assistant",
+ "voice_pipeline_no_stt": "sin reconocimiento de voz"
 }

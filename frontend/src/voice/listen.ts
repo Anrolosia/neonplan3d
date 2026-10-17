@@ -36,9 +36,16 @@ export function toPcm16(input: Float32Array, from: number): Int16Array {
   return out;
 }
 
-/** The Assist pipeline to use: the preferred one when it has speech to text, else the first that has. */
-export async function findPipeline(hass: HomeAssistant): Promise<Pipeline | null> {
-  const res = await hass.callWS<{ pipelines: Pipeline[]; preferred_pipeline: string | null }>({ type: "assist_pipeline/pipeline/list" });
+/** Home Assistant's Assist pipelines and the preferred one (Settings → Voice assistants, the starred one). */
+export function listPipelines(hass: HomeAssistant): Promise<{ pipelines: Pipeline[]; preferred_pipeline: string | null }> {
+  return hass.callWS({ type: "assist_pipeline/pipeline/list" });
+}
+
+/** The Assist pipeline to use: the one chosen on this device, else the preferred one when it has speech to text, else the first that has. */
+export async function findPipeline(hass: HomeAssistant, chosen?: string | null): Promise<Pipeline | null> {
+  const res = await listPipelines(hass);
+  const own = chosen ? res.pipelines.find((p) => p.id === chosen && p.stt_engine) : undefined;
+  if (own) return own;
   const preferred = res.pipelines.find((p) => p.id === res.preferred_pipeline) ?? res.pipelines[0];
   return (preferred?.stt_engine ? preferred : res.pipelines.find((p) => p.stt_engine)) ?? null;
 }
@@ -56,7 +63,7 @@ export function openMicrophone(): Promise<MediaStream> {
  * Stream the microphone to Assist until it has written down one sentence; the sentence ("" when nothing was heard).
  * Rejects with Assist's error.
  */
-export async function transcribe(hass: HomeAssistant, ctx: AudioContext, source: MediaStreamAudioSourceNode, pipeline: string): Promise<string> {
+export async function transcribe(hass: HomeAssistant, ctx: AudioContext, source: MediaStreamAudioSourceNode, pipeline: string | null): Promise<string> {
   const socket = (hass.connection as unknown as { socket?: WebSocket }).socket;
   if (!socket) throw new Error("no connection");
   if (ctx.state === "suspended") await ctx.resume();
@@ -113,7 +120,8 @@ export async function transcribe(hass: HomeAssistant, ctx: AudioContext, source:
             finish();
           }
         },
-        { type: "assist_pipeline/run", start_stage: "stt", end_stage: "stt", input: { sample_rate: RATE }, pipeline },
+        // without a pipeline id Home Assistant takes its preferred one
+        { type: "assist_pipeline/run", start_stage: "stt", end_stage: "stt", input: { sample_rate: RATE }, ...(pipeline ? { pipeline } : {}) },
       )
       .then((u) => {
         unsub = u;
@@ -123,16 +131,24 @@ export async function transcribe(hass: HomeAssistant, ctx: AudioContext, source:
   });
 }
 
-let pipelineOf: { hass: HomeAssistant; id: Promise<string | null> } | null = null;
+let pipelineOf: { connection: unknown; chosen: string | null; id: Promise<string | null | undefined> } | null = null;
 
-/** One sentence: the microphone opens, Assist writes it down, the microphone closes again. */
-export async function listenOnce(hass: HomeAssistant, onListening?: () => void): Promise<string> {
-  if (!pipelineOf || pipelineOf.hass.connection !== hass.connection) pipelineOf = { hass, id: findPipeline(hass).then((p) => p?.id ?? null) };
-  const pipeline = await pipelineOf.id.catch(() => null);
-  if (!pipeline) {
+/**
+ * One sentence: the microphone opens, Assist writes it down, the microphone closes again. The pipeline: the one chosen
+ * on this device, else Home Assistant's preferred one (also when the list of pipelines cannot be read).
+ */
+export async function listenOnce(hass: HomeAssistant, onListening?: () => void, chosen: string | null = null): Promise<string> {
+  if (!pipelineOf || pipelineOf.connection !== hass.connection || pipelineOf.chosen !== chosen) {
+    // undefined: the list could not be read – the run takes the preferred pipeline then; null: none has speech to text
+    pipelineOf = { connection: hass.connection, chosen, id: findPipeline(hass, chosen).then((p) => p?.id ?? null, () => undefined) };
+  }
+  const found = await pipelineOf.id;
+  if (found === null) {
     pipelineOf = null;
     throw new Error("no_pipeline");
   }
+  if (found === undefined) pipelineOf = null;
+  const pipeline = found ?? chosen;
   const stream = await openMicrophone();
   const ctx = audioContext();
   try {

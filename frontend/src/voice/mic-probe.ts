@@ -7,6 +7,7 @@ import { LitElement, css, html, nothing } from "lit";
 import type { Building } from "../model.ts";
 import type { HomeAssistant } from "../types.ts";
 import { findPlace } from "./commands.ts";
+import { voicePipeline } from "../load-voice.ts";
 import { audioContext, findPipeline, openMicrophone, transcribe, type Pipeline } from "./listen.ts";
 
 type Step = { ok: boolean | null; text: string };
@@ -85,6 +86,7 @@ export class MicProbe extends LitElement {
   private source: MediaStreamAudioSourceNode | null = null;
   private meterTimer: ReturnType<typeof setInterval> | undefined;
   private pipeline: Pipeline | null = null;
+  private looked = false;
 
   constructor() {
     super();
@@ -107,7 +109,15 @@ export class MicProbe extends LitElement {
       { ok: window.isSecureContext, text: window.isSecureContext ? t.secure_ok : t.secure_no },
       { ok: api, text: api ? t.api_ok : t.api_no },
     ];
-    void this.findPipeline();
+    this.looked = false;
+  }
+
+  /** The pipeline is looked up once Home Assistant is there (it arrives after the element is connected). */
+  protected updated(): void {
+    if (!this.looked && this.hass) {
+      this.looked = true;
+      void this.findPipeline();
+    }
   }
 
   disconnectedCallback(): void {
@@ -122,7 +132,7 @@ export class MicProbe extends LitElement {
   private async findPipeline(): Promise<void> {
     const t = this.t;
     try {
-      const p = await findPipeline(this.hass!);
+      const p = await findPipeline(this.hass!, voicePipeline());
       this.pipeline = p;
       this.add(p ? { ok: true, text: `${t.pipe_ok}: ${p.name} (${p.language}, ${p.stt_engine})` } : { ok: false, text: t.pipe_no });
     } catch (err) {

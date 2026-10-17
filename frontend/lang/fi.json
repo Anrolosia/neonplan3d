@@ -1879,5 +1879,8 @@
  "card_voice": "Puheohjaus (mikrofonipainike)",
  "card_voice_hint": "”Näytä olohuone” näyttää huoneen, muut lauseet menevät Assistille. Vaatii https:n ja sallitun mikrofonin",
  "director_mic_test": "🎙️ Testaa mikrofoni",
- "director_mic_hint": "Tarkistaa tällä laitteella https:n, mikrofonin ja Assistin puheentunnistuksen ja näyttää, minkä huoneen lause avaisi. Mitään ei ohjata."
+ "director_mic_hint": "Tarkistaa tällä laitteella https:n, mikrofonin ja Assistin puheentunnistuksen ja näyttää, minkä huoneen lause avaisi. Mitään ei ohjata.",
+ "voice_pipeline": "Assist-putki tällä laitteella",
+ "voice_pipeline_preferred": "Home Assistantin ensisijainen",
+ "voice_pipeline_no_stt": "ei puheentunnistusta"
 }

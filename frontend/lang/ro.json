@@ -1879,5 +1879,8 @@
  "card_voice": "Control vocal (buton microfon)",
  "card_voice_hint": "„Arată sufrageria” arată camera, alte propoziții merg la Assist. Necesită https și un microfon permis",
  "director_mic_test": "🎙️ Testează microfonul",
- "director_mic_hint": "Verifică pe acest dispozitiv https, microfonul și recunoașterea vocală Assist și arată ce cameră ar deschide o propoziție. Nu se comandă nimic."
+ "director_mic_hint": "Verifică pe acest dispozitiv https, microfonul și recunoașterea vocală Assist și arată ce cameră ar deschide o propoziție. Nu se comandă nimic.",
+ "voice_pipeline": "Pipeline Assist pe acest dispozitiv",
+ "voice_pipeline_preferred": "Cel preferat în Home Assistant",
+ "voice_pipeline_no_stt": "fără recunoaștere vocală"
 }

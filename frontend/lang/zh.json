@@ -1879,5 +1879,8 @@
  "card_voice": "语音控制（麦克风按钮）",
  "card_voice_hint": "“显示客厅”会显示房间，其他句子交给 Assist。需要 https 和已授权的麦克风",
  "director_mic_test": "🎙️ 测试麦克风",
- "director_mic_hint": "在此设备上检查 https、麦克风和 Assist 语音识别，并显示一句话会打开哪个房间。不会切换任何设备。"
+ "director_mic_hint": "在此设备上检查 https、麦克风和 Assist 语音识别，并显示一句话会打开哪个房间。不会切换任何设备。",
+ "voice_pipeline": "此设备上的 Assist 管道",
+ "voice_pipeline_preferred": "Home Assistant 中的首选管道",
+ "voice_pipeline_no_stt": "无语音识别"
 }

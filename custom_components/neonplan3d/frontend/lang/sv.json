@@ -1879,5 +1879,8 @@
  "card_voice": "Röststyrning (mikrofonknapp)",
  "card_voice_hint": "”Visa vardagsrummet” visar rummet, andra meningar går till Assist. Kräver https och en tillåten mikrofon",
  "director_mic_test": "🎙️ Testa mikrofonen",
- "director_mic_hint": "Kontrollerar https, mikrofonen och Assists taligenkänning på den här enheten och visar vilket rum en mening skulle öppna. Inget styrs."
+ "director_mic_hint": "Kontrollerar https, mikrofonen och Assists taligenkänning på den här enheten och visar vilket rum en mening skulle öppna. Inget styrs.",
+ "voice_pipeline": "Assist-pipeline på den här enheten",
+ "voice_pipeline_preferred": "Den föredragna i Home Assistant",
+ "voice_pipeline_no_stt": "utan taligenkänning"
 }

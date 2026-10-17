@@ -1879,5 +1879,8 @@
  "card_voice": "Commande vocale (bouton micro)",
  "card_voice_hint": "« Montre le salon » affiche la pièce, les autres phrases vont à Assist. Nécessite https et un micro autorisé",
  "director_mic_test": "🎙️ Tester le micro",
- "director_mic_hint": "Vérifie sur cet appareil https, le micro et la reconnaissance vocale d'Assist, et montre quelle pièce une phrase ouvrirait. Rien n'est commandé."
+ "director_mic_hint": "Vérifie sur cet appareil https, le micro et la reconnaissance vocale d'Assist, et montre quelle pièce une phrase ouvrirait. Rien n'est commandé.",
+ "voice_pipeline": "Pipeline Assist sur cet appareil",
+ "voice_pipeline_preferred": "Celui préféré dans Home Assistant",
+ "voice_pipeline_no_stt": "sans reconnaissance vocale"
 }

@@ -1879,5 +1879,8 @@
  "card_voice": "Talestyring (mikrofonknapp)",
  "card_voice_hint": "«Vis stua» viser rommet, andre setninger går til Assist. Krever https og en tillatt mikrofon",
  "director_mic_test": "🎙️ Test mikrofonen",
- "director_mic_hint": "Sjekker https, mikrofonen og Assists talegjenkjenning på denne enheten og viser hvilket rom en setning ville åpne. Ingenting blir styrt."
+ "director_mic_hint": "Sjekker https, mikrofonen og Assists talegjenkjenning på denne enheten og viser hvilket rom en setning ville åpne. Ingenting blir styrt.",
+ "voice_pipeline": "Assist-pipeline på denne enheten",
+ "voice_pipeline_preferred": "Den foretrukne i Home Assistant",
+ "voice_pipeline_no_stt": "uten talegjenkjenning"
 }

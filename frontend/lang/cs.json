@@ -1879,5 +1879,8 @@
  "card_voice": "Hlasové ovládání (tlačítko mikrofonu)",
  "card_voice_hint": "„Ukaž obývák“ ukáže místnost, ostatní věty jdou do Assistu. Potřebuje https a povolený mikrofon",
  "director_mic_test": "🎙️ Otestovat mikrofon",
- "director_mic_hint": "Na tomto zařízení zkontroluje https, mikrofon a rozpoznávání řeči Assistu a ukáže, kterou místnost by věta otevřela. Nic se nepřepíná."
+ "director_mic_hint": "Na tomto zařízení zkontroluje https, mikrofon a rozpoznávání řeči Assistu a ukáže, kterou místnost by věta otevřela. Nic se nepřepíná.",
+ "voice_pipeline": "Pipeline Assistu na tomto zařízení",
+ "voice_pipeline_preferred": "Preferovaná v Home Assistantu",
+ "voice_pipeline_no_stt": "bez rozpoznávání řeči"
 }

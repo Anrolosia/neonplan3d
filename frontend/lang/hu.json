@@ -1879,5 +1879,8 @@
  "card_voice": "Hangvezérlés (mikrofongomb)",
  "card_voice_hint": "„Mutasd a nappalit” megmutatja a szobát, más mondatok az Assisthoz mennek. Kell hozzá https és engedélyezett mikrofon",
  "director_mic_test": "🎙️ Mikrofon tesztelése",
- "director_mic_hint": "Ellenőrzi ezen az eszközön a https-t, a mikrofont és az Assist beszédfelismerését, és megmutatja, melyik szobát nyitná meg egy mondat. Semmi nem kapcsol."
+ "director_mic_hint": "Ellenőrzi ezen az eszközön a https-t, a mikrofont és az Assist beszédfelismerését, és megmutatja, melyik szobát nyitná meg egy mondat. Semmi nem kapcsol.",
+ "voice_pipeline": "Assist-folyamat ezen az eszközön",
+ "voice_pipeline_preferred": "Az előnyben részesített a Home Assistantban",
+ "voice_pipeline_no_stt": "beszédfelismerés nélkül"
 }
