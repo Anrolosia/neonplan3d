@@ -73,6 +73,7 @@ import {
   type CustomButton,
   type MediaPreset,
   outdoorStanding,
+  outdoorZones,
   SLOPE_DIRS,
   type SlopeDir,
   spotGrid,
@@ -4767,8 +4768,8 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** Place entities in the selected room; an entity already placed elsewhere moves here. */
-  private placeDevices(entityIds: string[]): void {
-    const room = this.room;
+  private placeDevices(entityIds: string[], zone?: Room): void {
+    const room = zone ?? this.room;
     if (!room || !entityIds.length || !this.isAdmin) return;
     const ids = new Set(entityIds);
     this.change((doc, floor) => {
@@ -4778,7 +4779,8 @@ export class Fp3dEditor extends LitElement {
       }
       const taken = [...floor.placements.map((pl) => [pl.x, pl.z] as Vec2), ...floor.furniture.filter((m) => isLamp(m.type)).map((m) => [m.x, m.z] as Vec2)];
       for (const pl of autoPlace(room, entityIds, taken)) {
-        if (!pl.entity_id.startsWith("light.")) {
+        // outside (an outdoor area acting as a room) a light stays a pin: no ceiling lamp over the lawn
+        if (!pl.entity_id.startsWith("light.") || room.outdoor) {
           floor.placements.push(pl);
           continue;
         }
@@ -5799,7 +5801,46 @@ export class Fp3dEditor extends LitElement {
             <input .value=${a.name ?? ""} ?disabled=${!admin} @change=${(e: Event) => this.updateOutdoor({ name: (e.target as HTMLInputElement).value.trim() || null })}
           /></label>`
         : nothing}
-      <p class="fp3d-sub fp3d-wide">${this.t("outdoor_area_hint")}</p>`;
+      <p class="fp3d-sub fp3d-wide">${this.t("outdoor_area_hint")}</p>
+      ${a.area_id ? this.renderOutdoorDevices(a) : nothing}`;
+  }
+
+  /** The devices of an outdoor area's Home Assistant area, to place on it like a room's (#100). */
+  private renderOutdoorDevices(a: OutdoorArea) {
+    const hass = this.hass;
+    const floor = this.floor;
+    const zone = floor ? outdoorZones(floor).find((z) => z.id === a.id) : undefined;
+    if (!hass || !floor || !zone) return nothing;
+    const areaName = zone.area_id ? hass.areas?.[zone.area_id]?.name : undefined;
+    const groups = groupByDevice(hass, areaEntities(hass, zone.area_id).filter((id) => isPlaceable(kindOf(id))));
+    // placed as a pin, or as a lamp (a path light, a garden spot) with this light
+    const placed = new Set([
+      ...floor.placements.filter((pl) => pointInPolygon([pl.x, pl.z], zone.points)).map((pl) => pl.entity_id),
+      ...floor.furniture.filter((m) => isLamp(m.type) && m.entity && pointInPolygon([m.x, m.z], zone.points)).map((m) => m.entity!),
+    ]);
+    const open = groups.map((g) => g.primary).filter((id) => !placed.has(id));
+    if (!groups.length) return html`<p class="fp3d-sub fp3d-wide">${this.t("devices_none")}</p>`;
+    return html`<div class="fp3d-wide">
+      <h4 class="fp3d-lib-head">${this.t("devices")}</h4>
+      ${groups.map(
+        (g) => html`<div class="fp3d-row fp3d-dev-row">
+          <button class="fp3d-dev-name ${placed.has(g.primary) ? "" : "fp3d-muted"}" ?disabled=${!placed.has(g.primary)} @click=${() => this.selectItem("device", g.primary)}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d=${iconPath(kindOf(g.primary)!)} />
+            </svg>
+            <span>${entityName(hass, g.primary, areaName)}</span>
+          </button>
+          ${this.isAdmin
+            ? placed.has(g.primary)
+              ? html`<button class="fp3d-link" @click=${() => this.removeDevice(g.primary)}>${this.t("devices_remove")}</button>`
+              : html`<button class="fp3d-link" @click=${() => this.placeDevices([g.primary], zone)}>${this.t("devices_place")}</button>`
+            : nothing}
+        </div>`,
+      )}
+      ${this.isAdmin && open.length > 1
+        ? html`<button class="fp3d-link fp3d-place-all" @click=${() => this.placeDevices(open, zone)}>${this.t("devices_place_all_n", { n: open.length })}</button>`
+        : nothing}
+    </div>`;
   }
 
   private renderOutdoorForm(a: OutdoorArea) {
