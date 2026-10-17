@@ -9,6 +9,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### New
 
 - Outdoor areas like rooms (#100, #59): a lawn, terrace, balcony or pool with a Home Assistant area (and a name) is in the room bar, opens with its area's devices on a tap in 3D, is framed by the camera and shows its outdoor temperature with "Values".
+- Light between floors (#570): a lamp over a stairwell or floor opening, or close to it, also lights the floor below through the opening.
 
 ### Fixed
 

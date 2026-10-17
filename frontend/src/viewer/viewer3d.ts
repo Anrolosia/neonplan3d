@@ -310,6 +310,23 @@ const BELOW_OPACITY = 0.22;
 /** The roof's opacity when fully shown (a touch of see-through); it then sits right on its walls. */
 const ROOF_OPACITY = 0.94;
 const FLOOR_TAU = 140;
+/** How far beside a floor opening a lamp above still shines down through it (m). */
+const REACH_DOWN = 1.5;
+
+/** Distance from a point to the edges of a ring (plan coordinates). */
+function distanceToRing(x: number, z: number, ring: readonly [number, number][]): number {
+  let best = Infinity;
+  for (let i = 0; i < ring.length; i++) {
+    const [ax, az] = ring[i];
+    const [bx, bz] = ring[(i + 1) % ring.length];
+    const ex = bx - ax;
+    const ez = bz - az;
+    const l2 = ex * ex + ez * ez || 1;
+    const t = Math.max(0, Math.min(1, ((x - ax) * ex + (z - az) * ez) / l2));
+    best = Math.min(best, Math.hypot(x - (ax + ex * t), z - (az + ez * t)));
+  }
+  return best;
+}
 /** Grid cells across the ground texture. */
 const GROUND_CELLS = 32;
 /** Press duration that counts as a long press (ms). */
@@ -1805,6 +1822,46 @@ export class FloorplanViewer {
           else out.push({ x: d.x + Math.cos(a) * w * t, y, z: d.z + Math.sin(a) * w * t, color, level: glow.level * 0.55, kind: sideways ? "omni" : kind, room });
         }
       } else out.push({ x: d.x, y, z: d.z, color, level: glow.level, kind, room });
+    }
+    out.push(...this.lightFromAbove(fv));
+    return out;
+  }
+
+  /**
+   * Light falling down a stairwell or floor opening (#570): the lamps of the floor above that hang over the opening or
+   * close to it shine into this floor from the opening, a little weaker and in their colour.
+   */
+  private lightFromAbove(fv: FloorView): LightSource[] {
+    const top = fv.floor.elevation + fv.floor.height;
+    const above = this.floors.find((f) => f !== fv && Math.abs(f.floor.elevation - top) < 0.8 && f.geo.holes.length);
+    if (!above) return [];
+    const out: LightSource[] = [];
+    for (const hole of above.geo.holes) {
+      if (hole.length < 3) continue;
+      let weight = 0;
+      const color: [number, number, number] = [0, 0, 0];
+      for (const d of this.devices) {
+        if (d.floorId !== above.floor.id) continue;
+        const glow = this.glowOf(d);
+        if (!glow) continue;
+        // full strength over the opening, none from 1.5 m beside it
+        const dist = pointInPolygon([d.x, d.z], hole) ? 0 : distanceToRing(d.x, d.z, hole);
+        if (dist > REACH_DOWN) continue;
+        const k = glow.level * (1 - dist / REACH_DOWN);
+        for (let i = 0; i < 3; i++) color[i] += glow.color[i] * k;
+        weight += k;
+      }
+      if (weight < 0.02) continue;
+      const [x, z] = centroid(hole);
+      out.push({
+        x,
+        y: fv.floor.height - 0.05,
+        z,
+        color: [color[0] / weight, color[1] / weight, color[2] / weight],
+        level: Math.min(1, weight) * 0.6,
+        kind: "ceiling",
+        room: zoneOf(fv.lightZones, roomIndexAt(fv.floor, x, z)),
+      });
     }
     return out;
   }
