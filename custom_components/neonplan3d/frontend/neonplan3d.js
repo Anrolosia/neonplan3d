@@ -3176,7 +3176,7 @@ Array.prototype.at||Object.defineProperty(Array.prototype,"at",{configurable:!0,
                   ${r.name}
                 </button>`)}
               <span class="fp3d-sep"></span>`:k}
-        ${n.flatMap(r=>[n.length>1&&ke(r).some(s=>s.name.trim())?_`<span class="fp3d-nav-floor">${r.name}</span>`:k,...ke(r).filter(s=>s.name.trim()).map(s=>_`<button
+        ${n.flatMap(r=>[n.length>1&&ke(r).some(s=>s.name.trim())?_`<span class="fp3d-nav-floor">${r.name}</span>`:k,...ke(r).filter((s,a,l)=>s.name.trim()&&!(s.outdoor&&l.findIndex(d=>d.outdoor&&d.area_id===s.area_id&&d.name===s.name)<a)).map(s=>_`<button
               class="fp3d-chip fp3d-room-chip"
               aria-pressed=${s.id===this._roomId}
               @click=${()=>{e.floors.length>1&&(this._floorId=r.id),this._roomId=s.id===this._roomId?null:s.id}}

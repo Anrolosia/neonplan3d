@@ -815,7 +815,10 @@ export class Floorplan3dPanel extends LitElement {
           // no button (an empty chip would only take space, #370)
           roomFloors.length > 1 && zonesOf(f).some((r) => r.name.trim()) ? html`<span class="fp3d-nav-floor">${f.name}</span>` : nothing,
           // the rooms, then the outdoor areas acting as rooms (garden, terrace – #100)
-          ...zonesOf(f).filter((r) => r.name.trim()).map(
+          // several areas of one garden (front and back lawn with the same area and name) share one chip
+          ...zonesOf(f)
+            .filter((r, i, all) => r.name.trim() && !(r.outdoor && all.findIndex((x) => x.outdoor && x.area_id === r.area_id && x.name === r.name) < i))
+            .map(
             (r) => html`<button
               class="fp3d-chip fp3d-room-chip"
               aria-pressed=${r.id === this._roomId}
