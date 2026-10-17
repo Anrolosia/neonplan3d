@@ -1865,5 +1865,19 @@
  "director_hold": "Tilbake etter (sekund)",
  "director_back_hint": "Deretter går visinga tilbake dit ho var – med mindre nokon har rørt skjermen i mellomtida. Den som brukar nettbrettet, vert berre avbroten av dørklokka og åtvaringar. Dørklokka vert ståande dobbelt så lenge.",
  "card_director": "Live-regi (Kamera-cockpit)",
- "card_director_hint": "Kortet viser av seg sjølv kva som skjer. Kva hendingar vel du i editoren under «Live-regi»."
+ "card_director_hint": "Kortet viser av seg sjølv kva som skjer. Kva hendingar vel du i editoren under «Live-regi».",
+ "voice": "Talestyring",
+ "voice_hint": "Ein mikrofonknapp nede til venstre i 3D-visinga: trykk og snakk. «Vis stova», «andre etasje» eller «heile huset» viser staden; alt anna («slå på lyset i gangen») går til Assist i Home Assistant.",
+ "voice_here": "Slå på på denne eininga",
+ "voice_needs": "Krev https, tillaten mikrofon (i Fully Kiosk: Web Content Settings → mikrofontilgang) og ein Assist-pipeline med talegjenkjenning. På eit dashbordkort slår du på knappen i kortinnstillingane.",
+ "voice_button": "Snakk",
+ "voice_listen": "Eg lyttar …",
+ "voice_none": "Forstod ingenting",
+ "voice_no_pipeline": "Inga talegjenkjenning sett opp i Assist (Innstillingar → Taleassistentar).",
+ "voice_denied": "Mikrofonen er ikkje tillaten – berre via https og med løyve i nettlesaren eller i Fully Kiosk.",
+ "voice_error": "Talestyring: {msg}",
+ "card_voice": "Talestyring (mikrofonknapp)",
+ "card_voice_hint": "«Vis stova» viser rommet, andre setningar går til Assist. Krev https og ein tillaten mikrofon",
+ "director_mic_test": "🎙️ Test mikrofonen",
+ "director_mic_hint": "Sjekkar https, mikrofonen og talegjenkjenninga til Assist på denne eininga og viser kva rom ei setning ville opna. Ingenting vert styrt."
 }

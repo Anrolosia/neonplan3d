@@ -1865,5 +1865,19 @@
  "director_hold": "Zpět za (sekund)",
  "director_back_hint": "Pak se pohled vrátí tam, kde byl – pokud se mezitím někdo nedotkl obrazovky. Kdo tablet právě používá, toho přeruší jen zvonek a varování. Zvonek zůstane dvakrát déle.",
  "card_director": "Živá režie (Kamerový kokpit)",
- "card_director_hint": "Karta sama ukazuje, co se děje. Události vybereš v editoru v části „Živá režie“."
+ "card_director_hint": "Karta sama ukazuje, co se děje. Události vybereš v editoru v části „Živá režie“.",
+ "voice": "Hlasové ovládání",
+ "voice_hint": "Tlačítko mikrofonu vlevo dole ve 3D zobrazení: klepni a mluv. „Ukaž obývák“, „patro“ nebo „celý dům“ ukáže místo; vše ostatní („rozsviť světlo v chodbě“) jde do Assistu v Home Assistantu.",
+ "voice_here": "Zapnout na tomto zařízení",
+ "voice_needs": "Potřebuje https, povolený mikrofon (ve Fully Kiosk: Web Content Settings → přístup k mikrofonu) a pipeline Assistu s rozpoznáváním řeči. Na kartě nástěnky zapneš tlačítko v nastavení karty.",
+ "voice_button": "Mluvit",
+ "voice_listen": "Poslouchám …",
+ "voice_none": "Nic jsem nerozuměl",
+ "voice_no_pipeline": "V Assistu není nastavené rozpoznávání řeči (Nastavení → Hlasoví asistenti).",
+ "voice_denied": "Mikrofon není povolen – jen přes https a s povolením v prohlížeči nebo ve Fully Kiosk.",
+ "voice_error": "Hlasové ovládání: {msg}",
+ "card_voice": "Hlasové ovládání (tlačítko mikrofonu)",
+ "card_voice_hint": "„Ukaž obývák“ ukáže místnost, ostatní věty jdou do Assistu. Potřebuje https a povolený mikrofon",
+ "director_mic_test": "🎙️ Otestovat mikrofon",
+ "director_mic_hint": "Na tomto zařízení zkontroluje https, mikrofon a rozpoznávání řeči Assistu a ukáže, kterou místnost by věta otevřela. Nic se nepřepíná."
 }

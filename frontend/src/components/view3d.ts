@@ -227,6 +227,8 @@ export class Fp3dView3d extends LitElement {
     alerts: { attribute: false },
     alertJump: { attribute: false },
     director: { attribute: false },
+    voice: { attribute: false },
+    _voice: { state: true },
     scenes: { attribute: false },
     dimmed: { attribute: false },
     autoOrbit: { attribute: false },
@@ -398,6 +400,10 @@ export class Fp3dView3d extends LitElement {
   declare alertJump: boolean;
   /** Kamera-Cockpit: this screen shows by itself what happens (the events chosen in the settings; default off). */
   declare director: boolean;
+  /** Voice control: a microphone button – "Zeig das Wohnzimmer" shows it, other sentences go to Assist (default off). */
+  declare voice: boolean;
+  private declare _voice: { phase: "wait" | "listen" | "done" | "error"; text: string } | null;
+  private voiceTimer: ReturnType<typeof setTimeout> | undefined;
   private declare _alerts: Alert[];
   /** Haushalt Pro: what is due in the household now (the glass card "Today in the household"). */
   private declare _household: HouseholdItem[];
@@ -585,6 +591,8 @@ export class Fp3dView3d extends LitElement {
     this.alerts = true;
     this.alertJump = false;
     this.director = false;
+    this.voice = false;
+    this._voice = null;
     this._micProbe = micProbeAsked();
     this._alerts = [];
     this._household = [];
@@ -655,6 +663,7 @@ export class Fp3dView3d extends LitElement {
     clearTimeout(this.fridgeTimer);
     clearTimeout(this.directorTimer);
     clearTimeout(this.restTimer);
+    clearTimeout(this.voiceTimer);
     this.directing.clear();
     this.pickupKey = "";
     // back in the page (another dashboard view and back), the day curves are fetched and kept fresh again (#527)
@@ -3689,6 +3698,61 @@ export class Fp3dView3d extends LitElement {
     </button>`;
   }
 
+  /** Voice control: the microphone button and what was heard or answered. */
+  private renderMic() {
+    const hass = this.hass;
+    if (!this.voice || !hass || this.ro || this._walk) return nothing;
+    const v = this._voice;
+    const busy = v?.phase === "wait" || v?.phase === "listen";
+    const label = translate(hass, "voice_button");
+    const left = this.cleanButton && !(this._find !== null && !this.clean) ? (this.clean ? 56 : 100) : 56;
+    return html`<button class="fp3d-mic ${v?.phase === "listen" ? "fp3d-mic-on" : ""}" style="left:${left}px" title=${label} aria-label=${label} ?disabled=${busy} @click=${() => void this.onMic()}>
+        ${svg`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2Z" /></svg>`}
+      </button>
+      ${v ? html`<div class="fp3d-mic-say ${v.phase === "error" ? "fp3d-mic-err" : ""}" style="left:${left}px">${v.text}</div>` : nothing}`;
+  }
+
+  /** One spoken sentence: a place to show ("Zeig das Wohnzimmer") is shown, anything else goes to Assist. */
+  private async onMic(): Promise<void> {
+    const hass = this.hass;
+    const b = this.building;
+    if (!hass || !b || this._voice?.phase === "wait" || this._voice?.phase === "listen") return;
+    clearTimeout(this.voiceTimer);
+    const say = (phase: "wait" | "listen" | "done" | "error", text: string) => {
+      this._voice = { phase, text };
+      clearTimeout(this.voiceTimer);
+      if (phase === "done" || phase === "error") this.voiceTimer = setTimeout(() => (this._voice = null), phase === "error" ? 9000 : 6000);
+    };
+    say("wait", "…");
+    try {
+      const v = await loadVoice();
+      const text = await v.listenOnce(hass, () => say("listen", translate(hass, "voice_listen")));
+      if (!text) {
+        say("error", translate(hass, "voice_none"));
+        return;
+      }
+      const place = v.showCommand(text, b, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
+      if (place) {
+        say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.name}`);
+        this.directing.touch(Date.now());
+        if (place.kind === "house") this.fire("floor-tap", { floorId: null });
+        else if (place.kind === "floor") this.fire("floor-tap", { floorId: place.floorId });
+        else {
+          if (this.floorId !== place.floorId) this.fire("floor-tap", { floorId: place.floorId });
+          setTimeout(() => this.fire("room-tap", { floorId: place.floorId, roomId: place.roomId }), 60);
+        }
+        return;
+      }
+      say("wait", `“${text}” …`);
+      const answer = await v.converse(hass, text);
+      say("done", answer ? `“${text}” – ${answer}` : `“${text}”`);
+    } catch (err) {
+      const e = err as { name?: string; message?: string };
+      const key = e?.message === "no_pipeline" ? "voice_no_pipeline" : e?.name === "NotAllowedError" || e?.name === "SecurityError" || !window.isSecureContext ? "voice_denied" : null;
+      say("error", key ? translate(hass, key) : translate(hass, "voice_error", { msg: String(e?.message ?? e?.name ?? err) }));
+    }
+  }
+
   private renderSwipe() {
     const s = this._swipe;
     if (!s || !this.hass) return nothing;
@@ -4081,6 +4145,7 @@ export class Fp3dView3d extends LitElement {
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
       ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
+      ${this.renderMic()}
       ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
@@ -4757,6 +4822,41 @@ export class Fp3dView3d extends LitElement {
         color: var(--fp3d-text);
         cursor: pointer;
         z-index: 4;
+      }
+      .fp3d-mic {
+        position: absolute;
+        bottom: calc(10px + var(--fp3d-bottom-inset, 0px));
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        border-radius: 50%;
+        border: 1px solid rgba(160, 240, 255, 0.35);
+        background: rgba(8, 16, 34, 0.7);
+        color: var(--fp3d-text);
+        cursor: pointer;
+        z-index: 4;
+      }
+      .fp3d-mic-on {
+        color: #ff5a6a;
+        border-color: #ff5a6a;
+        box-shadow: 0 0 12px rgba(255, 90, 106, 0.7);
+      }
+      .fp3d-mic-say {
+        position: absolute;
+        bottom: calc(54px + var(--fp3d-bottom-inset, 0px));
+        max-width: min(420px, calc(100% - 80px));
+        padding: 6px 12px;
+        border-radius: 14px;
+        background: rgba(8, 16, 34, 0.85);
+        border: 1px solid rgba(160, 240, 255, 0.35);
+        color: var(--fp3d-text);
+        font-size: 14px;
+        z-index: 4;
+      }
+      .fp3d-mic-err {
+        border-color: rgba(255, 90, 106, 0.7);
       }
       .fp3d-eye-clean {
         left: 12px;

@@ -1865,5 +1865,19 @@
  "director_hold": "Takaisin (sekuntia)",
  "director_back_hint": "Sen jälkeen näkymä palaa entiseen paikkaansa – ellei joku ole koskenut näyttöön sillä välin. Tablettia käyttävää keskeyttävät vain ovikello ja varoitukset. Ovikello pysyy kaksi kertaa niin kauan.",
  "card_director": "Live-ohjaus (Kamera-cockpit)",
- "card_director_hint": "Kortti näyttää itsestään, mitä tapahtuu. Tapahtumat valitaan editorissa kohdassa ”Live-ohjaus”."
+ "card_director_hint": "Kortti näyttää itsestään, mitä tapahtuu. Tapahtumat valitaan editorissa kohdassa ”Live-ohjaus”.",
+ "voice": "Puheohjaus",
+ "voice_hint": "Mikrofonipainike 3D-näkymän vasemmassa alakulmassa: napauta ja puhu. ”Näytä olohuone”, ”yläkerta” tai ”koko talo” näyttää paikan; kaikki muu (”sytytä eteisen valo”) menee Home Assistantin Assistille.",
+ "voice_here": "Kytke päälle tällä laitteella",
+ "voice_needs": "Vaatii https:n, sallitun mikrofonin (Fully Kioskissa: Web Content Settings → mikrofonin käyttö) ja Assist-putken puheentunnistuksella. Kojelautakortissa kytket painikkeen päälle kortin asetuksista.",
+ "voice_button": "Puhu",
+ "voice_listen": "Kuuntelen …",
+ "voice_none": "En ymmärtänyt mitään",
+ "voice_no_pipeline": "Assistissa ei ole puheentunnistusta (Asetukset → Puheavustajat).",
+ "voice_denied": "Mikrofonia ei sallittu – vain https:n kautta ja luvalla selaimessa tai Fully Kioskissa.",
+ "voice_error": "Puheohjaus: {msg}",
+ "card_voice": "Puheohjaus (mikrofonipainike)",
+ "card_voice_hint": "”Näytä olohuone” näyttää huoneen, muut lauseet menevät Assistille. Vaatii https:n ja sallitun mikrofonin",
+ "director_mic_test": "🎙️ Testaa mikrofoni",
+ "director_mic_hint": "Tarkistaa tällä laitteella https:n, mikrofonin ja Assistin puheentunnistuksen ja näyttää, minkä huoneen lause avaisi. Mitään ei ohjata."
 }

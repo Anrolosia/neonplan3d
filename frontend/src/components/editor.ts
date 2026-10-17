@@ -24,6 +24,7 @@ import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlan
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
+import { setVoiceHere, voiceOnHere } from "../load-voice.ts";
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
@@ -9736,7 +9737,7 @@ export class Fp3dEditor extends LitElement {
             : floor
               ? this.renderRoomList(floor)
               : nothing}
-      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing}
+      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing} ${this.renderVoice()}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
       ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderTerrain() : nothing}
@@ -10713,8 +10714,32 @@ export class Fp3dEditor extends LitElement {
         ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}
       </div>
       <p class="fp3d-sub">${this.t("director_back_hint")}</p>
+    </details>`;
+  }
+
+  /** Voice control: the microphone button on this device (a card has its own option), and the microphone test. */
+  private renderVoice() {
+    const here = voiceOnHere();
+    return html`<details class="fp3d-section">
+      <summary>🎙️ ${this.t("voice")}</summary>
+      <p class="fp3d-sub">${this.t("voice_hint")}</p>
+      <div class="fp3d-form">
+        <label class="fp3d-check fp3d-wide"
+          ><input
+            type="checkbox"
+            .checked=${here}
+            @change=${(e: Event) => {
+              setVoiceHere((e.target as HTMLInputElement).checked);
+              this.dispatchEvent(new CustomEvent("voice-here", { bubbles: true, composed: true }));
+              this.requestUpdate();
+            }}
+          />
+          ${this.t("voice_here")}</label
+        >
+      </div>
+      <p class="fp3d-sub">${this.t("voice_needs")}</p>
       <div class="fp3d-actions">
-        <button class="fp3d-btn" @click=${() => this.dispatchEvent(new CustomEvent("mic-probe", { bubbles: true, composed: true }))}>🎙️ ${this.t("director_mic_test")}</button>
+        <button class="fp3d-btn" @click=${() => this.dispatchEvent(new CustomEvent("mic-probe", { bubbles: true, composed: true }))}>${this.t("director_mic_test")}</button>
       </div>
       <p class="fp3d-sub">${this.t("director_mic_hint")}</p>
     </details>`;

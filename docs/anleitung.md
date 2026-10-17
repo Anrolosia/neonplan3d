@@ -1034,6 +1034,21 @@ NeonPlan 3D ist für Wandtablets wie das Amazon Fire gebaut:
 
 **Tipps für Fire-Tablets:** Fully Kiosk Browser mit Hardwarebeschleunigung nutzen, die Karte mit `fill: true` bildschirmfüllend zeigen und `quality: auto` lassen.
 
+**Sprachsteuerung:** Ein Mikrofon-Knopf unten links in der 3D-Ansicht. Antippen und sprechen:
+
+- **„Zeig das Wohnzimmer“**, **„geh ins Obergeschoss“**, **„das ganze Haus“** oder einfach **„Küche“** öffnet den Ort. Erkannt werden die Namen der Räume, Außenflächen und Etagen in deinem Plan sowie die Namen der Home-Assistant-Bereiche.
+- **Alles andere** geht an Assist von Home Assistant, z. B. „Licht im Flur an“. Die Antwort erscheint als Sprechblase.
+
+Einschalten: Editor → **🎙️ Sprachsteuerung** → **Auf diesem Gerät einschalten**. Auf einer Dashboard-Karte schaltest du stattdessen **Sprachsteuerung** in den Karten-Einstellungen ein (`voice: true`).
+
+Dafür brauchst du:
+
+- **https:** Über http gibt der Browser das Mikrofon nicht frei.
+- **Freigabe des Mikrofons:** in Fully Kiosk unter Web Content Settings → Mikrofonzugriff, dazu die Android-Berechtigung.
+- **Eine Assist-Pipeline mit Spracherkennung**, z. B. Home Assistant Cloud, Whisper oder Speech-to-Phrase.
+
+Das Mikrofon ist nur offen, solange du sprichst. **🎙️ Mikrofon testen** im selben Abschnitt prüft alles Schritt für Schritt.
+
 ---
 
 ## 10. Sicherung und Umzug

@@ -1865,5 +1865,19 @@
  "director_hold": "Volver tras (segundos)",
  "director_back_hint": "Después la vista vuelve a donde estaba – salvo que alguien haya tocado la pantalla entretanto. Quien usa la tableta solo es interrumpido por el timbre y las alertas. El timbre se queda el doble de tiempo.",
  "card_director": "Realización en directo (Cabina de cámaras)",
- "card_director_hint": "La tarjeta muestra por sí sola lo que pasa. Los eventos se eligen en el editor en «Realización en directo»."
+ "card_director_hint": "La tarjeta muestra por sí sola lo que pasa. Los eventos se eligen en el editor en «Realización en directo».",
+ "voice": "Control por voz",
+ "voice_hint": "Un botón de micrófono abajo a la izquierda de la vista 3D: tócalo y habla. «Muestra el salón», «planta alta» o «toda la casa» muestra el lugar; todo lo demás («enciende la luz del pasillo») va a Assist de Home Assistant.",
+ "voice_here": "Activar en este dispositivo",
+ "voice_needs": "Necesita https, el micrófono permitido (en Fully Kiosk: Web Content Settings → acceso al micrófono) y una canalización de Assist con reconocimiento de voz. En una tarjeta del panel activas el botón en los ajustes de la tarjeta.",
+ "voice_button": "Hablar",
+ "voice_listen": "Te escucho …",
+ "voice_none": "No he entendido nada",
+ "voice_no_pipeline": "No hay reconocimiento de voz configurado en Assist (Ajustes → Asistentes de voz).",
+ "voice_denied": "Micrófono no permitido – solo por https y con permiso en el navegador o en Fully Kiosk.",
+ "voice_error": "Control por voz: {msg}",
+ "card_voice": "Control por voz (botón de micrófono)",
+ "card_voice_hint": "«Muestra el salón» muestra la habitación, las demás frases van a Assist. Necesita https y un micrófono permitido",
+ "director_mic_test": "🎙️ Probar el micrófono",
+ "director_mic_hint": "Comprueba en este dispositivo https, el micrófono y el reconocimiento de voz de Assist, y muestra qué habitación abriría una frase. No se acciona nada."
 }

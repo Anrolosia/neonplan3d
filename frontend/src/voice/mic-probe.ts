@@ -7,25 +7,9 @@ import { LitElement, css, html, nothing } from "lit";
 import type { Building } from "../model.ts";
 import type { HomeAssistant } from "../types.ts";
 import { findPlace } from "./commands.ts";
+import { audioContext, findPipeline, openMicrophone, transcribe, type Pipeline } from "./listen.ts";
 
 type Step = { ok: boolean | null; text: string };
-
-interface Pipeline {
-  id: string;
-  name: string;
-  language: string;
-  stt_engine: string | null;
-}
-
-interface RunEvent {
-  type: string;
-  data?: { runner_data?: { stt_binary_handler_id?: number }; stt_output?: { text?: string }; code?: string; message?: string };
-}
-
-/** Speech goes to Assist as 16-bit mono at 16 kHz. */
-const RATE = 16000;
-/** The longest sentence recorded (ms); Assist usually ends earlier, at the first pause. */
-const LONGEST = 7000;
 
 const TEXT = {
   de: {
@@ -79,22 +63,6 @@ const TEXT = {
     close: "Close",
   },
 };
-
-/** Float samples at `from` Hz to 16-bit samples at 16 kHz (each output sample the mean of its input stretch). */
-export function toPcm16(input: Float32Array, from: number): Int16Array {
-  const ratio = from / RATE;
-  const n = Math.floor(input.length / ratio);
-  const out = new Int16Array(n);
-  for (let i = 0; i < n; i++) {
-    const a = Math.floor(i * ratio);
-    const b = Math.max(a + 1, Math.floor((i + 1) * ratio));
-    let sum = 0;
-    for (let k = a; k < b && k < input.length; k++) sum += input[k];
-    const v = Math.max(-1, Math.min(1, sum / (b - a)));
-    out[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
-  }
-  return out;
-}
 
 export class MicProbe extends LitElement {
   static properties = {
@@ -154,11 +122,9 @@ export class MicProbe extends LitElement {
   private async findPipeline(): Promise<void> {
     const t = this.t;
     try {
-      const res = await this.hass!.callWS<{ pipelines: Pipeline[]; preferred_pipeline: string | null }>({ type: "assist_pipeline/pipeline/list" });
-      const preferred = res.pipelines.find((p) => p.id === res.preferred_pipeline) ?? res.pipelines[0];
-      const withStt = preferred?.stt_engine ? preferred : res.pipelines.find((p) => p.stt_engine);
-      this.pipeline = withStt ?? null;
-      this.add(withStt ? { ok: true, text: `${t.pipe_ok}: ${withStt.name} (${withStt.language}, ${withStt.stt_engine})` } : { ok: false, text: t.pipe_no });
+      const p = await findPipeline(this.hass!);
+      this.pipeline = p;
+      this.add(p ? { ok: true, text: `${t.pipe_ok}: ${p.name} (${p.language}, ${p.stt_engine})` } : { ok: false, text: t.pipe_no });
     } catch (err) {
       this.add({ ok: false, text: `${t.pipe_no} (${String((err as Error)?.message ?? err)})` });
     }
@@ -171,14 +137,13 @@ export class MicProbe extends LitElement {
   private async allow(): Promise<void> {
     const t = this.t;
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      this.stream = await openMicrophone();
     } catch (err) {
       const name = (err as DOMException)?.name ?? "";
       this.add({ ok: false, text: name === "NotAllowedError" || name === "SecurityError" ? t.mic_denied : name === "NotFoundError" ? t.mic_none : `${t.mic_other}: ${name || String(err)}` });
       return;
     }
-    const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    this.ctx = new Ctx();
+    this.ctx = audioContext();
     this.source = this.ctx.createMediaStreamSource(this.stream);
     const analyser = this.ctx.createAnalyser();
     analyser.fftSize = 512;
@@ -196,74 +161,24 @@ export class MicProbe extends LitElement {
   /** Record one sentence and let Assist write it down (the pipeline stops after speech to text). */
   private async talk(): Promise<void> {
     const hass = this.hass;
-    const ctx = this.ctx;
-    const source = this.source;
-    const socket = (hass?.connection as unknown as { socket?: WebSocket })?.socket;
-    if (!hass || !ctx || !source || !this.pipeline || !socket) return;
+    if (!hass || !this.ctx || !this.source || !this.pipeline) return;
     const t = this.t;
     this._busy = true;
     this._result = [{ ok: null, text: t.listening }];
-    if (ctx.state === "suspended") await ctx.resume();
     const began = performance.now();
-    let handler: number | null = null;
-    const early: Int16Array[] = [];
-    let done = false;
-    const send = (pcm: Int16Array | null) => {
-      if (handler === null) return;
-      const bytes = pcm ? new Uint8Array(pcm.buffer, pcm.byteOffset, pcm.byteLength) : new Uint8Array(0);
-      const msg = new Uint8Array(1 + bytes.length);
-      msg[0] = handler;
-      msg.set(bytes, 1);
-      socket.send(msg);
-    };
-    // ScriptProcessor: old, but every WebView of an old wall tablet has it (AudioWorklet not)
-    const proc = ctx.createScriptProcessor(4096, 1, 1);
-    proc.onaudioprocess = (e) => {
-      if (done) return;
-      const pcm = toPcm16(e.inputBuffer.getChannelData(0), ctx.sampleRate);
-      if (handler === null) early.push(pcm);
-      else send(pcm);
-    };
-    source.connect(proc);
-    proc.connect(ctx.destination);
-    let unsub: (() => Promise<void>) | null = null;
-    const finish = (step: Step[]) => {
-      if (done) return;
-      done = true;
-      clearTimeout(limit);
-      source.disconnect(proc);
-      proc.disconnect();
-      void unsub?.();
-      this._result = step;
-      this._busy = false;
-    };
-    const limit = setTimeout(() => send(null), LONGEST);
     try {
-      unsub = await hass.connection.subscribeMessage<RunEvent>(
-        (ev) => {
-          if (ev.type === "run-start") {
-            handler = ev.data?.runner_data?.stt_binary_handler_id ?? null;
-            for (const pcm of early.splice(0)) send(pcm);
-          } else if (ev.type === "stt-end") {
-            const text = ev.data?.stt_output?.text?.trim() ?? "";
-            const took = `${t.took}: ${((performance.now() - began) / 1000).toFixed(1)} s`;
-            const place = text && this.building ? findPlace(text, this.building) : null;
-            const where = place ? (place.kind === "house" ? t.house : place.name) : null;
-            finish([
-              { ok: !!text, text: text ? `${t.heard}: „${text}“ · ${took}` : `${t.nothing} · ${took}` },
-              ...(text ? [{ ok: !!where, text: where ? `${t.would}: ${where}` : t.would_none }] : []),
-            ]);
-          } else if (ev.type === "error") {
-            finish([{ ok: false, text: `Assist: ${ev.data?.code ?? ""} ${ev.data?.message ?? ""}`.trim() }]);
-          } else if (ev.type === "run-end") {
-            finish(this._result.length && this._result[0].ok !== null ? this._result : [{ ok: false, text: t.nothing }]);
-          }
-        },
-        { type: "assist_pipeline/run", start_stage: "stt", end_stage: "stt", input: { sample_rate: RATE }, pipeline: this.pipeline.id },
-      );
+      const text = await transcribe(hass, this.ctx, this.source, this.pipeline.id);
+      const took = `${t.took}: ${((performance.now() - began) / 1000).toFixed(1)} s`;
+      const place = text && this.building ? findPlace(text, this.building) : null;
+      const where = place ? (place.kind === "house" ? t.house : place.name) : null;
+      this._result = [
+        { ok: !!text, text: text ? `${t.heard}: „${text}“ · ${took}` : `${t.nothing} · ${took}` },
+        ...(text ? [{ ok: !!where, text: where ? `${t.would}: ${where}` : t.would_none }] : []),
+      ];
     } catch (err) {
-      finish([{ ok: false, text: `Assist: ${String((err as Error)?.message ?? err)}` }]);
+      this._result = [{ ok: false, text: `Assist: ${String((err as Error)?.message ?? err)}` }];
     }
+    this._busy = false;
   }
 
   private close(): void {

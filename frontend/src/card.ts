@@ -354,6 +354,7 @@ clearTimeout(this.cleanTimer);
               .householdCard=${c?.household_card !== false}
               .alertJump=${!!c?.alert_jump}
               .director=${!!c?.director}
+              .voice=${!!c?.voice}
               .scenes=${c?.scenes !== false}
               ?trail=${!!c?.motion_trail}
               .cameraWall=${this._cameraWall && !tt}

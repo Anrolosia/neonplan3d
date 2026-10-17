@@ -1865,5 +1865,19 @@
  "director_hold": "Ritorno dopo (secondi)",
  "director_back_hint": "Poi la vista torna dov'era – a meno che qualcuno non abbia toccato lo schermo nel frattempo. Chi sta usando il tablet viene interrotto solo dal campanello e dagli avvisi. Il campanello resta il doppio del tempo.",
  "card_director": "Regia live (Cockpit telecamere)",
- "card_director_hint": "La scheda mostra da sola ciò che succede. Gli eventi si scelgono nell'editor sotto «Regia live»."
+ "card_director_hint": "La scheda mostra da sola ciò che succede. Gli eventi si scelgono nell'editor sotto «Regia live».",
+ "voice": "Comando vocale",
+ "voice_hint": "Un pulsante microfono in basso a sinistra nella vista 3D: toccalo e parla. «Mostra il soggiorno», «piano superiore» o «tutta la casa» mostra il luogo; tutto il resto («accendi la luce del corridoio») va ad Assist di Home Assistant.",
+ "voice_here": "Attiva su questo dispositivo",
+ "voice_needs": "Richiede https, il microfono consentito (in Fully Kiosk: Web Content Settings → accesso al microfono) e una pipeline Assist con riconoscimento vocale. Su una scheda della dashboard attivi il pulsante nelle impostazioni della scheda.",
+ "voice_button": "Parla",
+ "voice_listen": "Ti ascolto …",
+ "voice_none": "Non ho capito",
+ "voice_no_pipeline": "Nessun riconoscimento vocale configurato in Assist (Impostazioni → Assistenti vocali).",
+ "voice_denied": "Microfono non consentito – solo tramite https e con il permesso nel browser o in Fully Kiosk.",
+ "voice_error": "Comando vocale: {msg}",
+ "card_voice": "Comando vocale (pulsante microfono)",
+ "card_voice_hint": "«Mostra il soggiorno» mostra la stanza, le altre frasi vanno ad Assist. Richiede https e un microfono consentito",
+ "director_mic_test": "🎙️ Prova il microfono",
+ "director_mic_hint": "Controlla su questo dispositivo https, il microfono e il riconoscimento vocale di Assist, e mostra quale stanza aprirebbe una frase. Non viene comandato nulla."
 }

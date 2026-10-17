@@ -1865,5 +1865,19 @@
  "director_hold": "Vissza ennyi után (másodperc)",
  "director_back_hint": "Ezután a nézet visszatér oda, ahol volt – hacsak közben valaki nem érintette meg a képernyőt. Aki éppen a tabletet használja, azt csak a csengő és a figyelmeztetések szakítják meg. A csengő kétszer olyan sokáig marad.",
  "card_director": "Élő rendezés (Kamera-pilótafülke)",
- "card_director_hint": "A kártya magától mutatja, mi történik. Az eseményeket a szerkesztőben az „Élő rendezés” alatt választod ki."
+ "card_director_hint": "A kártya magától mutatja, mi történik. Az eseményeket a szerkesztőben az „Élő rendezés” alatt választod ki.",
+ "voice": "Hangvezérlés",
+ "voice_hint": "Mikrofongomb a 3D nézet bal alsó sarkában: koppints rá és beszélj. „Mutasd a nappalit”, „emelet” vagy „az egész ház” megmutatja a helyet; minden más („kapcsold fel a folyosó lámpáját”) a Home Assistant Assistjához megy.",
+ "voice_here": "Bekapcsolás ezen az eszközön",
+ "voice_needs": "Kell hozzá https, engedélyezett mikrofon (Fully Kioskban: Web Content Settings → mikrofonhozzáférés) és beszédfelismerős Assist-folyamat. Irányítópult-kártyán a gombot a kártya beállításaiban kapcsolod be.",
+ "voice_button": "Beszéd",
+ "voice_listen": "Figyelek …",
+ "voice_none": "Nem értettem semmit",
+ "voice_no_pipeline": "Nincs beszédfelismerés beállítva az Assistban (Beállítások → Hangasszisztensek).",
+ "voice_denied": "A mikrofon nincs engedélyezve – csak https-en és a böngészőben vagy Fully Kioskban adott engedéllyel.",
+ "voice_error": "Hangvezérlés: {msg}",
+ "card_voice": "Hangvezérlés (mikrofongomb)",
+ "card_voice_hint": "„Mutasd a nappalit” megmutatja a szobát, más mondatok az Assisthoz mennek. Kell hozzá https és engedélyezett mikrofon",
+ "director_mic_test": "🎙️ Mikrofon tesztelése",
+ "director_mic_hint": "Ellenőrzi ezen az eszközön a https-t, a mikrofont és az Assist beszédfelismerését, és megmutatja, melyik szobát nyitná meg egy mondat. Semmi nem kapcsol."
 }

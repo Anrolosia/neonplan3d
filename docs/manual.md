@@ -1034,6 +1034,21 @@ NeonPlan 3D is built for wall tablets such as the Amazon Fire:
 
 **Tips for Fire tablets:** Use Fully Kiosk Browser with hardware acceleration, show the card full screen with `fill: true` and keep `quality: auto`.
 
+**Voice control:** a microphone button at the bottom left of the 3D view. Tap it and speak:
+
+- **"Show the living room"**, **"go to the upper floor"**, **"the whole house"** or simply **"kitchen"** opens the place. It knows the names of the rooms, outdoor areas and floors in your plan, and the names of the Home Assistant areas.
+- **Anything else** goes to Home Assistant's Assist, e.g. "turn on the hall light". The answer shows as a speech bubble.
+
+To switch it on: editor → **🎙️ Voice control** → **Switch on on this device**. On a dashboard card you switch on **Voice control** in the card settings instead (`voice: true`).
+
+You need:
+
+- **https:** over http the browser does not give out the microphone.
+- **The microphone allowed:** in Fully Kiosk under Web Content Settings → microphone access, plus the Android permission.
+- **An Assist pipeline with speech to text**, e.g. Home Assistant Cloud, Whisper or Speech-to-Phrase.
+
+The microphone is only open while you speak. **🎙️ Test the microphone** in the same section checks everything step by step.
+
 ---
 
 ## 10. Backup and moving

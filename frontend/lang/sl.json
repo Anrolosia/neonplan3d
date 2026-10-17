@@ -1865,5 +1865,19 @@
  "director_hold": "Nazaj po (sekundah)",
  "director_back_hint": "Nato se pogled vrne tja, kjer je bil – razen če se je kdo medtem dotaknil zaslona. Kdor tablico uporablja, ga prekineta samo zvonec in opozorila. Zvonec ostane dvakrat dlje.",
  "card_director": "Režija v živo (Kamerni kokpit)",
- "card_director_hint": "Kartica sama pokaže, kaj se dogaja. Dogodke izbereš v urejevalniku pod »Režija v živo«."
+ "card_director_hint": "Kartica sama pokaže, kaj se dogaja. Dogodke izbereš v urejevalniku pod »Režija v živo«.",
+ "voice": "Glasovno upravljanje",
+ "voice_hint": "Gumb za mikrofon spodaj levo v 3D-pogledu: tapni in govori. »Pokaži dnevno sobo«, »nadstropje« ali »celo hišo« pokaže mesto; vse drugo (»prižgi luč na hodniku«) gre v Assist v Home Assistantu.",
+ "voice_here": "Vklopi na tej napravi",
+ "voice_needs": "Potrebuje https, dovoljen mikrofon (v Fully Kiosk: Web Content Settings → dostop do mikrofona) in cevovod Assist s prepoznavanjem govora. Na kartici nadzorne plošče gumb vklopiš v nastavitvah kartice.",
+ "voice_button": "Govori",
+ "voice_listen": "Poslušam …",
+ "voice_none": "Nič nisem razumel",
+ "voice_no_pipeline": "V Assistu ni nastavljenega prepoznavanja govora (Nastavitve → Glasovni pomočniki).",
+ "voice_denied": "Mikrofon ni dovoljen – samo prek https in z dovoljenjem v brskalniku ali v Fully Kiosk.",
+ "voice_error": "Glasovno upravljanje: {msg}",
+ "card_voice": "Glasovno upravljanje (gumb za mikrofon)",
+ "card_voice_hint": "»Pokaži dnevno sobo« pokaže prostor, drugi stavki gredo v Assist. Potrebuje https in dovoljen mikrofon",
+ "director_mic_test": "🎙️ Preizkusi mikrofon",
+ "director_mic_hint": "Na tej napravi preveri https, mikrofon in prepoznavanje govora v Assistu ter pokaže, kateri prostor bi stavek odprl. Nič se ne preklopi."
 }

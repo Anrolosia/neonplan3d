@@ -1865,5 +1865,19 @@
  "director_hold": "返回时间（秒）",
  "director_back_hint": "之后视图会回到原来的位置——除非期间有人触摸了屏幕。正在使用平板的人只会被门铃和警告打断。门铃画面停留时间加倍。",
  "card_director": "实时导播（摄像头驾驶舱）",
- "card_director_hint": "卡片会自动显示正在发生的事。在编辑器的“实时导播”中选择哪些事件。"
+ "card_director_hint": "卡片会自动显示正在发生的事。在编辑器的“实时导播”中选择哪些事件。",
+ "voice": "语音控制",
+ "voice_hint": "3D 视图左下角的麦克风按钮：点一下再说话。“显示客厅”、“楼上”或“整个房子”会显示该位置；其他内容（“打开走廊灯”）交给 Home Assistant 的 Assist。",
+ "voice_here": "在此设备上开启",
+ "voice_needs": "需要 https、已授权的麦克风（在 Fully Kiosk 中：Web Content Settings → 麦克风访问）以及带语音识别的 Assist 管道。在仪表盘卡片上，请在卡片设置中开启按钮。",
+ "voice_button": "说话",
+ "voice_listen": "正在聆听……",
+ "voice_none": "没有听懂",
+ "voice_no_pipeline": "Assist 中未设置语音识别（设置 → 语音助手）。",
+ "voice_denied": "麦克风未授权——仅在 https 下且在浏览器或 Fully Kiosk 中授权后可用。",
+ "voice_error": "语音控制：{msg}",
+ "card_voice": "语音控制（麦克风按钮）",
+ "card_voice_hint": "“显示客厅”会显示房间，其他句子交给 Assist。需要 https 和已授权的麦克风",
+ "director_mic_test": "🎙️ 测试麦克风",
+ "director_mic_hint": "在此设备上检查 https、麦克风和 Assist 语音识别，并显示一句话会打开哪个房间。不会切换任何设备。"
 }

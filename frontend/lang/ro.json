@@ -1865,5 +1865,19 @@
  "director_hold": "Înapoi după (secunde)",
  "director_back_hint": "Apoi vederea revine unde era – dacă nimeni nu a atins ecranul între timp. Cine folosește tableta este întrerupt doar de sonerie și de avertizări. Soneria rămâne de două ori mai mult.",
  "card_director": "Regie live (Cockpit camere)",
- "card_director_hint": "Cardul arată singur ce se întâmplă. Evenimentele le alegi în editor la „Regie live”."
+ "card_director_hint": "Cardul arată singur ce se întâmplă. Evenimentele le alegi în editor la „Regie live”.",
+ "voice": "Control vocal",
+ "voice_hint": "Un buton de microfon jos în stânga vederii 3D: atinge-l și vorbește. „Arată sufrageria”, „etajul” sau „toată casa” arată locul; orice altceva („aprinde lumina pe hol”) merge la Assist din Home Assistant.",
+ "voice_here": "Pornește pe acest dispozitiv",
+ "voice_needs": "Necesită https, microfonul permis (în Fully Kiosk: Web Content Settings → acces la microfon) și un pipeline Assist cu recunoaștere vocală. Pe un card din tabloul de bord pornești butonul în setările cardului.",
+ "voice_button": "Vorbește",
+ "voice_listen": "Ascult …",
+ "voice_none": "N-am înțeles nimic",
+ "voice_no_pipeline": "Nicio recunoaștere vocală configurată în Assist (Setări → Asistenți vocali).",
+ "voice_denied": "Microfon nepermis – doar prin https și cu permisiune în browser sau în Fully Kiosk.",
+ "voice_error": "Control vocal: {msg}",
+ "card_voice": "Control vocal (buton microfon)",
+ "card_voice_hint": "„Arată sufrageria” arată camera, alte propoziții merg la Assist. Necesită https și un microfon permis",
+ "director_mic_test": "🎙️ Testează microfonul",
+ "director_mic_hint": "Verifică pe acest dispozitiv https, microfonul și recunoașterea vocală Assist și arată ce cameră ar deschide o propoziție. Nu se comandă nimic."
 }

@@ -1865,5 +1865,19 @@
  "director_hold": "Powrót po (sekundach)",
  "director_back_hint": "Potem widok wraca tam, gdzie był – chyba że ktoś w międzyczasie dotknął ekranu. Osobę korzystającą z tabletu przerywa tylko dzwonek i ostrzeżenia. Dzwonek zostaje dwa razy dłużej.",
  "card_director": "Reżyseria na żywo (Kokpit kamer)",
- "card_director_hint": "Karta sama pokazuje, co się dzieje. Zdarzenia wybierasz w edytorze w sekcji „Reżyseria na żywo”."
+ "card_director_hint": "Karta sama pokazuje, co się dzieje. Zdarzenia wybierasz w edytorze w sekcji „Reżyseria na żywo”.",
+ "voice": "Sterowanie głosem",
+ "voice_hint": "Przycisk mikrofonu w lewym dolnym rogu widoku 3D: dotknij i mów. „Pokaż salon”, „piętro” lub „cały dom” pokazuje miejsce; wszystko inne („włącz światło w korytarzu”) trafia do Assist w Home Assistant.",
+ "voice_here": "Włącz na tym urządzeniu",
+ "voice_needs": "Wymaga https, zgody na mikrofon (w Fully Kiosk: Web Content Settings → dostęp do mikrofonu) i potoku Assist z rozpoznawaniem mowy. Na karcie pulpitu włączasz przycisk w ustawieniach karty.",
+ "voice_button": "Mów",
+ "voice_listen": "Słucham …",
+ "voice_none": "Nic nie zrozumiałem",
+ "voice_no_pipeline": "Brak rozpoznawania mowy w Assist (Ustawienia → Asystenci głosowi).",
+ "voice_denied": "Mikrofon niedozwolony – tylko przez https i ze zgodą w przeglądarce lub w Fully Kiosk.",
+ "voice_error": "Sterowanie głosem: {msg}",
+ "card_voice": "Sterowanie głosem (przycisk mikrofonu)",
+ "card_voice_hint": "„Pokaż salon” pokazuje pokój, inne zdania trafiają do Assist. Wymaga https i dozwolonego mikrofonu",
+ "director_mic_test": "🎙️ Testuj mikrofon",
+ "director_mic_hint": "Sprawdza na tym urządzeniu https, mikrofon i rozpoznawanie mowy Assist oraz pokazuje, który pokój otworzyłoby zdanie. Nic nie jest przełączane."
 }

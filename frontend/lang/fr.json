@@ -1865,5 +1865,19 @@
  "director_hold": "Retour après (secondes)",
  "director_back_hint": "Ensuite, la vue revient là où elle était – sauf si quelqu'un a touché l'écran entre-temps. Une personne qui utilise la tablette n'est interrompue que par la sonnette et les alertes. La sonnette reste deux fois plus longtemps.",
  "card_director": "Régie en direct (Cockpit caméras)",
- "card_director_hint": "La carte montre d'elle-même ce qui se passe. Les événements se choisissent dans l'éditeur sous « Régie en direct »."
+ "card_director_hint": "La carte montre d'elle-même ce qui se passe. Les événements se choisissent dans l'éditeur sous « Régie en direct ».",
+ "voice": "Commande vocale",
+ "voice_hint": "Un bouton micro en bas à gauche de la vue 3D : touchez-le et parlez. « Montre le salon », « étage » ou « toute la maison » affiche le lieu ; tout le reste (« allume la lumière du couloir ») va à Assist de Home Assistant.",
+ "voice_here": "Activer sur cet appareil",
+ "voice_needs": "Nécessite https, le micro autorisé (dans Fully Kiosk : Web Content Settings → accès au micro) et un pipeline Assist avec reconnaissance vocale. Sur une carte du tableau de bord, activez le bouton dans les réglages de la carte.",
+ "voice_button": "Parler",
+ "voice_listen": "J'écoute …",
+ "voice_none": "Rien compris",
+ "voice_no_pipeline": "Aucune reconnaissance vocale configurée dans Assist (Paramètres → Assistants vocaux).",
+ "voice_denied": "Micro non autorisé – uniquement via https et avec l'autorisation dans le navigateur ou dans Fully Kiosk.",
+ "voice_error": "Commande vocale : {msg}",
+ "card_voice": "Commande vocale (bouton micro)",
+ "card_voice_hint": "« Montre le salon » affiche la pièce, les autres phrases vont à Assist. Nécessite https et un micro autorisé",
+ "director_mic_test": "🎙️ Tester le micro",
+ "director_mic_hint": "Vérifie sur cet appareil https, le micro et la reconnaissance vocale d'Assist, et montre quelle pièce une phrase ouvrirait. Rien n'est commandé."
 }

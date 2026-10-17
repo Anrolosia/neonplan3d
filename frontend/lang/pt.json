@@ -1865,5 +1865,19 @@
  "director_hold": "Voltar após (segundos)",
  "director_back_hint": "Depois a vista volta para onde estava – a não ser que alguém tenha tocado no ecrã entretanto. Quem está a usar o tablet só é interrompido pela campainha e pelos avisos. A campainha fica o dobro do tempo.",
  "card_director": "Realização ao vivo (Cockpit de câmaras)",
- "card_director_hint": "O cartão mostra sozinho o que acontece. Os eventos escolhem-se no editor em «Realização ao vivo»."
+ "card_director_hint": "O cartão mostra sozinho o que acontece. Os eventos escolhem-se no editor em «Realização ao vivo».",
+ "voice": "Controlo por voz",
+ "voice_hint": "Um botão de microfone em baixo à esquerda na vista 3D: toca e fala. «Mostra a sala», «piso de cima» ou «a casa toda» mostra o lugar; tudo o resto («liga a luz do corredor») vai para o Assist do Home Assistant.",
+ "voice_here": "Ligar neste dispositivo",
+ "voice_needs": "Precisa de https, do microfone autorizado (no Fully Kiosk: Web Content Settings → acesso ao microfone) e de um pipeline do Assist com reconhecimento de voz. Num cartão do painel ligas o botão nas definições do cartão.",
+ "voice_button": "Falar",
+ "voice_listen": "Estou a ouvir …",
+ "voice_none": "Nada compreendido",
+ "voice_no_pipeline": "Nenhum reconhecimento de voz configurado no Assist (Definições → Assistentes de voz).",
+ "voice_denied": "Microfone não autorizado – só por https e com autorização no navegador ou no Fully Kiosk.",
+ "voice_error": "Controlo por voz: {msg}",
+ "card_voice": "Controlo por voz (botão de microfone)",
+ "card_voice_hint": "«Mostra a sala» mostra a divisão, outras frases vão para o Assist. Precisa de https e de um microfone autorizado",
+ "director_mic_test": "🎙️ Testar o microfone",
+ "director_mic_hint": "Verifica neste dispositivo https, o microfone e o reconhecimento de voz do Assist, e mostra que divisão uma frase abriria. Nada é acionado."
 }

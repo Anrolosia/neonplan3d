@@ -1865,5 +1865,19 @@
  "director_hold": "Tillbaka efter (sekunder)",
  "director_back_hint": "Sedan går vyn tillbaka dit den var – om ingen har rört skärmen under tiden. Den som använder plattan avbryts bara av dörrklockan och varningar. Dörrklockan stannar dubbelt så länge.",
  "card_director": "Live-regi (Kamera-cockpit)",
- "card_director_hint": "Kortet visar av sig själv vad som händer. Vilka händelser väljer du i editorn under ”Live-regi”."
+ "card_director_hint": "Kortet visar av sig själv vad som händer. Vilka händelser väljer du i editorn under ”Live-regi”.",
+ "voice": "Röststyrning",
+ "voice_hint": "En mikrofonknapp nere till vänster i 3D-vyn: tryck och tala. ”Visa vardagsrummet”, ”övervåningen” eller ”hela huset” visar platsen; allt annat (”tänd lampan i hallen”) går till Home Assistants Assist.",
+ "voice_here": "Slå på på den här enheten",
+ "voice_needs": "Kräver https, tillåten mikrofon (i Fully Kiosk: Web Content Settings → mikrofonåtkomst) och en Assist-pipeline med taligenkänning. På ett instrumentpanelskort slår du på knappen i kortets inställningar.",
+ "voice_button": "Tala",
+ "voice_listen": "Jag lyssnar …",
+ "voice_none": "Uppfattade inget",
+ "voice_no_pipeline": "Ingen taligenkänning inställd i Assist (Inställningar → Röstassistenter).",
+ "voice_denied": "Mikrofonen är inte tillåten – bara via https och med tillstånd i webbläsaren eller i Fully Kiosk.",
+ "voice_error": "Röststyrning: {msg}",
+ "card_voice": "Röststyrning (mikrofonknapp)",
+ "card_voice_hint": "”Visa vardagsrummet” visar rummet, andra meningar går till Assist. Kräver https och en tillåten mikrofon",
+ "director_mic_test": "🎙️ Testa mikrofonen",
+ "director_mic_hint": "Kontrollerar https, mikrofonen och Assists taligenkänning på den här enheten och visar vilket rum en mening skulle öppna. Inget styrs."
 }

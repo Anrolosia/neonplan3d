@@ -22,10 +22,28 @@ export function loadVoice(): Promise<typeof VoiceBundle> {
  */
 export function micProbeAsked(): boolean {
   try {
-    if (/[?&#]fp3d_mic=1/.test(location.href)) sessionStorage.setItem("neonplan3d.mic", "1");
+    if (/[?&#]fp3d_mic=1\b/.test(location.href)) sessionStorage.setItem("neonplan3d.mic", "1");
     return sessionStorage.getItem("neonplan3d.mic") === "1";
   } catch {
     return false;
+  }
+}
+
+/** Voice control on this device: the microphone button in the 3D view (the card has its option `voice`). */
+export function voiceOnHere(): boolean {
+  try {
+    return localStorage.getItem("neonplan3d.voice") === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setVoiceHere(on: boolean): void {
+  try {
+    if (on) localStorage.setItem("neonplan3d.voice", "1");
+    else localStorage.removeItem("neonplan3d.voice");
+  } catch {
+    // private mode: nothing remembered
   }
 }
 

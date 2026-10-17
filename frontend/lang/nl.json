@@ -1865,5 +1865,19 @@
  "director_hold": "Terug na (seconden)",
  "director_back_hint": "Daarna gaat het beeld terug naar waar het was – tenzij iemand intussen het scherm heeft aangeraakt. Wie de tablet bedient, wordt alleen door de deurbel en waarschuwingen onderbroken. De deurbel blijft twee keer zo lang.",
  "card_director": "Live-regie (Camera-cockpit)",
- "card_director_hint": "De kaart laat vanzelf zien wat er gebeurt. Welke gebeurtenissen, kies je in de editor onder „Live-regie”."
+ "card_director_hint": "De kaart laat vanzelf zien wat er gebeurt. Welke gebeurtenissen, kies je in de editor onder „Live-regie”.",
+ "voice": "Spraakbediening",
+ "voice_hint": "Een microfoonknop linksonder in de 3D-weergave: tik erop en spreek. „Toon de woonkamer”, „verdieping” of „het hele huis” toont de plek; al het andere („zet het licht in de gang aan”) gaat naar Assist van Home Assistant.",
+ "voice_here": "Op dit apparaat inschakelen",
+ "voice_needs": "Vereist https, toestemming voor de microfoon (in Fully Kiosk: Web Content Settings → microfoontoegang) en een Assist-pipeline met spraakherkenning. Op een dashboardkaart zet je de knop aan in de kaartinstellingen.",
+ "voice_button": "Spreken",
+ "voice_listen": "Ik luister …",
+ "voice_none": "Niets verstaan",
+ "voice_no_pipeline": "Geen spraakherkenning ingesteld in Assist (Instellingen → Spraakassistenten).",
+ "voice_denied": "Microfoon niet toegestaan – alleen via https en met toestemming in de browser of in Fully Kiosk.",
+ "voice_error": "Spraakbediening: {msg}",
+ "card_voice": "Spraakbediening (microfoonknop)",
+ "card_voice_hint": "„Toon de woonkamer” toont de kamer, andere zinnen gaan naar Assist. Vereist https en een toegestane microfoon",
+ "director_mic_test": "🎙️ Microfoon testen",
+ "director_mic_hint": "Controleert op dit apparaat https, de microfoon en de spraakherkenning van Assist, en toont welke kamer een zin zou openen. Er wordt niets geschakeld."
 }
