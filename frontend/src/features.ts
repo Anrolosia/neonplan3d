@@ -36,6 +36,18 @@ export function labOn(): boolean {
   }
 }
 
+/** The parked camera projection prototype: only with its own switch ("?fp3d_projection=1", "=0" off), off by default. */
+export function projectionOn(): boolean {
+  try {
+    const flag = new URLSearchParams(location.search).get("fp3d_projection");
+    if (flag === "1") localStorage.setItem("neonplan3d.projection", "1");
+    else if (flag === "0") localStorage.removeItem("neonplan3d.projection");
+    return localStorage.getItem("neonplan3d.projection") === "1";
+  } catch {
+    return false;
+  }
+}
+
 /** Whether an add-on may be shown and advertised: released, or unlocked, or the lab switch is on. */
 export function released(feature: Gated): boolean {
   return !UNRELEASED.includes(feature) || (feature !== "diagnostics" && hasFeature(feature)) || labOn();

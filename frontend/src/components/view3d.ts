@@ -93,7 +93,7 @@ import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from 
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, labOn, manualUrl, shopUrl, type Feature } from "../features.ts";
+import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
@@ -2837,7 +2837,8 @@ export class Fp3dView3d extends LitElement {
 
   private projectedCameras(hass: HomeAssistant, b: Building): { id: string; url: string }[] {
     const out: { id: string; url: string }[] = [];
-    if (labOn()) {
+    // the camera projection is a parked prototype: its own switch ("?fp3d_projection=1"), not the lab's
+    if (projectionOn()) {
       const ids = new Set(b.floors.flatMap((f) => f.placements.map((p) => p.entity_id)).filter((id) => kindOf(id) === "camera"));
       for (const id of ids) {
         const st = hass.states[id];
