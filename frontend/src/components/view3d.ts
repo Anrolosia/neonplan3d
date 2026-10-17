@@ -3731,11 +3731,25 @@ export class Fp3dView3d extends LitElement {
         say("error", translate(hass, "voice_none"));
         return;
       }
-      const place = v.showCommand(text, b, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
+      // the plan's devices (placed, or furniture with an entity), with the room each stands in
+      const index = (this.findIndex ??= searchIndex(hass, b));
+      const roomName = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
+      const devices = index
+        .filter((it) => it.kind === "device" && it.entity)
+        .map((it) => ({ entity: it.entity!, name: it.name, room: (it.roomId && roomName.get(it.roomId)) || "", camera: kindOf(it.entity!) === "camera" }));
+      const place = v.showTarget(text, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
       if (place) {
-        say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.name}`);
+        say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.kind === "cameras" ? translate(hass, "camera_wall_title") : place.name}`);
         this.directing.touch(Date.now());
-        if (place.kind === "house") this.fire("floor-tap", { floorId: null });
+        if (place.kind === "cameras") {
+          if (hasFeature("camera_cockpit")) this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
+          else this._proHint = "camera_cockpit";
+        } else if (place.kind === "device") {
+          const item = index.find((it) => it.entity === place.entity);
+          // a camera is looked through (Kamera-Cockpit), any other device shown where it stands
+          if (place.camera && hasFeature("camera_cockpit")) this.lookThrough(place.entity);
+          else if (item) this.goTo(item);
+        } else if (place.kind === "house") this.fire("floor-tap", { floorId: null });
         else if (place.kind === "floor") this.fire("floor-tap", { floorId: place.floorId });
         else {
           if (this.floorId !== place.floorId) this.fire("floor-tap", { floorId: place.floorId });

@@ -1037,6 +1037,7 @@ NeonPlan 3D is built for wall tablets such as the Amazon Fire:
 **Voice control:** a microphone button at the bottom left of the 3D view. Tap it and speak:
 
 - **"Show the living room"**, **"go to the upper floor"**, **"the whole house"** or simply **"kitchen"** opens the place. It knows the names of the rooms, outdoor areas and floors in your plan, and the names of the Home Assistant areas.
+- **Devices and cameras:** **"Show the washing machine"** or **"Where is the floor lamp"** flies to the device and makes it flash. **"Show the front door camera"** or **"Show the camera in the garden"** looks through the camera, **"Show the cameras"** opens the camera wall. Both belong to the Camera Cockpit; without it the view only flies to the camera. Devices need a "show" or "where is", because "hall light on" is a command for Assist.
 - **Anything else** goes to Home Assistant's Assist, e.g. "turn on the hall light". The answer shows as a speech bubble.
 
 To switch it on: editor → **🎙️ Voice control** → **Switch on on this device**. On a dashboard card you switch on **Voice control** in the card settings instead (`voice: true`).

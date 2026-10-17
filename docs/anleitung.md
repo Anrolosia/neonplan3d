@@ -1037,6 +1037,7 @@ NeonPlan 3D ist für Wandtablets wie das Amazon Fire gebaut:
 **Sprachsteuerung:** Ein Mikrofon-Knopf unten links in der 3D-Ansicht. Antippen und sprechen:
 
 - **„Zeig das Wohnzimmer“**, **„geh ins Obergeschoss“**, **„das ganze Haus“** oder einfach **„Küche“** öffnet den Ort. Erkannt werden die Namen der Räume, Außenflächen und Etagen in deinem Plan sowie die Namen der Home-Assistant-Bereiche.
+- **Geräte und Kameras:** **„Zeig die Waschmaschine“** oder **„Wo ist die Stehlampe“** fliegt zum Gerät und lässt es aufblinken. **„Zeig die Kamera Haustür“** oder **„Zeig die Kamera im Garten“** schaut durch die Kamera, **„Zeig die Kameras“** öffnet die Kamera-Wand. Beides gehört zum Kamera-Cockpit, ohne das fliegt die Ansicht nur zur Kamera. Bei Geräten braucht es ein „zeig“ oder „wo ist“, denn „Flurlicht an“ ist ein Befehl für Assist.
 - **Alles andere** geht an Assist von Home Assistant, z. B. „Licht im Flur an“. Die Antwort erscheint als Sprechblase.
 
 Einschalten: Editor → **🎙️ Sprachsteuerung** → **Auf diesem Gerät einschalten**. Auf einer Dashboard-Karte schaltest du stattdessen **Sprachsteuerung** in den Karten-Einstellungen ein (`voice: true`).
