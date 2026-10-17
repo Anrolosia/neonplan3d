@@ -731,6 +731,24 @@ SETTINGS_SCHEMA = vol.Schema(
                 extra=vol.ALLOW_EXTRA,
             ),
         ),
+        # Kamera-Cockpit: the live director - events a wall screen shows by itself (all off unless switched on)
+        vol.Optional("director", default=None): vol.Any(
+            None,
+            vol.Schema(
+                {
+                    vol.Optional("doorbell", default=False): bool,
+                    vol.Optional("doorbell_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+                    vol.Optional("doorbell_camera", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+                    vol.Optional("motion", default="off"): vol.In(["off", "person", "all"]),
+                    vol.Optional("appliances", default=False): bool,
+                    vol.Optional("alerts", default=False): bool,
+                    vol.Optional("hold", default=None): vol.Any(
+                        None, vol.All(vol.Coerce(float), vol.Range(min=10, max=600))
+                    ),
+                },
+                extra=vol.ALLOW_EXTRA,
+            ),
+        ),
         vol.Optional("halloween", default=None): vol.Any(
             None, vol.Schema({vol.Optional("ghost", default=True): bool}, extra=vol.ALLOW_EXTRA)
         ),

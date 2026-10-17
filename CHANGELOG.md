@@ -10,6 +10,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 - Outdoor areas like rooms (#100, #59): a lawn, terrace, balcony or pool with a Home Assistant area (and a name) is in the room bar, opens with its area's devices on a tap in 3D, is framed by the camera and shows its outdoor temperature with "Values".
 - Light between floors (#570): a lamp over a stairwell or floor opening, or close to it, also lights the floor below through the opening.
+- Live director (Camera Cockpit): a wall screen shows by itself what happens – the doorbell rings and the view flies to the door and looks through its camera; a camera sees someone; the washer is done; a new warning. Every event is its own switch, all off until switched on, and the screen is chosen too (this device, or the card option `director`); the view goes back afterwards unless someone touched the screen.
 - Pets walk around furniture instead of through it (sofa, table, cupboard), hopping onto their place on the sofa or bed at the end – idea from Thundras' fork.
 
 ### Fixed

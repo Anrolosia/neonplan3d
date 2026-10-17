@@ -115,6 +115,8 @@ import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../
 import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
+import { loadVoice, micProbeAsked } from "../load-voice.ts";
+import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
 /** Which HTML markers are shown: none, only what has no 3D object or shows a value, or all. */
@@ -224,11 +226,13 @@ export class Fp3dView3d extends LitElement {
     keepView: { attribute: false },
     alerts: { attribute: false },
     alertJump: { attribute: false },
+    director: { attribute: false },
     scenes: { attribute: false },
     dimmed: { attribute: false },
     autoOrbit: { attribute: false },
     startView: { attribute: false },
     _low: { state: true },
+    _micProbe: { state: true },
     _narrowStage: { state: true },
     _alerts: { state: true },
     _household: { state: true },
@@ -392,6 +396,8 @@ export class Fp3dView3d extends LitElement {
   /** Warnings (smoke, water, alarm, window in the rain): pulsing rooms and a banner; jump to new ones. */
   declare alerts: boolean;
   declare alertJump: boolean;
+  /** Kamera-Cockpit: this screen shows by itself what happens (the events chosen in the settings; default off). */
+  declare director: boolean;
   private declare _alerts: Alert[];
   /** Haushalt Pro: what is due in the household now (the glass card "Today in the household"). */
   private declare _household: HouseholdItem[];
@@ -478,6 +484,22 @@ export class Fp3dView3d extends LitElement {
   private binHolos: { floorId: string; x: number; z: number; y: number; name: string; color: string; when: string; soon?: boolean }[] = [];
   /** Haushalt Pro: appliances that ended their program while the page is open ("finished" until the door opens). */
   private finished = new FinishedMemory();
+  /** Washers, dryers and dishwashers as last read: whether they run (the live director notices a program ending). */
+  private appliances = new Map<string, { floorId: string; x: number; z: number; entity: string; running: boolean }>();
+  private directing = new Director();
+  /** Lab: the microphone probe ("?fp3d_mic=1" in the address). */
+  private declare _micProbe: boolean;
+  private directorTimer: ReturnType<typeof setTimeout> | undefined;
+  private restTimer: ReturnType<typeof setTimeout> | undefined;
+  private directorSrc: {
+    registry: HomeAssistant["entities"];
+    building: Building;
+    sig: string;
+    bells: { id: string; camera: string | null }[];
+    motion: { sensor: string; cam: string }[];
+  } | null = null;
+  /** Where the view was before the director took it: it goes back there. */
+  private directorBack: { floorId: string | null; roomId: string | null; view: ReturnType<FloorplanViewer["getView"]> } | null = null;
   /** Haushalt Pro: looks again when an open fridge door reaches its limit. */
   private fridgeTimer: ReturnType<typeof setTimeout> | undefined;
   /** Room values of the current heatmap (for the legend). */
@@ -562,6 +584,8 @@ export class Fp3dView3d extends LitElement {
     this._narrowStage = false;
     this.alerts = true;
     this.alertJump = false;
+    this.director = false;
+    this._micProbe = micProbeAsked();
     this._alerts = [];
     this._household = [];
     this._hhFolded = readFlag("neonplan3d.hhFolded");
@@ -629,6 +653,9 @@ export class Fp3dView3d extends LitElement {
     clearInterval(this.householdTimer);
     this.householdTimer = undefined;
     clearTimeout(this.fridgeTimer);
+    clearTimeout(this.directorTimer);
+    clearTimeout(this.restTimer);
+    this.directing.clear();
     this.pickupKey = "";
     // back in the page (another dashboard view and back), the day curves are fetched and kept fresh again (#527)
     this.holoIds = "";
@@ -641,6 +668,12 @@ export class Fp3dView3d extends LitElement {
 
   protected firstUpdated(): void {
     this.observeStage();
+    // the microphone probe lives in the voice bundle: it shows once that has loaded
+    if (this._micProbe) loadVoice().catch(() => (this._micProbe = false));
+    // a touch means someone uses the screen: the director leaves them the view (a shot on screen stays)
+    const touched = () => this.directing.touch(Date.now());
+    this.addEventListener("pointerdown", touched, { passive: true });
+    this.addEventListener("wheel", touched, { passive: true });
     // the mouse wheel over a hologram card zooms the view like anywhere else on the stage (#239)
     this.renderRoot.addEventListener(
       "wheel",
@@ -787,6 +820,7 @@ export class Fp3dView3d extends LitElement {
     const ticked = this.replayTicked && !!this.replay;
     this.replayTicked = false;
     if (forced || changed.has("hass") || ticked) this.syncDevices(forced, ticked && (this.trail || this.detecting));
+    if (changed.has("hass") || changed.has("director")) this.direct();
     if (changed.has("autoOrbit")) v.setAutoOrbit(this.autoOrbit ? 0.06 : 0);
     if (changed.has("_thumbs") || changed.has("_narrowStage")) v.setLabelInset(this._thumbs.length ? (this.narrowThumbs ? 136 : 184) : 0);
     if (changed.has("floorId")) v.setFloor(this.floorId);
@@ -2171,7 +2205,135 @@ export class Fp3dView3d extends LitElement {
       clearInterval(this.alertTimer);
       this.alertTimer = undefined;
     }
-    if (fresh.length && this.alertJump) this.jumpTo(fresh[0]);
+    if (!fresh.length) return;
+    const s = this.directorSettings();
+    if (s?.alerts) {
+      const a = fresh[0];
+      if (this.directing.offer({ kind: "alert", key: `alert:${a.kind}:${a.entity}`, entity: a.entity }, Date.now(), s.hold ?? HOLD_DEFAULT)) {
+        this.directorShow(() => this.jumpTo(a));
+        return;
+      }
+    }
+    if (this.alertJump) this.jumpTo(fresh[0]);
+  }
+
+  /** The live director's settings while it works on this screen (switched on here, Kamera-Cockpit, live, an event on). */
+  private directorSettings(): DirectorSettings | null {
+    const s = this.building?.settings.director;
+    return this.director && !this.ro && hasFeature("camera_cockpit") && directorAny(s) ? s! : null;
+  }
+
+  /**
+   * Live director: look for a ring at the door, someone in front of a camera, an appliance that has finished – and
+   * show the most important one. Runs on every state change while switched on (cheap: a few entities).
+   */
+  private direct(): void {
+    const s = this.directorSettings();
+    const hass = this.hass;
+    const b = this.building;
+    if (!s || !hass || !b) {
+      // switched off: everything forgotten, so switching on again starts from the states of that moment
+      if (this.directorSrc) {
+        this.directing = new Director();
+        this.directorSrc = null;
+        clearTimeout(this.directorTimer);
+        clearTimeout(this.restTimer);
+        this.directorBack = null;
+      }
+      return;
+    }
+    const now = Date.now();
+    const hold = s.hold ?? HOLD_DEFAULT;
+    // the doorbells and cameras' sensors are found once per registry, plan and settings (not on every state change)
+    const sig = `${JSON.stringify(s)}|${b.floors.map((f) => f.placements.length).join()}`;
+    if (!this.directorSrc || this.directorSrc.registry !== hass.entities || this.directorSrc.building !== b || this.directorSrc.sig !== sig) {
+      const placed = [...new Set(b.floors.flatMap((f) => f.placements.map((p) => p.entity_id)))];
+      const motion = s.motion ?? "off";
+      this.directorSrc = {
+        registry: hass.entities,
+        building: b,
+        sig,
+        bells: (s.doorbell ? doorbellEntities(hass, s.doorbell_entity) : []).map((id) => ({ id, camera: doorbellCamera(hass, id, placed, s.doorbell_camera) })),
+        motion:
+          motion === "off"
+            ? []
+            : placed
+                .filter((id) => id.startsWith("camera."))
+                .flatMap((cam) => cameraMotionSensors(hass, cam).filter((sensor) => motion === "all" || detectionKind(hass, sensor) === "person").map((sensor) => ({ sensor, cam }))),
+      };
+    }
+    const shots: Shot[] = [];
+    // every source is looked at each time (its last state is remembered), shown or not
+    for (const bell of this.directorSrc.bells) {
+      if (this.directing.edge(bell.id, hass.states[bell.id], (a, c) => doorbellRang(a, c, now))) {
+        shots.push({ kind: "doorbell", key: `bell:${bell.id}`, entity: bell.id, camera: bell.camera });
+      }
+    }
+    for (const m of this.directorSrc.motion) {
+      if (this.directing.edge(m.sensor, hass.states[m.sensor], (a, c) => a?.state === "off" && c?.state === "on")) {
+        shots.push({ kind: "motion", key: `cam:${m.cam}`, entity: m.sensor, camera: m.cam });
+      }
+    }
+    if (s.appliances) {
+      for (const [id, a] of this.appliances) if (this.directing.stopped(`app:${id}`, a.running, now)) shots.push({ kind: "appliance", key: `app:${id}`, entity: id });
+      // a program that just rested is looked at again once its rest is long enough to count as the end
+      clearTimeout(this.restTimer);
+      if (this.directing.resting()) this.restTimer = setTimeout(() => this.direct(), 60_000);
+    }
+    const order: Shot["kind"][] = ["doorbell", "motion", "appliance"];
+    shots.sort((x, y) => order.indexOf(x.kind) - order.indexOf(y.kind));
+    for (const shot of shots) {
+      if (!this.directing.offer(shot, now, hold)) continue;
+      this.directorShow(() => this.directorGo(shot));
+      break;
+    }
+  }
+
+  /** Show a shot: remember where the view was (once per series of shots), go, and plan the way back. */
+  private directorShow(go: () => void): void {
+    const v = this.viewer;
+    if (!v) return;
+    if (!this.directorBack) this.directorBack = { floorId: this.floorId, roomId: this.roomId, view: v.getView() };
+    v.setAutoOrbit(0);
+    go();
+    clearTimeout(this.directorTimer);
+    const cur = this.directing.current;
+    if (cur) this.directorTimer = setTimeout(() => this.directorDue(), Math.max(0, cur.until - Date.now()) + 50);
+  }
+
+  private directorGo(shot: Shot): void {
+    const b = this.building;
+    if (!b) return;
+    // a camera at the door (or the one that saw someone): look through it, when it is placed in the plan
+    if (shot.camera && b.floors.some((f) => f.placements.some((p) => p.entity_id === shot.camera))) {
+      this.lookThrough(shot.camera);
+      return;
+    }
+    if (shot.kind === "appliance") {
+      const a = this.appliances.get(shot.key.slice(4));
+      if (a) this.goTo({ kind: "device", name: "", where: "", floorId: a.floorId, roomId: null, entity: a.entity, icon: null, x: a.x, z: a.z, y: 1 });
+      return;
+    }
+    this.showEntity(shot.entity);
+  }
+
+  /** The shot's time is up: back to where the view was – unless someone took the screen meanwhile. */
+  private directorDue(): void {
+    const due = this.directing.due(Date.now());
+    const back = this.directorBack;
+    if (!due) return;
+    this.directorBack = null;
+    if (!due.back || !back) return;
+    if (this._through) {
+      this._through = null;
+    }
+    if (this.floorId !== back.floorId) this.fire("floor-tap", { floorId: back.floorId });
+    if (back.roomId) setTimeout(() => this.fire("room-tap", { floorId: back.floorId, roomId: back.roomId }), 60);
+    else if (this.roomId && back.floorId) setTimeout(() => this.fire("room-tap", { floorId: back.floorId, roomId: null }), 60);
+    setTimeout(() => {
+      this.viewer?.flyTo(back.view);
+      this.viewer?.setAutoOrbit(this.autoOrbit ? 0.06 : 0);
+    }, 400);
   }
 
   /** Show where a warning is: its floor and room, or the house for an alarm. */
@@ -2372,6 +2534,8 @@ export class Fp3dView3d extends LitElement {
         // an own threshold for appliances behind a smart plug that draw a few watts on standby (null: 10 W)
         const runW = typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 10;
         const running = (power ?? 0) > runW || st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st));
+        // the live director notices a program ending (a washer done) from the same reading
+        if (appliance) this.appliances.set(f.id, { floorId: floor.id, x: f.x, z: f.z, entity: link.entity ?? link.power ?? f.id, running });
         // Haushalt Pro: a washer, dryer or dishwasher tells the time left while it runs and "finished" afterwards –
         // until its door opens (or it runs again); from its own state, or remembered from the moment it stopped
         let hhText: string | null = null;
@@ -3916,6 +4080,7 @@ export class Fp3dView3d extends LitElement {
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
       ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
+      ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => (this._micProbe = false)}></fp3d-mic-probe>` : nothing}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
             ><b>${this._stats.fps ? translate(this.hass, "stats_fps", { fps: this._stats.fps, ms: this._stats.worstMs }) : translate(this.hass, "stats_idle")}</b>

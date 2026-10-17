@@ -24,6 +24,7 @@ import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlan
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
+import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
 import { sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
@@ -9735,7 +9736,7 @@ export class Fp3dEditor extends LitElement {
             : floor
               ? this.renderRoomList(floor)
               : nothing}
-      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing}
+      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
       ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderTerrain() : nothing}
@@ -10659,6 +10660,59 @@ export class Fp3dEditor extends LitElement {
               >start_view: { theta: ${set.theta}, phi: ${set.phi}, radius: ${set.radius}${set.target ? `, target: { x: ${set.target.x}, y: ${set.target.y}, z: ${set.target.z} }` : ""} }</code
             >`
         : nothing}
+    </details>`;
+  }
+
+  /**
+   * Kamera-Cockpit: the live director – which events a screen shows by itself (each off until switched on), and the
+   * switch for this device (a card has its own option).
+   */
+  private renderDirector() {
+    const hass = this.hass;
+    const d: DirectorSettings = this._doc.settings.director ?? {};
+    const set = (patch: Partial<DirectorSettings>) => this.change((doc) => (doc.settings.director = { ...(doc.settings.director ?? {}), ...patch }));
+    const pro = hasFeature("camera_cockpit");
+    const here = directorOnHere();
+    const placed = [...new Set(this._doc.floors.flatMap((f) => f.placements.map((p) => p.entity_id)))];
+    const bells = hass ? doorbellEntities(hass) : [];
+    const bell = hass ? (d.doorbell_entity ?? bells[0] ?? null) : null;
+    const autoCam = hass && bell ? doorbellCamera(hass, bell, placed) : null;
+    const check = (label: I18nKey, on: boolean, change: (on: boolean) => void, disabled = !pro) =>
+      html`<label class="fp3d-check fp3d-wide"
+        ><input type="checkbox" .checked=${on} ?disabled=${disabled} @change=${(e: Event) => change((e.target as HTMLInputElement).checked)} /> ${this.t(label)}</label
+      >`;
+    return html`<details class="fp3d-section">
+      <summary>🎬 ${this.t("director")}</summary>
+      <p class="fp3d-sub">${this.t("director_hint")}</p>
+      ${pro ? nothing : html`<p class="fp3d-sub">🔒 ${this.t("pro_feature_camera_cockpit")}</p>`}
+      <div class="fp3d-form">
+        ${check("director_here", here, (on) => {
+          setDirectorHere(on);
+          this.dispatchEvent(new CustomEvent("director-here", { bubbles: true, composed: true }));
+          this.requestUpdate();
+        })}
+        <p class="fp3d-sub fp3d-wide">${this.t("director_here_hint")}</p>
+        ${check("director_doorbell", !!d.doorbell, (on) => set({ doorbell: on }))}
+        ${d.doorbell && hass
+          ? html`${this.entitySelect(this.t("director_doorbell_entity"), d.doorbell_entity ?? null, bells[0] ?? null, this.entityOptions((id) => id.startsWith("event.") || id.startsWith("binary_sensor.")), (v) =>
+              set({ doorbell_entity: v === "none" ? null : v }),
+            )}
+            ${this.entitySelect(this.t("director_doorbell_camera"), d.doorbell_camera ?? null, autoCam, this.entityOptions((id) => id.startsWith("camera.") && placed.includes(id)), (v) =>
+              set({ doorbell_camera: v === "none" ? null : v }),
+            )}
+            ${!bells.length && !d.doorbell_entity ? html`<p class="fp3d-sub fp3d-wide">${this.t("director_no_doorbell")}</p>` : nothing}`
+          : nothing}
+        <label class="fp3d-field fp3d-wide"
+          >${this.t("director_motion")}
+          <select ?disabled=${!pro} @change=${(e: Event) => set({ motion: (e.target as HTMLSelectElement).value as DirectorSettings["motion"] })}>
+            ${(["off", "person", "all"] as const).map((m) => html`<option value=${m} ?selected=${(d.motion ?? "off") === m}>${this.t(`director_motion_${m}`)}</option>`)}
+          </select></label
+        >
+        ${check("director_appliances", !!d.appliances, (on) => set({ appliances: on }))}
+        ${check("director_alerts", !!d.alerts, (on) => set({ alerts: on }))}
+        ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}
+      </div>
+      <p class="fp3d-sub">${this.t("director_back_hint")}</p>
     </details>`;
   }
 

@@ -592,6 +592,25 @@ export const PET_FURS_OF: Record<Pet["kind"], readonly string[]> = {
 export const DOG_BREEDS = ["dachshund", "pug", "terrier", "labrador", "shepherd"] as const;
 
 export interface BuildingSettings {
+  /**
+   * Kamera-Cockpit: the live director – which events make a screen (that has it switched on) show them by itself.
+   * Every event is off unless switched on.
+   */
+  director?: {
+    /** The doorbell rings: fly to the door and look through its camera. */
+    doorbell?: boolean;
+    /** The doorbell entity (null: found by itself) and the camera at the door (null: the doorbell's own). */
+    doorbell_entity?: string | null;
+    doorbell_camera?: string | null;
+    /** A placed camera sees someone ("person") or anything moving ("all"). */
+    motion?: "off" | "person" | "all";
+    /** A washer, dryer or dishwasher has finished. */
+    appliances?: boolean;
+    /** A new warning (smoke, water, alarm, window in the rain …). */
+    alerts?: boolean;
+    /** Seconds before the view goes back (the doorbell twice as long; default 30). */
+    hold?: number | null;
+  } | null;
   /** Fun pack "pets": the animals and whether they are shown. */
   pets?: { on: boolean; list: Pet[] } | null;
   /** Stations and playlists for the speakers' quick menu (Klang & Kino). */

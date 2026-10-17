@@ -20,6 +20,7 @@ import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts
 import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
+import { directorOnHere } from "./director.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -83,6 +84,7 @@ export class Floorplan3dPanel extends LitElement {
     _optsOpen: { state: true },
     _accent: { state: true },
     _weather: { state: true },
+    _director: { state: true },
   };
 
   declare hass: HomeAssistant;
@@ -135,6 +137,8 @@ export class Floorplan3dPanel extends LitElement {
   private declare _accent: string | null;
   /** Weather outside the house in 3D. */
   private declare _weather: boolean;
+  /** Kamera-Cockpit: the live director works on this device (its own switch, default off). */
+  private declare _director: boolean;
 
   private readonly data = new BuildingController(this);
   /** Time travel (Pro): the last 24 hours replayed, read-only. */
@@ -184,6 +188,7 @@ export class Floorplan3dPanel extends LitElement {
     this._navWrap = prefs.get("nav_wrap") === "1";
     this._optsOpen = false;
     this._weather = prefs.get("weather") !== "0";
+    this._director = directorOnHere();
   }
 
   private t(key: I18nKey, vars?: Record<string, string | number>): string {
@@ -760,6 +765,7 @@ export class Floorplan3dPanel extends LitElement {
       .narrow=${this.narrow}
       .packs=${this.data.packs}
       @packs-changed=${() => void this.data.reloadPacks()}
+      @director-here=${() => (this._director = directorOnHere())}
       @open-extensions=${() => this.setMode("extensions")}
       @building-changed=${(e: CustomEvent<{ building: Building }>) => this.data.edit(e.detail.building)}
     ></fp3d-editor>`;
@@ -866,6 +872,7 @@ export class Floorplan3dPanel extends LitElement {
             prefs.set("clean", this._clean ? "1" : "0");
           }}
           .weather=${this._weather}
+          .director=${this._director}
           .panelOpen=${!!this._roomId}
           .floorId=${b.floors.length > 1 ? this._floorId : (b.floors[0]?.id ?? null)}
           .roomId=${this._roomId}
