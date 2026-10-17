@@ -17,6 +17,8 @@ export interface RoomClimate {
 export type WallHeight = number | null | (number | null)[];
 
 export interface Room {
+  /** An outdoor area acting as a room (made by outdoorZones, never stored among the rooms). */
+  outdoor?: boolean;
   /** Room temperature, humidity and CO2: chosen sensors instead of the automatic pick. */
   climate?: RoomClimate | null;
   id: string;
@@ -590,6 +592,25 @@ export const PET_FURS_OF: Record<Pet["kind"], readonly string[]> = {
 export const DOG_BREEDS = ["dachshund", "pug", "terrier", "labrador", "shepherd"] as const;
 
 export interface BuildingSettings {
+  /**
+   * Kamera-Cockpit: the live director – which events make a screen (that has it switched on) show them by itself.
+   * Every event is off unless switched on.
+   */
+  director?: {
+    /** The doorbell rings: fly to the door and look through its camera. */
+    doorbell?: boolean;
+    /** The doorbell entity (null: found by itself) and the camera at the door (null: the doorbell's own). */
+    doorbell_entity?: string | null;
+    doorbell_camera?: string | null;
+    /** A placed camera sees someone ("person") or anything moving ("all"). */
+    motion?: "off" | "person" | "all";
+    /** A washer, dryer or dishwasher has finished. */
+    appliances?: boolean;
+    /** A new warning (smoke, water, alarm, window in the rain …). */
+    alerts?: boolean;
+    /** Seconds before the view goes back (the doorbell twice as long; default 30). */
+    hold?: number | null;
+  } | null;
   /** Fun pack "pets": the animals and whether they are shown. */
   pets?: { on: boolean; list: Pet[] } | null;
   /** Stations and playlists for the speakers' quick menu (Klang & Kino). */
@@ -677,6 +698,22 @@ export const OUTDOOR_TOP: Record<OutdoorType, number> = {
 /** Types that stand on the ground as structures (no surface to stand on, no light pool). */
 export function outdoorStanding(type: OutdoorType): boolean {
   return type === "hedge" || type === "fence" || type === "pergola";
+}
+
+/**
+ * Outdoor areas that act as rooms (#100): every flat area with a Home Assistant area (a garden, terrace, balcony, pool),
+ * as a room that is not stored among the rooms – it has no walls, but a chip, a tap target, a room panel with its
+ * area's devices and a name in 3D.
+ */
+export function outdoorZones(floor: Floor): Room[] {
+  return (floor.outdoor ?? [])
+    .filter((a) => a.area_id && a.points.length >= 3 && !outdoorStanding(a.type))
+    .map((a) => ({ id: a.id, name: (a.name ?? "").trim(), area_id: a.area_id ?? null, points: a.points, floor_material: "wood", outdoor: true }));
+}
+
+/** The rooms of a floor and its outdoor areas that act as rooms. */
+export function zonesOf(floor: Floor): Room[] {
+  return [...floor.rooms, ...outdoorZones(floor)];
 }
 
 /** The directions an area can fall towards: +x (right in the plan), −x, +z (down in the plan), −z. */
@@ -804,6 +841,9 @@ export interface OutdoorArea {
   rim?: number | null;
   /** Pool Pro: the pool's entities (water temperature, heat pump, filter pump, light, pH, chlorine, cover). */
   pool?: PoolLinks | null;
+  /** Outdoor areas like rooms (#100): a name and a Home Assistant area – a tap opens it with its devices like a room. */
+  name?: string | null;
+  area_id?: string | null;
 }
 
 /** Pool Pro: the entities of a pool; a role left empty is searched by name ("pool"), "none" switches it off. */

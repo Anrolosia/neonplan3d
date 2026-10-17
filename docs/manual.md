@@ -306,7 +306,7 @@ A selected device has:
 
 Lamps are furniture with a linked light: ceiling light, downlight, surface spot, LED panel, pendant, floor lamp, uplight, table lamp, wall light, LED strip, path light and garden spot.
 
-- The 3D model glows in the light's colour and brightness. The room's floor and walls are lit too, two coloured ceiling lights mix in between. Light reaches the next room only through doors.
+- The 3D model glows in the light's colour and brightness. The room's floor and walls are lit too, two coloured ceiling lights mix in between. Light reaches the next room only through doors. A lamp over a stairwell or floor opening (up to 1.5 m beside it) also shines through the opening into the floor below.
 - Colour effects such as a colour loop are animated in 3D.
 - Table lamps stand on the item below, wall lights and LED strips snap to the wall, a pendant's height is how far it hangs below the ceiling.
 - **Height above floor:** wall lights hang at 1.75 m by default, LED strips right under the ceiling. Under a sloped roof, ceiling lamps, spots and pendants hang from the roof's underside instead of in the air. In the form you set a **Height above floor** of their own, e.g. for a strip under the wall cabinets or behind the TV unit. **Automatic height** resets it. Recessed and surface spots have the field as well: by default they sit under the ceiling, with a height of their own e.g. under the wall cabinets – model and light then shine down from there onto the worktop. A strip below 1 m (skirting board, behind a cabinet) shines up the wall, higher strips shine down. A strip below the cut height stays visible with cut walls. **Tilt about its length** lays the strip against a roof slope or turns it sideways (90° = its face points to the side); **Upright** stands it on end: it then runs up from the height above the floor, along a door frame or as a light column, and shines all around.
@@ -377,6 +377,8 @@ Its lanes keep clear of furniture standing on the floor: cabinets, sofas, beds, 
 ### 4.17 Outdoor areas and outdoor lights
 
 With **Outside → Outdoor** you draw lawn, terrace, path, driveway, flower bed, hedge or fence. Choose in the menu first what you draw; the type can still be changed in the form afterwards. There you also choose **Rectangle** (drag it open) or **Free form**: then you place the corners one by one like a free-form room – for curved beds, slanted plot borders or an L-shaped path; a tap on the first corner or **Enter** closes the area. A selected outdoor area is resized at its corners; a rectangle stays a rectangle. Hedges and fences take a **height** in the form (a 2.5 m thuja screen, a 0.5 m bed border); **Show the outline** unticked leaves out the glowing line along the edge, say on a plot made of several lawns. **Height offset** lowers an area below the ground or raises it – the driveway down to a lower garage, a raised terrace; lamps on it follow. **Slope** tilts an area: the height difference in metres and the direction it falls towards (the high edge sits at the height offset) – a driveway falling to the street, a sloping garden; fence posts and lamps stand on the sloped surface. **Wild patch** is a type for unmown corners. **Balcony** is for upper floors: a thin slab at the floor's level with a see-through railing of bars (height in the form); edges along a house wall get no railing – balcony doors behind it stay in view. **Cut out of the areas beneath** turns an area into a hole in every area drawn before it that contains it whole – a pond or a wild patch in the middle of one single big lawn. **Pergola / frame** draws corner posts, beams and rafters at the set height, with **X-bracing** on the sides – for pergolas, carport frames or the support of a roll-off roof. Fences and pergolas can stay **open**: the edge from the last point back to the first is left out, so the fence leans against the house. Trees, shrubs and brush come as furniture from the **Garden & Terrace** pack (from release 3: oak, lime, birch, maple, fruit tree, spruce, pine, thuja, shrub, flowering shrub, brush, group of trees); width and height in the furniture form set crown and growth. Path lights, garden spots and outdoor wall lights light the outdoor areas and the facade. **Pool:** pools are drawn with **Outside → Pool**; in the menu you choose the shape – **Rectangular**, **Round**, **Oval** or **Free** – and then draw it (round: as wide as the short side of the box). A round or oval pool is resized at the four corners of its box (a circle stays round) or in the form by diameter or width and depth; the shape itself stays. A pool cuts itself out of the lawn around it. **Above-ground pool** stands it on the ground as a tub, with a **pool height**; otherwise it is let into the ground. **Basin depth** is the depth from the rim down to the floor (1.50 m by default), **Rim above the lawn** how far the rim stands out – a 1.50 m deep pool standing 20 cm out of the lawn: depth 1.50, rim 0.20. The water stands 15 cm below the rim; you look through the water onto the basin's walls and floor. The depth shows when the pool lies in a lawn, terrace or other area – without ground around it the basin would show from outside, so it stays flat.
+
+**Outdoor areas like rooms:** give an area (lawn, terrace, balcony, pool …) a Home Assistant **area** in its form, say "Garden", and a **name** if you like. It then acts like a room: it is in the room bar, a tap in 3D opens it with the area's devices (garden lights, sockets, irrigation), the camera frames it, and with **Show → Values** the outdoor temperature stands at its name – sensors with "outdoor" in their name count here on purpose. Hedges, fences and pergolas take no area.
 
 ![The garden at night](images/view-garden.jpg)
 
@@ -619,6 +621,48 @@ A tap on the camera or on its wedge opens the snapshot, which refreshes every fe
 
 ![Camera snapshot](images/view-camera.jpg)
 
+### 5.10 Voice control (new)
+
+> **New in 1.20 and still in development.** Voice control is switched on for everyone, free, and already works well. It will grow over the next versions. If a sentence is not understood the way you mean it, send us the sentence on Discord or in a GitHub issue.
+
+Talk to your house. A **microphone button** 🎙️ appears at the bottom left of the 3D view. Tap it: it turns red and "Listening …" shows above it. Say your sentence and pause briefly, and NeonPlan responds.
+
+**What you can say:**
+
+| You say | What happens |
+|---|---|
+| "Show the living room", "Go to the kitchen" or just "Bathroom" | The room opens, on its floor. |
+| "Show the upper floor", "Cellar" | The floor opens. |
+| "Show the whole house" | Back to the house view. |
+| "Show the garden", "Terrace" | An outdoor area with a name and an area opens like a room. |
+| "Show the washing machine", "Where is the floor lamp?" | The view flies to the device and it flashes. |
+| "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
+| "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
+| "Turn on the hall light", "How warm is it outside?" | Anything else goes to Home Assistant's **Assist**. The answer shows as a speech bubble. |
+
+NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors and devices. A room also answers to the name of its Home Assistant area. Devices need a "show" or "where is", so "turn on the living room light" stays a command for Assist and switches the light instead of flying there.
+
+**Switching it on.** Voice control is off by default. You switch it on where you want to speak:
+
+- **NeonPlan page (panel):** editor → **🎙️ Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
+- **Dashboard card:** edit the dashboard → NeonPlan card → **Features** → **Voice control (microphone button)**, or `voice: true` in YAML. The card setting applies on every device that shows this dashboard, so you can set it on the PC even when it is meant for the tablet.
+
+**What you need:**
+
+1. **An Assist pipeline with speech to text** in Home Assistant: Settings → Voice assistants. Home Assistant Cloud, Whisper or **Speech-to-Phrase** (local and fast, even on a Raspberry Pi) all work well. NeonPlan uses the **preferred** pipeline, the starred one. Under **Assist pipeline on this device** you can choose another one per device.
+2. **https:** browsers only give out the microphone on secure pages. It does not work over `http://192.168…`, but it does over Nabu Casa, your own certificate or a reverse proxy.
+3. **The microphone allowed:**
+   - in the browser, "Allow" on the first tap;
+   - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access (Plus licence), plus Fully's microphone permission in Android.
+
+**Testing:** in the **🎙️ Voice control** section, **🎙️ Test the microphone** starts a probe. It checks https, the microphone, the level and Assist one after the other. It also shows which room a spoken sentence would open, and switches nothing while doing so. Wherever there is a ✖, the fix stands next to it.
+
+**Good to know:**
+
+- The microphone is **only open while you speak**. It does not listen all the time, so there is no wake word. That also spares old tablets.
+- Speech to text is done by **your** Assist pipeline, so how fast and accurate it is depends on that pipeline. With Speech-to-Phrase or the cloud a sentence usually takes one to two seconds.
+- If the live director is on, it does not interrupt you while you speak.
+
 ---
 
 ## 6. Pro add-ons
@@ -640,6 +684,18 @@ Pro add-ons are paid extra features, sold singly in the shop. Without an add-on,
 **Detection pins:** when one of a camera's sensors reports a detection right now (Frigate, UniFi Protect, Reolink and the like give one sensor per object: person, vehicle, animal, motion), a pin stands in front of the camera with a symbol, the kind and the time – "Person · 18:42". A tap opens the sensor. Several objects at once give several pins on top of each other. Too busy? Switch off **Show detection symbols** in the camera's form – a detection then only turns the field of view red.
 
 **Camera wall:** the **Cameras** switch at the bottom (in the card the option `camera_wall: true`) lays every placed camera's live picture over the scene as a wall, refreshed every few seconds. A camera that sees motion right now gets a red frame; one that records, a red dot. The tiles share the wall: the grid picks as many columns as make every camera as large as possible without overlapping (one camera fills it, two sit side by side, 22 e.g. as 6 × 4); with very many cameras the wall scrolls. The tiles are stills, refreshed every 5 seconds (every 10 on the tablet level; a small note in the header says so) – ten live streams would overwhelm an old tablet. The look-through in 3D is a still as well; the bar at the bottom says so. A tap shows the picture big, as a **live stream** through Home Assistant’s player as soon as the camera can stream (otherwise the still stays); from there **Look through the camera** goes into the 3D view, and **Back to the view** brings the wall back. **‹ All cameras** returns to the grid, ✕ closes the wall.
+
+**Live director:** a screen, usually the wall tablet, shows by itself what happens in the house. When the doorbell rings, the view flies to the front door and looks through the camera there. When a camera sees someone, the washer is done or a warning comes up, it flies there too. Afterwards it goes back to where it was. Everything is **off** until you switch it on, in two places:
+
+1. **Which events:** editor → **🎬 Live director**. Every event has its own switch:
+   - **Doorbell rings:** NeonPlan finds the doorbell itself, as an event entity of the class "doorbell" (Ring, UniFi Protect …) or a sensor like Reolink's "Visitor". You can also choose it yourself, and the camera at the door too. Without a choice NeonPlan takes the camera of the same device, or one in the same area. The camera has to be placed in the plan; otherwise the view only flies to the doorbell.
+   - **A camera sees someone:** "People only" or "Any motion", for all placed cameras.
+   - **Washer, dryer or dishwasher finished:** the appliance has to be furniture linked to a power sensor or a status. It counts as finished once it rests for 3 minutes after its run, so a pause in the programme does not count.
+   - **New warning:** smoke, water, alarm, a window in the rain and so on.
+   - **Back after:** the seconds before the view goes back (default 30). The doorbell stays twice as long.
+2. **On which screen:** in the same section, **Switch on on this device**. This only applies to this browser, e.g. the wall tablet with the NeonPlan panel. On a dashboard card you switch on **Live director** in the card settings instead (`director: true`).
+
+Someone using the tablet is only interrupted by the doorbell and by warnings. If you touch the screen while the director shows something, the view stays where it is. Part of the camera cockpit.
 
 ### 6.2 Weather outside
 
@@ -920,6 +976,7 @@ Switch them on and off under **🎈 Fun packs** afterwards.
 **Pets:** a cat, a rabbit or a dog – as a dachshund, pug, terrier, labrador or shepherd – lives in your 3D house. **+ Add a pet** sets one up: kind, breed (for dogs), name, fur and the floor it starts on. **Show the pets** switches all of them on and off; in the dashboard card the option **Show the pets** (YAML `pets: false`) leaves them out of that card, e.g. on the wall tablet.
 
 - The pets walk through the doors from room to room and **up and down the stairs** – they get around the whole house. A door whose contact reports it shut stops them; doors without a sensor count as open.
+- They walk **around furniture** instead of through it – round the sofa, table and cupboard; rugs, lamps and what hangs on a wall are no obstacle. Onto their place on the sofa or bed they hop at the end.
 - They rest at their favourite places: a cat walks up to a **sofa, an armchair or a bed** and jumps on from the front, a dog lies down in front of it. From the Pets pack, cats like the cat bed, cave and scratching tree, dogs the dog bed, basket and kennel; they drop by the **bowls**, the feeder and the water fountain.
 - **At night** (the sun in Home Assistant has set) they sleep curled up, with a little "z Z".
 - Colourful **fish** swim in the Pets pack's **aquariums**.
@@ -1019,6 +1076,8 @@ NeonPlan 3D is built for wall tablets such as the Amazon Fire:
 
 **Tips for Fire tablets:** Use Fully Kiosk Browser with hardware acceleration, show the card full screen with `fill: true` and keep `quality: auto`.
 
+**Voice control:** on the wall tablet you talk to NeonPlan with a microphone button, e.g. "Show the living room". Everything about it is in [5.10 Voice control](#510-voice-control-new).
+
 ---
 
 ## 10. Backup and moving
@@ -1062,6 +1121,9 @@ Alexa Media Player does not set the volume on some Echos, or only with a delay, 
 
 **"Restart needed" appears at the top.**
 After an update the old version still runs in the background. Restart Home Assistant.
+
+**On an iPhone or iPad NeonPlan closes when I move or zoom with two fingers.**
+That is no crash: the Home Assistant app has gestures of its own. If a two-finger swipe has an action there (e.g. to the start page), the app runs it and leaves the page. In the app, set the two-finger gestures under **Settings → Companion App → Gestures** to **None**. It never happens in Safari.
 
 **A device is missing in a room's device list.**
 The room needs an area, and the device must belong to that area, either the device or the entity itself. If the entity sits under a device with several entities, it is behind "+n more". The search field finds it directly.

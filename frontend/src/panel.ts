@@ -17,9 +17,11 @@ import { THEMES, type Theme } from "./themes.ts";
 import { keepInRoom, snapToWall } from "./geometry/snap.ts";
 import { furnitureName } from "./furniture-names.ts";
 import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts";
-import { canLift, type LampMount } from "./model.ts";
+import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
+import { directorOnHere } from "./director.ts";
+import { loadVoice, micProbeDone, voiceOnHere } from "./load-voice.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -83,6 +85,9 @@ export class Floorplan3dPanel extends LitElement {
     _optsOpen: { state: true },
     _accent: { state: true },
     _weather: { state: true },
+    _director: { state: true },
+    _micProbe: { state: true },
+    _voiceHere: { state: true },
   };
 
   declare hass: HomeAssistant;
@@ -135,6 +140,12 @@ export class Floorplan3dPanel extends LitElement {
   private declare _accent: string | null;
   /** Weather outside the house in 3D. */
   private declare _weather: boolean;
+  /** Kamera-Cockpit: the live director works on this device (its own switch, default off). */
+  private declare _director: boolean;
+  /** The microphone probe opened from the editor (the live director's section). */
+  private declare _micProbe: boolean;
+  /** Voice control (the microphone button) on this device. */
+  private declare _voiceHere: boolean;
 
   private readonly data = new BuildingController(this);
   /** Time travel (Pro): the last 24 hours replayed, read-only. */
@@ -184,6 +195,9 @@ export class Floorplan3dPanel extends LitElement {
     this._navWrap = prefs.get("nav_wrap") === "1";
     this._optsOpen = false;
     this._weather = prefs.get("weather") !== "0";
+    this._director = directorOnHere();
+    this._micProbe = false;
+    this._voiceHere = voiceOnHere();
   }
 
   private t(key: I18nKey, vars?: Record<string, string | number>): string {
@@ -510,6 +524,7 @@ export class Floorplan3dPanel extends LitElement {
     const saveState = this.data.saveState;
     return html`
       <div class="fp3d-app ${this._clean && this._mode === "view" ? "fp3d-clean" : ""}" style=${this._accent ? `--fp3d-accent:${this._accent}` : ""}>
+        ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${b} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
         ${this._clean && this._mode === "view" ? nothing : html`<header class="fp3d-header">
           <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
           <h1>NeonPlan 3D</h1>
@@ -760,6 +775,9 @@ export class Floorplan3dPanel extends LitElement {
       .narrow=${this.narrow}
       .packs=${this.data.packs}
       @packs-changed=${() => void this.data.reloadPacks()}
+      @director-here=${() => (this._director = directorOnHere())}
+      @voice-here=${() => (this._voiceHere = voiceOnHere())}
+      @mic-probe=${() => loadVoice().then(() => (this._micProbe = true)).catch(() => undefined)}
       @open-extensions=${() => this.setMode("extensions")}
       @building-changed=${(e: CustomEvent<{ building: Building }>) => this.data.edit(e.detail.building)}
     ></fp3d-editor>`;
@@ -813,8 +831,12 @@ export class Floorplan3dPanel extends LitElement {
         ${roomFloors.flatMap((f) => [
           // in the house view the rooms of every floor follow a small floor label; a room without a name has
           // no button (an empty chip would only take space, #370)
-          roomFloors.length > 1 && f.rooms.some((r) => r.name.trim()) ? html`<span class="fp3d-nav-floor">${f.name}</span>` : nothing,
-          ...f.rooms.filter((r) => r.name.trim()).map(
+          roomFloors.length > 1 && zonesOf(f).some((r) => r.name.trim()) ? html`<span class="fp3d-nav-floor">${f.name}</span>` : nothing,
+          // the rooms, then the outdoor areas acting as rooms (garden, terrace – #100)
+          // several areas of one garden (front and back lawn with the same area and name) share one chip
+          ...zonesOf(f)
+            .filter((r, i, all) => r.name.trim() && !(r.outdoor && all.findIndex((x) => x.outdoor && x.area_id === r.area_id && x.name === r.name) < i))
+            .map(
             (r) => html`<button
               class="fp3d-chip fp3d-room-chip"
               aria-pressed=${r.id === this._roomId}
@@ -862,6 +884,8 @@ export class Floorplan3dPanel extends LitElement {
             prefs.set("clean", this._clean ? "1" : "0");
           }}
           .weather=${this._weather}
+          .director=${this._director}
+          .voice=${this._voiceHere}
           .panelOpen=${!!this._roomId}
           .floorId=${b.floors.length > 1 ? this._floorId : (b.floors[0]?.id ?? null)}
           .roomId=${this._roomId}
@@ -894,8 +918,8 @@ export class Floorplan3dPanel extends LitElement {
               @camera-look=${(e: CustomEvent<{ entity: string }>) => this.view3d()?.lookThrough(e.detail.entity)}
               .hass=${this.tt.hass(this.hass)}
               ?readOnly=${tt}
-              .room=${b.floors.flatMap((f) => f.rooms).find((r) => r.id === this._roomId) ?? null}
-              .floor=${b.floors.find((f) => f.rooms.some((r) => r.id === this._roomId)) ?? null}
+              .room=${b.floors.flatMap((f) => zonesOf(f)).find((r) => r.id === this._roomId) ?? null}
+              .floor=${b.floors.find((f) => zonesOf(f).some((r) => r.id === this._roomId)) ?? null}
               .building=${b}
               .confirmEntities=${confirmEntities(this.hass, b.floors)}
               @close=${() => (this._roomId = null)}

@@ -46,6 +46,7 @@ export const DEMO_AREAS = {
   heizung: { area_id: "heizung", name: "Heizungsraum", floor_id: "keller" },
   vorrat: { area_id: "vorrat", name: "Vorratsraum", floor_id: "keller" },
   hobby: { area_id: "hobby", name: "Hobbyraum", floor_id: "keller" },
+  garten: { area_id: "garten", name: "Garten", floor_id: "erdgeschoss" },
 };
 
 export const DEMO_BUILDING = {
@@ -130,7 +131,7 @@ const DEVICES = [
   light("esstisch", "Esstisch Pendel", "kueche", true, { brightness: 140 }),
   light("kueche_links", "Küche links", "kueche", true, { brightness: 230, color_mode: "hs", rgb_color: [255, 70, 40] }),
   light("kueche_rechts", "Küche rechts", "kueche", true, { brightness: 230, color_mode: "hs", rgb_color: [60, 110, 255] }),
-  light("garten", "Garten Wegleuchten", null, true, { brightness: 170 }),
+  light("garten", "Garten Wegleuchten", "garten", true, { brightness: 170 }),
   light("pool", "Pool Spot", null, true, { brightness: 200, color_mode: "hs", rgb_color: [40, 200, 255] }),
   light("haustuer", "Haustür Außenlicht", "flur", true, { brightness: 200 }),
   light("led_band", "LED Band", "wohnzimmer", true, { brightness: 160, color_mode: "hs", rgb_color: [120, 90, 255], effect: "colorloop", effect_list: ["colorloop", "none"] }),
@@ -165,6 +166,7 @@ const DEVICES = [
   entity("sensor.schlafzimmer_temperatur", "schlafzimmer", "18.1", { friendly_name: "Schlafzimmer Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("sensor.bad_temperatur", "bad", "24.6", { friendly_name: "Bad Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("sensor.flur_temperatur", "flur", "19.6", { friendly_name: "Flur Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sensor.garten_temperatur", "garten", "14.2", { friendly_name: "Garten Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("sun.sun", null, "above_horizon", { friendly_name: "Sonne", elevation: 32, azimuth: 205 }),
   entity("sensor.wohnzimmer_feuchte", "wohnzimmer", "48", { friendly_name: "Wohnzimmer Luftfeuchtigkeit", device_class: "humidity", unit_of_measurement: "%" }),
   entity("binary_sensor.kueche_fenster", "kueche", "on", { friendly_name: "Küche Fenster", device_class: "window" }),
@@ -458,7 +460,8 @@ DEMO_BUILDING.floors[1].furniture = [
 // Invented garden and roof.
 const area = (id, type, x0, z0, x1, z1) => ({ id, type, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });
 DEMO_BUILDING.floors[0].outdoor = [
-  area("a1", "lawn", -3, -8, 17, -0.3),
+  // the garden acts as a room: tapped, it opens with its lights and the outdoor temperature (#100)
+  { ...area("a1", "lawn", -3, -8, 17, -0.3), area_id: "garten", name: "Garten" },
   area("a2", "lawn", -3, 9.5, 6.5, 14),
   area("a3", "terrace", 1.5, -2.8, 6.2, -0.3),
   {

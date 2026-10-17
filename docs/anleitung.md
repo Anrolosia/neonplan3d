@@ -306,7 +306,7 @@ Ein ausgewähltes Gerät hat:
 
 Leuchten sind Möbel mit einem verknüpften Licht. Es gibt Deckenleuchte, Einbauspot, Aufbau-Spot, LED-Panel, Pendelleuchte, Stehlampe, Deckenfluter, Tischlampe, Wandleuchte, LED-Streifen, Wegleuchte und Garten-Spot.
 
-- Das 3D-Modell leuchtet in Farbe und Helligkeit des Lichts. Boden und Wände des Raums werden mit beleuchtet, zwei farbige Deckenleuchten mischen sich dazwischen. In den Nachbarraum fällt das Licht nur durch Türen.
+- Das 3D-Modell leuchtet in Farbe und Helligkeit des Lichts. Boden und Wände des Raums werden mit beleuchtet, zwei farbige Deckenleuchten mischen sich dazwischen. In den Nachbarraum fällt das Licht nur durch Türen. Eine Lampe über einer Treppe oder Deckenöffnung (bis 1,5 m daneben) leuchtet auch durch die Öffnung in die Etage darunter.
 - Farbeffekte wie ein Farbwechsel werden in 3D animiert.
 - Tischlampen stehen auf dem Möbel darunter, Wandleuchten und LED-Streifen rasten an der Wand ein, bei Pendelleuchten ist die Höhe die Abhängung unter der Decke.
 - **Höhe über Boden:** Wandleuchten hängen von sich aus auf 1,75 m, LED-Streifen direkt unter der Decke. Im Formular stellst du für beide eine eigene **Höhe über Boden** ein, etwa für einen Streifen unter den Hängeschränken oder hinter dem TV-Board. **Höhe automatisch** setzt sie zurück. Auch Einbauspots und Aufbau-Spots haben das Feld: Von sich aus sitzen sie unter der Decke, mit einer eigenen Höhe etwa unter den Hängeschränken – Modell und Lichtkegel strahlen dann von dort nach unten auf die Arbeitsplatte. Unter einer Dachschräge hängen Deckenleuchten, Spots und Pendelleuchten an der Dachunterseite statt in der Luft. Ein Streifen unter 1 m Höhe (Sockelleiste, hinter dem Schrank) strahlt nach oben an die Wand, höher montierte strahlen nach unten. Ein Streifen unterhalb der Schnitthöhe bleibt auch bei geschnittenen Wänden sichtbar. **Neigung um die Länge** legt den Streifen an eine Dachschräge oder kippt ihn zur Seite (90° = die Leuchtfläche zeigt seitlich), **Senkrecht** stellt ihn hochkant: Dann läuft er von der Höhe über Boden nach oben, am Türrahmen oder als Lichtsäule, und leuchtet rundum.
@@ -377,6 +377,8 @@ Seine Bahnen machen einen Bogen um Möbel, die auf dem Boden stehen: Schränke, 
 ### 4.17 Außenflächen und Außenleuchten
 
 Mit **Draußen → Außen** ziehst du Rasen, Terrasse, Weg, Einfahrt, Beet, Hecke oder Zaun auf. Im Menü wählst du vorher, was du aufziehst; die Art lässt sich danach im Formular noch ändern. Dort wählst du auch **Rechteck** (aufziehen) oder **Freie Form**: Dann setzt du die Ecken einzeln wie bei einem freien Raum – für geschwungene Beete, schräge Grundstücksgrenzen oder einen L-förmigen Weg; ein Tipp auf den ersten Punkt oder **Enter** schließt die Fläche. Eine ausgewählte Außenfläche änderst du an ihren Ecken; ein Rechteck bleibt dabei ein Rechteck. Hecke und Zaun bekommen im Formular eine **Höhe** (Thuja-Sichtschutz 2,5 m, Beeteinfassung 0,5 m); **Umrisslinie zeigen** ohne Haken lässt die Leuchtlinie am Rand weg, etwa bei einem Grundstück aus mehreren Rasenflächen. **Höhenversatz** senkt eine Fläche unter den Boden oder hebt sie an – die Einfahrt hinunter zur tieferen Garage, die erhöhte Terrasse; Leuchten darauf folgen mit. **Gefälle** neigt eine Fläche: Höhenunterschied in Metern und die Richtung, in die sie fällt (die hohe Kante liegt auf dem Höhenversatz) – eine Einfahrt, die zur Straße abfällt, ein Hang im Garten; Zaunpfosten und Leuchten stehen auf der schrägen Fläche. **Wildfläche** ist eine Art für ungemähte Ecken. **Balkon** ist für obere Etagen: eine dünne Platte auf Höhe der Etage mit einem durchsichtigen Stabgeländer (Höhe im Formular); an Kanten, die an einer Hauswand liegen, entsteht kein Geländer – Balkontüren dahinter bleiben frei. **Aus Flächen darunter ausschneiden** macht eine Fläche zum Loch in jeder vorher gezeichneten Fläche, in der sie ganz liegt – ein Teich oder eine Wildfläche mitten in einem einzigen großen Rasen. **Pergola / Rahmen** zeichnet Eckpfosten, Balken und Sparren in der eingestellten Höhe, mit **X-Verstrebung** an den Seiten – für Pergolen, Carport-Gerüste oder den Unterbau eines Rolldachs. Zaun und Pergola können **offen** bleiben: Die Kante vom letzten zum ersten Punkt fehlt dann, der Zaun lehnt am Haus. Bäume, Sträucher und Gestrüpp kommen als Möbel aus dem Pack **Garten & Terrasse** (ab Release 3: Eiche, Linde, Birke, Ahorn, Obstbaum, Fichte, Kiefer, Thuja, Strauch, Blühstrauch, Gestrüpp, Baumgruppe); Breite und Höhe im Möbelformular bestimmen Krone und Wuchs. Wegleuchten, Garten-Spots und Außen-Wandleuchten beleuchten die Außenflächen und die Fassade. **Pool:** Pools zeichnest du mit **Draußen → Pool**; im Menü wählst du die Form – **Eckig**, **Rund**, **Oval** oder **Frei** – und ziehst ihn dann auf (rund: so breit wie die kurze Seite des Rahmens). Einen runden oder ovalen Pool vergrößerst du an den vier Ecken seines Rahmens (der Kreis bleibt rund) oder im Formular über Durchmesser bzw. Breite und Tiefe; die Form selbst bleibt. Ein Pool schneidet sich selbst aus dem Rasen darunter aus. **Aufstellpool** stellt ihn als Becken auf den Boden, mit **Beckenhöhe**; sonst ist er eingelassen. **Beckentiefe** ist die Tiefe vom Rand bis zum Boden (sonst 1,50 m), **Rand über dem Rasen** wie weit der Rand herausschaut – ein 1,50 m tiefer Pool, der 20 cm aus dem Rasen schaut: Tiefe 1,50, Rand 0,20. Das Wasser steht 15 cm unter dem Rand; man sieht durch das Wasser auf Wände und Boden des Beckens. Die Tiefe zeigt sich, wenn der Pool in einer Rasen-, Terrassen- oder anderen Fläche liegt – ohne Boden drumherum wäre das Becken von außen zu sehen, dann bleibt er flach.
+
+**Außenflächen wie Räume:** Gib einer Fläche (Rasen, Terrasse, Balkon, Pool …) im Formular einen **Bereich** aus Home Assistant, etwa „Garten“, und auf Wunsch einen **Namen**. Dann verhält sie sich wie ein Raum: Sie steht in der Raumleiste, ein Tipp in 3D öffnet sie mit den Geräten des Bereichs (Gartenlicht, Steckdosen, Bewässerung), die Kamera rahmt sie ein, und mit **Anzeige → Werte** steht die Außentemperatur an ihrem Namen – Sensoren mit „Außen“ im Namen zählen hier ausdrücklich mit. Hecken, Zäune und Pergolen haben keinen Bereich.
 
 ![Garten bei Nacht](images/view-garden.jpg)
 
@@ -619,6 +621,48 @@ Ein Tipp auf die Kamera oder auf ihren Sichtkegel öffnet das Standbild, das sic
 
 ![Kamera-Standbild](images/view-camera.jpg)
 
+### 5.10 Sprachsteuerung (neu)
+
+> **Neu in 1.20 und noch in Entwicklung.** Die Sprachsteuerung ist für alle freigeschaltet, kostenlos, und funktioniert schon gut. Sie wird in den nächsten Versionen weiter ausgebaut. Wenn ein Satz nicht so verstanden wird, wie du ihn meinst, schreib uns den Satz in den Discord oder in ein GitHub-Issue.
+
+Sprich mit deinem Haus. Unten links in der 3D-Ansicht erscheint ein **Mikrofon-Knopf** 🎙️. Antippen, dann wird er rot und darüber steht „Ich höre zu …“. Sprich deinen Satz und mach eine kurze Pause, dann reagiert NeonPlan.
+
+**Was du sagen kannst:**
+
+| Du sagst | Was passiert |
+|---|---|
+| „Zeig das Wohnzimmer“, „Geh in die Küche“ oder einfach „Bad“ | Der Raum öffnet sich, auf seiner Etage. |
+| „Zeig das Obergeschoss“, „Keller“ | Die Etage öffnet sich. |
+| „Zeig das ganze Haus“ | Zurück zur Hausansicht. |
+| „Zeig den Garten“, „Terrasse“ | Eine Außenfläche mit Namen und Bereich öffnet sich wie ein Raum. |
+| „Zeig die Waschmaschine“, „Wo ist die Stehlampe?“ | Die Ansicht fliegt zum Gerät, und es blinkt kurz auf. |
+| „Zeig die Kamera Haustür“, „Zeig die Kamera im Garten“ | Die Ansicht schaut durch die Kamera (mit dem Kamera-Cockpit). |
+| „Zeig die Kameras“ | Die Kamera-Wand öffnet sich (mit dem Kamera-Cockpit). |
+| „Licht im Flur an“, „Wie warm ist es draußen?“ | Alles andere geht an **Assist** von Home Assistant. Die Antwort erscheint als Sprechblase. |
+
+NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen und Geräte. Ein Raum hört auch auf den Namen seines Home-Assistant-Bereichs. Bei Geräten braucht es ein „zeig“ oder „wo ist“. So bleibt „Licht im Wohnzimmer an“ ein Befehl für Assist und schaltet das Licht, statt nur hinzufliegen.
+
+**Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
+
+- **NeonPlan-Seite (Panel):** Editor → **🎙️ Sprachsteuerung** → **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet, aber nicht das Handy.
+- **Dashboard-Karte:** Dashboard bearbeiten → NeonPlan-Karte → **Funktionen** → **Sprachsteuerung (Mikrofon-Knopf)**, oder im YAML `voice: true`. Die Karten-Einstellung gilt auf allen Geräten, die dieses Dashboard zeigen. Du kannst sie bequem am PC setzen, auch wenn sie für das Tablet gedacht ist.
+
+**Was du dafür brauchst:**
+
+1. **Eine Assist-Pipeline mit Spracherkennung** in Home Assistant: Einstellungen → Sprachassistenten. Gut geeignet sind Home Assistant Cloud, Whisper oder **Speech-to-Phrase**, das lokal und schnell ist, auch auf einem Raspberry Pi. NeonPlan nimmt die **bevorzugte** Pipeline, also die mit dem Stern. Unter **Assist-Pipeline auf diesem Gerät** kannst du pro Gerät eine andere wählen.
+2. **https:** Browser geben das Mikrofon nur auf sicheren Seiten frei. Über `http://192.168…` geht es nicht, über Nabu Casa, ein eigenes Zertifikat oder einen Reverse Proxy schon.
+3. **Die Mikrofon-Freigabe:**
+   - im Browser beim ersten Antippen „Zulassen“;
+   - in **Fully Kiosk**: Einstellungen → Web Content Settings → Mikrofonzugriff einschalten (Plus-Lizenz), dazu in Android die Mikrofon-Berechtigung für Fully.
+
+**Testen:** Im Abschnitt **🎙️ Sprachsteuerung** startet **🎙️ Mikrofon testen** eine Probe. Sie prüft der Reihe nach https, Mikrofon, Pegel und Assist. Sie zeigt auch, welchen Raum ein gesprochener Satz öffnen würde, und schaltet dabei nichts. Steht irgendwo ein ✖, steht daneben, was zu tun ist.
+
+**Gut zu wissen:**
+
+- Das Mikrofon ist **nur offen, solange du sprichst**. Es lauscht nicht dauerhaft, deshalb gibt es kein Aktivierungswort. Das schont auch alte Tablets.
+- Die Erkennung übernimmt **deine** Assist-Pipeline. Wie schnell und genau sie ist, hängt von ihr ab. Mit Speech-to-Phrase oder der Cloud dauert ein Satz meist ein bis zwei Sekunden.
+- Hast du die Live-Regie an, unterbricht sie dich nicht, während du sprichst.
+
 ---
 
 ## 6. Pro-Erweiterungen
@@ -640,6 +684,18 @@ Pro-Erweiterungen sind kostenpflichtige Zusatzfunktionen, einzeln im Shop erhäl
 **Erkennungs-Pins:** Meldet ein Sensor der Kamera gerade eine Erkennung (Frigate, UniFi Protect, Reolink und ähnliche liefern je Objekt einen Sensor: Person, Fahrzeug, Tier, Bewegung), steht vor der Kamera ein Pin mit Symbol, Art und Uhrzeit – „Person · 18:42“. Antippen öffnet den Sensor. Mehrere Objekte zugleich ergeben mehrere Pins übereinander. Wem das zu unruhig ist: **Erkennungs-Symbole zeigen** im Formular der Kamera abschalten – dann färbt sich bei einer Erkennung nur der Sichtkegel rot.
 
 **Kamera-Wand:** Der Schalter **Kameras** unten (in der Karte die Option `camera_wall: true`) legt alle Livebilder deiner platzierten Kameras als Wand über die Szene, alle paar Sekunden aufgefrischt. Eine Kamera, die gerade Bewegung sieht, bekommt einen roten Rahmen; eine, die aufnimmt, einen roten Punkt. Die Kacheln teilen sich die Wand: Das Raster wählt so viele Spalten, dass alle Kameras möglichst groß und ohne Überlappen hineinpassen (eine Kamera füllt sie, zwei stehen nebeneinander, 22 etwa als 6 × 4); bei sehr vielen Kameras wird die Wand scrollbar. Die Kacheln sind Standbilder, alle 5 Sekunden neu (auf der Tablet-Stufe alle 10, ein kleiner Hinweis im Kopf sagt es) – zehn Livestreams würden ein altes Tablet überfordern. Auch beim Durchschauen in 3D ist das Bild ein Standbild; die Leiste unten sagt es. Antippen zeigt das Bild groß, und zwar als **Livestream** über den Player von Home Assistant, sobald die Kamera streamen kann (sonst bleibt das Standbild); von dort führt **Durch die Kamera schauen** in die 3D-Ansicht, und **Zurück zur Ansicht** bringt dich wieder zur Wand. **‹ Alle Kameras** geht zurück zum Raster, ✕ schließt die Wand.
+
+**Live-Regie:** Ein Bildschirm, meist das Wandtablet, zeigt von selbst, was im Haus passiert. Klingelt es, fliegt die Ansicht zur Haustür und schaut durch die Kamera dort. Sieht eine Kamera jemanden, ist die Waschmaschine fertig oder kommt eine Warnung, fliegt sie ebenfalls dorthin. Danach kehrt sie zurück, wo sie war. Alles ist **aus**, bis du es einschaltest, und zwar an zwei Stellen:
+
+1. **Welche Ereignisse:** Editor → **🎬 Live-Regie**. Jedes Ereignis hat einen eigenen Schalter:
+   - **Es klingelt:** Die Klingel findet NeonPlan selbst, nämlich eine Ereignis-Entität der Klasse „Türklingel“ (Ring, UniFi Protect …) oder einen Sensor wie Reolinks „Besucher“. Du kannst sie auch selbst wählen, ebenso die Kamera an der Tür. Ohne Wahl nimmt NeonPlan die Kamera desselben Geräts oder eine im selben Bereich. Die Kamera muss im Plan platziert sein, sonst fliegt die Ansicht nur zur Klingel.
+   - **Eine Kamera sieht jemanden:** „Nur Personen“ oder „Jede Bewegung“, für alle platzierten Kameras.
+   - **Waschmaschine, Trockner oder Spülmaschine fertig:** Das Gerät muss als Möbel mit Strommessung oder Status verknüpft sein. Als fertig gilt es, wenn es nach dem Lauf 3 Minuten ruht. Eine Pause im Programm zählt also nicht.
+   - **Neue Warnung:** Rauch, Wasser, Alarm, Fenster bei Regen und so weiter.
+   - **Zurück nach:** die Sekunden bis zur Rückkehr (Standard 30). Die Klingel bleibt doppelt so lange.
+2. **Auf welchem Bildschirm:** im selben Abschnitt **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet mit dem NeonPlan-Panel. Auf einer Dashboard-Karte schaltest du stattdessen **Live-Regie** in den Karten-Einstellungen ein (`director: true`).
+
+Wer das Tablet gerade bedient, wird nur von der Klingel und von Warnungen unterbrochen. Berührst du den Bildschirm, während die Regie etwas zeigt, bleibt die Ansicht, wo sie ist. Teil des Kamera-Cockpits.
 
 ### 6.2 Wetter draußen
 
@@ -920,6 +976,7 @@ Unter **🎈 Fun-Packs** schaltest du sie danach ein und aus.
 **Haustiere:** Katze, Kaninchen oder Hund – als Dackel, Mops, Terrier, Labrador oder Schäferhund – leben in deinem 3D-Haus. **+ Haustier hinzufügen** legt ein Tier an: Art, Rasse (bei Hunden), Name, Fell und die Etage, auf der es startet. **Haustiere zeigen** schaltet alle auf einmal ein und aus; in der Dashboard-Karte blendet die Option **Haustiere zeigen** (YAML `pets: false`) sie für diese Karte aus, etwa am Wandtablet.
 
 - Die Tiere laufen durch die Türen von Raum zu Raum und **die Treppe hoch und runter** – so sind sie im ganzen Haus unterwegs. Eine Tür, deren Kontakt „zu“ meldet, ist für sie zu; Türen ohne Sensor gelten als offen.
+- Sie laufen **um Möbel herum** statt hindurch – um Sofa, Tisch und Schrank; Teppiche, Lampen und was an der Wand hängt, sind kein Hindernis. Auf ihren Platz auf dem Sofa oder Bett springen sie zum Schluss hinauf.
 - Sie ruhen an ihren Lieblingsplätzen: Die Katze läuft vor ein **Sofa, einen Sessel oder ein Bett** und springt von vorne hinauf, der Hund legt sich davor. Aus dem Pack Haustiere mögen Katzen Katzenbett, Katzenhöhle und Kratzbaum, Hunde Hundebett, Hundekorb und Hundehütte; am **Napf**, Futterautomaten und Trinkbrunnen schauen sie kurz vorbei.
 - **Nachts** (die Sonne in Home Assistant ist untergegangen) schlafen sie eingerollt, mit einem kleinen „z Z“.
 - In den **Aquarien** des Packs Haustiere schwimmen bunte **Fische**.
@@ -1019,6 +1076,8 @@ NeonPlan 3D ist für Wandtablets wie das Amazon Fire gebaut:
 
 **Tipps für Fire-Tablets:** Fully Kiosk Browser mit Hardwarebeschleunigung nutzen, die Karte mit `fill: true` bildschirmfüllend zeigen und `quality: auto` lassen.
 
+**Sprachsteuerung:** Auf dem Wandtablet sprichst du mit NeonPlan über einen Mikrofon-Knopf, z. B. „Zeig das Wohnzimmer“. Alles dazu steht in [5.10 Sprachsteuerung](#510-sprachsteuerung-neu).
+
 ---
 
 ## 10. Sicherung und Umzug
@@ -1059,6 +1118,9 @@ Ja. Überall, wo NeonPlan einen Zahlenwert erwartet (Leistung, Ladestand, Reichw
 
 **Die Lautstärke eines Echo ändert sich nicht.**
 Alexa Media Player setzt die Lautstärke bei manchen Echos nicht oder nur verzögert und meldet den neuen Wert spät zurück. Prüfe es unter Entwicklerwerkzeuge → Aktionen mit `media_player.volume_set`: Passiert dort nichts, liegt es an der Integration (siehe Kapitel 6.5).
+
+**Auf iPhone oder iPad schließt sich NeonPlan, wenn ich mit zwei Fingern verschiebe oder zoome.**
+Das ist kein Absturz: Die Home-Assistant-App hat eigene Wischgesten. Liegt auf einem Wischen mit zwei Fingern eine Aktion (etwa zur Startseite), führt die App sie aus und verlässt die Seite. In der App unter **Einstellungen → Companion App → Gesten** die Zwei-Finger-Gesten auf **Keine** stellen. In Safari passiert das nicht.
 
 **Oben steht „Neustart nötig“.**
 Nach einem Update läuft im Hintergrund noch die alte Version. Home Assistant neu starten.

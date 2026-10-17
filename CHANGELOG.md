@@ -4,11 +4,20 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
-## Unreleased
+## 1.20.0
+
+### New
+
+- Outdoor areas like rooms (#100, #59): a lawn, terrace, balcony or pool with a Home Assistant area (and a name) is in the room bar, opens with its area's devices on a tap in 3D, is framed by the camera and shows its outdoor temperature with "Values"; in the editor its area's devices are listed to place on it.
+- Light between floors (#570): a lamp over a stairwell or floor opening, or close to it, also lights the floor below through the opening.
+- Live director (Camera Cockpit): a wall screen shows by itself what happens – the doorbell rings and the view flies to the door and looks through its camera; a camera sees someone; the washer is done; a new warning. Every event is its own switch, all off until switched on, and the screen is chosen too (this device, or the card option `director`); the view goes back afterwards unless someone touched the screen.
+- Voice control – new and still in development, released for everyone (opt-in per device or card option `voice`): a microphone button in the 3D view – "Show the living room", "upper floor" or just a room's name opens it; "Show the washing machine" / "Where is the floor lamp" flies to a device, "Show the front door camera" looks through it and "Show the cameras" opens the camera wall (Camera Cockpit); any other sentence goes to Home Assistant's Assist and its answer shows as a bubble. Speech to text by your Assist pipeline; needs https and the microphone allowed. "Test the microphone" checks a device step by step.
+- Pets walk around furniture instead of through it (sofa, table, cupboard), hopping onto their place on the sofa or bed at the end – idea from Thundras' fork.
 
 ### Fixed
 
 - Furniture library: with the 3D view beside the plan, an item's preview picture showed beside or below the library instead of next to the item.
+- Manual (FAQ): NeonPlan closing on a two-finger move on iPhone/iPad is the Home Assistant app's own gesture – set it to None (#571).
 
 ## 1.19.2
 

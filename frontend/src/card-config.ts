@@ -76,6 +76,10 @@ export interface CardConfig {
   alerts?: boolean;
   /** Jump to the room of a new warning (default false). */
   alert_jump?: boolean;
+  /** Kamera-Cockpit: the live director – the card shows by itself what happens (events chosen in the settings; default off). */
+  director?: boolean;
+  /** Voice control: a microphone button – "Show the living room" shows it, other sentences go to Assist (default off). */
+  voice?: boolean;
   /** Scene and script chips of the selected room (default true). */
   scenes?: boolean;
   /** Motion trail: where motion was reported in the last half hour, with times (default off). */

@@ -7,6 +7,7 @@ from custom_components.neonplan3d.schema import (
     FURNITURE_SCHEMA,
     HOLOGRAM_SCHEMA,
     OPENING_SCHEMA,
+    OUTDOOR_SCHEMA,
     ROOM_SCHEMA,
     SETTINGS_SCHEMA,
     START_VIEW_SCHEMA,
@@ -134,3 +135,36 @@ def test_household_fields_are_kept_and_checked() -> None:
     for bad in ({"bin_kind": "nuclear"}, {"bin_color": "blue"}, {"moisture_min": 150}, {"door_alarm": 0}):
         with pytest.raises(vol.Invalid):
             FURNITURE_SCHEMA({**base, **bad})
+
+
+def test_outdoor_area_keeps_its_name_and_area() -> None:
+    """An outdoor area acting as a room (#100) keeps its name and Home Assistant area; without them both are None."""
+    base = {"id": "g1", "type": "lawn", "points": [[0, 0], [4, 0], [4, 3]]}
+    out = OUTDOOR_SCHEMA({**base, "name": "Garten", "area_id": "garden"})
+    assert out["name"] == "Garten" and out["area_id"] == "garden"
+    plain = OUTDOOR_SCHEMA(base)
+    assert plain["name"] is None and plain["area_id"] is None
+
+
+def test_live_director_is_off_unless_switched_on() -> None:
+    """The live director (Kamera-Cockpit): no settings, nothing on; every event is its own switch."""
+    base = {"wall_exterior": 0.3, "wall_interior": 0.12, "grid": 0.05}
+    assert SETTINGS_SCHEMA(base)["director"] is None
+    d = SETTINGS_SCHEMA({**base, "director": {"doorbell": True}})["director"]
+    assert d["doorbell"] is True
+    assert d["motion"] == "off"
+    assert d["appliances"] is False
+    assert d["alerts"] is False
+    assert d["doorbell_entity"] is None
+    full = {
+        "doorbell": True,
+        "doorbell_entity": "event.ding",
+        "doorbell_camera": "camera.door",
+        "motion": "person",
+        "hold": 45,
+    }
+    assert SETTINGS_SCHEMA({**base, "director": full})["director"]["hold"] == 45
+    with pytest.raises(vol.Invalid):
+        SETTINGS_SCHEMA({**base, "director": {"motion": "cats"}})
+    with pytest.raises(vol.Invalid):
+        SETTINGS_SCHEMA({**base, "director": {"hold": 2}})

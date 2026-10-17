@@ -6,8 +6,11 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 
 **Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## ✅ Recently done (1.13 – 1.19)
+## ✅ Recently done (1.13 – 1.20)
 
+- **Voice control** (1.20, free, new and still growing): a microphone button – "Show the living room", "Where is the washing machine?", "Show the front door camera"; anything else goes to Assist.
+- **Live director** (Camera Cockpit): the wall tablet flies to the front door when the doorbell rings and looks through the camera, and to a camera that sees someone, a finished washer or a warning.
+- **Outdoor areas like rooms**, **light between floors** and **pets that walk around furniture** (1.20).
 - **Time travel** (Pro): replay the last days in the house – now for everyone in the shop.
 - **Walk through the house** at eye level, with keys or a touch stick.
 - **Wall view:** a wall from the front, furniture slides along and up it.
@@ -20,16 +23,14 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 - **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
 - A tidied-up editor, furniture blocks and multi-select, 18 languages.
 
-## 🔨 Next up (1.20 and 1.21)
+## 🔨 Next up (1.21)
 
 | Topic | What it is about | Wish |
 |---|---|---|
-| Outdoor areas like rooms | Give the garden, terrace or balcony a name and a Home Assistant area: a tap opens it like a room, with its lights, sockets, irrigation and outdoor sensors | #100, #59, discussion #80 |
-| Light between floors | A lamp over the stairs or a floor opening lights the floor below as well | #570 |
-| Pets walk around furniture | Cats and dogs from the fun pack find their way round sofas and tables instead of through them | idea from a fork (Thundras) |
 | Wall switches | A switch plate with 1–4 keys on the wall, each key switches its own light, blind or fan, with a small LED; optionally a light ring in the lamp's colour | Discord, idea from the CasaNeon fork |
 | Wall sockets | 1–4 sockets in one frame, each with its own switch and power reading – several sockets in one room for the same plug | Discord |
 | Ceiling fans | Blades that turn with the fan's speed, the light separately | Discord, idea from a fork (ProvUK) |
+| Voice control, round 2 | More sentences ("lights off upstairs", "what is open?"), answers spoken by the tablet, a voice view for the live director | your sentences on Discord |
 | Even faster on old tablets | Fewer redraws, calmer warning pulses, a lower resolution on weak devices by itself | – |
 
 ## Free – planned
@@ -78,7 +79,7 @@ Available: **Camera Cockpit**, **Weather outside**, **Live screens**, **Energy P
 **Updates for existing add-ons:**
 - **Energy Pro:** gas and water with their own cable colours, heat pump with heat flow, 7-day history.
 - **Car Pro:** opening doors and hatches, departure time, charging cable to the wallbox.
-- **Camera Cockpit:** pan/tilt from 3D, doorbell.
+- **Camera Cockpit:** pan/tilt from 3D, talk at the doorbell.
 - **Sound & Cinema:** favourites per speaker.
 - **Household Pro:** after the beta for everyone in the shop; holographic plant card.
 
@@ -104,8 +105,11 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 
 **Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
-## ✅ Zuletzt erledigt (1.13 – 1.19)
+## ✅ Zuletzt erledigt (1.13 – 1.20)
 
+- **Sprachsteuerung** (1.20, kostenlos, neu und wächst weiter): ein Mikrofon-Knopf – „Zeig das Wohnzimmer“, „Wo ist die Waschmaschine?“, „Zeig die Kamera Haustür“; alles andere geht an Assist.
+- **Live-Regie** (Kamera-Cockpit): Das Wandtablet fliegt beim Klingeln zur Haustür und schaut durch die Kamera, außerdem zu einer Kamera, die jemanden sieht, zur fertigen Waschmaschine oder zu einer Warnung.
+- **Außenflächen wie Räume**, **Licht zwischen den Etagen** und **Haustiere, die um Möbel herumlaufen** (1.20).
 - **Zeitreise** (Pro): die letzten Tage im Haus zurückspulen – jetzt für alle im Shop.
 - **Rundgang durchs Haus** auf Augenhöhe, mit Tasten oder Touch-Stick.
 - **Wandansicht:** eine Wand von vorn, Möbel daran verschieben und anheben.
@@ -118,16 +122,14 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 - **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
 - Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## 🔨 Als Nächstes (1.20 und 1.21)
+## 🔨 Als Nächstes (1.21)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
-| Außenflächen wie Räume | Garten, Terrasse oder Balkon bekommen einen Namen und einen Home-Assistant-Bereich: Antippen öffnet sie wie einen Raum, mit Licht, Steckdosen, Bewässerung und Außensensoren | #100, #59, Diskussion #80 |
-| Licht zwischen Etagen | Eine Lampe über der Treppe oder einer Deckenöffnung leuchtet auch in die Etage darunter | #570 |
-| Haustiere laufen um Möbel herum | Katzen und Hunde aus dem Fun-Pack finden ihren Weg um Sofa und Tisch statt hindurch | Idee aus einem Fork (Thundras) |
 | Wandschalter | Eine Schalterplatte mit 1–4 Tasten an der Wand, jede Taste schaltet ihr eigenes Licht, ihren Rollladen oder Ventilator, mit kleiner LED; auf Wunsch ein Leuchtring in der Lampenfarbe | Discord, Idee aus dem Fork CasaNeon |
 | Wandsteckdosen | 1–4 Steckdosen in einem Rahmen, jede mit eigenem Schalter und Verbrauch – auch mehrere Steckdosen im Raum für denselben Stecker | Discord |
 | Deckenventilatoren | Flügel, die sich mit der Stufe des Ventilators drehen, das Licht getrennt | Discord, Idee aus einem Fork (ProvUK) |
+| Sprachsteuerung, Runde 2 | Mehr Sätze („oben alles aus“, „was ist offen?“), Antworten vom Tablet vorgelesen, Sprache auch in der Live-Regie | eure Sätze im Discord |
 | Noch schneller auf alten Tablets | Weniger Neuberechnungen, ruhigeres Pulsieren der Warnungen, auf schwachen Geräten von selbst eine niedrigere Auflösung | – |
 
 ## Kostenlos – geplant
@@ -176,7 +178,7 @@ Erhältlich: **Kamera-Cockpit**, **Wetter draußen**, **Bildschirme live**, **En
 **Updates für bestehende Erweiterungen:**
 - **Energie Pro:** Gas und Wasser mit eigenen Leitungsfarben, Wärmepumpe mit Wärmefluss, 7-Tage-Verlauf.
 - **Auto Pro:** bewegliche Türen und Klappen, Abfahrtszeit, Ladekabel zur Wallbox.
-- **Kamera-Cockpit:** Schwenken/Neigen aus 3D, Türklingel.
+- **Kamera-Cockpit:** Schwenken/Neigen aus 3D, an der Türklingel sprechen.
 - **Klang & Kino:** Favoriten je Lautsprecher.
 - **Haushalt Pro:** nach der Beta für alle im Shop; holografische Pflanzenkarte.
 

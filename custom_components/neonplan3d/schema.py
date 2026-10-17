@@ -458,6 +458,9 @@ OUTDOOR_SCHEMA = vol.Schema(
         vol.Optional("rim", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=-0.5, max=2))),
         # Pool Pro: the pool's entities
         vol.Optional("pool", default=None): vol.Any(None, POOL_SCHEMA),
+        # an outdoor area like a room (#100): its name and Home Assistant area
+        vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=80))),
+        vol.Optional("area_id", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -724,6 +727,24 @@ SETTINGS_SCHEMA = vol.Schema(
                 {
                     vol.Optional("bin_from"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
                     vol.Optional("bin_until"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
+                },
+                extra=vol.ALLOW_EXTRA,
+            ),
+        ),
+        # Kamera-Cockpit: the live director - events a wall screen shows by itself (all off unless switched on)
+        vol.Optional("director", default=None): vol.Any(
+            None,
+            vol.Schema(
+                {
+                    vol.Optional("doorbell", default=False): bool,
+                    vol.Optional("doorbell_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+                    vol.Optional("doorbell_camera", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+                    vol.Optional("motion", default="off"): vol.In(["off", "person", "all"]),
+                    vol.Optional("appliances", default=False): bool,
+                    vol.Optional("alerts", default=False): bool,
+                    vol.Optional("hold", default=None): vol.Any(
+                        None, vol.All(vol.Coerce(float), vol.Range(min=10, max=600))
+                    ),
                 },
                 extra=vol.ALLOW_EXTRA,
             ),

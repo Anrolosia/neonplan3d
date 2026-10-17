@@ -93,7 +93,7 @@ import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from 
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, manualUrl, shopUrl, type Feature } from "../features.ts";
+import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
@@ -101,7 +101,7 @@ import { load3d } from "../load3d.ts";
 import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
-import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
+import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, zonesOf, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -115,6 +115,8 @@ import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../
 import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
+import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
+import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
 /** Which HTML markers are shown: none, only what has no 3D object or shows a value, or all. */
@@ -224,11 +226,15 @@ export class Fp3dView3d extends LitElement {
     keepView: { attribute: false },
     alerts: { attribute: false },
     alertJump: { attribute: false },
+    director: { attribute: false },
+    voice: { attribute: false },
+    _voice: { state: true },
     scenes: { attribute: false },
     dimmed: { attribute: false },
     autoOrbit: { attribute: false },
     startView: { attribute: false },
     _low: { state: true },
+    _micProbe: { state: true },
     _narrowStage: { state: true },
     _alerts: { state: true },
     _household: { state: true },
@@ -392,6 +398,12 @@ export class Fp3dView3d extends LitElement {
   /** Warnings (smoke, water, alarm, window in the rain): pulsing rooms and a banner; jump to new ones. */
   declare alerts: boolean;
   declare alertJump: boolean;
+  /** Kamera-Cockpit: this screen shows by itself what happens (the events chosen in the settings; default off). */
+  declare director: boolean;
+  /** Voice control: a microphone button – "Zeig das Wohnzimmer" shows it, other sentences go to Assist (default off). */
+  declare voice: boolean;
+  private declare _voice: { phase: "wait" | "listen" | "done" | "error"; text: string } | null;
+  private voiceTimer: ReturnType<typeof setTimeout> | undefined;
   private declare _alerts: Alert[];
   /** Haushalt Pro: what is due in the household now (the glass card "Today in the household"). */
   private declare _household: HouseholdItem[];
@@ -478,6 +490,22 @@ export class Fp3dView3d extends LitElement {
   private binHolos: { floorId: string; x: number; z: number; y: number; name: string; color: string; when: string; soon?: boolean }[] = [];
   /** Haushalt Pro: appliances that ended their program while the page is open ("finished" until the door opens). */
   private finished = new FinishedMemory();
+  /** Washers, dryers and dishwashers as last read: whether they run (the live director notices a program ending). */
+  private appliances = new Map<string, { floorId: string; x: number; z: number; entity: string; running: boolean }>();
+  private directing = new Director();
+  /** Lab: the microphone probe ("?fp3d_mic=1" in the address). */
+  private declare _micProbe: boolean;
+  private directorTimer: ReturnType<typeof setTimeout> | undefined;
+  private restTimer: ReturnType<typeof setTimeout> | undefined;
+  private directorSrc: {
+    registry: HomeAssistant["entities"];
+    building: Building;
+    sig: string;
+    bells: { id: string; camera: string | null }[];
+    motion: { sensor: string; cam: string }[];
+  } | null = null;
+  /** Where the view was before the director took it: it goes back there. */
+  private directorBack: { floorId: string | null; roomId: string | null; view: ReturnType<FloorplanViewer["getView"]> } | null = null;
   /** Haushalt Pro: looks again when an open fridge door reaches its limit. */
   private fridgeTimer: ReturnType<typeof setTimeout> | undefined;
   /** Room values of the current heatmap (for the legend). */
@@ -562,6 +590,10 @@ export class Fp3dView3d extends LitElement {
     this._narrowStage = false;
     this.alerts = true;
     this.alertJump = false;
+    this.director = false;
+    this.voice = false;
+    this._voice = null;
+    this._micProbe = micProbeAsked();
     this._alerts = [];
     this._household = [];
     this._hhFolded = readFlag("neonplan3d.hhFolded");
@@ -629,6 +661,10 @@ export class Fp3dView3d extends LitElement {
     clearInterval(this.householdTimer);
     this.householdTimer = undefined;
     clearTimeout(this.fridgeTimer);
+    clearTimeout(this.directorTimer);
+    clearTimeout(this.restTimer);
+    clearTimeout(this.voiceTimer);
+    this.directing.clear();
     this.pickupKey = "";
     // back in the page (another dashboard view and back), the day curves are fetched and kept fresh again (#527)
     this.holoIds = "";
@@ -641,6 +677,12 @@ export class Fp3dView3d extends LitElement {
 
   protected firstUpdated(): void {
     this.observeStage();
+    // the microphone probe lives in the voice bundle: it shows once that has loaded
+    if (this._micProbe) loadVoice().catch(() => (this._micProbe = false));
+    // a touch means someone uses the screen: the director leaves them the view (a shot on screen stays)
+    const touched = () => this.directing.touch(Date.now());
+    this.addEventListener("pointerdown", touched, { passive: true });
+    this.addEventListener("wheel", touched, { passive: true });
     // the mouse wheel over a hologram card zooms the view like anywhere else on the stage (#239)
     this.renderRoot.addEventListener(
       "wheel",
@@ -787,6 +829,7 @@ export class Fp3dView3d extends LitElement {
     const ticked = this.replayTicked && !!this.replay;
     this.replayTicked = false;
     if (forced || changed.has("hass") || ticked) this.syncDevices(forced, ticked && (this.trail || this.detecting));
+    if (changed.has("hass") || changed.has("director")) this.direct();
     if (changed.has("autoOrbit")) v.setAutoOrbit(this.autoOrbit ? 0.06 : 0);
     if (changed.has("_thumbs") || changed.has("_narrowStage")) v.setLabelInset(this._thumbs.length ? (this.narrowThumbs ? 136 : 184) : 0);
     if (changed.has("floorId")) v.setFloor(this.floorId);
@@ -912,6 +955,7 @@ export class Fp3dView3d extends LitElement {
     v.setScreens(furniture.screens);
     v.setFridgeDoors(fridgeDoors(hass, b.floors));
     v.setAwnings(awningStates(hass, b.floors));
+    v.setProjections(this.projectedCameras(hass, b));
     v.setRobots(this.robotInfos(hass, b));
     // roof windows: sash and blind follow their contact and cover like windows do
     const roofWindows = new Map<string, { open: number; tilt: number; cover: number }>();
@@ -2170,7 +2214,135 @@ export class Fp3dView3d extends LitElement {
       clearInterval(this.alertTimer);
       this.alertTimer = undefined;
     }
-    if (fresh.length && this.alertJump) this.jumpTo(fresh[0]);
+    if (!fresh.length) return;
+    const s = this.directorSettings();
+    if (s?.alerts) {
+      const a = fresh[0];
+      if (this.directing.offer({ kind: "alert", key: `alert:${a.kind}:${a.entity}`, entity: a.entity }, Date.now(), s.hold ?? HOLD_DEFAULT)) {
+        this.directorShow(() => this.jumpTo(a));
+        return;
+      }
+    }
+    if (this.alertJump) this.jumpTo(fresh[0]);
+  }
+
+  /** The live director's settings while it works on this screen (switched on here, Kamera-Cockpit, live, an event on). */
+  private directorSettings(): DirectorSettings | null {
+    const s = this.building?.settings.director;
+    return this.director && !this.ro && hasFeature("camera_cockpit") && directorAny(s) ? s! : null;
+  }
+
+  /**
+   * Live director: look for a ring at the door, someone in front of a camera, an appliance that has finished – and
+   * show the most important one. Runs on every state change while switched on (cheap: a few entities).
+   */
+  private direct(): void {
+    const s = this.directorSettings();
+    const hass = this.hass;
+    const b = this.building;
+    if (!s || !hass || !b) {
+      // switched off: everything forgotten, so switching on again starts from the states of that moment
+      if (this.directorSrc) {
+        this.directing = new Director();
+        this.directorSrc = null;
+        clearTimeout(this.directorTimer);
+        clearTimeout(this.restTimer);
+        this.directorBack = null;
+      }
+      return;
+    }
+    const now = Date.now();
+    const hold = s.hold ?? HOLD_DEFAULT;
+    // the doorbells and cameras' sensors are found once per registry, plan and settings (not on every state change)
+    const sig = `${JSON.stringify(s)}|${b.floors.map((f) => f.placements.length).join()}`;
+    if (!this.directorSrc || this.directorSrc.registry !== hass.entities || this.directorSrc.building !== b || this.directorSrc.sig !== sig) {
+      const placed = [...new Set(b.floors.flatMap((f) => f.placements.map((p) => p.entity_id)))];
+      const motion = s.motion ?? "off";
+      this.directorSrc = {
+        registry: hass.entities,
+        building: b,
+        sig,
+        bells: (s.doorbell ? doorbellEntities(hass, s.doorbell_entity) : []).map((id) => ({ id, camera: doorbellCamera(hass, id, placed, s.doorbell_camera) })),
+        motion:
+          motion === "off"
+            ? []
+            : placed
+                .filter((id) => id.startsWith("camera."))
+                .flatMap((cam) => cameraMotionSensors(hass, cam).filter((sensor) => motion === "all" || detectionKind(hass, sensor) === "person").map((sensor) => ({ sensor, cam }))),
+      };
+    }
+    const shots: Shot[] = [];
+    // every source is looked at each time (its last state is remembered), shown or not
+    for (const bell of this.directorSrc.bells) {
+      if (this.directing.edge(bell.id, hass.states[bell.id], (a, c) => doorbellRang(a, c, now))) {
+        shots.push({ kind: "doorbell", key: `bell:${bell.id}`, entity: bell.id, camera: bell.camera });
+      }
+    }
+    for (const m of this.directorSrc.motion) {
+      if (this.directing.edge(m.sensor, hass.states[m.sensor], (a, c) => a?.state === "off" && c?.state === "on")) {
+        shots.push({ kind: "motion", key: `cam:${m.cam}`, entity: m.sensor, camera: m.cam });
+      }
+    }
+    if (s.appliances) {
+      for (const [id, a] of this.appliances) if (this.directing.stopped(`app:${id}`, a.running, now)) shots.push({ kind: "appliance", key: `app:${id}`, entity: id });
+      // a program that just rested is looked at again once its rest is long enough to count as the end
+      clearTimeout(this.restTimer);
+      if (this.directing.resting()) this.restTimer = setTimeout(() => this.direct(), 60_000);
+    }
+    const order: Shot["kind"][] = ["doorbell", "motion", "appliance"];
+    shots.sort((x, y) => order.indexOf(x.kind) - order.indexOf(y.kind));
+    for (const shot of shots) {
+      if (!this.directing.offer(shot, now, hold)) continue;
+      this.directorShow(() => this.directorGo(shot));
+      break;
+    }
+  }
+
+  /** Show a shot: remember where the view was (once per series of shots), go, and plan the way back. */
+  private directorShow(go: () => void): void {
+    const v = this.viewer;
+    if (!v) return;
+    if (!this.directorBack) this.directorBack = { floorId: this.floorId, roomId: this.roomId, view: v.getView() };
+    v.setAutoOrbit(0);
+    go();
+    clearTimeout(this.directorTimer);
+    const cur = this.directing.current;
+    if (cur) this.directorTimer = setTimeout(() => this.directorDue(), Math.max(0, cur.until - Date.now()) + 50);
+  }
+
+  private directorGo(shot: Shot): void {
+    const b = this.building;
+    if (!b) return;
+    // a camera at the door (or the one that saw someone): look through it, when it is placed in the plan
+    if (shot.camera && b.floors.some((f) => f.placements.some((p) => p.entity_id === shot.camera))) {
+      this.lookThrough(shot.camera);
+      return;
+    }
+    if (shot.kind === "appliance") {
+      const a = this.appliances.get(shot.key.slice(4));
+      if (a) this.goTo({ kind: "device", name: "", where: "", floorId: a.floorId, roomId: null, entity: a.entity, icon: null, x: a.x, z: a.z, y: 1 });
+      return;
+    }
+    this.showEntity(shot.entity);
+  }
+
+  /** The shot's time is up: back to where the view was – unless someone took the screen meanwhile. */
+  private directorDue(): void {
+    const due = this.directing.due(Date.now());
+    const back = this.directorBack;
+    if (!due) return;
+    this.directorBack = null;
+    if (!due.back || !back) return;
+    if (this._through) {
+      this._through = null;
+    }
+    if (this.floorId !== back.floorId) this.fire("floor-tap", { floorId: back.floorId });
+    if (back.roomId) setTimeout(() => this.fire("room-tap", { floorId: back.floorId, roomId: back.roomId }), 60);
+    else if (this.roomId && back.floorId) setTimeout(() => this.fire("room-tap", { floorId: back.floorId, roomId: null }), 60);
+    setTimeout(() => {
+      this.viewer?.flyTo(back.view);
+      this.viewer?.setAutoOrbit(this.autoOrbit ? 0.06 : 0);
+    }, 400);
   }
 
   /** Show where a warning is: its floor and room, or the house for an alarm. */
@@ -2189,7 +2361,7 @@ export class Fp3dView3d extends LitElement {
     const b = this.building;
     const hass = this.hass;
     const floor = b?.floors.find((f) => f.id === floorId);
-    const room = floor?.rooms.find((r) => r.id === roomId);
+    const room = floor ? zonesOf(floor).find((r) => r.id === roomId) : undefined;
     if (!b || !hass || !floor || !room || this.ro) return;
     const ids = new Set(areaEntities(hass, room.area_id).filter((id) => kindOf(id) === "light"));
     for (const p of floor.placements) if (kindOf(p.entity_id) === "light" && pointInPolygon([p.x, p.z], room.points)) ids.add(p.entity_id);
@@ -2239,7 +2411,8 @@ export class Fp3dView3d extends LitElement {
     const info = new Map<string, string>();
     if (this.heatMode === "values") {
       for (const floor of b.floors)
-        for (const room of floor.rooms) {
+        // outdoor areas acting as rooms show their values too (the garden's temperature, #100)
+        for (const room of zonesOf(floor)) {
           const t = roomClimateValue(hass, floor, room, "temperature");
           const h = roomClimateValue(hass, floor, room, "humidity");
           const c = roomClimateValue(hass, floor, room, "co2");
@@ -2370,6 +2543,8 @@ export class Fp3dView3d extends LitElement {
         // an own threshold for appliances behind a smart plug that draw a few watts on standby (null: 10 W)
         const runW = typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 10;
         const running = (power ?? 0) > runW || st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st));
+        // the live director notices a program ending (a washer done) from the same reading
+        if (appliance) this.appliances.set(f.id, { floorId: floor.id, x: f.x, z: f.z, entity: link.entity ?? link.power ?? f.id, running });
         // Haushalt Pro: a washer, dryer or dishwasher tells the time left while it runs and "finished" afterwards –
         // until its door opens (or it runs again); from its own state, or remembered from the moment it stopped
         let hhText: string | null = null;
@@ -2509,7 +2684,7 @@ export class Fp3dView3d extends LitElement {
         if (picture) screens.set(f.id, { color: bg, level: 1, picture, plain: true });
       }
     }
-    this.watchCameras(this.cameraScreens > 0 || !!this._through || this.cameraWall);
+    this.watchCameras(this.cameraScreens > 0 || !!this._through || this.cameraWall || this.projecting);
     return { markers, consumers, screens, targets };
   }
 
@@ -2666,6 +2841,25 @@ export class Fp3dView3d extends LitElement {
   }
 
   /** While a screen shows a camera, its snapshot is fetched again every few seconds (slower on the tablet level). */
+  /** Lab prototype: cameras placed in the plan whose current picture is cast onto it. */
+  private projecting = false;
+
+  private projectedCameras(hass: HomeAssistant, b: Building): { id: string; url: string }[] {
+    const out: { id: string; url: string }[] = [];
+    // the camera projection is a parked prototype: its own switch ("?fp3d_projection=1"), not the lab's
+    if (projectionOn()) {
+      const ids = new Set(b.floors.flatMap((f) => f.placements.map((p) => p.entity_id)).filter((id) => kindOf(id) === "camera"));
+      for (const id of ids) {
+        const st = hass.states[id];
+        const picture = st?.attributes.entity_picture as string | undefined;
+        if (!picture || isUnavailable(st)) continue;
+        out.push({ id, url: picture.startsWith("data:") ? picture : `${picture}${picture.includes("?") ? "&" : "?"}fp3d=${this.cameraTick}` });
+      }
+    }
+    this.projecting = out.length > 0;
+    return out;
+  }
+
   private watchCameras(on: boolean): void {
     if (on && !this.cameraTimer) {
       this.cameraTimer = setInterval(() => {
@@ -3130,7 +3324,7 @@ export class Fp3dView3d extends LitElement {
   private renderScenes() {
     const b = this.building;
     if (!this.scenes || !this.roomId || this.panelOpen || !b || !this.hass || this.ro) return nothing;
-    const room = b.floors.flatMap((f) => f.rooms).find((r) => r.id === this.roomId);
+    const room = b.floors.flatMap((f) => zonesOf(f)).find((r) => r.id === this.roomId);
     const ids = room ? areaEntities(this.hass, room.area_id).filter((id) => kindOf(id) === "scene" || kindOf(id) === "script").slice(0, 6) : [];
     if (!ids.length) return nothing;
     const areaName = room?.area_id ? this.hass.areas?.[room.area_id]?.name : undefined;
@@ -3502,6 +3696,75 @@ export class Fp3dView3d extends LitElement {
         ? svg`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 6a9.8 9.8 0 0 1 9 6 9.8 9.8 0 0 1-9 6 9.8 9.8 0 0 1-9-6 9.8 9.8 0 0 1 9-6m0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8m0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4" /></svg>`
         : svg`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.4 3.8 3.8 2.4l17.8 17.8-1.4 1.4-3.3-3.3A10.5 10.5 0 0 1 12 19a9.8 9.8 0 0 1-9-6 10.3 10.3 0 0 1 3.6-4.3L2.4 3.8M12 7a4 4 0 0 1 4 4c0 .5-.1 1-.3 1.5l-5.2-5.2c.5-.2 1-.3 1.5-.3m-4 4a4 4 0 0 0 5.5 3.7l-5.2-5.2c-.2.5-.3 1-.3 1.5m4-7a9.8 9.8 0 0 1 9 6 10 10 0 0 1-2.6 3.6l-1.4-1.4A8 8 0 0 0 18.8 12 8 8 0 0 0 9.6 7.2L8 5.6A10.3 10.3 0 0 1 12 4" /></svg>`}
     </button>`;
+  }
+
+  /** Voice control: the microphone button and what was heard or answered. */
+  private renderMic() {
+    const hass = this.hass;
+    if (!this.voice || !hass || this.ro || this._walk) return nothing;
+    const v = this._voice;
+    const busy = v?.phase === "wait" || v?.phase === "listen";
+    const label = translate(hass, "voice_button");
+    const left = this.cleanButton && !(this._find !== null && !this.clean) ? (this.clean ? 56 : 100) : 56;
+    return html`<button class="fp3d-mic ${v?.phase === "listen" ? "fp3d-mic-on" : ""}" style="left:${left}px" title=${label} aria-label=${label} ?disabled=${busy} @click=${() => void this.onMic()}>
+        ${svg`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2Z" /></svg>`}
+      </button>
+      ${v ? html`<div class="fp3d-mic-say ${v.phase === "error" ? "fp3d-mic-err" : ""}" style="left:${left}px">${v.text}</div>` : nothing}`;
+  }
+
+  /** One spoken sentence: a place to show ("Zeig das Wohnzimmer") is shown, anything else goes to Assist. */
+  private async onMic(): Promise<void> {
+    const hass = this.hass;
+    const b = this.building;
+    if (!hass || !b || this._voice?.phase === "wait" || this._voice?.phase === "listen") return;
+    clearTimeout(this.voiceTimer);
+    const say = (phase: "wait" | "listen" | "done" | "error", text: string) => {
+      this._voice = { phase, text };
+      clearTimeout(this.voiceTimer);
+      if (phase === "done" || phase === "error") this.voiceTimer = setTimeout(() => (this._voice = null), phase === "error" ? 9000 : 6000);
+    };
+    say("wait", "…");
+    try {
+      const v = await loadVoice();
+      const text = await v.listenOnce(hass, () => say("listen", translate(hass, "voice_listen")), voicePipeline());
+      if (!text) {
+        say("error", translate(hass, "voice_none"));
+        return;
+      }
+      // the plan's devices (placed, or furniture with an entity), with the room each stands in
+      const index = (this.findIndex ??= searchIndex(hass, b));
+      const roomName = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
+      const devices = index
+        .filter((it) => it.kind === "device" && it.entity)
+        .map((it) => ({ entity: it.entity!, name: it.name, room: (it.roomId && roomName.get(it.roomId)) || "", camera: kindOf(it.entity!) === "camera" }));
+      const place = v.showTarget(text, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
+      if (place) {
+        say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.kind === "cameras" ? translate(hass, "camera_wall_title") : place.name}`);
+        this.directing.touch(Date.now());
+        if (place.kind === "cameras") {
+          if (hasFeature("camera_cockpit")) this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
+          else this._proHint = "camera_cockpit";
+        } else if (place.kind === "device") {
+          const item = index.find((it) => it.entity === place.entity);
+          // a camera is looked through (Kamera-Cockpit), any other device shown where it stands
+          if (place.camera && hasFeature("camera_cockpit")) this.lookThrough(place.entity);
+          else if (item) this.goTo(item);
+        } else if (place.kind === "house") this.fire("floor-tap", { floorId: null });
+        else if (place.kind === "floor") this.fire("floor-tap", { floorId: place.floorId });
+        else {
+          if (this.floorId !== place.floorId) this.fire("floor-tap", { floorId: place.floorId });
+          setTimeout(() => this.fire("room-tap", { floorId: place.floorId, roomId: place.roomId }), 60);
+        }
+        return;
+      }
+      say("wait", `“${text}” …`);
+      const answer = await v.converse(hass, text);
+      say("done", answer ? `“${text}” – ${answer}` : `“${text}”`);
+    } catch (err) {
+      const e = err as { name?: string; message?: string };
+      const key = e?.message === "no_pipeline" ? "voice_no_pipeline" : e?.name === "NotAllowedError" || e?.name === "SecurityError" || !window.isSecureContext ? "voice_denied" : null;
+      say("error", key ? translate(hass, key) : translate(hass, "voice_error", { msg: String(e?.message ?? e?.name ?? err) }));
+    }
   }
 
   private renderSwipe() {
@@ -3896,6 +4159,8 @@ export class Fp3dView3d extends LitElement {
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
       ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
+      ${this.renderMic()}
+      ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
             ><b>${this._stats.fps ? translate(this.hass, "stats_fps", { fps: this._stats.fps, ms: this._stats.worstMs }) : translate(this.hass, "stats_idle")}</b>
@@ -4571,6 +4836,41 @@ export class Fp3dView3d extends LitElement {
         color: var(--fp3d-text);
         cursor: pointer;
         z-index: 4;
+      }
+      .fp3d-mic {
+        position: absolute;
+        bottom: calc(10px + var(--fp3d-bottom-inset, 0px));
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        border-radius: 50%;
+        border: 1px solid rgba(160, 240, 255, 0.35);
+        background: rgba(8, 16, 34, 0.7);
+        color: var(--fp3d-text);
+        cursor: pointer;
+        z-index: 4;
+      }
+      .fp3d-mic-on {
+        color: #ff5a6a;
+        border-color: #ff5a6a;
+        box-shadow: 0 0 12px rgba(255, 90, 106, 0.7);
+      }
+      .fp3d-mic-say {
+        position: absolute;
+        bottom: calc(54px + var(--fp3d-bottom-inset, 0px));
+        max-width: min(420px, calc(100% - 80px));
+        padding: 6px 12px;
+        border-radius: 14px;
+        background: rgba(8, 16, 34, 0.85);
+        border: 1px solid rgba(160, 240, 255, 0.35);
+        color: var(--fp3d-text);
+        font-size: 14px;
+        z-index: 4;
+      }
+      .fp3d-mic-err {
+        border-color: rgba(255, 90, 106, 0.7);
       }
       .fp3d-eye-clean {
         left: 12px;

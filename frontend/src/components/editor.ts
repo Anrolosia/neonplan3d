@@ -24,6 +24,8 @@ import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlan
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
+import { setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
+import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
 import { sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
@@ -73,6 +75,7 @@ import {
   type CustomButton,
   type MediaPreset,
   outdoorStanding,
+  outdoorZones,
   SLOPE_DIRS,
   type SlopeDir,
   spotGrid,
@@ -2860,7 +2863,8 @@ export class Fp3dEditor extends LitElement {
   /** Areas of a floor's Home Assistant floor that have no room in the plan yet. */
   private unplacedAreas(floor: Floor): HassArea[] {
     if (!floor.ha_floor) return [];
-    const used = new Set(this._doc.floors.flatMap((f) => f.rooms.map((r) => r.area_id)));
+    // an area that an outdoor area stands for (the garden) is placed too
+    const used = new Set(this._doc.floors.flatMap((f) => [...f.rooms.map((r) => r.area_id), ...(f.outdoor ?? []).map((a) => a.area_id ?? null)]));
     return Object.values(this.hass?.areas ?? {})
       .filter((a) => a.floor_id === floor.ha_floor && !used.has(a.area_id))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -4766,8 +4770,8 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** Place entities in the selected room; an entity already placed elsewhere moves here. */
-  private placeDevices(entityIds: string[]): void {
-    const room = this.room;
+  private placeDevices(entityIds: string[], zone?: Room): void {
+    const room = zone ?? this.room;
     if (!room || !entityIds.length || !this.isAdmin) return;
     const ids = new Set(entityIds);
     this.change((doc, floor) => {
@@ -4777,7 +4781,8 @@ export class Fp3dEditor extends LitElement {
       }
       const taken = [...floor.placements.map((pl) => [pl.x, pl.z] as Vec2), ...floor.furniture.filter((m) => isLamp(m.type)).map((m) => [m.x, m.z] as Vec2)];
       for (const pl of autoPlace(room, entityIds, taken)) {
-        if (!pl.entity_id.startsWith("light.")) {
+        // outside (an outdoor area acting as a room) a light stays a pin: no ceiling lamp over the lawn
+        if (!pl.entity_id.startsWith("light.") || room.outdoor) {
           floor.placements.push(pl);
           continue;
         }
@@ -5773,6 +5778,73 @@ export class Fp3dEditor extends LitElement {
     })}</g>`;
   }
 
+  /** An outdoor area like a room (#100): a Home Assistant area (with its devices) and a name for chip and 3D. */
+  private renderOutdoorZone(a: OutdoorArea) {
+    const admin = this.isAdmin;
+    const areas = Object.values(this.hass?.areas ?? {}).sort((x, y) => x.name.localeCompare(y.name));
+    return html`<label class="fp3d-field fp3d-wide" title=${this.t("outdoor_area_hint")}
+        >${this.t("area")}
+        <select
+          ?disabled=${!admin}
+          @change=${(e: Event) => {
+            const id = (e.target as HTMLSelectElement).value || null;
+            // the area's name is a good first name for the garden or terrace
+            const name = (a.name ?? "").trim() || (id ? (this.hass?.areas?.[id]?.name ?? null) : null);
+            this.updateOutdoor({ area_id: id, name: id ? name : a.name ?? null });
+          }}
+        >
+          <option value="" ?selected=${!a.area_id}>${this.t("no_area")}</option>
+          ${areas.map((x) => html`<option value=${x.area_id} ?selected=${x.area_id === a.area_id}>${x.name}</option>`)}
+        </select></label
+      >
+      ${a.area_id
+        ? html`<label class="fp3d-field fp3d-wide"
+            >${this.t("room_name")}
+            <input .value=${a.name ?? ""} ?disabled=${!admin} @change=${(e: Event) => this.updateOutdoor({ name: (e.target as HTMLInputElement).value.trim() || null })}
+          /></label>`
+        : nothing}
+      <p class="fp3d-sub fp3d-wide">${this.t("outdoor_area_hint")}</p>
+      ${a.area_id ? this.renderOutdoorDevices(a) : nothing}`;
+  }
+
+  /** The devices of an outdoor area's Home Assistant area, to place on it like a room's (#100). */
+  private renderOutdoorDevices(a: OutdoorArea) {
+    const hass = this.hass;
+    const floor = this.floor;
+    const zone = floor ? outdoorZones(floor).find((z) => z.id === a.id) : undefined;
+    if (!hass || !floor || !zone) return nothing;
+    const areaName = zone.area_id ? hass.areas?.[zone.area_id]?.name : undefined;
+    const groups = groupByDevice(hass, areaEntities(hass, zone.area_id).filter((id) => isPlaceable(kindOf(id))));
+    // placed as a pin, or as a lamp (a path light, a garden spot) with this light
+    const placed = new Set([
+      ...floor.placements.filter((pl) => pointInPolygon([pl.x, pl.z], zone.points)).map((pl) => pl.entity_id),
+      ...floor.furniture.filter((m) => isLamp(m.type) && m.entity && pointInPolygon([m.x, m.z], zone.points)).map((m) => m.entity!),
+    ]);
+    const open = groups.map((g) => g.primary).filter((id) => !placed.has(id));
+    if (!groups.length) return html`<p class="fp3d-sub fp3d-wide">${this.t("devices_none")}</p>`;
+    return html`<div class="fp3d-wide">
+      <h4 class="fp3d-lib-head">${this.t("devices")}</h4>
+      ${groups.map(
+        (g) => html`<div class="fp3d-row fp3d-dev-row">
+          <button class="fp3d-dev-name ${placed.has(g.primary) ? "" : "fp3d-muted"}" ?disabled=${!placed.has(g.primary)} @click=${() => this.selectItem("device", g.primary)}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d=${iconPath(kindOf(g.primary)!)} />
+            </svg>
+            <span>${entityName(hass, g.primary, areaName)}</span>
+          </button>
+          ${this.isAdmin
+            ? placed.has(g.primary)
+              ? html`<button class="fp3d-link" @click=${() => this.removeDevice(g.primary)}>${this.t("devices_remove")}</button>`
+              : html`<button class="fp3d-link" @click=${() => this.placeDevices([g.primary], zone)}>${this.t("devices_place")}</button>`
+            : nothing}
+        </div>`,
+      )}
+      ${this.isAdmin && open.length > 1
+        ? html`<button class="fp3d-link fp3d-place-all" @click=${() => this.placeDevices(open, zone)}>${this.t("devices_place_all_n", { n: open.length })}</button>`
+        : nothing}
+    </div>`;
+  }
+
   private renderOutdoorForm(a: OutdoorArea) {
     const admin = this.isAdmin;
     const rect = isAxisRect(a.points);
@@ -5794,6 +5866,7 @@ export class Fp3dEditor extends LitElement {
             ${OUTDOOR_TYPES.map((t) => html`<option value=${t} ?selected=${t === a.type}>${this.t(`out_${t}` as I18nKey)}</option>`)}
           </select></label
         >
+        ${outdoorStanding(a.type) ? nothing : this.renderOutdoorZone(a)}
         ${rect
           ? html`${this.len(this.t("x"), b.x0, (v) => setRect("x", v))} ${this.len(this.t("z"), b.z0, (v) => setRect("z", v))}
             ${this.len(this.t("width"), b.x1 - b.x0, (v) => setRect("w", v), 0.01, 0.1)} ${this.len(this.t("depth"), b.z1 - b.z0, (v) => setRect("d", v), 0.01, 0.1)}`
@@ -9664,7 +9737,7 @@ export class Fp3dEditor extends LitElement {
             : floor
               ? this.renderRoomList(floor)
               : nothing}
-      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing}
+      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing} ${this.renderVoice()}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
       ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderTerrain() : nothing}
@@ -10588,6 +10661,122 @@ export class Fp3dEditor extends LitElement {
               >start_view: { theta: ${set.theta}, phi: ${set.phi}, radius: ${set.radius}${set.target ? `, target: { x: ${set.target.x}, y: ${set.target.y}, z: ${set.target.z} }` : ""} }</code
             >`
         : nothing}
+    </details>`;
+  }
+
+  /**
+   * Kamera-Cockpit: the live director – which events a screen shows by itself (each off until switched on), and the
+   * switch for this device (a card has its own option).
+   */
+  private renderDirector() {
+    const hass = this.hass;
+    const d: DirectorSettings = this._doc.settings.director ?? {};
+    const set = (patch: Partial<DirectorSettings>) => this.change((doc) => (doc.settings.director = { ...(doc.settings.director ?? {}), ...patch }));
+    const pro = hasFeature("camera_cockpit");
+    const here = directorOnHere();
+    const placed = [...new Set(this._doc.floors.flatMap((f) => f.placements.map((p) => p.entity_id)))];
+    const bells = hass ? doorbellEntities(hass) : [];
+    const bell = hass ? (d.doorbell_entity ?? bells[0] ?? null) : null;
+    const autoCam = hass && bell ? doorbellCamera(hass, bell, placed) : null;
+    const check = (label: I18nKey, on: boolean, change: (on: boolean) => void, disabled = !pro) =>
+      html`<label class="fp3d-check fp3d-wide"
+        ><input type="checkbox" .checked=${on} ?disabled=${disabled} @change=${(e: Event) => change((e.target as HTMLInputElement).checked)} /> ${this.t(label)}</label
+      >`;
+    return html`<details class="fp3d-section">
+      <summary>🎬 ${this.t("director")}</summary>
+      <p class="fp3d-sub">${this.t("director_hint")}</p>
+      ${pro ? nothing : html`<p class="fp3d-sub">🔒 ${this.t("pro_feature_camera_cockpit")}</p>`}
+      <div class="fp3d-form">
+        ${check("director_here", here, (on) => {
+          setDirectorHere(on);
+          this.dispatchEvent(new CustomEvent("director-here", { bubbles: true, composed: true }));
+          this.requestUpdate();
+        })}
+        <p class="fp3d-sub fp3d-wide">${this.t("director_here_hint")}</p>
+        ${check("director_doorbell", !!d.doorbell, (on) => set({ doorbell: on }))}
+        ${d.doorbell && hass
+          ? html`${this.entitySelect(this.t("director_doorbell_entity"), d.doorbell_entity ?? null, bells[0] ?? null, this.entityOptions((id) => id.startsWith("event.") || id.startsWith("binary_sensor.")), (v) =>
+              set({ doorbell_entity: v === "none" ? null : v }),
+            )}
+            ${this.entitySelect(this.t("director_doorbell_camera"), d.doorbell_camera ?? null, autoCam, this.entityOptions((id) => id.startsWith("camera.") && placed.includes(id)), (v) =>
+              set({ doorbell_camera: v === "none" ? null : v }),
+            )}
+            ${!bells.length && !d.doorbell_entity ? html`<p class="fp3d-sub fp3d-wide">${this.t("director_no_doorbell")}</p>` : nothing}`
+          : nothing}
+        <label class="fp3d-field fp3d-wide"
+          >${this.t("director_motion")}
+          <select ?disabled=${!pro} @change=${(e: Event) => set({ motion: (e.target as HTMLSelectElement).value as DirectorSettings["motion"] })}>
+            ${(["off", "person", "all"] as const).map((m) => html`<option value=${m} ?selected=${(d.motion ?? "off") === m}>${this.t(`director_motion_${m}`)}</option>`)}
+          </select></label
+        >
+        ${check("director_appliances", !!d.appliances, (on) => set({ appliances: on }))}
+        ${check("director_alerts", !!d.alerts, (on) => set({ alerts: on }))}
+        ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}
+      </div>
+      <p class="fp3d-sub">${this.t("director_back_hint")}</p>
+    </details>`;
+  }
+
+  private voicePipes: { id: string; name: string; stt: boolean }[] | null = null;
+  private voicePipesAsked = false;
+
+  /** The Assist pipeline for this device's voice control: Home Assistant's preferred one, or one chosen here. */
+  private renderVoicePipeline() {
+    const hass = this.hass;
+    if (!hass) return nothing;
+    if (!this.voicePipesAsked) {
+      this.voicePipesAsked = true;
+      hass
+        .callWS<{ pipelines: { id: string; name: string; stt_engine: string | null }[] }>({ type: "assist_pipeline/pipeline/list" })
+        .then((res) => {
+          this.voicePipes = res.pipelines.map((p) => ({ id: p.id, name: p.name, stt: !!p.stt_engine }));
+          this.requestUpdate();
+        })
+        .catch(() => undefined);
+    }
+    const own = voicePipeline();
+    return html`<div class="fp3d-form">
+      <label class="fp3d-field fp3d-wide"
+        >${this.t("voice_pipeline")}
+        <select
+          @change=${(e: Event) => {
+            setVoicePipeline((e.target as HTMLSelectElement).value || null);
+            this.requestUpdate();
+          }}
+        >
+          <option value="" ?selected=${!own}>${this.t("voice_pipeline_preferred")}</option>
+          ${(this.voicePipes ?? []).map((p) => html`<option value=${p.id} ?selected=${own === p.id} ?disabled=${!p.stt}>${p.name}${p.stt ? "" : ` (${this.t("voice_pipeline_no_stt")})`}</option>`)}
+        </select></label
+      >
+    </div>`;
+  }
+
+  /** Voice control: the microphone button on this device (a card has its own option), and the microphone test. */
+  private renderVoice() {
+    const here = voiceOnHere();
+    return html`<details class="fp3d-section">
+      <summary>🎙️ ${this.t("voice")}</summary>
+      <p class="fp3d-sub">${this.t("voice_hint")}</p>
+      <div class="fp3d-form">
+        <label class="fp3d-check fp3d-wide"
+          ><input
+            type="checkbox"
+            .checked=${here}
+            @change=${(e: Event) => {
+              setVoiceHere((e.target as HTMLInputElement).checked);
+              this.dispatchEvent(new CustomEvent("voice-here", { bubbles: true, composed: true }));
+              this.requestUpdate();
+            }}
+          />
+          ${this.t("voice_here")}</label
+        >
+      </div>
+      ${this.renderVoicePipeline()}
+      <p class="fp3d-sub">${this.t("voice_needs")}</p>
+      <div class="fp3d-actions">
+        <button class="fp3d-btn" @click=${() => this.dispatchEvent(new CustomEvent("mic-probe", { bubbles: true, composed: true }))}>${this.t("director_mic_test")}</button>
+      </div>
+      <p class="fp3d-sub">${this.t("director_mic_hint")}</p>
     </details>`;
   }
 
