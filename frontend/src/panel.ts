@@ -21,6 +21,7 @@ import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
 import { directorOnHere } from "./director.ts";
+import { loadVoice, micProbeDone } from "./load-voice.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -85,6 +86,7 @@ export class Floorplan3dPanel extends LitElement {
     _accent: { state: true },
     _weather: { state: true },
     _director: { state: true },
+    _micProbe: { state: true },
   };
 
   declare hass: HomeAssistant;
@@ -139,6 +141,8 @@ export class Floorplan3dPanel extends LitElement {
   private declare _weather: boolean;
   /** Kamera-Cockpit: the live director works on this device (its own switch, default off). */
   private declare _director: boolean;
+  /** The microphone probe opened from the editor (the live director's section). */
+  private declare _micProbe: boolean;
 
   private readonly data = new BuildingController(this);
   /** Time travel (Pro): the last 24 hours replayed, read-only. */
@@ -189,6 +193,7 @@ export class Floorplan3dPanel extends LitElement {
     this._optsOpen = false;
     this._weather = prefs.get("weather") !== "0";
     this._director = directorOnHere();
+    this._micProbe = false;
   }
 
   private t(key: I18nKey, vars?: Record<string, string | number>): string {
@@ -515,6 +520,7 @@ export class Floorplan3dPanel extends LitElement {
     const saveState = this.data.saveState;
     return html`
       <div class="fp3d-app ${this._clean && this._mode === "view" ? "fp3d-clean" : ""}" style=${this._accent ? `--fp3d-accent:${this._accent}` : ""}>
+        ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${b} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
         ${this._clean && this._mode === "view" ? nothing : html`<header class="fp3d-header">
           <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
           <h1>NeonPlan 3D</h1>
@@ -766,6 +772,7 @@ export class Floorplan3dPanel extends LitElement {
       .packs=${this.data.packs}
       @packs-changed=${() => void this.data.reloadPacks()}
       @director-here=${() => (this._director = directorOnHere())}
+      @mic-probe=${() => loadVoice().then(() => (this._micProbe = true)).catch(() => undefined)}
       @open-extensions=${() => this.setMode("extensions")}
       @building-changed=${(e: CustomEvent<{ building: Building }>) => this.data.edit(e.detail.building)}
     ></fp3d-editor>`;

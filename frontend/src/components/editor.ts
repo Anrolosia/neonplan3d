@@ -10713,6 +10713,10 @@ export class Fp3dEditor extends LitElement {
         ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}
       </div>
       <p class="fp3d-sub">${this.t("director_back_hint")}</p>
+      <div class="fp3d-actions">
+        <button class="fp3d-btn" @click=${() => this.dispatchEvent(new CustomEvent("mic-probe", { bubbles: true, composed: true }))}>🎙️ ${this.t("director_mic_test")}</button>
+      </div>
+      <p class="fp3d-sub">${this.t("director_mic_hint")}</p>
     </details>`;
   }
 

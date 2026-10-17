@@ -16,11 +16,24 @@ export function loadVoice(): Promise<typeof VoiceBundle> {
   return loading;
 }
 
-/** Whether the microphone probe was asked for in the address ("?fp3d_mic=1"). */
+/**
+ * Whether the microphone probe was asked for in the address ("?fp3d_mic=1", also after "#"). Remembered for this tab:
+ * Home Assistant may drop the parameter when it forwards to a dashboard.
+ */
 export function micProbeAsked(): boolean {
   try {
-    return new URLSearchParams(location.search).get("fp3d_mic") === "1";
+    if (/[?&#]fp3d_mic=1/.test(location.href)) sessionStorage.setItem("neonplan3d.mic", "1");
+    return sessionStorage.getItem("neonplan3d.mic") === "1";
   } catch {
     return false;
+  }
+}
+
+/** The probe closed: it does not open again in this tab. */
+export function micProbeDone(): void {
+  try {
+    sessionStorage.removeItem("neonplan3d.mic");
+  } catch {
+    // private mode
   }
 }

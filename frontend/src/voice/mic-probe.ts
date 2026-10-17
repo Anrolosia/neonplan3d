@@ -297,9 +297,9 @@ export class MicProbe extends LitElement {
 
   static styles = css`
     :host {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 30;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;

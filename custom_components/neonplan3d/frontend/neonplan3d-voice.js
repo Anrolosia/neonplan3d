@@ -18,9 +18,9 @@ var R=globalThis,z=R.ShadowRoot&&(R.ShadyCSS===void 0||R.ShadyCSS.nativeShadow)&
       </div>
     </div>`}static styles=V`
     :host {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      z-index: 30;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
