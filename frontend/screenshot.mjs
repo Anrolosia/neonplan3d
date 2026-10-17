@@ -148,7 +148,7 @@ const shots = [
   { name: "view-high", query: "", width: 1280, height: 800, click: "Hoch", then: "Bad" },
   { name: "view-garden", query: "", width: 1280, height: 800, click: "Gestapelt" },
   { name: "view-sun", query: "", width: 1280, height: 800, click: "Erdgeschoss", then: "Schlafzimmer" },
-  { name: "view-heat", query: "", width: 1280, height: 800, click: "Temp.", then: "Erdgeschoss" },
+  { name: "view-heat", query: "", width: 1280, height: 800, click: "Erdgeschoss", then: "Anzeige", thenAlso: ["Temp."] },
   { name: "view-blueprint", query: "", width: 1280, height: 800, click: "Blueprint", then: "Erdgeschoss" },
   { name: "view-day", query: "", width: 1280, height: 800, click: "Tag", then: "Erdgeschoss" },
   { name: "view-day-house", query: "", width: 1280, height: 800, click: "Tag" },
@@ -472,6 +472,7 @@ for (const shot of shots.filter((s) => !only || only.includes(s.name))) {
   if (shot.select) await clickText(shot.select);
   if (shot.click) await clickText(shot.click);
   if (shot.then) await clickText(shot.then);
+  for (const t of shot.thenAlso ?? []) await clickText(t);
   if (shot.tapAt) {
     await page.mouse.click(shot.tapAt[0], shot.tapAt[1]);
     await new Promise((r) => setTimeout(r, 900));
@@ -551,10 +552,10 @@ for (const shot of shots.filter((s) => !only || only.includes(s.name))) {
       }
       // DEBUG_VIEW="<code using v>" prints what the panel's 3D view says after the switch
       if (process.env.DEBUG_VIEW) {
-        const out = await page.evaluate((code) => {
+        const out = await page.evaluate(async (code) => {
           const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
           try {
-            return String(new Function("v", "return " + code)(v));
+            return String(await new Function("v", "return " + code)(v));
           } catch (err) {
             return "ERROR " + err.message;
           }
