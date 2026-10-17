@@ -621,6 +621,48 @@ Ein Tipp auf die Kamera oder auf ihren Sichtkegel öffnet das Standbild, das sic
 
 ![Kamera-Standbild](images/view-camera.jpg)
 
+### 5.10 Sprachsteuerung (neu)
+
+> **Neu in 1.20 und noch in Entwicklung.** Die Sprachsteuerung ist für alle freigeschaltet, kostenlos, und funktioniert schon gut. Sie wird in den nächsten Versionen weiter ausgebaut. Wenn ein Satz nicht so verstanden wird, wie du ihn meinst, schreib uns den Satz in den Discord oder in ein GitHub-Issue.
+
+Sprich mit deinem Haus. Unten links in der 3D-Ansicht erscheint ein **Mikrofon-Knopf** 🎙️. Antippen, dann wird er rot und darüber steht „Ich höre zu …“. Sprich deinen Satz und mach eine kurze Pause, dann reagiert NeonPlan.
+
+**Was du sagen kannst:**
+
+| Du sagst | Was passiert |
+|---|---|
+| „Zeig das Wohnzimmer“, „Geh in die Küche“ oder einfach „Bad“ | Der Raum öffnet sich, auf seiner Etage. |
+| „Zeig das Obergeschoss“, „Keller“ | Die Etage öffnet sich. |
+| „Zeig das ganze Haus“ | Zurück zur Hausansicht. |
+| „Zeig den Garten“, „Terrasse“ | Eine Außenfläche mit Namen und Bereich öffnet sich wie ein Raum. |
+| „Zeig die Waschmaschine“, „Wo ist die Stehlampe?“ | Die Ansicht fliegt zum Gerät, und es blinkt kurz auf. |
+| „Zeig die Kamera Haustür“, „Zeig die Kamera im Garten“ | Die Ansicht schaut durch die Kamera (mit dem Kamera-Cockpit). |
+| „Zeig die Kameras“ | Die Kamera-Wand öffnet sich (mit dem Kamera-Cockpit). |
+| „Licht im Flur an“, „Wie warm ist es draußen?“ | Alles andere geht an **Assist** von Home Assistant. Die Antwort erscheint als Sprechblase. |
+
+NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen und Geräte. Ein Raum hört auch auf den Namen seines Home-Assistant-Bereichs. Bei Geräten braucht es ein „zeig“ oder „wo ist“. So bleibt „Licht im Wohnzimmer an“ ein Befehl für Assist und schaltet das Licht, statt nur hinzufliegen.
+
+**Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
+
+- **NeonPlan-Seite (Panel):** Editor → **🎙️ Sprachsteuerung** → **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet, aber nicht das Handy.
+- **Dashboard-Karte:** Dashboard bearbeiten → NeonPlan-Karte → **Funktionen** → **Sprachsteuerung (Mikrofon-Knopf)**, oder im YAML `voice: true`. Die Karten-Einstellung gilt auf allen Geräten, die dieses Dashboard zeigen. Du kannst sie bequem am PC setzen, auch wenn sie für das Tablet gedacht ist.
+
+**Was du dafür brauchst:**
+
+1. **Eine Assist-Pipeline mit Spracherkennung** in Home Assistant: Einstellungen → Sprachassistenten. Gut geeignet sind Home Assistant Cloud, Whisper oder **Speech-to-Phrase**, das lokal und schnell ist, auch auf einem Raspberry Pi. NeonPlan nimmt die **bevorzugte** Pipeline, also die mit dem Stern. Unter **Assist-Pipeline auf diesem Gerät** kannst du pro Gerät eine andere wählen.
+2. **https:** Browser geben das Mikrofon nur auf sicheren Seiten frei. Über `http://192.168…` geht es nicht, über Nabu Casa, ein eigenes Zertifikat oder einen Reverse Proxy schon.
+3. **Die Mikrofon-Freigabe:**
+   - im Browser beim ersten Antippen „Zulassen“;
+   - in **Fully Kiosk**: Einstellungen → Web Content Settings → Mikrofonzugriff einschalten (Plus-Lizenz), dazu in Android die Mikrofon-Berechtigung für Fully.
+
+**Testen:** Im Abschnitt **🎙️ Sprachsteuerung** startet **🎙️ Mikrofon testen** eine Probe. Sie prüft der Reihe nach https, Mikrofon, Pegel und Assist. Sie zeigt auch, welchen Raum ein gesprochener Satz öffnen würde, und schaltet dabei nichts. Steht irgendwo ein ✖, steht daneben, was zu tun ist.
+
+**Gut zu wissen:**
+
+- Das Mikrofon ist **nur offen, solange du sprichst**. Es lauscht nicht dauerhaft, deshalb gibt es kein Aktivierungswort. Das schont auch alte Tablets.
+- Die Erkennung übernimmt **deine** Assist-Pipeline. Wie schnell und genau sie ist, hängt von ihr ab. Mit Speech-to-Phrase oder der Cloud dauert ein Satz meist ein bis zwei Sekunden.
+- Hast du die Live-Regie an, unterbricht sie dich nicht, während du sprichst.
+
 ---
 
 ## 6. Pro-Erweiterungen
@@ -1034,23 +1076,7 @@ NeonPlan 3D ist für Wandtablets wie das Amazon Fire gebaut:
 
 **Tipps für Fire-Tablets:** Fully Kiosk Browser mit Hardwarebeschleunigung nutzen, die Karte mit `fill: true` bildschirmfüllend zeigen und `quality: auto` lassen.
 
-**Sprachsteuerung:** Ein Mikrofon-Knopf unten links in der 3D-Ansicht. Antippen und sprechen:
-
-- **„Zeig das Wohnzimmer“**, **„geh ins Obergeschoss“**, **„das ganze Haus“** oder einfach **„Küche“** öffnet den Ort. Erkannt werden die Namen der Räume, Außenflächen und Etagen in deinem Plan sowie die Namen der Home-Assistant-Bereiche.
-- **Geräte und Kameras:** **„Zeig die Waschmaschine“** oder **„Wo ist die Stehlampe“** fliegt zum Gerät und lässt es aufblinken. **„Zeig die Kamera Haustür“** oder **„Zeig die Kamera im Garten“** schaut durch die Kamera, **„Zeig die Kameras“** öffnet die Kamera-Wand. Beides gehört zum Kamera-Cockpit, ohne das fliegt die Ansicht nur zur Kamera. Bei Geräten braucht es ein „zeig“ oder „wo ist“, denn „Flurlicht an“ ist ein Befehl für Assist.
-- **Alles andere** geht an Assist von Home Assistant, z. B. „Licht im Flur an“. Die Antwort erscheint als Sprechblase.
-
-Einschalten: Editor → **🎙️ Sprachsteuerung** → **Auf diesem Gerät einschalten**. Auf einer Dashboard-Karte schaltest du stattdessen **Sprachsteuerung** in den Karten-Einstellungen ein (`voice: true`).
-
-Dafür brauchst du:
-
-- **https:** Über http gibt der Browser das Mikrofon nicht frei.
-- **Freigabe des Mikrofons:** in Fully Kiosk unter Web Content Settings → Mikrofonzugriff, dazu die Android-Berechtigung.
-- **Eine Assist-Pipeline mit Spracherkennung**, z. B. Home Assistant Cloud, Whisper oder Speech-to-Phrase.
-
-NeonPlan nimmt die **bevorzugte Pipeline** aus Home Assistant (Einstellungen → Sprachassistenten, die mit dem Stern). Unter **Assist-Pipeline auf diesem Gerät** kannst du für jedes Gerät eine andere wählen.
-
-Das Mikrofon ist nur offen, solange du sprichst. **🎙️ Mikrofon testen** im selben Abschnitt prüft alles Schritt für Schritt.
+**Sprachsteuerung:** Auf dem Wandtablet sprichst du mit NeonPlan über einen Mikrofon-Knopf, z. B. „Zeig das Wohnzimmer“. Alles dazu steht in [5.10 Sprachsteuerung](#510-sprachsteuerung-neu).
 
 ---
 

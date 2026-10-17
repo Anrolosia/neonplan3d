@@ -621,6 +621,48 @@ A tap on the camera or on its wedge opens the snapshot, which refreshes every fe
 
 ![Camera snapshot](images/view-camera.jpg)
 
+### 5.10 Voice control (new)
+
+> **New in 1.20 and still in development.** Voice control is switched on for everyone, free, and already works well. It will grow over the next versions. If a sentence is not understood the way you mean it, send us the sentence on Discord or in a GitHub issue.
+
+Talk to your house. A **microphone button** 🎙️ appears at the bottom left of the 3D view. Tap it: it turns red and "Listening …" shows above it. Say your sentence and pause briefly, and NeonPlan responds.
+
+**What you can say:**
+
+| You say | What happens |
+|---|---|
+| "Show the living room", "Go to the kitchen" or just "Bathroom" | The room opens, on its floor. |
+| "Show the upper floor", "Cellar" | The floor opens. |
+| "Show the whole house" | Back to the house view. |
+| "Show the garden", "Terrace" | An outdoor area with a name and an area opens like a room. |
+| "Show the washing machine", "Where is the floor lamp?" | The view flies to the device and it flashes. |
+| "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
+| "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
+| "Turn on the hall light", "How warm is it outside?" | Anything else goes to Home Assistant's **Assist**. The answer shows as a speech bubble. |
+
+NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors and devices. A room also answers to the name of its Home Assistant area. Devices need a "show" or "where is", so "turn on the living room light" stays a command for Assist and switches the light instead of flying there.
+
+**Switching it on.** Voice control is off by default. You switch it on where you want to speak:
+
+- **NeonPlan page (panel):** editor → **🎙️ Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
+- **Dashboard card:** edit the dashboard → NeonPlan card → **Features** → **Voice control (microphone button)**, or `voice: true` in YAML. The card setting applies on every device that shows this dashboard, so you can set it on the PC even when it is meant for the tablet.
+
+**What you need:**
+
+1. **An Assist pipeline with speech to text** in Home Assistant: Settings → Voice assistants. Home Assistant Cloud, Whisper or **Speech-to-Phrase** (local and fast, even on a Raspberry Pi) all work well. NeonPlan uses the **preferred** pipeline, the starred one. Under **Assist pipeline on this device** you can choose another one per device.
+2. **https:** browsers only give out the microphone on secure pages. It does not work over `http://192.168…`, but it does over Nabu Casa, your own certificate or a reverse proxy.
+3. **The microphone allowed:**
+   - in the browser, "Allow" on the first tap;
+   - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access (Plus licence), plus Fully's microphone permission in Android.
+
+**Testing:** in the **🎙️ Voice control** section, **🎙️ Test the microphone** starts a probe. It checks https, the microphone, the level and Assist one after the other. It also shows which room a spoken sentence would open, and switches nothing while doing so. Wherever there is a ✖, the fix stands next to it.
+
+**Good to know:**
+
+- The microphone is **only open while you speak**. It does not listen all the time, so there is no wake word. That also spares old tablets.
+- Speech to text is done by **your** Assist pipeline, so how fast and accurate it is depends on that pipeline. With Speech-to-Phrase or the cloud a sentence usually takes one to two seconds.
+- If the live director is on, it does not interrupt you while you speak.
+
 ---
 
 ## 6. Pro add-ons
@@ -1034,23 +1076,7 @@ NeonPlan 3D is built for wall tablets such as the Amazon Fire:
 
 **Tips for Fire tablets:** Use Fully Kiosk Browser with hardware acceleration, show the card full screen with `fill: true` and keep `quality: auto`.
 
-**Voice control:** a microphone button at the bottom left of the 3D view. Tap it and speak:
-
-- **"Show the living room"**, **"go to the upper floor"**, **"the whole house"** or simply **"kitchen"** opens the place. It knows the names of the rooms, outdoor areas and floors in your plan, and the names of the Home Assistant areas.
-- **Devices and cameras:** **"Show the washing machine"** or **"Where is the floor lamp"** flies to the device and makes it flash. **"Show the front door camera"** or **"Show the camera in the garden"** looks through the camera, **"Show the cameras"** opens the camera wall. Both belong to the Camera Cockpit; without it the view only flies to the camera. Devices need a "show" or "where is", because "hall light on" is a command for Assist.
-- **Anything else** goes to Home Assistant's Assist, e.g. "turn on the hall light". The answer shows as a speech bubble.
-
-To switch it on: editor → **🎙️ Voice control** → **Switch on on this device**. On a dashboard card you switch on **Voice control** in the card settings instead (`voice: true`).
-
-You need:
-
-- **https:** over http the browser does not give out the microphone.
-- **The microphone allowed:** in Fully Kiosk under Web Content Settings → microphone access, plus the Android permission.
-- **An Assist pipeline with speech to text**, e.g. Home Assistant Cloud, Whisper or Speech-to-Phrase.
-
-NeonPlan uses Home Assistant's **preferred pipeline** (Settings → Voice assistants, the starred one). Under **Assist pipeline on this device** you can choose another one for each device.
-
-The microphone is only open while you speak. **🎙️ Test the microphone** in the same section checks everything step by step.
+**Voice control:** on the wall tablet you talk to NeonPlan with a microphone button, e.g. "Show the living room". Everything about it is in [5.10 Voice control](#510-voice-control-new).
 
 ---
 
