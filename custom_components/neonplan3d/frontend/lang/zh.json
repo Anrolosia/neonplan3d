@@ -1882,5 +1882,7 @@
  "director_mic_hint": "在此设备上检查 https、麦克风和 Assist 语音识别，并显示一句话会打开哪个房间。不会切换任何设备。",
  "voice_pipeline": "此设备上的 Assist 管道",
  "voice_pipeline_preferred": "Home Assistant 中的首选管道",
- "voice_pipeline_no_stt": "无语音识别"
+ "voice_pipeline_no_stt": "无语音识别",
+ "beta_ready": "已为你准备好——在下方的包中安装。",
+ "beta_supporter_missing": "作为支持者，你可以获得此测试版。它还不在你的密钥上——请在 Discord 上告诉我们，我们会为你解锁。"
 }

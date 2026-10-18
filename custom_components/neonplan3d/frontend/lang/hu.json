@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Ellenőrzi ezen az eszközön a https-t, a mikrofont és az Assist beszédfelismerését, és megmutatja, melyik szobát nyitná meg egy mondat. Semmi nem kapcsol.",
  "voice_pipeline": "Assist-folyamat ezen az eszközön",
  "voice_pipeline_preferred": "Az előnyben részesített a Home Assistantban",
- "voice_pipeline_no_stt": "beszédfelismerés nélkül"
+ "voice_pipeline_no_stt": "beszédfelismerés nélkül",
+ "beta_ready": "Elkészült neked – telepítsd lent a csomagjaid között.",
+ "beta_supporter_missing": "Támogatóként megkapod ezt a bétát. Még nincs a kulcsodon – írj nekünk Discordon, és feloldjuk."
 }

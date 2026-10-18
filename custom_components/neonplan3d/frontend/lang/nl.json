@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Controleert op dit apparaat https, de microfoon en de spraakherkenning van Assist, en toont welke kamer een zin zou openen. Er wordt niets geschakeld.",
  "voice_pipeline": "Assist-pipeline op dit apparaat",
  "voice_pipeline_preferred": "Voorkeur in Home Assistant",
- "voice_pipeline_no_stt": "zonder spraakherkenning"
+ "voice_pipeline_no_stt": "zonder spraakherkenning",
+ "beta_ready": "Staat voor je klaar – installeer hem hieronder bij je packs.",
+ "beta_supporter_missing": "Als supporter krijg je deze bèta. Hij staat nog niet op je sleutel – stuur ons een berichtje op Discord, dan zetten we hem vrij."
 }

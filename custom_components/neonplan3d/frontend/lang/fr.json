@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Vérifie sur cet appareil https, le micro et la reconnaissance vocale d'Assist, et montre quelle pièce une phrase ouvrirait. Rien n'est commandé.",
  "voice_pipeline": "Pipeline Assist sur cet appareil",
  "voice_pipeline_preferred": "Celui préféré dans Home Assistant",
- "voice_pipeline_no_stt": "sans reconnaissance vocale"
+ "voice_pipeline_no_stt": "sans reconnaissance vocale",
+ "beta_ready": "Prêt pour vous – installez-le ci-dessous avec vos packs.",
+ "beta_supporter_missing": "En tant que supporter, vous recevez cette bêta. Elle n'est pas encore sur votre clé – écrivez-nous sur Discord et nous l'activerons."
 }

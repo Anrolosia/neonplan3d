@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Kontrollerar https, mikrofonen och Assists taligenkänning på den här enheten och visar vilket rum en mening skulle öppna. Inget styrs.",
  "voice_pipeline": "Assist-pipeline på den här enheten",
  "voice_pipeline_preferred": "Den föredragna i Home Assistant",
- "voice_pipeline_no_stt": "utan taligenkänning"
+ "voice_pipeline_no_stt": "utan taligenkänning",
+ "beta_ready": "Redo för dig – installera den nedan med dina paket.",
+ "beta_supporter_missing": "Som supporter får du den här betan. Den finns inte på din nyckel än – skriv till oss på Discord så låser vi upp den."
 }

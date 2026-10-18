@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Verifică pe acest dispozitiv https, microfonul și recunoașterea vocală Assist și arată ce cameră ar deschide o propoziție. Nu se comandă nimic.",
  "voice_pipeline": "Pipeline Assist pe acest dispozitiv",
  "voice_pipeline_preferred": "Cel preferat în Home Assistant",
- "voice_pipeline_no_stt": "fără recunoaștere vocală"
+ "voice_pipeline_no_stt": "fără recunoaștere vocală",
+ "beta_ready": "Gata pentru tine – instalează mai jos, la pachetele tale.",
+ "beta_supporter_missing": "Ca supporter primești această beta. Nu este încă pe cheia ta – scrie-ne pe Discord și o deblocăm."
 }
