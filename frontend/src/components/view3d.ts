@@ -2036,10 +2036,13 @@ export class Fp3dView3d extends LitElement {
     const intent = this.mediaIntent.get(m.id);
     if (intent && (intent.playing === m.playing || Date.now() - intent.at > 30000)) this.mediaIntent.delete(m.id);
     const playing = this.mediaIntent.get(m.id)?.playing ?? m.playing;
+    // a player that can pause but does not report "play" (an Echo through Alexa Media Player, #400) still resumes:
+    // ▶ stays on and sends play_pause there – a greyed-out ▶ after ⏸ sent nothing at all
+    const canPlay = can(16384) || can(1);
     const playPause = () => {
       this.mediaIntent.set(m.id, { playing: !playing, at: Date.now() });
       this.requestUpdate();
-      call(playing ? "media_pause" : "media_play");
+      call(playing ? "media_pause" : can(16384) ? "media_play" : "media_play_pause");
     };
     // the dragged volume shows at once and is sent while dragging (at most every 350 ms) and on release;
     // it stays until the player reports it (a cloud speaker like an Echo answers late), at most 30 s
@@ -2067,7 +2070,7 @@ export class Fp3dView3d extends LitElement {
         ${open && !this.ro
           ? html`<div class="fp3d-holo-media-controls">
                 <button aria-label=${t("previous")} ?disabled=${!can(16)} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_previous_track"))} @click=${press.key(() => call("media_previous_track"))}>⏮</button>
-                <button aria-label=${t("play_pause")} ?disabled=${playing ? !can(1) : !can(16384)} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${playing ? "⏸" : "▶"}</button>
+                <button aria-label=${t("play_pause")} ?disabled=${playing ? !can(1) : !canPlay} @pointerdown=${press.down} @pointerup=${press.up(playPause)} @click=${press.key(playPause)}>${playing ? "⏸" : "▶"}</button>
                 <button aria-label=${t("next")} ?disabled=${!can(32)} @pointerdown=${press.down} @pointerup=${press.up(() => call("media_next_track"))} @click=${press.key(() => call("media_next_track"))}>⏭</button>
                 <input
                   type="range"

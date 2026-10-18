@@ -3,7 +3,7 @@ import { test } from "node:test";
 import type { BufferGeometry } from "three";
 import type { Floor, Furniture, Opening, Room } from "../model.ts";
 import { newFloor } from "../model.ts";
-import { buildFloorGeometry, clipAlong, stairHoles } from "./build.ts";
+import { buildFloorGeometry, clipAlong, stairHoles, stairHoleParts } from "./build.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -175,4 +175,17 @@ test("a stairwell opening cuts a hole into its own floor; stairs below reaching 
   const solid = area(buildFloorGeometry(upper, EXT, INT).floor);
   const cut = area(buildFloorGeometry(upper, EXT, INT, holes).floor);
   assert.ok(solid - cut > 4.4 && solid - cut < 4.6, `${solid - cut}`);
+});
+
+test("a stairwell joined with the stairs' own hole is cut even where the two reach past the room (#375)", () => {
+  // two rooms upstairs; the stairwell lies in the first, the tall stairs below reach a little into the second
+  const upper = floorWith([rect("a", 0, 0, 6, 4.5), rect("b", 0, 4.5, 6, 8)]);
+  upper.elevation = 2.75;
+  upper.furniture.push({ id: "w", type: "stairwell", x: 3, z: 3.65, rotation: 0, w: 2, d: 1, h: 0.005, variant: null });
+  const lower = floorWith([rect("c", 0, 0, 6, 8)]);
+  lower.furniture.push({ id: "s", type: "stairs", x: 3, z: 4.2, rotation: 0, w: 2, d: 1.95, h: 3.5, variant: null });
+  const solid = area(buildFloorGeometry(upper, EXT, INT).floor);
+  const cut = area(buildFloorGeometry(upper, EXT, INT, stairHoleParts([lower, upper], upper)).floor);
+  // the union of both openings: x 2–4, z 3.15–5.175 (2 × 2.025 m), minus the 3 mm inset
+  assert.ok(solid - cut > 3.9 && solid - cut < 4.06, `${solid - cut}`);
 });
