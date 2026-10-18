@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Cel preferat în Home Assistant",
  "voice_pipeline_no_stt": "fără recunoaștere vocală",
  "beta_ready": "Gata pentru tine – instalează mai jos, la pachetele tale.",
- "beta_supporter_missing": "Ca supporter primești această beta. Nu este încă pe cheia ta – scrie-ne pe Discord și o deblocăm."
+ "beta_supporter_missing": "Ca supporter primești această beta. Nu este încă pe cheia ta – scrie-ne pe Discord și o deblocăm.",
+ "voice_silent": "Microfonul dă doar liniște. De obicei îl ține ocupat altă aplicație – în Fully Kiosk oprește detectarea acustică a mișcării (Motion Detection → Acoustic Detection) și reîncarcă."
 }

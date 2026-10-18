@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Den foretrukne i Home Assistant",
  "voice_pipeline_no_stt": "uten talegjenkjenning",
  "beta_ready": "Klar for deg – installer den nedenfor med pakkene dine.",
- "beta_supporter_missing": "Som supporter får du denne betaen. Den er ikke på nøkkelen din ennå – skriv til oss på Discord, så låser vi den opp."
+ "beta_supporter_missing": "Som supporter får du denne betaen. Den er ikke på nøkkelen din ennå – skriv til oss på Discord, så låser vi den opp.",
+ "voice_silent": "Mikrofonen gir bare stillhet. Som regel holder en annen app den – slå av akustisk bevegelsesdeteksjon i Fully Kiosk (Motion Detection → Acoustic Detection) og last inn på nytt."
 }

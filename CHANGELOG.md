@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.20.2
+
+### Fixed
+
+- Floor opening not cut when the stairs below reach higher than the floor and their own hole, joined with the opening, reached past the room – now each opening is cut room by room and joined afterwards (#375).
+- Media card: ▶ after ⏸ was greyed out on players that can pause but do not report "play" (an Echo through Alexa Media Player) and sent nothing; it now resumes with play/pause (#400).
+- Voice control on Android tablets: the audio was taken before the tap had started it, so some WebViews recorded silence; and when only silence comes in (the microphone held by another app, e.g. Fully's acoustic motion detection), it now says so (#579).
+
+### Improved
+
+- Outdoor areas like rooms: their device list in the editor has the room list's buttons – ☆ for the room panel without placing, 👁 hide, Aa without state (#597).
+
 ## 1.20.1
 
 ### Fixed

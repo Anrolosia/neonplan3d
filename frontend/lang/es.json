@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "La preferida en Home Assistant",
  "voice_pipeline_no_stt": "sin reconocimiento de voz",
  "beta_ready": "Listo para ti – instálalo abajo con tus paquetes.",
- "beta_supporter_missing": "Como supporter recibes esta beta. Aún no está en tu clave – escríbenos en Discord y la activamos."
+ "beta_supporter_missing": "Como supporter recibes esta beta. Aún no está en tu clave – escríbenos en Discord y la activamos.",
+ "voice_silent": "El micrófono solo da silencio. Normalmente otra app lo ocupa – en Fully Kiosk desactiva la detección acústica de movimiento (Motion Detection → Acoustic Detection) y recarga."
 }

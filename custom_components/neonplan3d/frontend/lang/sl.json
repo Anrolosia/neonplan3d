@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Prednostni v Home Assistantu",
  "voice_pipeline_no_stt": "brez prepoznavanja govora",
  "beta_ready": "Pripravljeno zate – namesti spodaj pri svojih paketih.",
- "beta_supporter_missing": "Kot podpornik dobiš to beto. Na tvojem ključu je še ni – piši nam na Discordu in jo odklenemo."
+ "beta_supporter_missing": "Kot podpornik dobiš to beto. Na tvojem ključu je še ni – piši nam na Discordu in jo odklenemo.",
+ "voice_silent": "Mikrofon daje samo tišino. Običajno ga zaseda druga aplikacija – v Fully Kiosk izklopi zvočno zaznavanje gibanja (Motion Detection → Acoustic Detection) in znova naloži."
 }

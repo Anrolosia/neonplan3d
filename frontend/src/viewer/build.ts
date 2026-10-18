@@ -151,12 +151,15 @@ export function buildFloorGeometry(
     const top = new Color(look.color);
     // an opening snapped to the room's edge is still cut, a few millimetres in from it
     // an opening across a room line is cut in every room it covers: here, the part inside this room (#353)
-    const inside = holes.flatMap((h) => {
-      if (holeInRoom(h, poly)) return [insetHole(h, 0.003)];
+    // the openings are clipped one by one and only then merged: an opening joined with the stairs' own hole before
+    // (overlapping, no longer convex) and reaching past the room was not cut at all (#375)
+    const parts = holes.flatMap((h) => {
+      if (holeInRoom(h, poly)) return [h];
       if (!isConvex(h)) return [];
       const part = clipConvex(poly, h);
-      return part.length >= 3 && Math.abs(polygonArea(part)) > 0.01 ? [insetHole(ccw(part), 0.003)] : [];
+      return part.length >= 3 && Math.abs(polygonArea(part)) > 0.01 ? [ccw(part)] : [];
     });
+    const inside = mergeHoles(parts).map((h) => insetHole(ccw(h), 0.003));
     cutHoles.push(...inside);
     const all = [...poly, ...inside.flat()];
     const start = floorBuf.count;
@@ -602,15 +605,20 @@ function buildShadow(edges: OutlineEdge[], rooms: readonly Room[], spans: Map<Wa
 
 /** Ceiling openings of a floor: stairs on the floor directly below that reach up to it. */
 export function stairHoles(floors: readonly Floor[], floor: Floor): Vec2[][] {
+  return mergeHoles(stairHoleParts(floors, floor));
+}
+
+/** The openings of a floor one by one (each convex), for cutting them room by room before merging them. */
+export function stairHoleParts(floors: readonly Floor[], floor: Floor): Vec2[][] {
   // a stairwell opening placed on this floor cuts its floor; stairs below that reach up here do too
   const own = floor.furniture.filter((f) => f.type === "stairwell").map(furnitureFootprint);
   const below = floors.filter((f) => f.elevation < floor.elevation).sort((p, q) => q.elevation - p.elevation)[0];
-  if (!below) return mergeHoles(own);
+  if (!below) return own;
   const stairs = below.furniture
     .filter((f) => (STAIR_TYPES.has(f.type) || packItem(f.type)?.hole) && below.elevation + f.h >= floor.elevation - 0.3)
     .map(furnitureFootprint);
-  // overlapping openings become one outline (an L-shaped stairwell made of two)
-  return mergeHoles([...own, ...stairs]);
+  // overlapping openings become one outline (an L-shaped stairwell made of two) – after cutting, room by room
+  return [...own, ...stairs];
 }
 
 /** How tall a wall stands: its own height (a low wall, a counter), never above the floor height. */

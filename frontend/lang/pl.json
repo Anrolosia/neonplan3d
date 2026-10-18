@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Preferowany w Home Assistant",
  "voice_pipeline_no_stt": "bez rozpoznawania mowy",
  "beta_ready": "Gotowe dla ciebie – zainstaluj poniżej razem z pakietami.",
- "beta_supporter_missing": "Jako supporter dostajesz tę betę. Nie ma jej jeszcze na twoim kluczu – napisz do nas na Discordzie, a ją odblokujemy."
+ "beta_supporter_missing": "Jako supporter dostajesz tę betę. Nie ma jej jeszcze na twoim kluczu – napisz do nas na Discordzie, a ją odblokujemy.",
+ "voice_silent": "Mikrofon daje tylko ciszę. Zwykle trzyma go inna aplikacja – w Fully Kiosk wyłącz akustyczne wykrywanie ruchu (Motion Detection → Acoustic Detection) i przeładuj."
 }

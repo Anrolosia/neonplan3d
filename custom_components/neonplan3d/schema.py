@@ -461,6 +461,10 @@ OUTDOOR_SCHEMA = vol.Schema(
         # an outdoor area like a room (#100): its name and Home Assistant area
         vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=80))),
         vol.Optional("area_id", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # like a room's: entities pinned to its panel, kept out of it, or shown without their state (#597)
+        vol.Optional("panel"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=100)),
+        vol.Optional("hidden"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=200)),
+        vol.Optional("no_state"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=200)),
     },
     extra=vol.ALLOW_EXTRA,
 )
