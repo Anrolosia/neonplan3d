@@ -5821,17 +5821,51 @@ export class Fp3dEditor extends LitElement {
       ...floor.furniture.filter((m) => isLamp(m.type) && m.entity && pointInPolygon([m.x, m.z], zone.points)).map((m) => m.entity!),
     ]);
     const open = groups.map((g) => g.primary).filter((id) => !placed.has(id));
+    const pinned = new Set(a.panel ?? []);
+    const hidden = new Set(a.hidden ?? []);
+    const noState = new Set(a.no_state ?? []);
+    const flip = (list: Set<string>, id: string) => (list.has(id) ? [...list].filter((x) => x !== id) : [...list, id]);
     if (!groups.length) return html`<p class="fp3d-sub fp3d-wide">${this.t("devices_none")}</p>`;
     return html`<div class="fp3d-wide">
       <h4 class="fp3d-lib-head">${this.t("devices")}</h4>
       ${groups.map(
-        (g) => html`<div class="fp3d-row fp3d-dev-row">
+        (g) => html`<div class="fp3d-row fp3d-dev-row ${hidden.has(g.primary) ? "fp3d-dev-hidden" : ""}">
           <button class="fp3d-dev-name ${placed.has(g.primary) ? "" : "fp3d-muted"}" ?disabled=${!placed.has(g.primary)} @click=${() => this.selectItem("device", g.primary)}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d=${iconPath(kindOf(g.primary)!)} />
             </svg>
             <span>${entityName(hass, g.primary, areaName)}</span>
           </button>
+          ${this.isAdmin
+            ? html`<button
+                  class="fp3d-pin ${hidden.has(g.primary) ? "fp3d-pin-on" : ""}"
+                  aria-pressed=${hidden.has(g.primary)}
+                  title=${this.t(hidden.has(g.primary) ? "panel_unhide" : "panel_hide")}
+                  @click=${() => this.updateOutdoor({ hidden: flip(hidden, g.primary) })}
+                >
+                  ${hidden.has(g.primary) ? "🙈" : "👁"}
+                </button>
+                ${hidden.has(g.primary)
+                  ? nothing
+                  : html`<button
+                      class="fp3d-pin ${noState.has(g.primary) ? "fp3d-pin-on" : ""}"
+                      aria-pressed=${noState.has(g.primary)}
+                      title=${this.t(noState.has(g.primary) ? "panel_state_show" : "panel_state_hide")}
+                      @click=${() => this.updateOutdoor({ no_state: flip(noState, g.primary) })}
+                    >
+                      ${noState.has(g.primary) ? "∅" : "Aa"}
+                    </button>`}
+                ${placed.has(g.primary)
+                  ? nothing
+                  : html`<button
+                      class="fp3d-pin ${pinned.has(g.primary) ? "fp3d-pin-on" : ""}"
+                      aria-pressed=${pinned.has(g.primary)}
+                      title=${this.t(pinned.has(g.primary) ? "panel_unpin" : "panel_pin")}
+                      @click=${() => this.updateOutdoor({ panel: flip(pinned, g.primary) })}
+                    >
+                      ${pinned.has(g.primary) ? "★" : "☆"}
+                    </button>`}`
+            : nothing}
           ${this.isAdmin
             ? placed.has(g.primary)
               ? html`<button class="fp3d-link" @click=${() => this.removeDevice(g.primary)}>${this.t("devices_remove")}</button>`

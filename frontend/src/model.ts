@@ -708,7 +708,7 @@ export function outdoorStanding(type: OutdoorType): boolean {
 export function outdoorZones(floor: Floor): Room[] {
   return (floor.outdoor ?? [])
     .filter((a) => a.area_id && a.points.length >= 3 && !outdoorStanding(a.type))
-    .map((a) => ({ id: a.id, name: (a.name ?? "").trim(), area_id: a.area_id ?? null, points: a.points, floor_material: "wood", outdoor: true }));
+    .map((a) => ({ id: a.id, name: (a.name ?? "").trim(), area_id: a.area_id ?? null, points: a.points, floor_material: "wood", outdoor: true, panel: a.panel, hidden: a.hidden, no_state: a.no_state }));
 }
 
 /** The rooms of a floor and its outdoor areas that act as rooms. */
@@ -844,6 +844,10 @@ export interface OutdoorArea {
   /** Outdoor areas like rooms (#100): a name and a Home Assistant area – a tap opens it with its devices like a room. */
   name?: string | null;
   area_id?: string | null;
+  /** Like a room's: entities shown in its panel although not placed, kept out of it, or shown without state (#597). */
+  panel?: string[];
+  hidden?: string[];
+  no_state?: string[];
 }
 
 /** Pool Pro: the entities of a pool; a role left empty is searched by name ("pool"), "none" switches it off. */

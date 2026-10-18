@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Home Assistantin ensisijainen",
  "voice_pipeline_no_stt": "ei puheentunnistusta",
  "beta_ready": "Valmiina sinulle – asenna se alta pakettiesi kanssa.",
- "beta_supporter_missing": "Tukijana saat tämän betan. Se ei ole vielä avaimellasi – kirjoita meille Discordissa, niin avaamme sen."
+ "beta_supporter_missing": "Tukijana saat tämän betan. Se ei ole vielä avaimellasi – kirjoita meille Discordissa, niin avaamme sen.",
+ "voice_silent": "Mikrofoni antaa vain hiljaisuutta. Yleensä toinen sovellus varaa sen – poista Fully Kioskista äänipohjainen liiketunnistus (Motion Detection → Acoustic Detection) ja lataa uudelleen."
 }

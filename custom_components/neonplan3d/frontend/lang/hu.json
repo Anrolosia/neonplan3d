@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Az előnyben részesített a Home Assistantban",
  "voice_pipeline_no_stt": "beszédfelismerés nélkül",
  "beta_ready": "Elkészült neked – telepítsd lent a csomagjaid között.",
- "beta_supporter_missing": "Támogatóként megkapod ezt a bétát. Még nincs a kulcsodon – írj nekünk Discordon, és feloldjuk."
+ "beta_supporter_missing": "Támogatóként megkapod ezt a bétát. Még nincs a kulcsodon – írj nekünk Discordon, és feloldjuk.",
+ "voice_silent": "A mikrofon csak csendet ad. Általában egy másik alkalmazás foglalja – a Fully Kioskban kapcsold ki a hangalapú mozgásérzékelést (Motion Detection → Acoustic Detection), és töltsd újra."
 }

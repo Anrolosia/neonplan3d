@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Preferovaná v Home Assistantu",
  "voice_pipeline_no_stt": "bez rozpoznávání řeči",
  "beta_ready": "Připraveno pro tebe – nainstaluj níže u svých balíčků.",
- "beta_supporter_missing": "Jako supporter dostáváš tuto betu. Na tvém klíči ještě není – napiš nám na Discordu a odemkneme ji."
+ "beta_supporter_missing": "Jako supporter dostáváš tuto betu. Na tvém klíči ještě není – napiš nám na Discordu a odemkneme ji.",
+ "voice_silent": "Mikrofon dává jen ticho. Obvykle ho drží jiná aplikace – ve Fully Kiosk vypni akustickou detekci pohybu (Motion Detection → Acoustic Detection) a načti znovu."
 }

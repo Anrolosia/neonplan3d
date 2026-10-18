@@ -3724,9 +3724,18 @@ export class Fp3dView3d extends LitElement {
       if (phase === "done" || phase === "error") this.voiceTimer = setTimeout(() => (this._voice = null), phase === "error" ? 9000 : 6000);
     };
     say("wait", "…");
+    // the audio context starts here, on the tap itself: made later (after loading) Android WebViews keep it mute (#579)
+    let started: AudioContext | undefined;
+    try {
+      const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      started = new Ctx();
+      void started.resume();
+    } catch {
+      started = undefined;
+    }
     try {
       const v = await loadVoice();
-      const text = await v.listenOnce(hass, () => say("listen", translate(hass, "voice_listen")), voicePipeline());
+      const text = await v.listenOnce(hass, () => say("listen", translate(hass, "voice_listen")), voicePipeline(), started);
       if (!text) {
         say("error", translate(hass, "voice_none"));
         return;
@@ -3762,7 +3771,14 @@ export class Fp3dView3d extends LitElement {
       say("done", answer ? `“${text}” – ${answer}` : `“${text}”`);
     } catch (err) {
       const e = err as { name?: string; message?: string };
-      const key = e?.message === "no_pipeline" ? "voice_no_pipeline" : e?.name === "NotAllowedError" || e?.name === "SecurityError" || !window.isSecureContext ? "voice_denied" : null;
+      const key =
+        e?.message === "no_pipeline"
+          ? "voice_no_pipeline"
+          : e?.message === "silent"
+            ? "voice_silent"
+            : e?.name === "NotAllowedError" || e?.name === "SecurityError" || !window.isSecureContext
+              ? "voice_denied"
+              : null;
       say("error", key ? translate(hass, key) : translate(hass, "voice_error", { msg: String(e?.message ?? e?.name ?? err) }));
     }
   }

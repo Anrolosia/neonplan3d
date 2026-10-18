@@ -1884,5 +1884,6 @@
  "voice_pipeline_preferred": "Voorkeur in Home Assistant",
  "voice_pipeline_no_stt": "zonder spraakherkenning",
  "beta_ready": "Staat voor je klaar – installeer hem hieronder bij je packs.",
- "beta_supporter_missing": "Als supporter krijg je deze bèta. Hij staat nog niet op je sleutel – stuur ons een berichtje op Discord, dan zetten we hem vrij."
+ "beta_supporter_missing": "Als supporter krijg je deze bèta. Hij staat nog niet op je sleutel – stuur ons een berichtje op Discord, dan zetten we hem vrij.",
+ "voice_silent": "De microfoon geeft alleen stilte. Meestal houdt een andere app hem vast – zet in Fully Kiosk de akoestische bewegingsdetectie uit (Motion Detection → Acoustic Detection) en herlaad."
 }

@@ -80,9 +80,12 @@ export async function transcribe(hass: HomeAssistant, ctx: AudioContext, source:
   };
   // ScriptProcessor: old, but every WebView of an old wall tablet has it (AudioWorklet not)
   const proc = ctx.createScriptProcessor(4096, 1, 1);
+  let peak = 0;
   proc.onaudioprocess = (e) => {
     if (done) return;
-    const pcm = toPcm16(e.inputBuffer.getChannelData(0), ctx.sampleRate);
+    const input = e.inputBuffer.getChannelData(0);
+    for (let i = 0; i < input.length; i += 16) peak = Math.max(peak, Math.abs(input[i]));
+    const pcm = toPcm16(input, ctx.sampleRate);
     if (handler === null) early.push(pcm);
     else send(pcm);
   };
@@ -102,7 +105,9 @@ export async function transcribe(hass: HomeAssistant, ctx: AudioContext, source:
       source.disconnect(proc);
       proc.disconnect();
       void unsub?.();
-      if (err) reject(err);
+      // nothing but silence came in: the microphone is open but gives no sound (another app holds it, #579)
+      if ((err || !text) && peak < 0.0005) reject(new Error("silent"));
+      else if (err) reject(err);
       else resolve(text);
     };
     hass.connection
@@ -137,7 +142,7 @@ let pipelineOf: { connection: unknown; chosen: string | null; id: Promise<string
  * One sentence: the microphone opens, Assist writes it down, the microphone closes again. The pipeline: the one chosen
  * on this device, else Home Assistant's preferred one (also when the list of pipelines cannot be read).
  */
-export async function listenOnce(hass: HomeAssistant, onListening?: () => void, chosen: string | null = null): Promise<string> {
+export async function listenOnce(hass: HomeAssistant, onListening?: () => void, chosen: string | null = null, started?: AudioContext): Promise<string> {
   if (!pipelineOf || pipelineOf.connection !== hass.connection || pipelineOf.chosen !== chosen) {
     // undefined: the list could not be read – the run takes the preferred pipeline then; null: none has speech to text
     pipelineOf = { connection: hass.connection, chosen, id: findPipeline(hass, chosen).then((p) => p?.id ?? null, () => undefined) };
@@ -145,12 +150,20 @@ export async function listenOnce(hass: HomeAssistant, onListening?: () => void, 
   const found = await pipelineOf.id;
   if (found === null) {
     pipelineOf = null;
+    void started?.close();
     throw new Error("no_pipeline");
   }
   if (found === undefined) pipelineOf = null;
   const pipeline = found ?? chosen;
-  const stream = await openMicrophone();
-  const ctx = audioContext();
+  // the audio context made on the tap itself (`started`): one made after the awaits stays mute in Android WebViews (#579)
+  const ctx = started ?? audioContext();
+  let stream: MediaStream;
+  try {
+    stream = await openMicrophone();
+  } catch (err) {
+    void ctx.close();
+    throw err;
+  }
   try {
     const source = ctx.createMediaStreamSource(stream);
     onListening?.();
