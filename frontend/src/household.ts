@@ -195,12 +195,13 @@ export function wasteCalendars(floors: readonly { furniture: readonly Furniture[
 }
 
 /** Events of the next `days` days of the waste calendars, by calendar; a calendar that fails is left out. */
-export async function fetchPickups(hass: HomeAssistant, calendars: readonly string[], now = new Date(), days = 10): Promise<Map<string, Pickup[]>> {
+// six weeks ahead: bins emptied every two or four weeks show their next pickup too (#585)
+export async function fetchPickups(hass: HomeAssistant, calendars: readonly string[], now = new Date(), days = 42): Promise<Map<string, Pickup[]>> {
   const out = new Map<string, Pickup[]>();
   const api = (hass as unknown as { callApi?: <T>(method: string, path: string) => Promise<T> }).callApi;
   if (!api) return out;
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(start.getTime() + days * 86400_000);
+  const end = addDays(start, days);
   await Promise.all(
     calendars.map(async (id) => {
       try {
@@ -224,6 +225,8 @@ export interface BinDue {
 }
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+/** A day `n` days later, counted in calendar days (a day with a clock change has 23 or 25 hours, D576). */
+const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const daysBetween = (a: Date, b: Date) => Math.round((startOfDay(b).getTime() - startOfDay(a).getTime()) / 86400_000);
 
 /** From which hour the day before a bin glows, until which hour on the day (the house's settings; 14 and 12). */
@@ -276,7 +279,7 @@ export function binDue(f: Pick<Furniture, "bin_kind" | "bin_source" | "bin_match
   if (!st) return null;
   const days = sensorDays(st, now);
   if (days === null || days < 0) return null;
-  const day = new Date(today.getTime() + days * 86400_000);
+  const day = addDays(today, days);
   return { days, day, summary: String(st.attributes.friendly_name ?? ""), glow: binGlows(days, now, hours) };
 }
 
@@ -292,8 +295,12 @@ export function sensorDays(st: HassEntity, now = new Date()): number | null {
   const low = s.toLowerCase();
   if (/(^|\s)(heute|today|vandaag|aujourd|oggi|hoy|hoje|idag|i dag|tänään|dnes|ma$|dziś|dzis|今天)/.test(low)) return 0;
   if (/(^|\s)(morgen|tomorrow|demain|domani|mañana|amanhã|imorgon|i morgen|huomenna|zítra|holnap|jutro|明天)/.test(low)) return 1;
-  const n = /(\d+)/.exec(low);
-  return n ? Number(n[1]) : null;
+  // the days are the number before a word for days or after "in" ("Restabfall 2-wöchentlich in 4 Tagen" is 4, D576),
+  // else the last number of the text
+  const unit = /(\d+)\s*(tag|day|dag|jour|giorn|día|dia|päiv|paiv|den|dn|nap|天)/.exec(low) ?? /\bin\s+(\d+)/.exec(low);
+  if (unit) return Number(unit[1]);
+  const all = low.match(/\d+/g);
+  return all ? Number(all[all.length - 1]) : null;
 }
 
 // ---------------------------------------------------------------- mailbox

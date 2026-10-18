@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Tjekker https, mikrofonen og Assists talegenkendelse på denne enhed og viser, hvilket rum en sætning ville åbne. Intet bliver tændt eller slukket.",
  "voice_pipeline": "Assist-pipeline på denne enhed",
  "voice_pipeline_preferred": "Den foretrukne i Home Assistant",
- "voice_pipeline_no_stt": "uden talegenkendelse"
+ "voice_pipeline_no_stt": "uden talegenkendelse",
+ "beta_ready": "Klar til dig – installér den nedenfor med dine pakker.",
+ "beta_supporter_missing": "Som supporter får du denne beta. Den er ikke på din nøgle endnu – skriv til os på Discord, så låser vi den op."
 }

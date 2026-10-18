@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Sprawdza na tym urządzeniu https, mikrofon i rozpoznawanie mowy Assist oraz pokazuje, który pokój otworzyłoby zdanie. Nic nie jest przełączane.",
  "voice_pipeline": "Potok Assist na tym urządzeniu",
  "voice_pipeline_preferred": "Preferowany w Home Assistant",
- "voice_pipeline_no_stt": "bez rozpoznawania mowy"
+ "voice_pipeline_no_stt": "bez rozpoznawania mowy",
+ "beta_ready": "Gotowe dla ciebie – zainstaluj poniżej razem z pakietami.",
+ "beta_supporter_missing": "Jako supporter dostajesz tę betę. Nie ma jej jeszcze na twoim kluczu – napisz do nas na Discordzie, a ją odblokujemy."
 }

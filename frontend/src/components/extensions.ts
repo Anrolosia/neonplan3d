@@ -18,7 +18,7 @@ import {
   type LicenseStatus,
 } from "../api.ts";
 import { DISCORD_URL, isBeta, supporterUrl } from "../beta.ts";
-import { FEATURES, FUN, knownFeature, manualUrl, registerUrl, released, shopUrl, unlockedFeatures } from "../features.ts";
+import { FEATURES, FUN, knownFeature, manualUrl, registerUrl, released, shopUrl, unlockedFeatures, type Feature } from "../features.ts";
 import { DOG_BREEDS, PET_FURS_OF, type Building, type Pet } from "../model.ts";
 import { translate, type I18nKey } from "../i18n.ts";
 import { packName, type FurniturePack } from "../packs.ts";
@@ -178,7 +178,7 @@ export class Extensions extends LitElement {
                   ? html`<span class="fp3d-ext-state">${this.t("ext_active")}</span>
                       ${isBeta(f) ? html`<a class="fp3d-ext-link" href=${DISCORD_URL} target="_blank" rel="noopener">💬 ${this.t("beta_feedback")}</a>` : nothing}`
                   : isBeta(f)
-                    ? html`<a class="fp3d-ext-link" href=${supporterUrl(this.hass?.language)} target="_blank" rel="noopener">💙 ${this.t("beta_become")}</a>`
+                    ? this.renderBetaLocked(f)
                     : html`<a class="fp3d-ext-link" href=${shopUrl(this.hass?.language)} target="_blank" rel="noopener">${this.t("ext_get")}</a>`}
                 <a class="fp3d-ext-link" href=${manualUrl(this.hass?.language, f)} target="_blank" rel="noopener">${this.t("manual_more")}</a>
               </span>
@@ -188,6 +188,18 @@ export class Extensions extends LitElement {
       </section>
       ${this.renderFun(unlocked)} ${this.renderPacks()}
     </div>`;
+  }
+
+  /**
+   * A beta add-on not unlocked here: its pack waiting on the key (install it below), a supporter whose key lacks it
+   * (tell us on Discord, #583), or the way to become a supporter.
+   */
+  private renderBetaLocked(f: Feature) {
+    const lic = this._license?.active ? this._license : null;
+    const pack = lic?.packs.find((p) => [f, `pro_${f}`].includes(p.id) || p.id.endsWith(`.pro_${f}`));
+    if (pack) return html`<span class="fp3d-sub">⬇ ${this.t("beta_ready")}</span>`;
+    if (lic?.supporter) return html`<span class="fp3d-sub">${this.t("beta_supporter_missing")}</span><a class="fp3d-ext-link" href=${DISCORD_URL} target="_blank" rel="noopener">💬 Discord</a>`;
+    return html`<a class="fp3d-ext-link" href=${supporterUrl(this.hass?.language)} target="_blank" rel="noopener">💙 ${this.t("beta_become")}</a>`;
   }
 
   /** A changed plan goes to the panel, which saves it. */

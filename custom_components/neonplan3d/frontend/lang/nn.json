@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Sjekkar https, mikrofonen og talegjenkjenninga til Assist på denne eininga og viser kva rom ei setning ville opna. Ingenting vert styrt.",
  "voice_pipeline": "Assist-pipeline på denne eininga",
  "voice_pipeline_preferred": "Den føretrekte i Home Assistant",
- "voice_pipeline_no_stt": "utan talegjenkjenning"
+ "voice_pipeline_no_stt": "utan talegjenkjenning",
+ "beta_ready": "Klar for deg – installer han nedanfor med pakkane dine.",
+ "beta_supporter_missing": "Som supporter får du denne betaen. Han er ikkje på nøkkelen din enno – skriv til oss på Discord, så låser vi han opp."
 }

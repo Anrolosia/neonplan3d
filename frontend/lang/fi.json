@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Tarkistaa tällä laitteella https:n, mikrofonin ja Assistin puheentunnistuksen ja näyttää, minkä huoneen lause avaisi. Mitään ei ohjata.",
  "voice_pipeline": "Assist-putki tällä laitteella",
  "voice_pipeline_preferred": "Home Assistantin ensisijainen",
- "voice_pipeline_no_stt": "ei puheentunnistusta"
+ "voice_pipeline_no_stt": "ei puheentunnistusta",
+ "beta_ready": "Valmiina sinulle – asenna se alta pakettiesi kanssa.",
+ "beta_supporter_missing": "Tukijana saat tämän betan. Se ei ole vielä avaimellasi – kirjoita meille Discordissa, niin avaamme sen."
 }

@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Verifica neste dispositivo https, o microfone e o reconhecimento de voz do Assist, e mostra que divisão uma frase abriria. Nada é acionado.",
  "voice_pipeline": "Pipeline do Assist neste dispositivo",
  "voice_pipeline_preferred": "O preferido no Home Assistant",
- "voice_pipeline_no_stt": "sem reconhecimento de voz"
+ "voice_pipeline_no_stt": "sem reconhecimento de voz",
+ "beta_ready": "Pronto para ti – instala-o abaixo com os teus pacotes.",
+ "beta_supporter_missing": "Como supporter recebes esta beta. Ainda não está na tua chave – escreve-nos no Discord e nós ativamos."
 }

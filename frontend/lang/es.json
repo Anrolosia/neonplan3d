@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Comprueba en este dispositivo https, el micrófono y el reconocimiento de voz de Assist, y muestra qué habitación abriría una frase. No se acciona nada.",
  "voice_pipeline": "Canalización de Assist en este dispositivo",
  "voice_pipeline_preferred": "La preferida en Home Assistant",
- "voice_pipeline_no_stt": "sin reconocimiento de voz"
+ "voice_pipeline_no_stt": "sin reconocimiento de voz",
+ "beta_ready": "Listo para ti – instálalo abajo con tus paquetes.",
+ "beta_supporter_missing": "Como supporter recibes esta beta. Aún no está en tu clave – escríbenos en Discord y la activamos."
 }

@@ -1882,5 +1882,7 @@
  "director_mic_hint": "Na tej napravi preveri https, mikrofon in prepoznavanje govora v Assistu ter pokaže, kateri prostor bi stavek odprl. Nič se ne preklopi.",
  "voice_pipeline": "Cevovod Assist na tej napravi",
  "voice_pipeline_preferred": "Prednostni v Home Assistantu",
- "voice_pipeline_no_stt": "brez prepoznavanja govora"
+ "voice_pipeline_no_stt": "brez prepoznavanja govora",
+ "beta_ready": "Pripravljeno zate – namesti spodaj pri svojih paketih.",
+ "beta_supporter_missing": "Kot podpornik dobiš to beto. Na tvojem ključu je še ni – piši nam na Discordu in jo odklenemo."
 }

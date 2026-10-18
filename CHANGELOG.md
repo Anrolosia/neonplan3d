@@ -4,6 +4,15 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.20.1
+
+### Fixed
+
+- Waste bins (Household Pro): a bin emptied every two or four weeks showed nothing when its next pickup was more than 10 days away – the calendar is now read six weeks ahead (#585).
+- Waste bins: a sensor whose text holds another number ("Restabfalltonne 2-wöchentlich in 4 Tagen") showed that number instead of the days (D576).
+- Waste bins: across the change to winter time the pickup day shown on a tap was one day early (D576).
+- Extensions: a Supporter-Pass holder whose key does not have a beta add-on yet saw "Become a supporter"; now it says the beta is theirs and to tell us on Discord, and a beta pack waiting on the key says to install it (#583).
+
 ## 1.20.0
 
 ### New
