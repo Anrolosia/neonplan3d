@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
+- Old wall tablets (Fire 7 and other WebViews before Chrome 108): the NeonPlan page lost its height since 1.18.2 and showed an empty 3D view; the height for newer browsers now only applies where they know it. The editor's arrow keys no longer use a function those WebViews lack, and the build refuses such functions. Spotted in the CasaNeon fork (diegood).
 - Waste bins (Household Pro): a bin emptied every two or four weeks showed nothing when its next pickup was more than 10 days away – the calendar is now read six weeks ahead (#585).
 - Waste bins: a sensor whose text holds another number ("Restabfalltonne 2-wöchentlich in 4 Tagen") showed that number instead of the days (D576).
 - Waste bins: across the change to winter time the pickup day shown on a tap was one day early (D576).

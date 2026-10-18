@@ -1118,8 +1118,14 @@ export class Floorplan3dPanel extends LitElement {
            screen's safe areas (notches; some themes set them on every screen): those are taken off, or the panel is
            taller than the window and its bottom is cut off (#529). */
         height: calc(100vh - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px));
-        height: calc(100dvh - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px));
         background: var(--fp3d-bg);
+      }
+      /* dvh only where the browser knows it: a line with var() is not dropped while it is read, so a WebView without
+         dvh (Chrome before 108, the Fire 7) lost the height altogether and the 3D view stayed empty (idea: CasaNeon) */
+      @supports (height: 100dvh) {
+        :host {
+          height: calc(100dvh - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px));
+        }
       }
       .fp3d-app {
         display: flex;
