@@ -1967,5 +1967,9 @@
  "voice_examples": "„Toon de woonkamer”|„Ga naar de bovenverdieping”|„Toon het hele huis”|„Toon de wasmachine” / „Waar is de droger?”|„Toon de camera van de voordeur”|„Toon de camera's”|Al het andere („licht in de gang aan”) gaat naar Assist",
  "aliases": "Andere namen voor de spraak",
  "aliases_hint": "Andere namen, gescheiden door komma's – zo noem je de „Smart TV Pro” „woonkamer-tv”. Voor spraakbediening en zoeken.",
- "aliases_placeholder": "bijv. woonkamer-tv"
+ "aliases_placeholder": "bijv. woonkamer-tv",
+ "voice_showing": "Ik toon {name}.",
+ "screen_name": "Schermnaam (voor Assist)",
+ "screen_name_placeholder": "bv. Keuken",
+ "screen_name_hint": "Vraag je het aan Assist („Toon de woonkamer”) of roept een automatisering de dienst neonplan3d.ask aan, dan reageert elke open NeonPlan-weergave. Noemt de dienst een scherm, dan reageert alleen de weergave met die naam."
 }

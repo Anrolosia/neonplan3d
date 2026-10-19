@@ -1967,5 +1967,9 @@
  "voice_examples": "«Mostra il soggiorno»|«Vai al piano di sopra»|«Mostra tutta la casa»|«Mostra la lavatrice» / «Dov'è l'asciugatrice?»|«Mostra la telecamera dell'ingresso»|«Mostra le telecamere»|Tutto il resto («accendi la luce del corridoio») va ad Assist",
  "aliases": "Altri nomi per la voce",
  "aliases_hint": "Altri nomi, separati da virgole – così chiami la «Smart TV Pro» «TV del soggiorno». Usati dal controllo vocale e dalla ricerca.",
- "aliases_placeholder": "es. TV del soggiorno"
+ "aliases_placeholder": "es. TV del soggiorno",
+ "voice_showing": "Mostro {name}.",
+ "screen_name": "Nome schermo (per Assist)",
+ "screen_name_placeholder": "es. Cucina",
+ "screen_name_hint": "Se chiedi ad Assist («Mostra il soggiorno») o un'automazione chiama il servizio neonplan3d.ask, reagisce ogni vista NeonPlan aperta. Se il servizio indica uno schermo, reagisce solo la vista con quel nome."
 }

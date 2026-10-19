@@ -1967,5 +1967,9 @@
  "voice_examples": "”Visa vardagsrummet”|”Gå till övervåningen”|”Visa hela huset”|”Visa tvättmaskinen” / ”Var är torktumlaren?”|”Visa kameran vid ytterdörren”|”Visa kamerorna”|Allt annat (”tänd lampan i hallen”) går till Assist",
  "aliases": "Fler namn för rösten",
  "aliases_hint": "Fler namn, kommaseparerade – så kallar du ”Smart TV Pro” för ”vardagsrums-tv”. Används av röststyrning och sökning.",
- "aliases_placeholder": "t.ex. vardagsrums-tv"
+ "aliases_placeholder": "t.ex. vardagsrums-tv",
+ "voice_showing": "Visar {name}.",
+ "screen_name": "Skärmnamn (för Assist)",
+ "screen_name_placeholder": "t.ex. Kök",
+ "screen_name_hint": "Frågar du Assist (”Visa vardagsrummet”) eller anropar en automation tjänsten neonplan3d.ask, reagerar alla öppna NeonPlan-vyer. Anger tjänsten en skärm, reagerar bara vyn med det namnet."
 }

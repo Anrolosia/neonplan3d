@@ -1967,5 +1967,9 @@
  "voice_examples": "„Mutasd a nappalit”|„Menj az emeletre”|„Mutasd az egész házat”|„Mutasd a mosógépet” / „Hol a szárító?”|„Mutasd a bejárati kamerát”|„Mutasd a kamerákat”|Minden más („kapcsold fel a folyosó lámpáját”) az Assisthez megy",
  "aliases": "További nevek a hanghoz",
  "aliases_hint": "További nevek vesszővel elválasztva – így hívod a „Smart TV Pro”-t „nappali tévének”. A hangvezérléshez és a kereséshez.",
- "aliases_placeholder": "pl. nappali tévé"
+ "aliases_placeholder": "pl. nappali tévé",
+ "voice_showing": "Mutatom: {name}.",
+ "screen_name": "Képernyő neve (az Assisthez)",
+ "screen_name_placeholder": "pl. Konyha",
+ "screen_name_hint": "Ha az Assistet kérdezed („Mutasd a nappalit”) vagy egy automatizálás hívja a neonplan3d.ask szolgáltatást, minden nyitott NeonPlan-nézet reagál. Ha a szolgáltatás képernyőt nevez meg, csak az ilyen nevű nézet reagál."
 }

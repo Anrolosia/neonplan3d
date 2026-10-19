@@ -675,12 +675,38 @@ Talk to your house. A **microphone button** 🎙️ appears at the bottom left o
 | "Show the washing machine", "Where is the floor lamp?", "Show the TV", "Where is the dryer?" | The view flies to the device or piece of furniture and it flashes. Furniture answers to its kind ("dryer", "pool pump"), its own name and everyday words ("TV", "telly", "heating", "car") – with or without a linked entity. If the sensor is called "Washing machine power" in the plan, "washing machine" is enough. With several of a kind, name the room too ("the heating in the living room"). |
 | "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
 | "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
-| "What is open?", "Which windows are open?", "Is a window open in the bathroom?", "Where is it cold?", "How warm is it in the living room?", "Is the washing machine running?", "Is the TV on?", "What is drawing power?", "What is the solar doing?", "How full is the battery?", "Which lights are on?", "Are the blinds down?", "Is the front door locked?", "Who is home?", "Good night", "What can you do?" | With the module **The house answers** (free in the shop, see below): the answer shows as a speech bubble, is spoken through Assist's text-to-speech, and the house shows it – open windows flash, the coldest room opens, the view flies to the washing machine. |
-| "Turn on the hall light", "How warm is it outside?" | Anything else goes to Home Assistant's **Assist**. The answer shows as a speech bubble. |
+| "What is open?", "Where is it cold?", "Is the washing machine running?", "What is drawing power?", "Who is home?", "What is the weather like?", "Is everything OK?", "What is on today?", "Good morning", "Good night" … | With the module **The house answers** (free in the shop, see below): the answer shows as a speech bubble, is spoken through Assist's text-to-speech, and the house shows it – open windows flash, the coldest room opens, the view flies to the washing machine. The full list is below. |
+| "Turn on the hall light", "Lower the blinds" | Commands go to Home Assistant's **Assist**. The answer shows as a speech bubble. |
 
 Compounds work too: "driveway camera" said as one word finds the camera "Driveway". Under **⚙ Settings → Voice control** the list **What NeonPlan understands** shows the sentences, with those of the installed modules.
 
 NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devices and furniture. A room also answers to the name of its Home Assistant area. Devices need a "show" or "where is", so "turn on the living room light" stays a command for Assist and switches the light instead of flying there.
+
+**Further names.** Your TV is called "Smart TV Pro" in Home Assistant, but you say "living room TV" or "telly": every room, piece of furniture and placed device has the field **Further names for the voice** below its name in the editor (comma separated, up to twelve). They count for voice control and the search.
+
+**The house answers – the questions.** The module (see below) answers from your plan and your sensors, without AI, all local:
+
+| Topic | You ask, for example |
+|---|---|
+| Open | "What is open?", "Which windows are open?", "Is a window open in the bathroom?", "Is the garage closed?", "How long has the window been open?" – the view flies to each open window, from inside, and says there what it is |
+| Temperature | "Where is it cold?", "Where is it warmest?", "How warm is it in the living room?", "How warm is it outside?" |
+| Air | "How humid is the bathroom?", "How is the air in the bedroom?" (CO₂), "Should I air the house?" |
+| Heating | "What is the heating set to in the living room?", "Is the heating on?" (the room's thermostats) |
+| Appliances | "Is the washing machine still running?", "Is the TV on?", "What is running right now?", with Haushalt Pro: "How long does the washing machine need?", "When is the laundry done?" |
+| Media | "What is playing on the TV?", "What music is playing?" |
+| Energy | "What is drawing power?", "What is the solar doing?", "How full is the battery?" |
+| Lights, blinds, locks | "Which lights are on?", "Is a light still on in the hall?", "Are the blinds down?", "Is the front door locked?" |
+| People | "Who is home?", "Where is Anna?", "Is anyone in the living room?", "Where is motion?" |
+| Warnings | "Is everything OK?", "Any warnings?" (smoke, water, a window in the rain, a power outage …) |
+| Household (Haushalt Pro) | "What is on today?", "When is the bin collected?", "Is there mail?", "Do the plants need water?" |
+| Car (Auto Pro) | "How full is the car?", "Is the car charging?", "How far can I still go?", "Is the car locked?", "Where is the car?" |
+| Pool (Pool Pro) | "How warm is the pool?", "Is the pool pump running?", "What is the pH?", "Is the pool OK?" |
+| Weather, time | "What is the weather like?", "Is it raining?", "What time is it?", "What day is it?", "When does the sun set?" |
+| The house | "How many rooms does the house have?", "How big is the living room?", "How many windows does the house have?" |
+| The day | "Good morning" – the morning report: weather, warnings, what is open, what is on today, who is home, the car. "Good night" – the night check: open windows and doors, unlocked locks, lights, running appliances, with a tour |
+| And more | "Who are you?", "How are you?", "Tell me a joke", "Thank you", "Hello", "What can you do?" |
+
+Commands ("turn on the light", "set the heating to 22 degrees") still go to Assist. The answers come in your user's language (German or English).
 
 **Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). Once imported it is listed under Extensions → Furniture packs as "Module by Mastershort". Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
 
@@ -696,6 +722,20 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devic
 3. **The microphone allowed:**
    - in the browser, "Allow" on the first tap;
    - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access (Plus licence), plus Fully's microphone permission in Android.
+
+**Asking through Assist – without a microphone on the tablet.** Everything NeonPlan understands you can also say to Assist: a voice satellite (Home Assistant Voice, ESPHome), the Assist dialog or the app. On start NeonPlan writes the sentences `custom_sentences/en/neonplan3d.yaml` and `…/de/…` into your configuration folder (only when they are missing or changed). Say "Show the living room" or "What is open?" to Assist and the sentence goes to **every open NeonPlan view** – the wall tablet shows the room or the open windows, and Assist speaks the answer where you asked. The tablet itself stays quiet. The sentences start unmistakably ("show …", "where is …", "what is open", "ask the house …", "NeonPlan, …") so Assist keeps switching your lights itself. Your own sentences go into a further file under `custom_sentences` for the intent `NeonPlanAsk`.
+
+**The service `neonplan3d.ask`.** For automations and scripts: fields **Sentence** (`text`), **Screen** (`screen`, optional) and **Speak** (`speak`, off by default). The service returns the answer (`answer`, `answered`, `screen_open`), e.g. for a notification. With `speak: true` the view speaks the answer itself through its Assist pipeline's text-to-speech. Example – the night check on the wall tablet every evening at 10 pm:
+
+```yaml
+action: neonplan3d.ask
+data:
+  text: "Good night"
+  screen: "Hall"
+  speak: true
+```
+
+**Screen names.** With several tablets, give each view a name: in the editor under **⚙ Settings → 🎙 Voice control → Screen name** (for this device) or on the card with the option `screen: Kitchen`. When the service names a screen, only the view with that name reacts; without one, all of them do. With no view open, Assist answers "No NeonPlan screen is open right now".
 
 **Testing:** in the **🎙️ Voice control** section, **🎙️ Test the microphone** starts a probe. It checks https, the microphone, the level and Assist one after the other. It also shows which room a spoken sentence would open, and switches nothing while doing so. Wherever there is a ✖, the fix stands next to it.
 

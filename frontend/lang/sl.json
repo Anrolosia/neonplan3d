@@ -1967,5 +1967,9 @@
  "voice_examples": "„Pokaži dnevno sobo“|„Pojdi v nadstropje“|„Pokaži celo hišo“|„Pokaži pralni stroj“ / „Kje je sušilni stroj?“|„Pokaži kamero pri vratih“|„Pokaži kamere“|Vse ostalo („prižgi luč na hodniku“) gre k Assistu",
  "aliases": "Dodatna imena za glas",
  "aliases_hint": "Dodatna imena, ločena z vejico – tako „Smart TV Pro“ kličeš „televizor v dnevni“. Za glasovno upravljanje in iskanje.",
- "aliases_placeholder": "npr. televizor v dnevni"
+ "aliases_placeholder": "npr. televizor v dnevni",
+ "voice_showing": "Prikazujem {name}.",
+ "screen_name": "Ime zaslona (za Assist)",
+ "screen_name_placeholder": "npr. Kuhinja",
+ "screen_name_hint": "Če vprašaš Assist („Pokaži dnevno sobo“) ali avtomatizacija pokliče storitev neonplan3d.ask, se odzove vsak odprt pogled NeonPlan. Če storitev navede zaslon, se odzove le pogled s tem imenom."
 }

@@ -1967,5 +1967,9 @@
  "voice_examples": "“显示客厅”|“去楼上”|“显示整个房子”|“显示洗衣机” / “烘干机在哪里？”|“显示入口摄像头”|“显示所有摄像头”|其他的话（“打开走廊的灯”）交给 Assist",
  "aliases": "语音用的其他名称",
  "aliases_hint": "其他名称，用逗号分隔——这样就能把“Smart TV Pro”叫作“客厅电视”。用于语音控制和搜索。",
- "aliases_placeholder": "例如：客厅电视"
+ "aliases_placeholder": "例如：客厅电视",
+ "voice_showing": "正在显示{name}。",
+ "screen_name": "屏幕名称（用于 Assist）",
+ "screen_name_placeholder": "例如：厨房",
+ "screen_name_hint": "向 Assist 提问（“显示客厅”）或自动化调用服务 neonplan3d.ask 时，每个打开的 NeonPlan 视图都会响应。若服务指定了屏幕，只有同名的视图会响应。"
 }

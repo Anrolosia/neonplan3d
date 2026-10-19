@@ -1967,5 +1967,9 @@
  "voice_examples": "”Näytä olohuone”|”Mene yläkertaan”|”Näytä koko talo”|”Näytä pesukone” / ”Missä kuivausrumpu on?”|”Näytä etuoven kamera”|”Näytä kamerat”|Kaikki muu (”valo eteiseen päälle”) menee Assistille",
  "aliases": "Lisänimet puhetta varten",
  "aliases_hint": "Lisänimet pilkulla eroteltuina – niin kutsut ”Smart TV Pro” -laitetta ”olohuoneen telkkariksi”. Käytössä puheohjauksessa ja haussa.",
- "aliases_placeholder": "esim. olohuoneen telkkari"
+ "aliases_placeholder": "esim. olohuoneen telkkari",
+ "voice_showing": "Näytän: {name}.",
+ "screen_name": "Näytön nimi (Assistia varten)",
+ "screen_name_placeholder": "esim. Keittiö",
+ "screen_name_hint": "Kun kysyt Assistilta (”Näytä olohuone”) tai automaatio kutsuu palvelua neonplan3d.ask, jokainen avoin NeonPlan-näkymä reagoi. Jos palvelu nimeää näytön, vain sen niminen näkymä reagoi."
 }

@@ -1967,5 +1967,9 @@
  "voice_examples": "„Ukaž obývák“|„Jdi do patra“|„Ukaž celý dům“|„Ukaž pračku“ / „Kde je sušička?“|„Ukaž kameru u dveří“|„Ukaž kamery“|Vše ostatní („rozsviť světlo na chodbě“) jde do Assistu",
  "aliases": "Další jména pro hlas",
  "aliases_hint": "Další jména oddělená čárkou – tak říkáš „Smart TV Pro“ „televize v obýváku“. Pro hlasové ovládání a hledání.",
- "aliases_placeholder": "např. televize v obýváku"
+ "aliases_placeholder": "např. televize v obýváku",
+ "voice_showing": "Ukazuji {name}.",
+ "screen_name": "Název obrazovky (pro Assist)",
+ "screen_name_placeholder": "např. Kuchyň",
+ "screen_name_hint": "Dotaz na Assist („Ukaž obývák“) nebo služba neonplan3d.ask z automatizace dorazí ke každému otevřenému pohledu NeonPlan. Když služba uvede obrazovku, reaguje jen pohled s tímto názvem."
 }

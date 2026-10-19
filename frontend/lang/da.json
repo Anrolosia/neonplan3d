@@ -1967,5 +1967,9 @@
  "voice_examples": "„Vis stuen“|„Gå til første sal“|„Vis hele huset“|„Vis vaskemaskinen“ / „Hvor er tørretumbleren?“|„Vis kameraet ved hoveddøren“|„Vis kameraerne“|Alt andet („tænd lyset i gangen“) går til Assist",
  "aliases": "Andre navne til stemmen",
  "aliases_hint": "Andre navne, adskilt med komma – så kalder du „Smart TV Pro“ for „stue-tv“. Bruges af stemmestyring og søgning.",
- "aliases_placeholder": "fx stue-tv"
+ "aliases_placeholder": "fx stue-tv",
+ "voice_showing": "Viser {name}.",
+ "screen_name": "Skærmnavn (til Assist)",
+ "screen_name_placeholder": "f.eks. Køkken",
+ "screen_name_hint": "Spørger du Assist („Vis stuen“) eller kalder en automatisering tjenesten neonplan3d.ask, reagerer alle åbne NeonPlan-visninger. Nævner tjenesten en skærm, reagerer kun visningen med det navn."
 }

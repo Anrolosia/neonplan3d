@@ -1967,5 +1967,9 @@
  "voice_examples": "„Arată sufrageria”|„Mergi la etaj”|„Arată toată casa”|„Arată mașina de spălat” / „Unde e uscătorul?”|„Arată camera de la intrare”|„Arată camerele”|Orice altceva („aprinde lumina pe hol”) merge la Assist",
  "aliases": "Alte nume pentru voce",
  "aliases_hint": "Alte nume, separate prin virgulă – așa numești „Smart TV Pro” „televizorul din sufragerie”. Pentru comanda vocală și căutare.",
- "aliases_placeholder": "de ex. televizorul din sufragerie"
+ "aliases_placeholder": "de ex. televizorul din sufragerie",
+ "voice_showing": "Afișez {name}.",
+ "screen_name": "Numele ecranului (pentru Assist)",
+ "screen_name_placeholder": "de ex. Bucătărie",
+ "screen_name_hint": "Dacă întrebi Assist („Arată sufrageria”) sau o automatizare apelează serviciul neonplan3d.ask, reacționează fiecare vizualizare NeonPlan deschisă. Dacă serviciul numește un ecran, reacționează doar vizualizarea cu acel nume."
 }

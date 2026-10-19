@@ -675,12 +675,38 @@ Sprich mit deinem Haus. Unten links in der 3D-Ansicht erscheint ein **Mikrofon-K
 | „Zeig die Waschmaschine“, „Wo ist die Stehlampe?“, „Zeig den Fernseher“, „Wo ist der Trockner?“ | Die Ansicht fliegt zum Gerät oder Möbel, und es blinkt kurz auf. Möbel hören auf ihre Art („Trockner“, „Poolpumpe“), ihren eigenen Namen und Alltagswörter („TV“, „Glotze“, „Heizung“, „Auto“) – auch ohne verknüpfte Entität. Steht der Sensor als „Waschmaschine Leistung“ im Plan, reicht „Waschmaschine“. Gibt es ein Möbel mehrfach, nennst du den Raum dazu („die Heizung im Wohnzimmer“). |
 | „Zeig die Kamera Haustür“, „Zeig die Kamera im Garten“ | Die Ansicht schaut durch die Kamera (mit dem Kamera-Cockpit). |
 | „Zeig die Kameras“ | Die Kamera-Wand öffnet sich (mit dem Kamera-Cockpit). |
-| „Was ist offen?“, „Welche Fenster sind offen?“, „Ist im Bad ein Fenster offen?“, „Wo ist es kalt?“, „Wie warm ist es im Wohnzimmer?“, „Läuft die Waschmaschine?“, „Ist der Fernseher an?“, „Was zieht Strom?“, „Was macht die Solaranlage?“, „Wie voll ist der Akku?“, „Welche Lichter sind an?“, „Sind die Rollläden unten?“, „Ist die Haustür abgeschlossen?“, „Wer ist zu Hause?“, „Gute Nacht“, „Was kannst du?“ | Mit dem Modul **Das Haus antwortet** (kostenlos im Shop, siehe unten): Die Antwort erscheint als Sprechblase, wird über die Sprachausgabe von Assist vorgelesen, und das Haus zeigt sie – offene Fenster blinken, der kälteste Raum öffnet sich, die Ansicht fliegt zur Waschmaschine. |
-| „Licht im Flur an“, „Wie warm ist es draußen?“ | Alles andere geht an **Assist** von Home Assistant. Die Antwort erscheint als Sprechblase. |
+| „Was ist offen?“, „Wo ist es kalt?“, „Läuft die Waschmaschine?“, „Was zieht Strom?“, „Wer ist zu Hause?“, „Wie ist das Wetter?“, „Ist alles in Ordnung?“, „Was steht heute an?“, „Guten Morgen“, „Gute Nacht“ … | Mit dem Modul **Das Haus antwortet** (kostenlos im Shop, siehe unten): Die Antwort erscheint als Sprechblase, wird über die Sprachausgabe von Assist vorgelesen, und das Haus zeigt sie – offene Fenster blinken, der kälteste Raum öffnet sich, die Ansicht fliegt zur Waschmaschine. Die ganze Liste steht unten. |
+| „Licht im Flur an“, „Mach die Rollläden runter“ | Befehle gehen an **Assist** von Home Assistant. Die Antwort erscheint als Sprechblase. |
 
 Zusammengesetzte Wörter versteht es auch: „Auffahrtkamera“ trifft die Kamera „Auffahrt“, „Flurlicht“ das Licht im Flur. Unter **⚙ Einstellungen → Sprachsteuerung** steht die Liste **Das versteht NeonPlan**, mit den Sätzen der eingespielten Module.
 
 NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, Geräte und Möbel. Ein Raum hört auch auf den Namen seines Home-Assistant-Bereichs. Bei Geräten braucht es ein „zeig“ oder „wo ist“. So bleibt „Licht im Wohnzimmer an“ ein Befehl für Assist und schaltet das Licht, statt nur hinzufliegen.
+
+**Weitere Namen.** Heißt dein Fernseher in Home Assistant „Smart TV Pro“, du sagst aber „Wohnzimmerfernseher“ oder „Glotze“: Jeder Raum, jedes Möbel und jedes platzierte Gerät hat im Editor unter dem Namen das Feld **Weitere Namen für die Sprache** (mit Komma getrennt, bis zu zwölf). Die Namen gelten für die Sprachsteuerung und die Suche.
+
+**Das Haus antwortet – die Fragen.** Das Modul (siehe unten) beantwortet Fragen aus deinem Plan und deinen Sensoren, ohne KI, alles lokal:
+
+| Thema | Du fragst zum Beispiel |
+|---|---|
+| Offen | „Was ist offen?“, „Welche Fenster sind offen?“, „Ist im Bad ein Fenster offen?“, „Ist die Garage zu?“, „Wie lange ist das Fenster schon offen?“ – die Ansicht fliegt zu jedem offenen Fenster, von innen, und sagt dort, was es ist |
+| Temperatur | „Wo ist es kalt?“, „Wo ist es am wärmsten?“, „Wie warm ist es im Wohnzimmer?“, „Wie warm ist es draußen?“ |
+| Luft | „Wie feucht ist es im Bad?“, „Wie ist die Luft im Schlafzimmer?“ (CO₂), „Soll ich lüften?“ |
+| Heizung | „Auf was steht die Heizung im Wohnzimmer?“, „Heizt die Heizung?“ (Thermostate des Raums) |
+| Geräte | „Läuft die Waschmaschine noch?“, „Ist der Fernseher an?“, „Was läuft gerade alles?“, mit Haushalt Pro: „Wie lange läuft die Waschmaschine noch?“, „Wann ist die Wäsche fertig?“ |
+| Medien | „Was läuft im Fernseher?“, „Welche Musik läuft?“ |
+| Energie | „Was zieht gerade Strom?“, „Was macht die Solaranlage?“, „Wie voll ist der Akku?“ |
+| Licht, Rollläden, Schlösser | „Welche Lichter sind an?“, „Ist im Flur noch Licht an?“, „Sind die Rollläden unten?“, „Ist die Haustür abgeschlossen?“ |
+| Personen | „Wer ist zu Hause?“, „Wo ist Anna?“, „Ist jemand im Wohnzimmer?“, „Wo ist Bewegung?“ |
+| Warnungen | „Ist alles in Ordnung?“, „Gibt es Warnungen?“ (Rauch, Wasser, Fenster bei Regen, Stromausfall …) |
+| Haushalt (Haushalt Pro) | „Was steht heute an?“, „Wann kommt die Mülltonne?“, „Ist Post da?“, „Müssen die Pflanzen gegossen werden?“ |
+| Auto (Auto Pro) | „Wie voll ist das Auto?“, „Lädt das Auto?“, „Wie weit komme ich noch?“, „Ist das Auto abgeschlossen?“, „Wo steht das Auto?“ |
+| Pool (Pool Pro) | „Wie warm ist der Pool?“, „Läuft die Poolpumpe?“, „Wie ist der pH-Wert?“, „Ist der Pool in Ordnung?“ |
+| Wetter, Zeit | „Wie ist das Wetter?“, „Regnet es?“, „Wie spät ist es?“, „Welcher Tag ist heute?“, „Wann geht die Sonne unter?“ |
+| Das Haus | „Wie viele Räume hat das Haus?“, „Wie groß ist das Wohnzimmer?“, „Wie viele Fenster hat das Haus?“ |
+| Der Tag | „Guten Morgen“ – der Morgenbericht: Wetter, Warnungen, was offen ist, was heute ansteht, wer da ist, das Auto. „Gute Nacht“ – der Nacht-Check: offene Fenster und Türen, nicht abgeschlossene Schlösser, Lichter, laufende Geräte, mit Rundflug |
+| Und sonst | „Wer bist du?“, „Wie geht's dir?“, „Erzähl einen Witz“, „Danke“, „Hallo“, „Was kannst du?“ |
+
+Befehle („Mach das Licht an“, „Stell die Heizung auf 22 Grad“) gehen weiter an Assist. Die Antworten kommen in der Sprache deines Nutzers (Deutsch oder Englisch).
 
 **Module.** Manche Fähigkeiten kommen als **Modul** aus dem Shop: ein signiertes Pack, das Code mitbringt, den NeonPlan nachlädt – geprüft und an deine Installation gebunden wie ein Möbel-Pack. Das erste Modul ist **Das Haus antwortet** (kostenlos mit Kundenkonto). Es steht nach dem Einspielen unter Erweiterungen → Möbel-Packs als „Modul von Mastershort“. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache); ohne sie bleibt es bei der Sprechblase.
 
@@ -696,6 +722,20 @@ NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, 
 3. **Die Mikrofon-Freigabe:**
    - im Browser beim ersten Antippen „Zulassen“;
    - in **Fully Kiosk**: Einstellungen → Web Content Settings → Mikrofonzugriff einschalten (Plus-Lizenz), dazu in Android die Mikrofon-Berechtigung für Fully.
+
+**Über Assist fragen – ohne Mikrofon am Tablet.** Alles, was NeonPlan versteht, kannst du auch Assist sagen: einem Voice-Satelliten (Home Assistant Voice, ESPHome), dem Assist-Dialog oder der App. NeonPlan legt dafür beim Start die Sätze `custom_sentences/de/neonplan3d.yaml` und `…/en/…` in deinem Konfigurationsordner an (nur wenn sie fehlen oder sich geändert haben). Sagst du Assist „Zeig das Wohnzimmer“ oder „Was ist offen?“, geht der Satz an **jede offene NeonPlan-Ansicht** – das Wandtablet zeigt den Raum oder die offenen Fenster, und Assist spricht die Antwort dort, wo du gefragt hast. Das Tablet selbst bleibt dabei still. Die Sätze beginnen bewusst eindeutig („zeig …“, „wo ist …“, „was ist offen“, „frag das Haus …“, „NeonPlan, …“), damit Assist deine Lichter weiter selbst schaltet. Eigene Sätze legst du in einer weiteren Datei unter `custom_sentences` für den Intent `NeonPlanAsk` an.
+
+**Der Dienst `neonplan3d.ask`.** Für Automationen und Skripte: Felder **Satz** (`text`), **Bildschirm** (`screen`, optional) und **Sprechen** (`speak`, Standard aus). Der Dienst liefert die Antwort zurück (`answer`, `answered`, `screen_open`), zum Beispiel für eine Benachrichtigung. Mit `speak: true` spricht die Ansicht die Antwort selbst über die Sprachausgabe ihrer Assist-Pipeline. Beispiel – jeden Abend um 22 Uhr der Nacht-Check am Wandtablet:
+
+```yaml
+action: neonplan3d.ask
+data:
+  text: "Gute Nacht"
+  screen: "Flur"
+  speak: true
+```
+
+**Bildschirmnamen.** Hast du mehrere Tablets, gib jeder Ansicht einen Namen: im Editor unter **⚙ Einstellungen → 🎙 Sprachsteuerung → Bildschirmname** (gilt für dieses Gerät) oder an der Karte mit der Option `screen: Küche`. Nennt der Dienst einen Bildschirm, reagiert nur die Ansicht mit diesem Namen; ohne Angabe reagieren alle. Ist keine Ansicht offen, antwortet Assist „Kein NeonPlan-Bildschirm ist gerade offen“.
 
 **Testen:** Im Abschnitt **🎙️ Sprachsteuerung** startet **🎙️ Mikrofon testen** eine Probe. Sie prüft der Reihe nach https, Mikrofon, Pegel und Assist. Sie zeigt auch, welchen Raum ein gesprochener Satz öffnen würde, und schaltet dabei nichts. Steht irgendwo ein ✖, steht daneben, was zu tun ist.
 

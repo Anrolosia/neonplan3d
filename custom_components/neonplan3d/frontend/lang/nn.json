@@ -1967,5 +1967,9 @@
  "voice_examples": "«Vis stova»|«Gå til andre etasje»|«Vis heile huset»|«Vis vaskemaskina» / «Kvar er tørketrommelen?»|«Vis kameraet ved inngangsdøra»|«Vis kameraa»|Alt anna («slå på lyset i gangen») går til Assist",
  "aliases": "Fleire namn for stemma",
  "aliases_hint": "Fleire namn, kommaseparert – så kallar du «Smart TV Pro» «stove-tv». Brukt av stemmestyring og søk.",
- "aliases_placeholder": "t.d. stove-tv"
+ "aliases_placeholder": "t.d. stove-tv",
+ "voice_showing": "Viser {name}.",
+ "screen_name": "Skjermnamn (for Assist)",
+ "screen_name_placeholder": "t.d. Kjøken",
+ "screen_name_hint": "Spør du Assist («Vis stova») eller kallar ein automasjon tenesta neonplan3d.ask, reagerer alle opne NeonPlan-visingar. Nemner tenesta ein skjerm, reagerer berre visinga med det namnet."
 }
