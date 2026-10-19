@@ -1,7 +1,9 @@
-**NeonPlan 3D 1.20.2** brings fixes for stairwells, the media card and voice control on Android tablets, and more control over the devices of outdoor areas.
+**NeonPlan 3D 1.20.2** brings fixes for light wells, stairwells, the media card and voice control on Android tablets, and more control over the devices of outdoor areas.
 
 ### Fixed
 
+- **Light well switch missing (discussion #575):** the **Light well** tick in a cellar window's form did not show unless the plan had its own ground height, so light wells could not be switched off. It shows now for every window below the ground. Thanks @LortusX and @1970lexi!
+- **Light well lifted by a balcony (#602):** a balcony on the floor above raised the cellar window's light well up to itself. Only areas on the ground count now. Thanks @d14tk for the precise analysis!
 - **Floor opening over tall stairs (#375):** an opening above stairs that reach higher than the floor was not cut at all when the opening and the stairs' own hole together reached past the room. Each opening is now cut room by room. Thanks @wouter-b for narrowing it down and the plan, and @LarsTh86!
 - **▶ after ⏸ on the media card (#400):** on players that can pause but do not report "play" (an Echo through Alexa Media Player) the ▶ button was greyed out and sent nothing. It now resumes playback. Thanks @domodial!
 - **Voice control on Android tablets (#579):** some WebViews (e.g. Fully Kiosk on a Huawei tablet) recorded only silence, because the audio was started too late after the tap. It now starts on the tap itself. If only silence still comes in, NeonPlan says why: usually another app holds the microphone, for example Fully Kiosk's acoustic motion detection. Thanks @PetrMa!
@@ -16,10 +18,12 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ---
 
-**NeonPlan 3D 1.20.2** bringt Fehlerbehebungen für Treppenöffnungen, die Medienkarte und die Sprachsteuerung auf Android-Tablets, dazu mehr Kontrolle über die Geräte von Außenflächen.
+**NeonPlan 3D 1.20.2** bringt Fehlerbehebungen für Lichtschächte, Treppenöffnungen, die Medienkarte und die Sprachsteuerung auf Android-Tablets, dazu mehr Kontrolle über die Geräte von Außenflächen.
 
 ### Behoben
 
+- **Lichtschacht-Haken fehlte (Diskussion #575):** Der Haken **Lichtschacht** im Formular eines Kellerfensters erschien nur, wenn der Plan eine eigene Geländehöhe hatte. Lichtschächte ließen sich so nicht abschalten. Jetzt erscheint er bei jedem Fenster unter dem Gelände. Danke an @LortusX und @1970lexi!
+- **Lichtschacht vom Balkon hochgezogen (#602):** Ein Balkon im Geschoss darüber zog den Lichtschacht des Kellerfensters bis zu sich hoch. Jetzt zählen nur Flächen auf dem Gelände. Danke an @d14tk für die genaue Analyse!
 - **Bodenöffnung über hohen Treppen (#375):** Eine Öffnung über einer Treppe, die höher reicht als die Etage, wurde gar nicht ausgeschnitten, wenn Öffnung und Treppenloch zusammen über den Raum hinausreichten. Jetzt wird jede Öffnung Raum für Raum ausgeschnitten. Danke an @wouter-b für das Eingrenzen und den Plan, und an @LarsTh86!
 - **▶ nach ⏸ auf der Medienkarte (#400):** Bei Playern, die pausieren können, aber kein „Play“ melden (ein Echo über Alexa Media Player), war ▶ ausgegraut und schickte nichts. Jetzt geht die Wiedergabe weiter. Danke an @domodial!
 - **Sprachsteuerung auf Android-Tablets (#579):** Manche WebViews (z. B. Fully Kiosk auf einem Huawei-Tablet) nahmen nur Stille auf, weil der Ton zu spät nach dem Antippen gestartet wurde. Jetzt startet er direkt beim Antippen. Kommt trotzdem nur Stille an, sagt NeonPlan, woran es liegt: Meist hält eine andere App das Mikrofon fest, etwa die Bewegungserkennung per Geräusch in Fully Kiosk. Danke an @PetrMa!
