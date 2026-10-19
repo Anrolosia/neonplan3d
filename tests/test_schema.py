@@ -176,3 +176,22 @@ def test_sloping_walls_keep_two_heights_per_edge() -> None:
     assert ROOM_SCHEMA(room)["wall_slopes"] == [[1.0, 2.6], None, None]
     with pytest.raises(vol.Invalid):
         ROOM_SCHEMA({**ROOM, "wall_slopes": [[1.0]]})
+
+
+def test_live_director_triggers_and_live_picture() -> None:
+    """Own triggers with a camera each (D615) and the live picture switch (D589)."""
+    base = {"wall_exterior": 0.3, "wall_interior": 0.12, "grid": 0.05}
+    d = SETTINGS_SCHEMA(
+        {
+            **base,
+            "director": {
+                "triggers": [{"entity": "cover.garage", "camera": "camera.hof"}, {"entity": "event.klingel_2"}],
+                "live": True,
+            },
+        }
+    )["director"]
+    assert d["triggers"] == [
+        {"entity": "cover.garage", "camera": "camera.hof"},
+        {"entity": "event.klingel_2", "camera": None},
+    ]
+    assert d["live"] is True

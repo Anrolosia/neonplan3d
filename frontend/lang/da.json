@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Højde ved hjørne {n} (m)",
  "wall_slope_end": "Højde ved hjørne {n} (m)",
  "director_live": "Livebillede ved gennemkig",
- "director_live_hint": "I stedet for et stillbillede hvert par sekunder kører kameraets video (via Home Assistants afspiller). Kræver mere kraft – lad det hellere være slået fra på meget gamle tablets."
+ "director_live_hint": "I stedet for et stillbillede hvert par sekunder kører kameraets video (via Home Assistants afspiller). Kræver mere kraft – lad det hellere være slået fra på meget gamle tablets.",
+ "director_triggers": "Egne udløsere",
+ "director_triggers_hint": "Når en af disse entiteter tændes eller åbnes – en ekstra dørklokke, garageporten, havelågen –, flyver visningen derhen og kigger gennem det valgte kamera (uden kamera: til enheden).",
+ "director_trigger_entity": "Udløser",
+ "director_trigger_add": "+ Tilføj udløser"
 }

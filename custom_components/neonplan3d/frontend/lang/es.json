@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Altura en la esquina {n} (m)",
  "wall_slope_end": "Altura en la esquina {n} (m)",
  "director_live": "Imagen en directo al mirar a través",
- "director_live_hint": "En lugar de una imagen fija cada pocos segundos se ve el vídeo de la cámara (con el reproductor de Home Assistant). Necesita más potencia: en tabletas muy antiguas mejor dejarlo desactivado."
+ "director_live_hint": "En lugar de una imagen fija cada pocos segundos se ve el vídeo de la cámara (con el reproductor de Home Assistant). Necesita más potencia: en tabletas muy antiguas mejor dejarlo desactivado.",
+ "director_triggers": "Disparadores propios",
+ "director_triggers_hint": "Cuando una de estas entidades se enciende o se abre – un segundo timbre, la puerta del garaje, la cancela –, la vista vuela allí y mira por la cámara elegida (sin cámara: hacia el dispositivo).",
+ "director_trigger_entity": "Disparador",
+ "director_trigger_add": "+ Añadir disparador"
 }

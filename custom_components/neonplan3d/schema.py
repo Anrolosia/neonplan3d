@@ -672,6 +672,7 @@ FLOOR_SCHEMA = vol.Schema(
     extra=vol.ALLOW_EXTRA,
 )
 
+
 SETTINGS_SCHEMA = vol.Schema(
     {
         vol.Required("wall_exterior"): vol.All(vol.Coerce(float), vol.Range(min=0.02, max=1)),
@@ -773,6 +774,20 @@ SETTINGS_SCHEMA = vol.Schema(
                     vol.Optional("appliances", default=False): bool,
                     vol.Optional("alerts", default=False): bool,
                     vol.Optional("live", default=False): bool,
+                    vol.Optional("triggers", default=None): vol.Any(
+                        None,
+                        vol.All(
+                            [
+                                vol.Schema(
+                                    {
+                                        vol.Required("entity"): vol.All(str, vol.Length(max=255)),
+                                        vol.Optional("camera", default=None): _ENTITY_REF,
+                                    }
+                                )
+                            ],
+                            vol.Length(max=20),
+                        ),
+                    ),
                     vol.Optional("hold", default=None): vol.Any(
                         None, vol.All(vol.Coerce(float), vol.Range(min=10, max=600))
                     ),

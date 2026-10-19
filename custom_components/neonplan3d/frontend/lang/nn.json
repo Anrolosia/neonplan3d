@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Høgd ved hjørne {n} (m)",
  "wall_slope_end": "Høgd ved hjørne {n} (m)",
  "director_live": "Livebilete når du ser gjennom",
- "director_live_hint": "I staden for eit stillbilete med nokre sekund mellomrom vert videoen frå kameraet spela (via spelaren i Home Assistant). Krev meir kraft – la det heller vere av på svært gamle nettbrett."
+ "director_live_hint": "I staden for eit stillbilete med nokre sekund mellomrom vert videoen frå kameraet spela (via spelaren i Home Assistant). Krev meir kraft – la det heller vere av på svært gamle nettbrett.",
+ "director_triggers": "Eigne utløysarar",
+ "director_triggers_hint": "Når ein av desse entitetane vert slått på eller opna – ei ekstra dørklokke, garasjeporten, grinda –, flyg visinga dit og ser gjennom det valde kameraet (utan kamera: til eininga).",
+ "director_trigger_entity": "Utløysar",
+ "director_trigger_add": "+ Legg til utløysar"
 }

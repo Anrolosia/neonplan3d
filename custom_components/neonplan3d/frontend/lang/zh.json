@@ -1912,5 +1912,9 @@
  "wall_slope_start": "第 {n} 角高度（米）",
  "wall_slope_end": "第 {n} 角高度（米）",
  "director_live": "透视时显示实时画面",
- "director_live_hint": "不再每隔几秒显示一张静态图，而是播放摄像头视频（通过 Home Assistant 播放器）。需要更多性能——很旧的平板建议关闭。"
+ "director_live_hint": "不再每隔几秒显示一张静态图，而是播放摄像头视频（通过 Home Assistant 播放器）。需要更多性能——很旧的平板建议关闭。",
+ "director_triggers": "自定义触发器",
+ "director_triggers_hint": "当其中一个实体打开或开启时——第二个门铃、车库门、花园门——视图会飞过去并通过所选摄像头查看（没有摄像头时：飞到该设备）。",
+ "director_trigger_entity": "触发器",
+ "director_trigger_add": "+ 添加触发器"
 }

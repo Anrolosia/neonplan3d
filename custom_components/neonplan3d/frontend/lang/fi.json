@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Korkeus kulmassa {n} (m)",
  "wall_slope_end": "Korkeus kulmassa {n} (m)",
  "director_live": "Live-kuva läpi katsottaessa",
- "director_live_hint": "Muutaman sekunnin välein päivittyvän kuvan sijaan kameran video pyörii (Home Assistantin soittimella). Vaatii enemmän tehoa – hyvin vanhoissa tableteissa parempi pitää pois päältä."
+ "director_live_hint": "Muutaman sekunnin välein päivittyvän kuvan sijaan kameran video pyörii (Home Assistantin soittimella). Vaatii enemmän tehoa – hyvin vanhoissa tableteissa parempi pitää pois päältä.",
+ "director_triggers": "Omat laukaisimet",
+ "director_triggers_hint": "Kun jokin näistä entiteeteistä menee päälle tai auki – toinen ovikello, autotallin ovi, portti –, näkymä lentää sinne ja katsoo valitun kameran läpi (ilman kameraa: laitteeseen).",
+ "director_trigger_entity": "Laukaisin",
+ "director_trigger_add": "+ Lisää laukaisin"
 }

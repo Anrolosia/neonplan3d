@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Höjd vid hörn {n} (m)",
  "wall_slope_end": "Höjd vid hörn {n} (m)",
  "director_live": "Livebild när du tittar igenom",
- "director_live_hint": "I stället för en stillbild med några sekunders mellanrum spelas kamerans video (via Home Assistants spelare). Kräver mer kraft – låt det hellre vara av på mycket gamla plattor."
+ "director_live_hint": "I stället för en stillbild med några sekunders mellanrum spelas kamerans video (via Home Assistants spelare). Kräver mer kraft – låt det hellre vara av på mycket gamla plattor.",
+ "director_triggers": "Egna utlösare",
+ "director_triggers_hint": "När en av dessa entiteter slås på eller öppnas – en andra dörrklocka, garageporten, grinden –, flyger vyn dit och tittar genom den valda kameran (utan kamera: till enheten).",
+ "director_trigger_entity": "Utlösare",
+ "director_trigger_add": "+ Lägg till utlösare"
 }

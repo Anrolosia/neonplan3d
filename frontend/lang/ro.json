@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Înălțimea la colțul {n} (m)",
  "wall_slope_end": "Înălțimea la colțul {n} (m)",
  "director_live": "Imagine live când privești prin cameră",
- "director_live_hint": "În loc de o imagine statică la câteva secunde rulează video-ul camerei (prin playerul Home Assistant). Cere mai multă putere – pe tablete foarte vechi mai bine lăsat oprit."
+ "director_live_hint": "În loc de o imagine statică la câteva secunde rulează video-ul camerei (prin playerul Home Assistant). Cere mai multă putere – pe tablete foarte vechi mai bine lăsat oprit.",
+ "director_triggers": "Declanșatoare proprii",
+ "director_triggers_hint": "Când una dintre aceste entități pornește sau se deschide – o a doua sonerie, ușa garajului, poarta –, vederea zboară acolo și privește prin camera aleasă (fără cameră: spre dispozitiv).",
+ "director_trigger_entity": "Declanșator",
+ "director_trigger_add": "+ Adaugă declanșator"
 }

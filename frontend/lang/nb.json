@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Høyde ved hjørne {n} (m)",
  "wall_slope_end": "Høyde ved hjørne {n} (m)",
  "director_live": "Livebilde når du ser gjennom",
- "director_live_hint": "I stedet for et stillbilde med noen sekunders mellomrom spilles kameraets video (via Home Assistants spiller). Krever mer kraft – la det heller være av på svært gamle nettbrett."
+ "director_live_hint": "I stedet for et stillbilde med noen sekunders mellomrom spilles kameraets video (via Home Assistants spiller). Krever mer kraft – la det heller være av på svært gamle nettbrett.",
+ "director_triggers": "Egne utløsere",
+ "director_triggers_hint": "Når en av disse entitetene slås på eller åpnes – en ekstra dørklokke, garasjeporten, grinden –, flyr visningen dit og ser gjennom det valgte kameraet (uten kamera: til enheten).",
+ "director_trigger_entity": "Utløser",
+ "director_trigger_add": "+ Legg til utløser"
 }

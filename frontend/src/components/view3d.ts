@@ -117,7 +117,7 @@ import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
 import { backdropCss } from "../backdrop.ts";
 import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
-import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, type DirectorSettings, type Shot } from "../director.ts";
+import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, triggerFired, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
 /** Which HTML markers are shown: none, only what has no 3D object or shows a value, or all. */
@@ -2295,6 +2295,13 @@ export class Fp3dView3d extends LitElement {
         shots.push({ kind: "doorbell", key: `bell:${bell.id}`, entity: bell.id, camera: bell.camera });
       }
     }
+    // own triggers: an entity that goes on or open, with the camera chosen for it (D615)
+    for (const t of s.triggers ?? []) {
+      if (!t.entity) continue;
+      if (this.directing.edge(`trigger:${t.entity}`, hass.states[t.entity], (a, c) => triggerFired(a, c, now))) {
+        shots.push({ kind: "trigger", key: `trigger:${t.entity}`, entity: t.entity, camera: t.camera });
+      }
+    }
     for (const m of this.directorSrc.motion) {
       if (this.directing.edge(m.sensor, hass.states[m.sensor], (a, c) => a?.state === "off" && c?.state === "on")) {
         shots.push({ kind: "motion", key: `cam:${m.cam}`, entity: m.sensor, camera: m.cam });
@@ -2306,7 +2313,7 @@ export class Fp3dView3d extends LitElement {
       clearTimeout(this.restTimer);
       if (this.directing.resting()) this.restTimer = setTimeout(() => this.direct(), 60_000);
     }
-    const order: Shot["kind"][] = ["doorbell", "motion", "appliance"];
+    const order: Shot["kind"][] = ["doorbell", "trigger", "motion", "appliance"];
     shots.sort((x, y) => order.indexOf(x.kind) - order.indexOf(y.kind));
     for (const shot of shots) {
       if (!this.directing.offer(shot, now, hold)) continue;

@@ -10748,6 +10748,37 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
+  /** Live director: own triggers – an entity that goes on or open and the camera to show for it (D615). */
+  private renderDirectorTriggers(d: DirectorSettings, placed: string[]) {
+    const hass = this.hass;
+    if (!hass) return nothing;
+    const list = d.triggers ?? [];
+    const save = (next: { entity: string; camera: string | null }[]) => this.change((doc) => (doc.settings.director = { ...(doc.settings.director ?? {}), triggers: next.length ? next : null }));
+    const pro = hasFeature("camera_cockpit");
+    return html`<div class="fp3d-wide">
+      <h4 class="fp3d-lib-head">${this.t("director_triggers")}</h4>
+      <p class="fp3d-sub">${this.t("director_triggers_hint")}</p>
+      ${list.map(
+        (t, i) => html`<div class="fp3d-form">
+          ${this.entitySelect(this.t("director_trigger_entity"), t.entity || null, undefined, this.entityOptions((id) => /^(event|binary_sensor|cover|lock|switch|input_boolean)\./.test(id)), (v) =>
+            save(list.map((x, k) => (k === i ? { ...x, entity: v && v !== "none" ? v : "" } : x)).filter((x) => x.entity)),
+          )}
+          ${this.entitySelect(this.t("director_doorbell_camera"), t.camera, undefined, this.entityOptions((id) => id.startsWith("camera.") && placed.includes(id)), (v) =>
+            save(list.map((x, k) => (k === i ? { ...x, camera: v && v !== "none" ? v : null } : x))),
+          )}
+          <button class="fp3d-btn" ?disabled=${!pro} @click=${() => save(list.filter((_, k) => k !== i))}>✕ ${this.t("delete")}</button>
+        </div>`,
+      )}
+      ${list.length < 20 && pro
+        ? html`<div class="fp3d-form">
+            ${this.entitySelect(this.t("director_trigger_add"), null, undefined, this.entityOptions((id) => /^(event|binary_sensor|cover|lock|switch|input_boolean)\./.test(id)), (v) => {
+              if (v && v !== "none") save([...list, { entity: v, camera: null }]);
+            })}
+          </div>`
+        : nothing}
+    </div>`;
+  }
+
   /**
    * Kamera-Cockpit: the live director – which events a screen shows by itself (each off until switched on), and the
    * switch for this device (a card has its own option).
@@ -10795,6 +10826,7 @@ export class Fp3dEditor extends LitElement {
         >
         ${check("director_appliances", !!d.appliances, (on) => set({ appliances: on }))}
         ${check("director_alerts", !!d.alerts, (on) => set({ alerts: on }))}
+        ${this.renderDirectorTriggers(d, placed)}
         ${check("director_live", !!d.live, (on) => set({ live: on }))}
         <p class="fp3d-sub fp3d-wide">${this.t("director_live_hint")}</p>
         ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}

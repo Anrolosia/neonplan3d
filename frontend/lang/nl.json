@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Hoogte bij hoek {n} (m)",
  "wall_slope_end": "Hoogte bij hoek {n} (m)",
  "director_live": "Livebeeld bij doorkijken",
- "director_live_hint": "In plaats van elke paar seconden een stilstaand beeld loopt de video van de camera (via de speler van Home Assistant). Vraagt meer rekenkracht – op heel oude tablets liever uit laten."
+ "director_live_hint": "In plaats van elke paar seconden een stilstaand beeld loopt de video van de camera (via de speler van Home Assistant). Vraagt meer rekenkracht – op heel oude tablets liever uit laten.",
+ "director_triggers": "Eigen triggers",
+ "director_triggers_hint": "Gaat een van deze entiteiten aan of open – een tweede deurbel, de garagedeur, het tuinhek –, dan vliegt het beeld erheen en kijkt door de gekozen camera (zonder camera: naar het apparaat).",
+ "director_trigger_entity": "Trigger",
+ "director_trigger_add": "+ Trigger toevoegen"
 }

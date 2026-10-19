@@ -697,6 +697,7 @@ Pro add-ons are paid extra features, sold singly in the shop. Without an add-on,
    - **Washer, dryer or dishwasher finished:** the appliance has to be furniture linked to a power sensor or a status. It counts as finished once it rests for 3 minutes after its run, so a pause in the programme does not count.
    - **New warning:** smoke, water, alarm, a window in the rain and so on.
    - **Back after:** the seconds before the view goes back (default 30). The doorbell stays twice as long.
+   - **Own triggers:** further entities, each with a camera. When one goes on or open, e.g. a second doorbell, the garage door or the garden gate, the view flies there and looks through that camera. Without a camera it flies to the device.
    - **Live picture when looking through:** instead of a still every few seconds the camera's video runs, also for "Look through the camera" by hand. Needs more power; better leave it off on very old tablets.
 2. **On which screen:** in the same section, **Switch on on this device**. This only applies to this browser, e.g. the wall tablet with the NeonPlan panel. On a dashboard card you switch on **Live director** in the card settings instead (`director: true`).
 

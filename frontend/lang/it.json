@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Altezza all'angolo {n} (m)",
  "wall_slope_end": "Altezza all'angolo {n} (m)",
  "director_live": "Immagine live guardando attraverso",
- "director_live_hint": "Invece di un fermo immagine ogni pochi secondi scorre il video della telecamera (con il player di Home Assistant). Richiede più potenza: sui tablet molto vecchi meglio lasciarlo spento."
+ "director_live_hint": "Invece di un fermo immagine ogni pochi secondi scorre il video della telecamera (con il player di Home Assistant). Richiede più potenza: sui tablet molto vecchi meglio lasciarlo spento.",
+ "director_triggers": "Attivatori propri",
+ "director_triggers_hint": "Quando una di queste entità si accende o si apre – un secondo campanello, la porta del garage, il cancello –, la vista vola lì e guarda attraverso la telecamera scelta (senza: verso il dispositivo).",
+ "director_trigger_entity": "Attivatore",
+ "director_trigger_add": "+ Aggiungi attivatore"
 }

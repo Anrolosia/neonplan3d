@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- Live director: **own triggers** – any entity that goes on or open (a second doorbell, the garage door, a gate), each with its camera (D615).
 - Live director / look through a camera: an option **Live picture when looking through** shows the camera's video instead of a still every few seconds (D589).
 - Energy hologram: the bar is called **Self-sufficiency now** (it is the momentary value) and no longer shows 100 % when the grid reading is missing (D590).
 - Sloping walls: ◢ Sloping in a room's wall heights gives a wall its own height at each corner, the top runs straight between them; windows and doors stay under it (D569; NextFloor has it too).

@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Hauteur à l'angle {n} (m)",
  "wall_slope_end": "Hauteur à l'angle {n} (m)",
  "director_live": "Image en direct en regardant à travers",
- "director_live_hint": "Au lieu d'une image fixe toutes les quelques secondes, la vidéo de la caméra défile (via le lecteur de Home Assistant). Demande plus de puissance – à laisser désactivé sur les très vieilles tablettes."
+ "director_live_hint": "Au lieu d'une image fixe toutes les quelques secondes, la vidéo de la caméra défile (via le lecteur de Home Assistant). Demande plus de puissance – à laisser désactivé sur les très vieilles tablettes.",
+ "director_triggers": "Déclencheurs personnels",
+ "director_triggers_hint": "Quand l'une de ces entités s'allume ou s'ouvre – une deuxième sonnette, la porte du garage, le portail –, la vue s'y rend et regarde par la caméra choisie (sans caméra : vers l'appareil).",
+ "director_trigger_entity": "Déclencheur",
+ "director_trigger_add": "+ Ajouter un déclencheur"
 }

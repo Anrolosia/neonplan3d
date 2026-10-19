@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Altura no canto {n} (m)",
  "wall_slope_end": "Altura no canto {n} (m)",
  "director_live": "Imagem ao vivo ao olhar através",
- "director_live_hint": "Em vez de uma imagem fixa a cada poucos segundos corre o vídeo da câmara (pelo leitor do Home Assistant). Precisa de mais potência – em tablets muito antigos é melhor deixar desligado."
+ "director_live_hint": "Em vez de uma imagem fixa a cada poucos segundos corre o vídeo da câmara (pelo leitor do Home Assistant). Precisa de mais potência – em tablets muito antigos é melhor deixar desligado.",
+ "director_triggers": "Gatilhos próprios",
+ "director_triggers_hint": "Quando uma destas entidades liga ou abre – uma segunda campainha, o portão da garagem, o portão do jardim –, a vista voa até lá e olha pela câmara escolhida (sem câmara: para o dispositivo).",
+ "director_trigger_entity": "Gatilho",
+ "director_trigger_add": "+ Adicionar gatilho"
 }

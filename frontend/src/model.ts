@@ -619,6 +619,8 @@ export interface BuildingSettings {
     hold?: number | null;
     /** Looking through a camera shows its live stream instead of a still every few seconds (D589; off: old tablets). */
     live?: boolean;
+    /** Own triggers (D615): an entity that goes on or open (a second doorbell, the garage door) and the camera to show. */
+    triggers?: { entity: string; camera: string | null }[] | null;
   } | null;
   /** Fun pack "pets": the animals and whether they are shown. */
   pets?: { on: boolean; list: Pet[] } | null;

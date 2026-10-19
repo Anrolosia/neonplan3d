@@ -697,6 +697,7 @@ Pro-Erweiterungen sind kostenpflichtige Zusatzfunktionen, einzeln im Shop erhäl
    - **Waschmaschine, Trockner oder Spülmaschine fertig:** Das Gerät muss als Möbel mit Strommessung oder Status verknüpft sein. Als fertig gilt es, wenn es nach dem Lauf 3 Minuten ruht. Eine Pause im Programm zählt also nicht.
    - **Neue Warnung:** Rauch, Wasser, Alarm, Fenster bei Regen und so weiter.
    - **Zurück nach:** die Sekunden bis zur Rückkehr (Standard 30). Die Klingel bleibt doppelt so lange.
+   - **Eigene Auslöser:** weitere Entitäten, jeweils mit einer Kamera. Geht eine davon an oder auf, z. B. eine zweite Klingel, das Garagentor oder das Gartentor, fliegt die Ansicht hin und schaut durch diese Kamera. Ohne Kamera fliegt sie zum Gerät.
    - **Livebild beim Durchschauen:** Statt eines Standbilds alle paar Sekunden läuft das Video der Kamera. Das gilt auch für „Durch die Kamera schauen“ von Hand. Braucht mehr Leistung, auf sehr alten Tablets lieber aus lassen.
 2. **Auf welchem Bildschirm:** im selben Abschnitt **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet mit dem NeonPlan-Panel. Auf einer Dashboard-Karte schaltest du stattdessen **Live-Regie** in den Karten-Einstellungen ein (`director: true`).
 

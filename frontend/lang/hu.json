@@ -1912,5 +1912,9 @@
  "wall_slope_start": "Magasság a(z) {n}. saroknál (m)",
  "wall_slope_end": "Magasság a(z) {n}. saroknál (m)",
  "director_live": "Élő kép a kamerán át nézve",
- "director_live_hint": "Néhány másodpercenkénti állókép helyett a kamera videója fut (a Home Assistant lejátszójával). Több teljesítményt igényel – nagyon régi tableteken inkább maradjon kikapcsolva."
+ "director_live_hint": "Néhány másodpercenkénti állókép helyett a kamera videója fut (a Home Assistant lejátszójával). Több teljesítményt igényel – nagyon régi tableteken inkább maradjon kikapcsolva.",
+ "director_triggers": "Saját indítók",
+ "director_triggers_hint": "Ha ezek közül valamelyik entitás bekapcsol vagy kinyílik – egy második csengő, a garázskapu, a kertkapu –, a nézet odarepül, és a választott kamerán át néz (kamera nélkül: az eszközhöz).",
+ "director_trigger_entity": "Indító",
+ "director_trigger_add": "+ Indító hozzáadása"
 }
