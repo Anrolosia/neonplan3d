@@ -21,6 +21,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
+- Furniture packs: on Home Assistant 2026.9 and newer a pack with an item kind this version does not know yet showed "invalid content" instead of asking for an update (pointed out by hohoanganh).
 - Waste bins in the Blueprint and Day looks: the lower half fell back to the look's grey; coloured bins now keep their colour down to the ground (#609, thanks TheBhim).
 
 ## 1.20.2
