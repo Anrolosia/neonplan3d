@@ -657,12 +657,12 @@ Sprich mit deinem Haus. Unten links in der 3D-Ansicht erscheint ein **Mikrofon-K
 | „Zeig das Obergeschoss“, „Keller“ | Die Etage öffnet sich. |
 | „Zeig das ganze Haus“ | Zurück zur Hausansicht. |
 | „Zeig den Garten“, „Terrasse“ | Eine Außenfläche mit Namen und Bereich öffnet sich wie ein Raum. |
-| „Zeig die Waschmaschine“, „Wo ist die Stehlampe?“ | Die Ansicht fliegt zum Gerät, und es blinkt kurz auf. |
+| „Zeig die Waschmaschine“, „Wo ist die Stehlampe?“, „Zeig den Fernseher“, „Wo ist der Trockner?“ | Die Ansicht fliegt zum Gerät oder Möbel, und es blinkt kurz auf. Möbel hören auf ihre Art („Trockner“, „Poolpumpe“), ihren eigenen Namen und Alltagswörter („TV“, „Glotze“, „Heizung“, „Auto“) – auch ohne verknüpfte Entität. Steht der Sensor als „Waschmaschine Leistung“ im Plan, reicht „Waschmaschine“. Gibt es ein Möbel mehrfach, nennst du den Raum dazu („die Heizung im Wohnzimmer“). |
 | „Zeig die Kamera Haustür“, „Zeig die Kamera im Garten“ | Die Ansicht schaut durch die Kamera (mit dem Kamera-Cockpit). |
 | „Zeig die Kameras“ | Die Kamera-Wand öffnet sich (mit dem Kamera-Cockpit). |
 | „Licht im Flur an“, „Wie warm ist es draußen?“ | Alles andere geht an **Assist** von Home Assistant. Die Antwort erscheint als Sprechblase. |
 
-NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen und Geräte. Ein Raum hört auch auf den Namen seines Home-Assistant-Bereichs. Bei Geräten braucht es ein „zeig“ oder „wo ist“. So bleibt „Licht im Wohnzimmer an“ ein Befehl für Assist und schaltet das Licht, statt nur hinzufliegen.
+NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, Geräte und Möbel. Ein Raum hört auch auf den Namen seines Home-Assistant-Bereichs. Bei Geräten braucht es ein „zeig“ oder „wo ist“. So bleibt „Licht im Wohnzimmer an“ ein Befehl für Assist und schaltet das Licht, statt nur hinzufliegen.
 
 **Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
 

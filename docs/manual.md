@@ -657,7 +657,7 @@ Talk to your house. A **microphone button** 🎙️ appears at the bottom left o
 | "Show the upper floor", "Cellar" | The floor opens. |
 | "Show the whole house" | Back to the house view. |
 | "Show the garden", "Terrace" | An outdoor area with a name and an area opens like a room. |
-| "Show the washing machine", "Where is the floor lamp?" | The view flies to the device and it flashes. |
+| "Show the washing machine", "Where is the floor lamp?", "Show the TV", "Where is the dryer?" | The view flies to the device or piece of furniture and it flashes. Furniture answers to its kind ("dryer", "pool pump"), its own name and everyday words ("TV", "telly", "heating", "car") – with or without a linked entity. If the sensor is called "Washing machine power" in the plan, "washing machine" is enough. With several of a kind, name the room too ("the heating in the living room"). |
 | "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
 | "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
 | "Turn on the hall light", "How warm is it outside?" | Anything else goes to Home Assistant's **Assist**. The answer shows as a speech bubble. |

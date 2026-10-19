@@ -6,6 +6,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+### Improved
+
+- Voice control: furniture can be asked for by its kind ("Zeig den Trockner"), its own name and everyday words ("TV", "Glotze", "Heizung", "Auto"), with or without an entity; a sensor called "Waschmaschine Leistung" answers to "Waschmaschine"; with several of a kind the one in the room named wins.
+
 ### Fixed
 
 - Editor: a pool (or any smaller area) inside a lawn or terrace could not be selected with the select tool – the larger area caught the tap; the smallest area under the pointer now wins, like with rooms.

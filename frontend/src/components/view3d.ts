@@ -97,6 +97,7 @@ import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
+import type { Shown } from "../voice/targets.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
@@ -4024,12 +4025,33 @@ export class Fp3dView3d extends LitElement {
         say("error", translate(hass, "voice_none"));
         return;
       }
-      // the plan's devices (placed, or furniture with an entity), with the room each stands in
+      // what can be shown: every piece of furniture (with or without an entity) by its own name, its kind, its
+      // entity's name and everyday words for it ("TV", "Glotze"); placed devices by their name – each with its room
       const index = (this.findIndex ??= searchIndex(hass, b));
       const roomName = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
-      const devices = index
-        .filter((it) => it.kind === "device" && it.entity)
-        .map((it) => ({ entity: it.entity!, name: it.name, room: (it.roomId && roomName.get(it.roomId)) || "", camera: kindOf(it.entity!) === "camera" }));
+      const devices: Shown[] = [];
+      const items = new Map<string, SearchItem>();
+      for (const it of index) if (it.kind === "device" && it.entity) items.set(it.entity, it);
+      const ofFurniture = new Set<string>();
+      for (const floor of b.floors) {
+        const zones = zonesOf(floor);
+        for (const f of floor.furniture) {
+          if (UNSPOKEN.has(f.type)) continue;
+          const link = this.furnitureLinks.get(f.id);
+          const entity = link?.entity ?? link?.power ?? null;
+          const id = entity ?? `furniture:${f.id}`;
+          const zone = zones.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+          const kindName = furnitureName(hass, f.type);
+          const names = [f.name, kindName, entity ? entityName(hass, entity) : null, ...(v.SYNONYMS[f.type] ?? [])].filter((n): n is string => !!n);
+          devices.push({ id, entity, name: f.name || (entity ? entityName(hass, entity) : kindName), names, room: zone?.name ?? "", camera: !!entity && kindOf(entity) === "camera" });
+          if (entity) ofFurniture.add(entity);
+          else items.set(id, { kind: "device", name: f.name || kindName, where: "", floorId: floor.id, roomId: zone?.id ?? null, entity: null, icon: null, x: f.x, z: f.z, y: Math.min(floor.height - 0.3, Math.max(0.5, f.h)) });
+        }
+      }
+      for (const [entity, it] of items) {
+        if (ofFurniture.has(entity) || entity.startsWith("furniture:")) continue;
+        devices.push({ id: entity, entity, name: it.name, room: (it.roomId && roomName.get(it.roomId)) || "", camera: kindOf(entity) === "camera" });
+      }
       const place = v.showTarget(text, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
       if (place) {
         say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.kind === "cameras" ? translate(hass, "camera_wall_title") : place.name}`);
@@ -4038,9 +4060,9 @@ export class Fp3dView3d extends LitElement {
           if (hasFeature("camera_cockpit")) this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
           else this._proHint = "camera_cockpit";
         } else if (place.kind === "device") {
-          const item = index.find((it) => it.entity === place.entity);
+          const item = items.get(place.id);
           // a camera is looked through (Kamera-Cockpit), any other device shown where it stands
-          if (place.camera && hasFeature("camera_cockpit")) this.lookThrough(place.entity);
+          if (place.camera && place.entity && hasFeature("camera_cockpit")) this.lookThrough(place.entity);
           else if (item) this.goTo(item);
         } else if (place.kind === "house") this.fire("floor-tap", { floorId: null });
         else if (place.kind === "floor") this.fire("floor-tap", { floorId: place.floorId });
@@ -6261,6 +6283,9 @@ function runGlow(type: string): ScreenState {
   const color: [number, number, number] = [0.3, 0.85, 1];
   return type === "washer" || type === "dryer" ? { color, level: 0.8, faces: [{ part: "drum", color, level: 0.8 }] } : { color, level: 0.8 };
 }
+
+/** Furniture nobody asks to see by voice (the floor itself, holes, helpers). */
+const UNSPOKEN = new Set(["rug", "stairwell", "grid_point", "worktop"]);
 
 function markerHeight(f: Furniture): number {
   if (f.type === "tv_board") return f.h + 0.9;
