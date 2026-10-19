@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
+- Waste bins (Household Pro): a sensor showing a date ("on Mon, 26.10.2026", "28.10.", "29/10/2026") showed "in 2026 days" since 1.20.1 (and the day of the month before) – a date in the text is now read as a date.
 - Light wells: the **Light well** switch in the window form did not show for cellar windows without an own ground height (the editor measured the ground differently from the 3D view), so wells could not be switched off (D575).
 - Light wells: a balcony on the floor above lifted the well's rim up to itself – only areas on the ground count now (#602).
 - Floor opening not cut when the stairs below reach higher than the floor and their own hole, joined with the opening, reached past the room – now each opening is cut room by room and joined afterwards (#375).
