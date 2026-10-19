@@ -1954,5 +1954,10 @@
  "heater_entity": "Urządzenie (water_heater, termostat lub przełącznik)",
  "heater_temp": "Czujnik: temperatura wody (opcjonalnie)",
  "heater_hint": "Zasobnik świeci ciepło, dopóki grzeje (termostat grzeje, przełącznik włączony lub moc powyżej progu), i pokazuje temperaturę wody – z czujnika lub z samego urządzenia.",
- "pack_module": "Moduł od {publisher} · działa w domu"
+ "pack_module": "Moduł od {publisher} · działa w domu",
+ "settings_house": "Dom",
+ "settings_weather": "Pogoda i ostrzeżenia",
+ "settings_modules": "Moduły",
+ "roof_basics": "Kształt dachu",
+ "module_no_settings": "Ten moduł nie ma własnych ustawień."
 }

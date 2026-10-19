@@ -8,7 +8,7 @@ import { loadEditor } from "./load-editor.ts";
 import "./components/room-panel.ts";
 import "./components/view3d.ts";
 import { languageReady, loadLanguage, translate, type I18nKey } from "./i18n.ts";
-import type { Building } from "./model.ts";
+import type { Building, StartView } from "./model.ts";
 import { controls, tokens } from "./styles.ts";
 import type { HomeAssistant } from "./types.ts";
 import type { MarkerMode } from "./components/view3d.ts";
@@ -456,8 +456,17 @@ export class Floorplan3dPanel extends LitElement {
     this._selFurniture = null;
   }
 
+  /** The view as it stands now becomes the start view of the house (null: back to the default); saved in the plan. */
+  private rememberStartView(reset = false): void {
+    const b = this.data.building;
+    if (!b) return;
+    const view = reset ? null : this.view3d()?.currentView();
+    if (!reset && !view) return;
+    this.data.edit({ ...b, settings: { ...b.settings, start_view: view ?? null } });
+  }
+
   private view3d() {
-    return this.renderRoot.querySelector("fp3d-view3d") as (HTMLElement & { resetView(): void; lookThrough(entityId: string): void; historyEntities(): HistorySpec; proHint(f: Feature): void }) | null;
+    return this.renderRoot.querySelector("fp3d-view3d") as (HTMLElement & { resetView(): void; lookThrough(entityId: string): void; historyEntities(): HistorySpec; proHint(f: Feature): void; currentView(): StartView | null }) | null;
   }
 
   /** Time travel on or off; without the Pro add-on its hint shows. `at`: a start moment from a link. */
@@ -649,6 +658,18 @@ export class Floorplan3dPanel extends LitElement {
                       ${right ? "◨" : "◧"}
                     </button>`,
                 )}
+                ${this.isAdmin
+                  ? html`<button
+                        title=${`${this.t("start_view")}: ${this.t("start_view_set")}`}
+                        aria-label=${this.t("start_view_set")}
+                        @click=${() => this.rememberStartView()}
+                      >
+                        📌
+                      </button>
+                      ${this.data.building?.settings.start_view
+                        ? html`<button title=${`${this.t("start_view")}: ${this.t("start_view_reset")}`} aria-label=${this.t("start_view_reset")} @click=${() => this.rememberStartView(true)}>📌✕</button>`
+                        : nothing}`
+                  : nothing}
                 <button
                   aria-pressed=${this._keepView}
                   title=${`${this.t("keep_view")}: ${this.t("keep_view_hint")}`}

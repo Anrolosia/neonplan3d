@@ -1954,5 +1954,10 @@
  "heater_entity": "Eszköz (water_heater, termosztát vagy kapcsoló)",
  "heater_temp": "Érzékelő: vízhőmérséklet (opcionális)",
  "heater_hint": "A tároló melegen izzik, amíg fűt (a termosztát fűt, a kapcsoló be van kapcsolva vagy a teljesítmény a küszöb felett van), és mutatja a víz hőmérsékletét – az érzékelőből vagy magától az eszköztől.",
- "pack_module": "{publisher} modulja · fut a házban"
+ "pack_module": "{publisher} modulja · fut a házban",
+ "settings_house": "Ház",
+ "settings_weather": "Időjárás és figyelmeztetések",
+ "settings_modules": "Modulok",
+ "roof_basics": "Tetőforma",
+ "module_no_settings": "Ennek a modulnak nincsenek saját beállításai."
 }

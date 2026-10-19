@@ -1954,5 +1954,10 @@
  "heater_entity": "Dispositivo (water_heater, termóstato ou interruptor)",
  "heater_temp": "Sensor: temperatura da água (opcional)",
  "heater_hint": "O termoacumulador brilha quente enquanto aquece (termóstato a aquecer, interruptor ligado ou potência acima do limiar) e mostra a temperatura da água – do sensor ou do próprio aparelho.",
- "pack_module": "Módulo de {publisher} · ativo na casa"
+ "pack_module": "Módulo de {publisher} · ativo na casa",
+ "settings_house": "Casa",
+ "settings_weather": "Tempo e avisos",
+ "settings_modules": "Módulos",
+ "roof_basics": "Forma do telhado",
+ "module_no_settings": "Este módulo não tem definições próprias."
 }

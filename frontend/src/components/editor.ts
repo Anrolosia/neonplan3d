@@ -194,6 +194,9 @@ const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", 
 
 const HISTORY = 100;
 
+/** Topics of the ⚙ settings menu (everything that belongs to the whole plan). */
+type SettingsTopic = "house" | "weather" | "director" | "voice" | "favorites" | "backdrop" | "terrain" | "backup" | "modules";
+
 /** Wall view side bar: what stands or hangs at a wall, by kind. */
 const WALL_CATS: Record<string, string[]> = {
   base: ["kitchen", "sink", "stove", "dishwasher", "sideboard", "dresser", "tv_board", "nightstand", "washbasin", "washer", "dryer", "worktop", "desk"],
@@ -346,6 +349,8 @@ export class Fp3dEditor extends LitElement {
     _rectSize: { state: true },
     _tool: { state: true },
     _toolMenu: { state: true },
+    _settingsMenu: { state: true },
+    _settingsDialog: { state: true },
     _toolOpen: { state: true },
     _viewMenu: { state: true },
     _draft: { state: true },
@@ -552,6 +557,9 @@ export class Fp3dEditor extends LitElement {
   private declare _tool: Tool;
   /** The toolbar menu open (its group), and which tool's choices are unfolded in it. */
   private declare _toolMenu: string | null;
+  /** The ⚙ menu in the toolbar is open; the global settings dialog shown (its topic). */
+  private declare _settingsMenu: boolean;
+  private declare _settingsDialog: SettingsTopic | null;
   private declare _toolOpen: Tool | null;
   /** The view menu of the toolbar (fit, 3D beside, wall view, lock) is open. */
   private declare _viewMenu: boolean;
@@ -712,6 +720,8 @@ export class Fp3dEditor extends LitElement {
     this._rectSize = [4, 3];
     this._tool = "select";
     this._toolMenu = null;
+    this._settingsMenu = false;
+    this._settingsDialog = null;
     this._toolOpen = null;
     this._viewMenu = false;
     this._draft = [];
@@ -1094,6 +1104,8 @@ export class Fp3dEditor extends LitElement {
   }
 
   protected updated(): void {
+    // the settings dialog shows its section unfolded (its summary is hidden there)
+    if (this._settingsDialog) for (const d of this.renderRoot.querySelectorAll<HTMLDetailsElement>(".fp3d-dialog details")) d.open = true;
     // the item preview is placed in window coordinates; with the 3D view beside the plan an ancestor becomes its
     // containing block (a transform or filter), so "fixed" no longer means the window: measure and correct once
     const preview = this._preview ? this.renderRoot.querySelector<HTMLElement>(".fp3d-preview") : null;
@@ -3825,7 +3837,8 @@ export class Fp3dEditor extends LitElement {
     if (win) return this.renderRoofWindowForm(win);
     if (sec) return this.renderRoofSectionForm(sec);
     const sections = roof.type === "custom" ? (roof.sections ?? []) : [];
-    return html`<section>
+    return html`${this.renderRoofBasics()}
+    <section>
       ${this.renderRoofFloors()}
       <h3>${this.t("roof_sections")}</h3>
       <p class="fp3d-sub">${this.t("roof_sections_hint")}</p>
@@ -5350,14 +5363,116 @@ export class Fp3dEditor extends LitElement {
         <button aria-pressed=${this._split} title=${this.t("split_3d_hint")} @click=${() => (close(), this.toggleSplit())}>${this.t("split_3d")}</button>
         <button aria-pressed=${this._wallPick} title=${this.t("wall_view_open")} @click=${(e: Event) => (close(), this.toggleWallPick(e.currentTarget as HTMLElement))}>${this.t("wall_view")}</button>
         <button title=${this.t("fit_hint")} @click=${() => (close(), this.fit())}>${this.t("fit")}</button>
-      </div>`;
+      </div>
+      ${this.renderSettingsMenu(close)}`;
+  }
+
+  /**
+   * ⚙ Settings: everything that belongs to the whole plan, not to a floor, a room or an item – the house, weather
+   * and warnings, the live director, voice control, favourites, the background, the ground, the backup and the
+   * modules. One button in the toolbar opens the list; a topic opens as a dialog over the plan.
+   */
+  private renderSettingsMenu(closeTools: () => void) {
+    const admin = this.isAdmin;
+    const open = this._settingsMenu;
+    const modules = (this.packs ?? []).filter((p) => p.module);
+    const all: { key: SettingsTopic; icon: string; label: string; admin: boolean }[] = [
+      { key: "house", icon: "🏠", label: this.t("settings_house"), admin: true },
+      { key: "weather", icon: "🌦", label: this.t("settings_weather"), admin: true },
+      { key: "director", icon: "🎬", label: this.t("card_director"), admin: true },
+      { key: "voice", icon: "🎙", label: this.t("voice"), admin: false },
+      { key: "favorites", icon: "⭐", label: this.t("favorites"), admin: true },
+      { key: "backdrop", icon: "🖼", label: this.t("backdrop"), admin: true },
+      { key: "terrain", icon: "⛰", label: this.t("terrain"), admin: true },
+      { key: "backup", icon: "💾", label: this.t("backup"), admin: true },
+      ...(modules.length ? [{ key: "modules" as const, icon: "🧩", label: this.t("settings_modules"), admin: true }] : []),
+    ];
+    const topics = all.filter((t) => admin || !t.admin);
+    const toggle = () => {
+      closeTools();
+      this._settingsMenu = !open;
+    };
+    return html`<div class="fp3d-seg fp3d-seg-menu fp3d-seg-settings">
+      <div class="fp3d-menu-wrap">
+        <button aria-haspopup="menu" aria-expanded=${open} title=${this.t("settings")} @click=${toggle}>
+          ⚙ <span class="fp3d-settings-word">${this.t("settings")}</span> <span class="fp3d-caret">▾</span>
+        </button>
+        ${open
+          ? html`<div class="fp3d-menu-veil" @click=${() => (this._settingsMenu = false)}></div>
+              <div class="fp3d-menu fp3d-menu-right" role="menu">
+                ${topics.map(
+                  (t) => html`<button role="menuitem" class="fp3d-menu-item" @click=${() => ((this._settingsDialog = t.key), (this._settingsMenu = false))}>${t.icon} ${t.label}</button>`,
+                )}
+              </div>`
+          : nothing}
+      </div>
+    </div>`;
+  }
+
+  /** The dialog of a settings topic: its section, as it stood in the side bar before, over the plan. */
+  private renderSettingsDialog() {
+    const topic = this._settingsDialog;
+    if (!topic) return nothing;
+    const close = () => (this._settingsDialog = null);
+    const titles: Record<SettingsTopic, string> = {
+      house: this.t("settings_house"),
+      weather: this.t("settings_weather"),
+      director: this.t("card_director"),
+      voice: this.t("voice"),
+      favorites: this.t("favorites"),
+      backdrop: this.t("backdrop"),
+      terrain: this.t("terrain"),
+      backup: this.t("backup"),
+      modules: this.t("settings_modules"),
+    };
+    const body =
+      topic === "house"
+        ? this.renderHouseSettings()
+        : topic === "weather"
+          ? this.renderWeatherSettings()
+          : topic === "director"
+            ? this.renderDirector()
+            : topic === "voice"
+              ? this.renderVoice()
+              : topic === "favorites"
+                ? this.renderFavorites()
+                : topic === "backdrop"
+                  ? this.renderBackdrop()
+                  : topic === "terrain"
+                    ? this.renderTerrain()
+                    : topic === "backup"
+                      ? this.renderBackup()
+                      : this.renderModuleSettings();
+    return html`<div class="fp3d-dialog-veil" @click=${(e: Event) => e.target === e.currentTarget && close()}>
+      <div class="fp3d-dialog" role="dialog" aria-label=${titles[topic]} tabindex="-1" @keydown=${(e: KeyboardEvent) => e.key === "Escape" && close()}>
+        <div class="fp3d-dialog-head">
+          <h3>${titles[topic]}</h3>
+          <button class="fp3d-btn" aria-label=${this.t("close")} @click=${close}>✕</button>
+        </div>
+        <div class="fp3d-dialog-body">${body}</div>
+      </div>
+    </div>`;
+  }
+
+  /** Modules installed from the shop; a module's own settings will show here once modules bring some. */
+  private renderModuleSettings() {
+    const modules = (this.packs ?? []).filter((p) => p.module);
+    return html`<div class="fp3d-form">
+      ${modules.map(
+        (p) => html`<div class="fp3d-wide">
+          <b>${packName(p, this.hass?.language ?? "de")}</b>
+          <p class="fp3d-sub">${this.t("pack_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</p>
+          <p class="fp3d-sub">${this.t("module_no_settings")}</p>
+        </div>`,
+      )}
+    </div>`;
   }
 
   protected render(): TemplateResult {
     const floor = this.floor;
     const walls = floor ? generateWalls(floor.rooms, { exterior: this._doc.settings.wall_exterior, interior: this._doc.settings.wall_interior }, floor.walls ?? []) : null;
     return html`
-      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()} ${this.renderNews()}
+      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()} ${this.renderNews()} ${this.renderSettingsDialog()}
       <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}">
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
@@ -9822,11 +9937,10 @@ export class Fp3dEditor extends LitElement {
             : floor
               ? this.renderRoomList(floor)
               : nothing}
-      ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing} ${this.renderVoice()}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
-      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderBackdrop() : nothing} ${admin ? this.renderTerrain() : nothing}
-      ${admin ? this.renderBackup() : nothing} ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
+      ${floor && admin ? this.renderBackgroundForm(floor) : nothing}
+      ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
   }
 
@@ -10743,30 +10857,6 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** The camera the house opens with: the editor's 3D pane as it stands right now, or the default. */
-  private renderStartView() {
-    const set = this._doc.settings.start_view ?? null;
-    const remember = () => {
-      const v = this.paneView();
-      if (!v) return;
-      this.change((d) => (d.settings.start_view = v));
-    };
-    return html`<details class="fp3d-section">
-      <summary>${this.t("start_view")}</summary>
-      <p class="fp3d-sub">${this.t("start_view_hint")}</p>
-      <div class="fp3d-actions">
-        <button class="fp3d-btn fp3d-primary" @click=${remember}>${this.t("start_view_set")}</button>
-        ${set ? html`<button class="fp3d-btn" @click=${() => this.change((d) => (d.settings.start_view = null))}>${this.t("start_view_reset")}</button>` : nothing}
-      </div>
-      ${set
-        ? html`<p class="fp3d-sub">${this.t("start_view_saved")}</p>
-            <p class="fp3d-sub">${this.t("start_view_card")}</p>
-            <code class="fp3d-code"
-              >start_view: { theta: ${set.theta}, phi: ${set.phi}, radius: ${set.radius}${set.target ? `, target: { x: ${set.target.x}, y: ${set.target.y}, z: ${set.target.z} }` : ""} }</code
-            >`
-        : nothing}
-    </details>`;
-  }
-
   /** Live director: own triggers – an entity that goes on or open and the camera to show for it (D615). */
   private renderDirectorTriggers(d: DirectorSettings, placed: string[]) {
     const hass = this.hass;
@@ -12479,15 +12569,18 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
-  private renderSettings() {
+  private setSettings(patch: Partial<Building["settings"]>): void {
+    const next = structuredClone(this._doc);
+    Object.assign(next.settings, patch);
+    this.setDoc(next);
+  }
+
+  /** ⚙ House: wall thicknesses, grid, units, north. */
+  private renderHouseSettings() {
     const s = this._doc.settings;
-    const set = (patch: Partial<Building["settings"]>) => {
-      const next = structuredClone(this._doc);
-      Object.assign(next.settings, patch);
-      this.setDoc(next);
-    };
+    const set = (patch: Partial<Building["settings"]>) => this.setSettings(patch);
     return html`<details class="fp3d-section">
-      <summary>${this.t("settings")}</summary>
+      <summary>${this.t("settings_house")}</summary>
       <div class="fp3d-form">
         ${this.len(this.t("wall_exterior"), s.wall_exterior, (v) => set({ wall_exterior: Math.min(1, Math.max(0.02, v)) }), 0.01, 0.02)}
         ${this.len(this.t("wall_interior"), s.wall_interior, (v) => set({ wall_interior: Math.min(1, Math.max(0.02, v)) }), 0.01, 0.02)}
@@ -12504,6 +12597,18 @@ export class Fp3dEditor extends LitElement {
           </select></label
         >
         ${this.num(this.t("north"), s.north, (v) => set({ north: ((Math.round(v) % 360) + 360) % 360 }), 1)}
+      </div>
+      <p class="fp3d-sub">${this.t("north_hint")}</p>
+    </details>`;
+  }
+
+  /** The roof's basics – its kind, ridge, pitch and overhang – in the roof tool (sections and windows live there too). */
+  private renderRoofBasics() {
+    const s = this._doc.settings;
+    const set = (patch: Partial<Building["settings"]>) => this.setSettings(patch);
+    return html`<section>
+      <h3>${this.t("roof_basics")}</h3>
+      <div class="fp3d-form">
         <label class="fp3d-field fp3d-wide"
           >${this.t("roof")}
           <select
@@ -12530,6 +12635,17 @@ export class Fp3dEditor extends LitElement {
           : nothing}
         ${s.roof.type === "gable" ? this.num(this.t("roof_pitch"), s.roof.pitch, (v) => set({ roof: { ...s.roof, pitch: Math.min(60, Math.max(5, v)) } }), 1, 5) : nothing}
         ${s.roof.type !== "none" ? this.len(this.t("roof_overhang"), s.roof.overhang, (v) => set({ roof: { ...s.roof, overhang: Math.min(2, Math.max(0, v)) } }), 0.05, 0) : nothing}
+      </div>
+    </section>`;
+  }
+
+  /** ⚙ Weather & warnings: the weather entity and its effects, the rain warning, warning names, outage, sun patches. */
+  private renderWeatherSettings() {
+    const s = this._doc.settings;
+    const set = (patch: Partial<Building["settings"]>) => this.setSettings(patch);
+    return html`<details class="fp3d-section">
+      <summary>${this.t("settings_weather")}</summary>
+      <div class="fp3d-form">
         ${this.hass
           ? this.entitySelect(this.t("weather_entity"), s.weather_entity ?? null, weatherEntity(this.hass, null), this.entityOptions((id) => id.startsWith("weather.")), (v) => set({ weather_entity: v }))
           : nothing}
@@ -12575,7 +12691,7 @@ export class Fp3dEditor extends LitElement {
           ${this.t("sun_patches")}</label
         >
       </div>
-      <p class="fp3d-sub">${this.t("north_hint")} ${this.t("weather_entity_hint")}</p>
+      <p class="fp3d-sub">${this.t("weather_entity_hint")}</p>
     </details>`;
   }
 
@@ -14108,6 +14224,62 @@ export class Fp3dEditor extends LitElement {
       .fp3d-menu-wrap {
         position: relative;
         display: inline-flex;
+      }
+      .fp3d-seg-settings {
+        margin-left: auto;
+      }
+      .fp3d-menu-right {
+        right: 0;
+        left: auto;
+      }
+      .fp3d-narrow .fp3d-settings-word {
+        display: none;
+      }
+      .fp3d-dialog-veil {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: rgba(2, 6, 14, 0.55);
+      }
+      .fp3d-dialog {
+        width: min(640px, 100%);
+        max-height: calc(100% - 16px);
+        overflow: auto;
+        padding: 14px 18px 18px;
+        border-radius: 18px;
+        border: 1px solid var(--fp3d-accent, #22d3ee);
+        background: var(--fp3d-panel, #0d1628);
+        box-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
+        outline: none;
+      }
+      .fp3d-dialog-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+      .fp3d-dialog-head h3 {
+        margin: 0;
+      }
+      .fp3d-dialog details.fp3d-section > summary {
+        display: none;
+      }
+      .fp3d-dialog details.fp3d-section {
+        border: 0;
+        padding: 0;
+        margin: 0;
+      }
+      .fp3d-narrow .fp3d-dialog-veil {
+        padding: 0;
+      }
+      .fp3d-narrow .fp3d-dialog {
+        width: 100%;
+        max-height: 100%;
+        border-radius: 0;
       }
       .fp3d-menu-veil {
         position: fixed;

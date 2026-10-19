@@ -1954,5 +1954,10 @@
  "heater_entity": "Apparaat (water_heater, thermostaat of schakelaar)",
  "heater_temp": "Sensor: watertemperatuur (optioneel)",
  "heater_hint": "De boiler gloeit warm zolang hij verwarmt (thermostaat verwarmt, schakelaar aan of vermogen boven de drempel) en toont de watertemperatuur – van de sensor of van het apparaat zelf.",
- "pack_module": "Module van {publisher} · actief in het huis"
+ "pack_module": "Module van {publisher} · actief in het huis",
+ "settings_house": "Huis",
+ "settings_weather": "Weer en waarschuwingen",
+ "settings_modules": "Modules",
+ "roof_basics": "Dakvorm",
+ "module_no_settings": "Deze module heeft geen eigen instellingen."
 }

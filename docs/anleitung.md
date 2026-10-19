@@ -177,9 +177,23 @@ Wände entstehen automatisch: Jede gemeinsame Kante zweier Räume wird eine Inne
 
 **Geteilte Wände:** Teilt ein Nachbarraum eine Wand in mehrere Stücke (etwa zwei kleine Räume an einer langen Wand), bekommt jedes Stück eine eigene Zeile „Wand 2–3 · Teil 1“, „… Teil 2“ mit seiner Länge, und jedes Stück kann seine eigene Höhe haben oder wegfallen.
 
-### 4.5 Einstellungen
+### 4.5 Das ⚙ Einstellungen-Menü
 
-Unten in der Seitenleiste klappt **Einstellungen** auf:
+Alles, was zum ganzen Plan gehört und nicht zu einer Etage, einem Raum oder einem Möbel, steht in einem Menü: **⚙ Einstellungen ▾** rechts in der Werkzeugleiste (auf schmalen Bildschirmen nur das Zahnrad). Jeder Punkt öffnet ein Fenster über dem Plan, auch während etwas ausgewählt ist; **✕** oder **Esc** schließt es. Die Seitenleiste ohne Auswahl zeigt nur noch die Räume der Etage, das Grundriss-Bild und die Hilfe.
+
+| Menüpunkt | Inhalt |
+|---|---|
+| **🏠 Haus** | Wandstärken, Raster, Längen, Nordrichtung (die Zeilen darunter) |
+| **🌦 Wetter & Warnungen** | Wetter-Entität und -Effekte, Regenwarnung, Warnungsnamen, Stromausfall-Sensor, Sonnenflecken |
+| **🎬 Live-Regie** | siehe [6.1](#61-kamera-cockpit) |
+| **🎙 Sprachsteuerung** | siehe [5.10](#510-sprachsteuerung-neu) |
+| **⭐ Favoriten** | das Zentral-Menü der 3D-Ansicht (unten) |
+| **🖼 Hintergrund** | was hinter dem 3D-Haus liegt (unten) |
+| **⛰ Gelände** | siehe [4.21](#421-keller-und-gelände) |
+| **💾 Sicherung** | Export, Import, Wiederherstellen, siehe Kapitel 9 |
+| **🧩 Module** | die aus dem Shop eingespielten Module mit ihren Einstellungen |
+
+Die **Dachform** (kein Dach, Flachdach, Satteldach, First, Neigung, Überstand) steht beim Dach-Werkzeug, siehe [4.19](#419-dach). Die **Startansicht** merkst du dir in der 3D-Ansicht: Haus drehen und zoomen, dann in den Ansicht-Einstellungen (Zahnrad oben rechts) **📌** antippen; **📌✕** setzt sie zurück. 3D-Ansicht, Karte und Kiosk öffnen das Haus dann so, und eine geöffnete Etage wird von derselben Seite gezeigt.
 
 | Einstellung | Bedeutung |
 |---|---|
@@ -187,10 +201,8 @@ Unten in der Seitenleiste klappt **Einstellungen** auf:
 | **Raster (m)** | Schrittweite beim Zeichnen |
 | **Längen** | **Automatisch** folgt dem Einheitensystem von Home Assistant, sonst **Meter** oder **Fuß und Zoll**. Mit Fuß und Zoll zeigt der Editor alle Längen, Maße und Flächen (ft²) so an und versteht Eingaben wie `8' 2"`, `98in`, `8.2ft` oder auch `2.5m`. Gespeichert wird immer in Metern, du kannst also jederzeit umschalten |
 | **Nordrichtung** | Grad im Uhrzeigersinn von oben. Wird für das Sonnenlicht gebraucht |
-| **Dach** | Kein Dach, Flachdach oder Satteldach, mit Dachneigung und Dachüberstand. Beim Satteldach legt **First** fest, ob der First entlang der langen oder der kurzen Seite läuft (z. B. Reihenhaus). **Dachflächen (frei)** baut das Dach aus mehreren Teilen, siehe [4.19](#419-dach) |
 | **Wetter-Entität** | Welche Wetter-Entität das Wetter draußen liefert, siehe [6.2](#62-wetter-draußen) |
 | **Wetter-Effekte in 3D** | Welche Effekte gezeigt werden |
-| **Startansicht** | Drehe, zoome und verschiebe das Haus in der 3D-Ansicht rechts so, wie es sich öffnen soll (zum Beispiel von der Gartenseite), und drücke **Aktuelle 3D-Ansicht als Start merken**. 3D-Ansicht, Karte und Kiosk öffnen das Haus dann so – mit Blickwinkel, Zoom und Bildausschnitt –, und auch eine geöffnete Etage wird von derselben Seite gezeigt; **Standard** setzt zurück |
 | **Favoriten** | Szenen, Skripte, Automationen, Tasten und Schalter für das Zentral-Menü (Stern) der 3D-Ansicht: Party, Anwesenheitssimulation, Verschattung, Bewässerung. Auswählen mit der Suche, Reihenfolge mit ↑ ↓, ✕ entfernt. Darunter **Eigene Knöpfe** mit Beschriftung, Symbol und Aktion: **Seite öffnen** (Pfad wie `/lovelace/rollos`), **Details einer Entität**, **Dienst aufrufen** (`domain.service` mit Daten als JSON) oder **fire-dom-event** – damit öffnet ein Knopf ein browser_mod-Popup mit deiner eigenen Karte, z. B. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Rollos", "content": {"type": "custom:meine-rollo-karte"}}}}` |
 | **🖼 Hintergrund** | Was hinter dem 3D-Haus liegt: der Himmel des Looks (Standard), **eine Farbe**, ein **Farbverlauf** oder ein **Bild**. Das Bild legst du in Home Assistant unter `config/www` ab und trägst `/local/dateiname.jpg` ein; **Abdunkeln** legt einen dunklen Schleier darüber, damit die Neonlinien lesbar bleiben. Gilt für Panel und Karten und kostet keine Leistung |
 
@@ -399,7 +411,7 @@ Mit **Draußen → Außen** ziehst du Rasen, Terrasse, Weg, Einfahrt, Beet, Heck
 
 ![Ein Bauernhaus mit Wohnhaus, Scheune und Anbau, jedes mit eigenem Dach](images/view-roof-sections.jpg)
 
-Ein einfaches Haus bekommt unter **Einstellungen → Dach** ein Flach- oder Satteldach über das ganze oberste Geschoss. Für alles andere – ein Haus in L- oder T-Form, ein Wohnhaus mit Scheune, ein Anbau mit Pultdach, ein Dach, das auf einer Seite tief herunterzieht – baust du das Dach aus **Dachflächen**.
+Ein einfaches Haus bekommt unter **Bauen → Dach** bei **Dachform** ein Flach- oder Satteldach über das ganze oberste Geschoss, mit First (entlang der langen oder der kurzen Seite, z. B. Reihenhaus), Neigung und Überstand. Für alles andere – ein Haus in L- oder T-Form, ein Wohnhaus mit Scheune, ein Anbau mit Pultdach, ein Dach, das auf einer Seite tief herunterzieht – baust du das Dach aus **Dachflächen**.
 
 - Wähle unter **Dach** die Option **Dachflächen (frei)** oder das Werkzeug **Dach**. Beim ersten Mal schlägt NeonPlan 3D die Dachflächen aus deinen Räumen vor: je Etage die Teile, über denen keine höhere Etage liegt, jeweils mit Satteldach. Danach passt du sie an.
 - Im Werkzeug **Dach** ziehst du eine neue Dachfläche im Plan auf. Antippen wählt eine aus, ziehen verschiebt sie, die Ecken ändern die Größe. Oben wählst du die Etage, deren Räume im Plan liegen. Daneben öffnet sich die 3D-Ansicht mit dem ganzen Haus, so siehst du jede Änderung sofort.
@@ -461,7 +473,7 @@ Ganz unten kündigt eine Karte die kommende Pro-Erweiterung **Energie Pro** an. 
 
 ### 4.21 Keller und Gelände
 
-Ein **Keller** ist eine Etage mit negativer **Höhe über Boden**, etwa −2,6 m. Ohne Auswahl zeigt die Seitenleiste unten den Abschnitt **Gelände**:
+Ein **Keller** ist eine Etage mit negativer **Höhe über Boden**, etwa −2,6 m. Unter **⚙ Einstellungen → Gelände** stellst du ein:
 
 - **Geländehöhe** (in Metern, Erdgeschoss = 0) sagt, wo der Boden um das Haus liegt. Rasen, Wege und Terrassen liegen darauf. Für ein **Souterrain** oder Hochparterre senkst du sie so weit, wie der Keller herausschauen soll, etwa auf −1,2 m. Steht das Haus dadurch höher als das Gelände, bekommt es in 3D einen **Sockel** bis zum Boden – nichts schwebt.
 - **Keller in der Erde zeigen:** Etagen unter dem Gelände stecken in 3D im Erdreich. Öffnest du den Keller, siehst du ihn wie in einer Baugrube, mit den Erdwänden ringsum. Ohne Haken stehen sie frei wie bisher.

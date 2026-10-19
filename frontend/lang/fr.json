@@ -1954,5 +1954,10 @@
  "heater_entity": "Appareil (water_heater, thermostat ou interrupteur)",
  "heater_temp": "Capteur : température de l'eau (facultatif)",
  "heater_hint": "Le ballon brille en chaud tant qu'il chauffe (thermostat en chauffe, interrupteur allumé ou puissance au-dessus du seuil) et affiche la température de l'eau – du capteur ou de l'appareil lui-même.",
- "pack_module": "Module de {publisher} · actif dans la maison"
+ "pack_module": "Module de {publisher} · actif dans la maison",
+ "settings_house": "Maison",
+ "settings_weather": "Météo et alertes",
+ "settings_modules": "Modules",
+ "roof_basics": "Forme du toit",
+ "module_no_settings": "Ce module n'a pas de réglages propres."
 }

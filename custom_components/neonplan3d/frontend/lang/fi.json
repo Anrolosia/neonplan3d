@@ -1954,5 +1954,10 @@
  "heater_entity": "Laite (water_heater, termostaatti tai kytkin)",
  "heater_temp": "Anturi: veden lämpötila (valinnainen)",
  "heater_hint": "Varaaja hehkuu lämpimänä lämmittäessään (termostaatti lämmittää, kytkin päällä tai teho yli kynnyksen) ja näyttää veden lämpötilan – anturista tai laitteesta itsestään.",
- "pack_module": "Moduuli: {publisher} · käytössä talossa"
+ "pack_module": "Moduuli: {publisher} · käytössä talossa",
+ "settings_house": "Talo",
+ "settings_weather": "Sää ja varoitukset",
+ "settings_modules": "Moduulit",
+ "roof_basics": "Katon muoto",
+ "module_no_settings": "Tällä moduulilla ei ole omia asetuksia."
 }

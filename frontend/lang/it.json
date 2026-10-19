@@ -1954,5 +1954,10 @@
  "heater_entity": "Dispositivo (water_heater, termostato o interruttore)",
  "heater_temp": "Sensore: temperatura dell'acqua (facoltativo)",
  "heater_hint": "Il bollitore si illumina di caldo mentre scalda (termostato in riscaldamento, interruttore acceso o potenza oltre la soglia) e mostra la temperatura dell'acqua – dal sensore o dal dispositivo stesso.",
- "pack_module": "Modulo di {publisher} · attivo nella casa"
+ "pack_module": "Modulo di {publisher} · attivo nella casa",
+ "settings_house": "Casa",
+ "settings_weather": "Meteo e avvisi",
+ "settings_modules": "Moduli",
+ "roof_basics": "Forma del tetto",
+ "module_no_settings": "Questo modulo non ha impostazioni proprie."
 }

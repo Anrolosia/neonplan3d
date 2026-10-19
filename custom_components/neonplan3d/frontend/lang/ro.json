@@ -1954,5 +1954,10 @@
  "heater_entity": "Dispozitiv (water_heater, termostat sau comutator)",
  "heater_temp": "Senzor: temperatura apei (opțional)",
  "heater_hint": "Boilerul strălucește cald cât timp încălzește (termostat în încălzire, comutator pornit sau putere peste prag) și arată temperatura apei – din senzor sau de la dispozitivul însuși.",
- "pack_module": "Modul de la {publisher} · activ în casă"
+ "pack_module": "Modul de la {publisher} · activ în casă",
+ "settings_house": "Casă",
+ "settings_weather": "Vreme și avertizări",
+ "settings_modules": "Module",
+ "roof_basics": "Forma acoperișului",
+ "module_no_settings": "Acest modul nu are setări proprii."
 }

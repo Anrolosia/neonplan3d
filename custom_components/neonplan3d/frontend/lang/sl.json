@@ -1954,5 +1954,10 @@
  "heater_entity": "Naprava (water_heater, termostat ali stikalo)",
  "heater_temp": "Senzor: temperatura vode (neobvezno)",
  "heater_hint": "Bojler toplo žari, dokler greje (termostat greje, stikalo vklopljeno ali moč nad pragom), in kaže temperaturo vode – iz senzorja ali iz same naprave.",
- "pack_module": "Modul od {publisher} · deluje v hiši"
+ "pack_module": "Modul od {publisher} · deluje v hiši",
+ "settings_house": "Hiša",
+ "settings_weather": "Vreme in opozorila",
+ "settings_modules": "Moduli",
+ "roof_basics": "Oblika strehe",
+ "module_no_settings": "Ta modul nima lastnih nastavitev."
 }

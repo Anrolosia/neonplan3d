@@ -1954,5 +1954,10 @@
  "heater_entity": "设备（water_heater、温控器或开关）",
  "heater_temp": "传感器：水温（可选）",
  "heater_hint": "热水器加热时发出暖光（温控器正在加热、开关打开或功率超过阈值），并显示水温——来自传感器或设备本身。",
- "pack_module": "{publisher} 的模块 · 在房子里运行"
+ "pack_module": "{publisher} 的模块 · 在房子里运行",
+ "settings_house": "房屋",
+ "settings_weather": "天气与警告",
+ "settings_modules": "模块",
+ "roof_basics": "屋顶形状",
+ "module_no_settings": "此模块没有自己的设置。"
 }

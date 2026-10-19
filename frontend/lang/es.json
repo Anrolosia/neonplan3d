@@ -1954,5 +1954,10 @@
  "heater_entity": "Dispositivo (water_heater, termostato o interruptor)",
  "heater_temp": "Sensor: temperatura del agua (opcional)",
  "heater_hint": "El termo brilla cálido mientras calienta (termostato calentando, interruptor encendido o potencia sobre el umbral) y muestra la temperatura del agua, del sensor o del propio aparato.",
- "pack_module": "Módulo de {publisher} · activo en la casa"
+ "pack_module": "Módulo de {publisher} · activo en la casa",
+ "settings_house": "Casa",
+ "settings_weather": "Tiempo y avisos",
+ "settings_modules": "Módulos",
+ "roof_basics": "Forma del tejado",
+ "module_no_settings": "Este módulo no tiene ajustes propios."
 }

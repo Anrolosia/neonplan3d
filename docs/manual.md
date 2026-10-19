@@ -177,9 +177,23 @@ Walls are created automatically: every shared edge of two rooms becomes an inter
 
 **Split walls:** When a neighbouring room splits a wall into several parts (say two small rooms along one long wall), every part gets a row of its own, "Wall 2–3 · part 1", "… part 2", with its length, and every part can have its own height or be left out.
 
-### 4.5 Settings
+### 4.5 The ⚙ settings menu
 
-**Settings** unfolds at the bottom of the sidebar:
+Everything that belongs to the whole plan rather than to a floor, a room or an item sits in one menu: **⚙ Settings ▾** on the right of the toolbar (only the gear on narrow screens). Each entry opens a dialog over the plan, also while something is selected; **✕** or **Esc** closes it. The side bar without a selection only keeps the floor's rooms, the floor-plan picture and the help.
+
+| Entry | Content |
+|---|---|
+| **🏠 House** | wall thicknesses, grid, lengths, north (the rows below) |
+| **🌦 Weather & warnings** | weather entity and effects, rain warning, warning names, outage sensor, sun patches |
+| **🎬 Live director** | see [6.1](#61-camera-cockpit) |
+| **🎙 Voice control** | see [5.10](#510-voice-control-new) |
+| **⭐ Favourites** | the central menu of the 3D view (below) |
+| **🖼 Background** | what lies behind the 3D house (below) |
+| **⛰ Ground** | see [4.21](#421-cellar-and-ground) |
+| **💾 Backup** | export, import, restore, see chapter 9 |
+| **🧩 Modules** | the modules installed from the shop with their settings |
+
+The **roof shape** (none, flat, gable, ridge, pitch, overhang) sits with the roof tool, see [4.19](#419-roof). The **start view** is remembered in the 3D view: turn and zoom the house, then tap **📌** in the view settings (gear at the top right); **📌✕** resets it. The 3D view, the card and the kiosk then open the house like that, and an opened floor is shown from the same side.
 
 | Setting | Meaning |
 |---|---|
@@ -187,10 +201,8 @@ Walls are created automatically: every shared edge of two rooms becomes an inter
 | **Grid (m)** | Drawing step |
 | **Lengths** | **Automatic** follows Home Assistant's unit system, otherwise **Metres** or **Feet and inches**. With feet and inches the editor shows every length, dimension and area (ft²) that way and understands input like `8' 2"`, `98in`, `8.2ft` or even `2.5m`. The plan always stores metres, so you can switch at any time |
 | **North** | Degrees clockwise from up. Needed for sunlight |
-| **Roof** | No roof, flat roof or gable roof, with pitch and overhang. For a gable roof, **Ridge** sets whether the ridge runs along the long or the short side (e.g. terraced house). **Roof sections (custom)** builds the roof from several parts, see [4.19](#419-roof) |
 | **Weather entity** | Which weather entity drives the weather outside, see [6.2](#62-weather-outside) |
 | **Weather effects in 3D** | Which effects are shown |
-| **Start view** | Turn, zoom and move the house in the 3D pane on the right the way it should open (e.g. from the garden side) and press **Remember the current 3D view as the start**. The 3D view, the card and the kiosk then open the house like that – angle, zoom and framing – and an opened floor is shown from the same side as well; **Default** resets it |
 | **Favourites** | Scenes, scripts, automations, buttons and switches for the central menu (star) of the 3D view: party, presence simulation, shading, watering. Pick them with the search, order them with ↑ ↓, ✕ removes one. Below them **Own buttons** with a label, an icon and an action: **Open a path** (e.g. `/lovelace/blinds`), **Entity details**, **Call a service** (`domain.service` with data as JSON) or **fire-dom-event** – with it a button opens a browser_mod popup with your own card, e.g. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Blinds", "content": {"type": "custom:my-blind-card"}}}}` |
 | **🖼 Background** | What lies behind the 3D house: the look's sky (default), **one colour**, a **gradient** or a **picture**. Put the picture into `config/www` in Home Assistant and enter `/local/filename.jpg`; **Darken** lays a dark veil over it so the neon lines stay readable. Applies to the panel and cards and costs no performance |
 
@@ -399,7 +411,7 @@ With **Outside → Outdoor** you draw lawn, terrace, path, driveway, flower bed,
 
 ![A farmhouse with house, barn and extension, each with a roof of its own](images/view-roof-sections.jpg)
 
-A simple house gets a flat or gable roof over the whole top floor under **Settings → Roof**. For everything else – an L- or T-shaped house, a house with a barn, an extension with a pent roof, a roof that reaches far down on one side – you build the roof from **roof sections**.
+A simple house gets a flat or gable roof over the whole top floor under **Build → Roof** at **Roof shape**, with the ridge (along the long or the short side, e.g. a terraced house), pitch and overhang. For everything else – an L- or T-shaped house, a house with a barn, an extension with a pent roof, a roof that reaches far down on one side – you build the roof from **roof sections**.
 
 - Choose **Roof sections (custom)** under **Roof**, or the **Roof** tool. The first time, NeonPlan 3D proposes the sections from your rooms: per floor the parts no higher floor covers, each with a gable roof. Then you adjust them.
 - In the **Roof** tool you drag a new section in the plan. Tap selects one, dragging moves it, the corners resize it. At the top you choose the floor whose rooms the plan shows. The 3D view opens beside it with the whole house, so you see every change at once.
@@ -461,7 +473,7 @@ At the bottom, a card announces the coming Pro add-on **Energy Pro**. Everything
 
 ### 4.21 Cellar and ground
 
-A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Without a selection, the sidebar shows the section **Ground** at the bottom:
+A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Under **⚙ Settings → Ground** you set:
 
 - **Ground height** (in metres, ground floor = 0) says where the ground lies around the house. Lawns, paths and terraces lie on it. For a **semi-basement** or raised ground floor you lower it as far as the cellar should show, e.g. to −1.2 m. If the house then stands higher than the ground, it gets a **plinth** down to the ground in 3D – nothing floats.
 - **Show cellars in the earth:** floors below the ground sit in the earth in 3D. Open the cellar and you see it as in a building pit, with the earth walls around it. Unticked, they stand free as before.

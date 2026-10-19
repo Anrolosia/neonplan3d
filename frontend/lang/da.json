@@ -1954,5 +1954,10 @@
  "heater_entity": "Enhed (water_heater, termostat eller kontakt)",
  "heater_temp": "Sensor: vandtemperatur (valgfri)",
  "heater_hint": "Beholderen gløder varmt, mens den varmer (termostat varmer, kontakt tændt eller effekt over tærsklen), og viser vandtemperaturen – fra sensoren eller fra selve enheden.",
- "pack_module": "Modul fra {publisher} · kører i huset"
+ "pack_module": "Modul fra {publisher} · kører i huset",
+ "settings_house": "Hus",
+ "settings_weather": "Vejr og advarsler",
+ "settings_modules": "Moduler",
+ "roof_basics": "Tagform",
+ "module_no_settings": "Dette modul har ingen egne indstillinger."
 }
