@@ -1231,7 +1231,7 @@ Array.prototype.at||Object.defineProperty(Array.prototype,"at",{configurable:!0,
     >
       ${this.clean?wt`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 6a9.8 9.8 0 0 1 9 6 9.8 9.8 0 0 1-9 6 9.8 9.8 0 0 1-9-6 9.8 9.8 0 0 1 9-6m0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8m0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4" /></svg>`:wt`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.4 3.8 3.8 2.4l17.8 17.8-1.4 1.4-3.3-3.3A10.5 10.5 0 0 1 12 19a9.8 9.8 0 0 1-9-6 10.3 10.3 0 0 1 3.6-4.3L2.4 3.8M12 7a4 4 0 0 1 4 4c0 .5-.1 1-.3 1.5l-5.2-5.2c.5-.2 1-.3 1.5-.3m-4 4a4 4 0 0 0 5.5 3.7l-5.2-5.2c-.2.5-.3 1-.3 1.5m4-7a9.8 9.8 0 0 1 9 6 10 10 0 0 1-2.6 3.6l-1.4-1.4A8 8 0 0 0 18.8 12 8 8 0 0 0 9.6 7.2L8 5.6A10.3 10.3 0 0 1 12 4" /></svg>`}
     </button>`}renderMic(){let e=this.hass;if(!this.voice||!e||this.ro||this._walk)return k;let t=this._voice,n=t?.phase==="wait"||t?.phase==="listen",i=E(e,"voice_button"),r=this.cleanButton&&!(this._find!==null&&!this.clean)?this.clean?56:100:56;return b`<button class="fp3d-mic ${t?.phase==="listen"?"fp3d-mic-on":""}" style="left:${r}px" title=${i} aria-label=${i} ?disabled=${n} @click=${()=>{this.onMic()}}>
-        ${wt`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2Z" /></svg>`}
+        ${wt`<svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2Z" /></svg>`}
       </button>
       ${t?b`<div class="fp3d-mic-say ${t.phase==="error"?"fp3d-mic-err":""}" style="left:${r}px">${t.text}</div>`:k}`}async onMic(){let e=this.hass,t=this.building;if(!e||!t||this._voice?.phase==="wait"||this._voice?.phase==="listen")return;clearTimeout(this.voiceTimer);let n=(r,s)=>{this._voice={phase:r,text:s},clearTimeout(this.voiceTimer),(r==="done"||r==="error")&&(this.voiceTimer=setTimeout(()=>this._voice=null,r==="error"?9e3:6e3))};n("wait","\u2026");let i;try{let r=window.AudioContext??window.webkitAudioContext;i=new r,i.resume()}catch{i=void 0}try{let r=await zn(),s=await r.listenOnce(e,()=>n("listen",E(e,"voice_listen")),rc(),i);if(!s){n("error",E(e,"voice_none"));return}let a=this.findIndex??=wo(e,t),l=new Map(t.floors.flatMap(g=>ve(g).map(m=>[m.id,m.name]))),c=[],d=new Map;for(let g of a)g.kind==="device"&&g.entity&&d.set(g.entity,g);let u=new Set;for(let g of t.floors){let m=ve(g);for(let h of g.furniture){if(mh.has(h.type))continue;let y=this.furnitureLinks.get(h.id),w=y?.entity??y?.power??null,_=w??`furniture:${h.id}`,S=m.find($=>$.points.length>=3&&K([h.x,h.z],$.points)),z=me(e,h.type),P=[h.name,z,w?j(e,w):null,...r.SYNONYMS[h.type]??[]].filter($=>!!$);c.push({id:_,entity:w,name:h.name||(w?j(e,w):z),names:P,room:S?.name??"",camera:!!w&&H(w)==="camera"}),w?u.add(w):d.set(_,{kind:"device",name:h.name||z,where:"",floorId:g.id,roomId:S?.id??null,entity:null,icon:null,x:h.x,z:h.z,y:Math.min(g.height-.3,Math.max(.5,h.h))})}}for(let[g,m]of d)u.has(g)||g.startsWith("furniture:")||c.push({id:g,entity:g,name:m.name,room:m.roomId&&l.get(m.roomId)||"",camera:H(g)==="camera"});let p=r.showTarget(s,t,c,g=>g.area_id?e.areas?.[g.area_id]?.name:null);if(p){if(n("done",`\u201C${s}\u201D \u2192 ${p.kind==="house"?E(e,"all_floors"):p.kind==="cameras"?E(e,"camera_wall_title"):p.name}`),this.directing.touch(Date.now()),p.kind==="cameras")W("camera_cockpit")?this.dispatchEvent(new CustomEvent("camera-wall-open",{bubbles:!0,composed:!0})):this._proHint="camera_cockpit";else if(p.kind==="device"){let g=d.get(p.id);p.camera&&p.entity&&W("camera_cockpit")?this.lookThrough(p.entity):g&&this.goTo(g)}else p.kind==="house"?this.fire("floor-tap",{floorId:null}):p.kind==="floor"?this.fire("floor-tap",{floorId:p.floorId}):(this.floorId!==p.floorId&&this.fire("floor-tap",{floorId:p.floorId}),setTimeout(()=>this.fire("room-tap",{floorId:p.floorId,roomId:p.roomId}),60));return}n("wait",`\u201C${s}\u201D \u2026`);let f=await r.converse(e,s);n("done",f?`\u201C${s}\u201D \u2013 ${f}`:`\u201C${s}\u201D`)}catch(r){let s=r,a=s?.message==="no_pipeline"?"voice_no_pipeline":s?.message==="silent"?"voice_silent":s?.name==="NotAllowedError"||s?.name==="SecurityError"||!window.isSecureContext?"voice_denied":null;n("error",a?E(e,a):E(e,"voice_error",{msg:String(s?.message??s?.name??r)}))}}renderSwipe(){let e=this._swipe;if(!e||!this.hass)return k;let t=e.kind==="light"&&e.value<=0;return b`<div class="fp3d-swipe" style="left:${e.x}px;top:${e.y}px">
       <span>${j(this.hass,e.entity)}</span>
@@ -2014,9 +2014,11 @@ Array.prototype.at||Object.defineProperty(Array.prototype,"at",{configurable:!0,
       }
       .fp3d-mic {
         position: absolute;
-        bottom: calc(10px + var(--fp3d-bottom-inset, 0px));
-        width: 36px;
-        height: 36px;
+        bottom: calc(6px + var(--fp3d-bottom-inset, 0px));
+        /* a big target: it is tapped from across the room, often with a thumb */
+        width: 52px;
+        height: 52px;
+        touch-action: manipulation;
         display: grid;
         place-items: center;
         padding: 0;
@@ -2034,7 +2036,7 @@ Array.prototype.at||Object.defineProperty(Array.prototype,"at",{configurable:!0,
       }
       .fp3d-mic-say {
         position: absolute;
-        bottom: calc(54px + var(--fp3d-bottom-inset, 0px));
+        bottom: calc(66px + var(--fp3d-bottom-inset, 0px));
         max-width: min(420px, calc(100% - 80px));
         padding: 6px 12px;
         border-radius: 14px;

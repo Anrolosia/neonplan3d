@@ -3992,7 +3992,7 @@ export class Fp3dView3d extends LitElement {
     const label = translate(hass, "voice_button");
     const left = this.cleanButton && !(this._find !== null && !this.clean) ? (this.clean ? 56 : 100) : 56;
     return html`<button class="fp3d-mic ${v?.phase === "listen" ? "fp3d-mic-on" : ""}" style="left:${left}px" title=${label} aria-label=${label} ?disabled=${busy} @click=${() => void this.onMic()}>
-        ${svg`<svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2Z" /></svg>`}
+        ${svg`<svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M12 2a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2Z" /></svg>`}
       </button>
       ${v ? html`<div class="fp3d-mic-say ${v.phase === "error" ? "fp3d-mic-err" : ""}" style="left:${left}px">${v.text}</div>` : nothing}`;
   }
@@ -5219,9 +5219,11 @@ export class Fp3dView3d extends LitElement {
       }
       .fp3d-mic {
         position: absolute;
-        bottom: calc(10px + var(--fp3d-bottom-inset, 0px));
-        width: 36px;
-        height: 36px;
+        bottom: calc(6px + var(--fp3d-bottom-inset, 0px));
+        /* a big target: it is tapped from across the room, often with a thumb */
+        width: 52px;
+        height: 52px;
+        touch-action: manipulation;
         display: grid;
         place-items: center;
         padding: 0;
@@ -5239,7 +5241,7 @@ export class Fp3dView3d extends LitElement {
       }
       .fp3d-mic-say {
         position: absolute;
-        bottom: calc(54px + var(--fp3d-bottom-inset, 0px));
+        bottom: calc(66px + var(--fp3d-bottom-inset, 0px));
         max-width: min(420px, calc(100% - 80px));
         padding: 6px 12px;
         border-radius: 14px;
