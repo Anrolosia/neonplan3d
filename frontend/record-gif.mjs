@@ -110,7 +110,9 @@ await inPage(`
   const st = panel.hass.states["event.haustuer_klingel"];
   panel.hass = { ...panel.hass, states: { ...panel.hass.states, "event.haustuer_klingel": { ...st, state: new Date().toISOString() } } };
 `);
-await hold(30, 90);
+await hold(4, 90);
+console.log("after the ring:", await inPage(`return JSON.stringify({ room: view.roomId, through: view._through?.entity ?? null, shot: view.directing.current?.shot.kind ?? null })`));
+await hold(26, 90);
 
 // 4. back to the whole house
 await clickText("Back to the view");
