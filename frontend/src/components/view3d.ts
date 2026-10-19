@@ -4193,14 +4193,22 @@ export class Fp3dView3d extends LitElement {
         const e = this.openingLinks?.get(o.id);
         if (!e) continue;
         const kind = o.type === "garage" ? "garage" : o.type === "door" ? "door" : "window";
+        // open as the 3D view shows it: the sash or door turned, a garage door up; tilted on its own
+        const s = openingState(hass, e, o.type);
+        const open = s.open > 0.02 || s.open2 > 0.02 || (o.type === "garage" && (s.cover ?? 0) > 0.02);
+        const tilted = !open && (s.tilt > 0.02 || s.tilt2 > 0.02);
         for (const id of [e.contact, e.contact2, e.cover, e.tilt, e.tilt2]) {
-          if (id && id !== "none") out.push({ id: o.id, entity: id, kind, name: t(`opening_${o.type}`), room: rooms.get(o.room_id) ?? "", floorId: floor.id, roomId: o.room_id });
+          if (id && id !== "none") out.push({ id: o.id, entity: id, kind, name: t(`opening_${o.type}`), room: rooms.get(o.room_id) ?? "", floorId: floor.id, roomId: o.room_id, open, tilted });
         }
       }
     }
     for (const w of b.settings.roof?.windows ?? []) {
-      for (const id of [w.contact, w.cover]) {
-        if (id && id !== "none") out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null });
+      const ref = (v: string | null | undefined) => (v && v !== "none" ? v : null);
+      const s = openingState(hass, { cover: ref(w.cover), contact: ref(w.contact), tilt: ref(w.tilt) }, "window");
+      const open = s.open > 0.02;
+      const tilted = !open && s.tilt > 0.02;
+      for (const id of [w.contact, w.cover, w.tilt]) {
+        if (id && id !== "none") out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null, open, tilted });
       }
     }
     return out;

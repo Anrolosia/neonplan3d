@@ -48,6 +48,9 @@ export interface SpokenOpening {
   room: string;
   floorId: string;
   roomId: string | null;
+  /** As the 3D view shows it: standing open (a sash, a door, a garage door), or only tilted. */
+  open: boolean;
+  tilted: boolean;
 }
 
 /** What a module may ask the host for. */
