@@ -8,6 +8,8 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
+- Light wells: the **Light well** switch in the window form did not show for cellar windows without an own ground height (the editor measured the ground differently from the 3D view), so wells could not be switched off (D575).
+- Light wells: a balcony on the floor above lifted the well's rim up to itself – only areas on the ground count now (#602).
 - Floor opening not cut when the stairs below reach higher than the floor and their own hole, joined with the opening, reached past the room – now each opening is cut room by room and joined afterwards (#375).
 - Media card: ▶ after ⏸ was greyed out on players that can pause but do not report "play" (an Echo through Alexa Media Player) and sent nothing; it now resumes with play/pause (#400).
 - Voice control on Android tablets: the audio was taken before the tap had started it, so some WebViews recorded silence; and when only silence comes in (the microphone held by another app, e.g. Fully's acoustic motion detection), it now says so (#579).
