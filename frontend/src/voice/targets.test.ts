@@ -30,6 +30,9 @@ test("devices by name, with a word that asks to see them", () => {
 
 test("cameras: by name, by 'camera' and their room, or all of them", () => {
   assert.equal(id(t("Zeig die Kamera Haustür")), "camera.haustuer");
+  // a compound: "Haustürkamera" is "Haustür" and "Kamera"; so is "Gartencam"
+  assert.equal(id(t("Zeig die Haustürkamera")), "camera.haustuer");
+  assert.equal(id(t("zeig mal die Gartencam")), "camera.garten");
   assert.equal(id(t("zeig die Kamera im Garten")), "camera.garten");
   assert.equal(t("Zeig mir die Kameras")?.kind, "cameras");
 });

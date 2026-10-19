@@ -1962,5 +1962,7 @@
  "module_no_settings": "Den här modulen har inga egna inställningar.",
  "side_resize": "Dra sidofältet bredare eller smalare",
  "furn_extra": "Extra värde vid symbolen (sensor, t.ex. vattentemperatur)",
- "theme_auto": "Auto (Dag/Neon efter solen)"
+ "theme_auto": "Auto (Dag/Neon efter solen)",
+ "voice_understands": "Det förstår NeonPlan",
+ "voice_examples": "”Visa vardagsrummet”|”Gå till övervåningen”|”Visa hela huset”|”Visa tvättmaskinen” / ”Var är torktumlaren?”|”Visa kameran vid ytterdörren”|”Visa kamerorna”|Allt annat (”tänd lampan i hallen”) går till Assist"
 }

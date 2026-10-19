@@ -1962,5 +1962,7 @@
  "module_no_settings": "Dette modul har ingen egne indstillinger.",
  "side_resize": "Træk sidepanelet bredere eller smallere",
  "furn_extra": "Ekstra værdi ved symbolet (sensor, fx vandtemperatur)",
- "theme_auto": "Auto (Dag/Neon efter solen)"
+ "theme_auto": "Auto (Dag/Neon efter solen)",
+ "voice_understands": "Det forstår NeonPlan",
+ "voice_examples": "„Vis stuen“|„Gå til første sal“|„Vis hele huset“|„Vis vaskemaskinen“ / „Hvor er tørretumbleren?“|„Vis kameraet ved hoveddøren“|„Vis kameraerne“|Alt andet („tænd lyset i gangen“) går til Assist"
 }

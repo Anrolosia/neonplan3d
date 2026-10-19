@@ -54,6 +54,7 @@ import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
+import { moduleHelp, syncModules } from "../modules.ts";
 import {
   bounds,
   centroid,
@@ -11023,9 +11024,16 @@ export class Fp3dEditor extends LitElement {
   /** Voice control: the microphone button on this device (a card has its own option), and the microphone test. */
   private renderVoice() {
     const here = voiceOnHere();
+    // the modules' sentences: loaded here as well (the editor is its own bundle), listed once they are there
+    if (this.hass) void syncModules(this.hass, this.packs ?? []).then(() => this.requestUpdate());
+    const examples = [...this.t("voice_examples").split("|"), ...moduleHelp(this.hass?.language ?? "en")];
     return html`<details class="fp3d-section">
       <summary>🎙️ ${this.t("voice")}</summary>
       <p class="fp3d-sub">${this.t("voice_hint")}</p>
+      <p class="fp3d-sub"><b>${this.t("voice_understands")}</b></p>
+      <ul class="fp3d-voice-list">
+        ${examples.map((e) => html`<li>${e}</li>`)}
+      </ul>
       <div class="fp3d-form">
         <label class="fp3d-check fp3d-wide"
           ><input
@@ -14283,6 +14291,18 @@ export class Fp3dEditor extends LitElement {
       .fp3d-menu-wrap {
         position: relative;
         display: inline-flex;
+      }
+      .fp3d-voice-list {
+        margin: 0 0 8px;
+        padding-left: 18px;
+        font-size: 13px;
+        color: var(--fp3d-muted);
+        columns: 2;
+        column-gap: 18px;
+      }
+      .fp3d-voice-list li {
+        break-inside: avoid;
+        margin: 2px 0;
       }
       .fp3d-seg-settings {
         margin-left: auto;

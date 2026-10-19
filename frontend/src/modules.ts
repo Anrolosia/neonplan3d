@@ -68,6 +68,8 @@ export interface ModuleHost {
   findDevice(sentence: string): SpokenDevice | null;
   /** The doors and windows of the plan with their rooms, one entry per linked entity (the plan names them better than Home Assistant's contact sensors do). */
   openings(): SpokenOpening[];
+  /** The energy balance shown now (W; grid + = import, battery + = discharging; soc %), null without one. */
+  energy(): { consumption: number | null; solar: number | null; grid: number | null; battery: number | null; soc: number | null } | null;
   /** Consumers drawing power right now (from the plan's sensors), highest first. */
   consumers(): { id: string; entity: string | null; name: string; watts: number }[];
 }
@@ -77,6 +79,8 @@ export interface NeonModule {
   id: string;
   /** Voice: a spoken sentence the host did not understand itself; null leaves it to Assist. */
   voice?(sentence: string, host: ModuleHost): Promise<VoiceAnswer | null> | VoiceAnswer | null;
+  /** Example sentences the module understands, in the user's language (shown in the voice settings). */
+  help?(language: string): string[];
 }
 
 interface Loaded {
@@ -150,6 +154,19 @@ export async function syncModules(hass: HomeAssistant, packs: readonly ModulePac
 /** The loaded modules (for the extensions page and tests). */
 export function loadedModules(): readonly { id: string; release: number }[] {
   return [...loaded.values()].map((m) => ({ id: m.id, release: m.release }));
+}
+
+/** Example sentences of every loaded module (for the voice settings). */
+export function moduleHelp(language: string): string[] {
+  const out: string[] = [];
+  for (const m of loaded.values()) {
+    try {
+      out.push(...(m.module.help?.(language) ?? []));
+    } catch {
+      // a module without a usable help list is simply not listed
+    }
+  }
+  return out;
 }
 
 /** Ask the voice modules in turn; the first answer wins. */

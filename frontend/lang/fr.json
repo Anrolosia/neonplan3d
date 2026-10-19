@@ -1962,5 +1962,7 @@
  "module_no_settings": "Ce module n'a pas de réglages propres.",
  "side_resize": "Élargir ou rétrécir le panneau latéral",
  "furn_extra": "Valeur supplémentaire au symbole (capteur, p. ex. température de l'eau)",
- "theme_auto": "Auto (Jour/Néon selon le soleil)"
+ "theme_auto": "Auto (Jour/Néon selon le soleil)",
+ "voice_understands": "Ce que NeonPlan comprend",
+ "voice_examples": "« Montre le salon »|« Va à l'étage »|« Montre toute la maison »|« Montre le lave-linge » / « Où est le sèche-linge ? »|« Montre la caméra de la porte d'entrée »|« Montre les caméras »|Tout le reste (« allume la lumière du couloir ») va à Assist"
 }

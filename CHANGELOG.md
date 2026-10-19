@@ -17,6 +17,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - Editor: the side bar can be dragged wider or narrower at its left edge; the width is remembered (#620).
 - Electric furniture: an **extra value at the symbol** – a sensor (a gas boiler's water temperature) shown at the item's pin (D619).
 - Symbol mode **In the room**: an open room shows every symbol of that room, not only the important ones (D477, found by haddung).
+- Voice control: compounds are understood ("Auffahrtkamera" finds the camera "Auffahrt"); the voice settings list what NeonPlan understands, with the sentences of installed modules.
 - Voice control: a bigger microphone button.
 - Voice control: furniture can be asked for by its kind ("Zeig den Trockner"), its own name and everyday words ("TV", "Glotze", "Heizung", "Auto"), with or without an entity; a sensor called "Waschmaschine Leistung" answers to "Waschmaschine"; with several of a kind the one in the room named wins.
 

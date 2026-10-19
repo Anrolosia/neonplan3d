@@ -77,7 +77,16 @@ export const SYNONYMS: Record<string, string[]> = {
   wall_switch: ["lichtschalter", "schalter", "light switch", "switch"],
 };
 
-const words = (s: string) => normalize(s).split(" ").filter((w) => w.length > 1);
+/** German compounds end in the thing itself: "auffahrtkamera" is said as "auffahrt" and "kamera", "flurlicht" as "flur" and "licht". */
+const COMPOUND_TAILS = ["kamera", "cam", "licht", "lampe", "leuchte", "tuer", "tur", "tor", "fenster", "steckdose", "schalter", "sensor", "heizung", "pumpe", "melder", "light", "lamp", "camera", "door", "window", "sensor"];
+const split = (w: string): string[] => {
+  for (const tail of COMPOUND_TAILS) {
+    if (w.length > tail.length + 2 && w.endsWith(tail)) return [w.slice(0, -tail.length), tail];
+  }
+  return [w];
+};
+/** The words of a name or a sentence, compounds split. */
+const words = (s: string) => normalize(s).split(" ").filter((w) => w.length > 1).flatMap(split);
 
 /** The words of a name that say what it is: generic measuring words drop out while others remain. */
 function telling(name: string): string[] {
@@ -94,8 +103,8 @@ export function showTarget(sentence: string, building: Building, devices: readon
   const text = normalize(sentence);
   if (!text) return null;
   const asks = SHOW.test(text);
-  const said = new Set(text.split(" "));
-  const camWord = CAMERA.test(text);
+  const said = new Set(words(text));
+  const camWord = CAMERA.test(text) || [...said].some((w) => CAMERA.test(w));
   if (asks && CAMERAS.test(text) && devices.some((d) => d.camera)) return { kind: "cameras", name: "" };
   const place = findPlace(sentence, building, alias);
   let best: Shown | null = null;

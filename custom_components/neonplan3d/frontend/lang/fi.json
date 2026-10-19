@@ -1962,5 +1962,7 @@
  "module_no_settings": "Tällä moduulilla ei ole omia asetuksia.",
  "side_resize": "Vedä sivupalkki leveämmäksi tai kapeammaksi",
  "furn_extra": "Lisäarvo symbolissa (anturi, esim. veden lämpötila)",
- "theme_auto": "Auto (Päivä/Neon auringon mukaan)"
+ "theme_auto": "Auto (Päivä/Neon auringon mukaan)",
+ "voice_understands": "Tämän NeonPlan ymmärtää",
+ "voice_examples": "”Näytä olohuone”|”Mene yläkertaan”|”Näytä koko talo”|”Näytä pesukone” / ”Missä kuivausrumpu on?”|”Näytä etuoven kamera”|”Näytä kamerat”|Kaikki muu (”valo eteiseen päälle”) menee Assistille"
 }

@@ -1962,5 +1962,7 @@
  "module_no_settings": "Este módulo não tem definições próprias.",
  "side_resize": "Arrastar a barra lateral mais larga ou mais estreita",
  "furn_extra": "Valor extra no símbolo (sensor, p. ex. temperatura da água)",
- "theme_auto": "Auto (Dia/Néon pelo sol)"
+ "theme_auto": "Auto (Dia/Néon pelo sol)",
+ "voice_understands": "O que o NeonPlan entende",
+ "voice_examples": "«Mostra a sala»|«Vai ao andar de cima»|«Mostra a casa toda»|«Mostra a máquina de lavar» / «Onde está a máquina de secar?»|«Mostra a câmara da entrada»|«Mostra as câmaras»|Tudo o resto («acende a luz do corredor») vai para o Assist"
 }

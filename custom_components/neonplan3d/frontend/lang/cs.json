@@ -1962,5 +1962,7 @@
  "module_no_settings": "Tento modul nemá vlastní nastavení.",
  "side_resize": "Přetažením rozšiřte nebo zúžte postranní panel",
  "furn_extra": "Doplňková hodnota u symbolu (senzor, např. teplota vody)",
- "theme_auto": "Auto (Den/Neon podle slunce)"
+ "theme_auto": "Auto (Den/Neon podle slunce)",
+ "voice_understands": "Tomu NeonPlan rozumí",
+ "voice_examples": "„Ukaž obývák“|„Jdi do patra“|„Ukaž celý dům“|„Ukaž pračku“ / „Kde je sušička?“|„Ukaž kameru u dveří“|„Ukaž kamery“|Vše ostatní („rozsviť světlo na chodbě“) jde do Assistu"
 }

@@ -1962,5 +1962,7 @@
  "module_no_settings": "Ta modul nima lastnih nastavitev.",
  "side_resize": "Povleci stransko vrstico širše ali ožje",
  "furn_extra": "Dodatna vrednost pri simbolu (senzor, npr. temperatura vode)",
- "theme_auto": "Samodejno (Dan/Neon po soncu)"
+ "theme_auto": "Samodejno (Dan/Neon po soncu)",
+ "voice_understands": "To NeonPlan razume",
+ "voice_examples": "„Pokaži dnevno sobo“|„Pojdi v nadstropje“|„Pokaži celo hišo“|„Pokaži pralni stroj“ / „Kje je sušilni stroj?“|„Pokaži kamero pri vratih“|„Pokaži kamere“|Vse ostalo („prižgi luč na hodniku“) gre k Assistu"
 }

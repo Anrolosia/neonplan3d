@@ -4263,6 +4263,7 @@ export class Fp3dView3d extends LitElement {
         return hit?.kind === "device" && hit.id ? (spoken.find((d) => d.id === hit.id) ?? null) : null;
       },
       openings: () => this.spokenOpenings(hass, b),
+      energy: () => (this._energy ? { consumption: this._energy.consumption, solar: this._energy.solar, grid: this._energy.grid, battery: this._energy.battery, soc: this._energy.soc } : null),
       consumers: () =>
         [...this.lastConsumers]
           .map((c) => ({ id: c.id, entity: c.powerEntity, name: spoken.find((d) => d.entity === c.id || d.power === c.powerEntity)?.name ?? entityName(hass, c.id), watts: c.power }))

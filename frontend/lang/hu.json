@@ -1962,5 +1962,7 @@
  "module_no_settings": "Ennek a modulnak nincsenek saját beállításai.",
  "side_resize": "Húzd az oldalsávot szélesebbre vagy keskenyebbre",
  "furn_extra": "Kiegészítő érték a szimbólumnál (érzékelő, pl. vízhőmérséklet)",
- "theme_auto": "Auto (Nappal/Neon a nap szerint)"
+ "theme_auto": "Auto (Nappal/Neon a nap szerint)",
+ "voice_understands": "Ezt érti a NeonPlan",
+ "voice_examples": "„Mutasd a nappalit”|„Menj az emeletre”|„Mutasd az egész házat”|„Mutasd a mosógépet” / „Hol a szárító?”|„Mutasd a bejárati kamerát”|„Mutasd a kamerákat”|Minden más („kapcsold fel a folyosó lámpáját”) az Assisthez megy"
 }

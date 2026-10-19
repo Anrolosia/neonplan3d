@@ -1962,5 +1962,7 @@
  "module_no_settings": "此模块没有自己的设置。",
  "side_resize": "拖动以加宽或缩窄侧栏",
  "furn_extra": "图标旁的附加数值（传感器，例如水温）",
- "theme_auto": "自动（按日照切换白天/霓虹）"
+ "theme_auto": "自动（按日照切换白天/霓虹）",
+ "voice_understands": "NeonPlan 能听懂的话",
+ "voice_examples": "“显示客厅”|“去楼上”|“显示整个房子”|“显示洗衣机” / “烘干机在哪里？”|“显示入口摄像头”|“显示所有摄像头”|其他的话（“打开走廊的灯”）交给 Assist"
 }

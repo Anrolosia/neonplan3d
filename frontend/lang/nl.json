@@ -1962,5 +1962,7 @@
  "module_no_settings": "Deze module heeft geen eigen instellingen.",
  "side_resize": "Zijbalk breder of smaller slepen",
  "furn_extra": "Extra waarde bij het symbool (sensor, bijv. watertemperatuur)",
- "theme_auto": "Auto (Dag/Neon naar de zon)"
+ "theme_auto": "Auto (Dag/Neon naar de zon)",
+ "voice_understands": "Dit verstaat NeonPlan",
+ "voice_examples": "„Toon de woonkamer”|„Ga naar de bovenverdieping”|„Toon het hele huis”|„Toon de wasmachine” / „Waar is de droger?”|„Toon de camera van de voordeur”|„Toon de camera's”|Al het andere („licht in de gang aan”) gaat naar Assist"
 }
