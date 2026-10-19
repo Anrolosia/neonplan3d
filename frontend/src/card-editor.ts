@@ -313,7 +313,7 @@ export class Floorplan3dCardEditor extends LitElement {
             }}
           />
         </label>
-        ${this.select("theme", "theme", [["neon", "theme_neon"], ["blueprint", "theme_blueprint"], ["day", "theme_day"]], v.theme)}
+        ${this.select("theme", "theme", [["neon", "theme_neon"], ["blueprint", "theme_blueprint"], ["day", "theme_day"], ["auto", "theme_auto"]], v.theme)}
         <label class="field"
           >${this.t("accent")}
           <input type="color" .value=${this._config.accent ?? "#37e0ff"} @input=${(e: Event) => this.set("accent", (e.target as HTMLInputElement).value)} />

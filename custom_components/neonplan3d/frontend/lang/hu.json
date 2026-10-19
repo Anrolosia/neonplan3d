@@ -1959,5 +1959,8 @@
  "settings_weather": "Időjárás és figyelmeztetések",
  "settings_modules": "Modulok",
  "roof_basics": "Tetőforma",
- "module_no_settings": "Ennek a modulnak nincsenek saját beállításai."
+ "module_no_settings": "Ennek a modulnak nincsenek saját beállításai.",
+ "side_resize": "Húzd az oldalsávot szélesebbre vagy keskenyebbre",
+ "furn_extra": "Kiegészítő érték a szimbólumnál (érzékelő, pl. vízhőmérséklet)",
+ "theme_auto": "Auto (Nappal/Neon a nap szerint)"
 }

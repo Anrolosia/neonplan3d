@@ -350,6 +350,7 @@ export class Fp3dEditor extends LitElement {
     _tool: { state: true },
     _toolMenu: { state: true },
     _settingsMenu: { state: true },
+    _sideWidth: { state: true },
     _settingsDialog: { state: true },
     _toolOpen: { state: true },
     _viewMenu: { state: true },
@@ -559,6 +560,9 @@ export class Fp3dEditor extends LitElement {
   private declare _toolMenu: string | null;
   /** The ⚙ menu in the toolbar is open; the global settings dialog shown (its topic). */
   private declare _settingsMenu: boolean;
+  /** Width of the side bar (px), dragged at its left edge and remembered per browser (#620). */
+  private declare _sideWidth: number;
+  private sideDrag: { x: number; width: number } | null = null;
   private declare _settingsDialog: SettingsTopic | null;
   private declare _toolOpen: Tool | null;
   /** The view menu of the toolbar (fit, 3D beside, wall view, lock) is open. */
@@ -721,6 +725,13 @@ export class Fp3dEditor extends LitElement {
     this._tool = "select";
     this._toolMenu = null;
     this._settingsMenu = false;
+    let width = 320;
+    try {
+      width = Number(localStorage.getItem("neonplan3d.sideWidth")) || 320;
+    } catch {
+      // no storage: the default width
+    }
+    this._sideWidth = Math.min(640, Math.max(280, width));
     this._settingsDialog = null;
     this._toolOpen = null;
     this._viewMenu = false;
@@ -5473,7 +5484,7 @@ export class Fp3dEditor extends LitElement {
     const walls = floor ? generateWalls(floor.rooms, { exterior: this._doc.settings.wall_exterior, interior: this._doc.settings.wall_interior }, floor.walls ?? []) : null;
     return html`
       ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()} ${this.renderNews()} ${this.renderSettingsDialog()}
-      <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}">
+      <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}" style=${`--fp3d-side-w:${this._sideWidth}px`}>
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
             ${this._wallPick ? html`<div class="fp3d-pick-tip" style=${`left:${this.wallPickTip[0]}px;top:${this.wallPickTip[1]}px`} @click=${() => (this._wallPick = false)}>${this.t("hint_wall_pick")}</div>` : nothing}
@@ -9783,6 +9794,37 @@ export class Fp3dEditor extends LitElement {
    * The sidebar: beside the plan, folded to a narrow strip on request (more room for the plan); next to the 3D pane
    * and not pinned, folded while idle and opened over the pane.
    */
+  /** The grip at the side bar's left edge: drag it to make the bar wider or narrower (#620). */
+  private renderSideGrip() {
+    if (this.narrow) return nothing;
+    const move = (e: PointerEvent) => {
+      if (!this.sideDrag) return;
+      this._sideWidth = Math.min(640, Math.max(280, Math.round(this.sideDrag.width + (this.sideDrag.x - e.clientX))));
+    };
+    const up = (e: PointerEvent) => {
+      if (!this.sideDrag) return;
+      this.sideDrag = null;
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      try {
+        localStorage.setItem("neonplan3d.sideWidth", String(this._sideWidth));
+      } catch {
+        // no storage: the width lasts for this visit
+      }
+    };
+    return html`<div
+      class="fp3d-side-grip"
+      title=${this.t("side_resize")}
+      @pointerdown=${(e: PointerEvent) => {
+        this.sideDrag = { x: e.clientX, width: this._sideWidth };
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        e.preventDefault();
+      }}
+      @pointermove=${move}
+      @pointerup=${up}
+      @pointercancel=${up}
+    ></div>`;
+  }
+
   private renderAside(floor: Floor | undefined) {
     const folding = this._split && !this._sidePinned && !this.narrow;
     const folded = !this.narrow && (folding ? !this._sideOpen : this._sideMin);
@@ -9794,7 +9836,7 @@ export class Fp3dEditor extends LitElement {
           : nothing}
       </aside>`;
     }
-    if (!folding) return html`<aside class="fp3d-side">${this.renderPinRow()}${this.renderSide(floor)}</aside>`;
+    if (!folding) return html`<aside class="fp3d-side">${this.renderSideGrip()}${this.renderPinRow()}${this.renderSide(floor)}</aside>`;
     // open over the 3D pane, so the pane keeps its size
     return html`<aside class="fp3d-side fp3d-side-strip"></aside>
       <aside class="fp3d-side fp3d-side-overlay">
@@ -11478,6 +11520,9 @@ export class Fp3dEditor extends LitElement {
             )}
           </div>`
         : nothing}
+      ${!lamp
+        ? this.entitySelect(this.t("furn_extra"), f.extra ?? null, undefined, this.entityOptions((id) => id.startsWith("sensor.")), (v) => this.updateFurniture({ extra: v === "none" ? null : v }))
+        : nothing}
       ${!lamp || f.entity
         ? html`<label class="fp3d-check fp3d-wide" title=${this.t("device_confirm_hint")}
             ><input type="checkbox" .checked=${!!f.confirm} ?disabled=${!this.isAdmin} @change=${(ev: Event) => this.updateFurniture({ confirm: (ev.target as HTMLInputElement).checked })} />
@@ -12706,7 +12751,7 @@ export class Fp3dEditor extends LitElement {
       .fp3d-editor {
         position: relative;
         display: grid;
-        grid-template-columns: 1fr 320px;
+        grid-template-columns: 1fr var(--fp3d-side-w, 320px);
         height: 100%;
         min-height: 0;
       }
@@ -13135,7 +13180,21 @@ export class Fp3dEditor extends LitElement {
         color: var(--fp3d-muted);
         pointer-events: none;
       }
+      .fp3d-side-grip {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 8px;
+        cursor: col-resize;
+        touch-action: none;
+        z-index: 2;
+      }
+      .fp3d-side-grip:hover {
+        background: linear-gradient(90deg, rgba(55, 224, 255, 0.35), transparent);
+      }
       .fp3d-side {
+        position: relative;
         border-left: 1px solid var(--fp3d-line);
         background: var(--fp3d-chrome-solid);
         overflow-y: auto;

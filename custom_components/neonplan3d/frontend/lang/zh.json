@@ -1959,5 +1959,8 @@
  "settings_weather": "天气与警告",
  "settings_modules": "模块",
  "roof_basics": "屋顶形状",
- "module_no_settings": "此模块没有自己的设置。"
+ "module_no_settings": "此模块没有自己的设置。",
+ "side_resize": "拖动以加宽或缩窄侧栏",
+ "furn_extra": "图标旁的附加数值（传感器，例如水温）",
+ "theme_auto": "自动（按日照切换白天/霓虹）"
 }

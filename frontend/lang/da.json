@@ -1959,5 +1959,8 @@
  "settings_weather": "Vejr og advarsler",
  "settings_modules": "Moduler",
  "roof_basics": "Tagform",
- "module_no_settings": "Dette modul har ingen egne indstillinger."
+ "module_no_settings": "Dette modul har ingen egne indstillinger.",
+ "side_resize": "Træk sidepanelet bredere eller smallere",
+ "furn_extra": "Ekstra værdi ved symbolet (sensor, fx vandtemperatur)",
+ "theme_auto": "Auto (Dag/Neon efter solen)"
 }

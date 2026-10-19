@@ -48,7 +48,8 @@ export interface CardConfig {
   /** Heatmap of the rooms: none | temperature | humidity | co2. */
   heatmap?: "none" | "temperature" | "humidity" | "co2";
   /** Look: neon | blueprint | day. */
-  theme?: "neon" | "blueprint" | "day";
+  /** The look; "auto" shows Day while the sun is up and Neon at night. */
+  theme?: "neon" | "blueprint" | "day" | "auto";
   /** Accent colour for the neon look and the card's chips ("#rrggbb"); leave out for the stock cyan. */
   accent?: string;
   /** Energy values at the top (default true). */

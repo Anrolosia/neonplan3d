@@ -1959,5 +1959,8 @@
  "settings_weather": "Vær og varsler",
  "settings_modules": "Moduler",
  "roof_basics": "Takform",
- "module_no_settings": "Denne modulen har ingen egne innstillinger."
+ "module_no_settings": "Denne modulen har ingen egne innstillinger.",
+ "side_resize": "Dra sidefeltet bredere eller smalere",
+ "furn_extra": "Ekstra verdi ved symbolet (sensor, f.eks. vanntemperatur)",
+ "theme_auto": "Auto (Dag/Neon etter sola)"
 }

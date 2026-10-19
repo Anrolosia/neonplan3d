@@ -1959,5 +1959,8 @@
  "settings_weather": "Pogoda i ostrzeżenia",
  "settings_modules": "Moduły",
  "roof_basics": "Kształt dachu",
- "module_no_settings": "Ten moduł nie ma własnych ustawień."
+ "module_no_settings": "Ten moduł nie ma własnych ustawień.",
+ "side_resize": "Przeciągnij pasek boczny, by go poszerzyć lub zwęzić",
+ "furn_extra": "Dodatkowa wartość przy symbolu (czujnik, np. temperatura wody)",
+ "theme_auto": "Auto (Dzień/Neon wg słońca)"
 }

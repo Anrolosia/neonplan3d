@@ -122,7 +122,7 @@ export class Floorplan3dPanel extends LitElement {
   /** How large the device symbols are (this device). */
   private declare _pinSize: "small" | "normal" | "large";
   private declare _heat: HeatMode;
-  private declare _theme: Theme;
+  private declare _theme: Theme | "auto";
   private declare _furnish: boolean;
   private declare _selFurniture: string | null;
   private declare _selDevice: string | null;
@@ -185,8 +185,8 @@ export class Floorplan3dPanel extends LitElement {
     this._pinSize = pinSize === "small" || pinSize === "large" ? pinSize : "normal";
     const heat = prefs.get("heat");
     this._heat = heat === "temperature" || heat === "humidity" || heat === "co2" || heat === "values" ? heat : "none";
-    const theme = prefs.get("theme") as Theme | null;
-    this._theme = theme && THEMES.includes(theme) ? theme : "neon";
+    const theme = prefs.get("theme") as Theme | "auto" | null;
+    this._theme = theme === "auto" || (theme && THEMES.includes(theme)) ? theme : "neon";
     const accent = prefs.get("accent");
     this._accent = accent && /^#[0-9a-f]{6}$/i.test(accent) ? accent : null;
     this._furnish = false;
@@ -577,7 +577,7 @@ export class Floorplan3dPanel extends LitElement {
                 )}
               </div>
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("theme")}>
-                ${THEMES.map(
+                ${[...THEMES, "auto" as const].map(
                   (t) =>
                     html`<button
                       aria-pressed=${this._theme === t}

@@ -1959,5 +1959,8 @@
  "settings_weather": "Počasí a varování",
  "settings_modules": "Moduly",
  "roof_basics": "Tvar střechy",
- "module_no_settings": "Tento modul nemá vlastní nastavení."
+ "module_no_settings": "Tento modul nemá vlastní nastavení.",
+ "side_resize": "Přetažením rozšiřte nebo zúžte postranní panel",
+ "furn_extra": "Doplňková hodnota u symbolu (senzor, např. teplota vody)",
+ "theme_auto": "Auto (Den/Neon podle slunce)"
 }

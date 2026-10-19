@@ -1959,5 +1959,8 @@
  "settings_weather": "Vreme in opozorila",
  "settings_modules": "Moduli",
  "roof_basics": "Oblika strehe",
- "module_no_settings": "Ta modul nima lastnih nastavitev."
+ "module_no_settings": "Ta modul nima lastnih nastavitev.",
+ "side_resize": "Povleci stransko vrstico širše ali ožje",
+ "furn_extra": "Dodatna vrednost pri simbolu (senzor, npr. temperatura vode)",
+ "theme_auto": "Samodejno (Dan/Neon po soncu)"
 }

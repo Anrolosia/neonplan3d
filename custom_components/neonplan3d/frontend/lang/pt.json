@@ -1959,5 +1959,8 @@
  "settings_weather": "Tempo e avisos",
  "settings_modules": "Módulos",
  "roof_basics": "Forma do telhado",
- "module_no_settings": "Este módulo não tem definições próprias."
+ "module_no_settings": "Este módulo não tem definições próprias.",
+ "side_resize": "Arrastar a barra lateral mais larga ou mais estreita",
+ "furn_extra": "Valor extra no símbolo (sensor, p. ex. temperatura da água)",
+ "theme_auto": "Auto (Dia/Néon pelo sol)"
 }

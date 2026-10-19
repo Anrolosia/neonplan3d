@@ -292,7 +292,8 @@ export class Fp3dView3d extends LitElement {
   declare heatMode: HeatMode;
   /** Imported furniture packs (a new list rebuilds pack furniture). */
   declare packs: unknown;
-  declare theme: Theme;
+  /** The look; "auto" is Day while the sun is up and Neon at night (D623). */
+  declare theme: Theme | "auto";
   /** Accent colour for the neon look ("#rrggbb"), null for the stock cyan. */
   declare accent: string | null;
   /** Show the energy values at the top (cards can switch them off). */
@@ -778,7 +779,7 @@ export class Fp3dView3d extends LitElement {
       this.viewer.setWallMode(this.wallMode);
       this.viewer.setKeepView(this.keepView);
       this.viewer.setAngleLock(this.angleLock);
-      this.viewer.setTheme(this.theme);
+      this.viewer.setTheme(this.effectiveTheme());
       this.viewer.setAccent(this.accent ?? null);
       this.viewer.setFurnishMode(this.furnish);
       this.viewer.setSurfaceGrab(this.surfaceGrab ?? null);
@@ -875,7 +876,7 @@ export class Fp3dView3d extends LitElement {
     if (changed.has("keepRoof")) v.setKeepRoof(this.keepRoof);
     if (changed.has("hideRoof")) v.setHideRoof(this.hideRoof);
     if (changed.has("floorStack")) v.setFloorStack(this.floorStack);
-    if (changed.has("theme")) v.setTheme(this.theme);
+    if (changed.has("theme")) v.setTheme(this.effectiveTheme());
     if (changed.has("accent")) v.setAccent(this.accent ?? null);
     if (changed.has("surfaceGrab")) v.setSurfaceGrab(this.surfaceGrab ?? null);
     if (changed.has("furnishTypes")) v.setFurnishTypes(this.furnishTypes ?? null);
@@ -1352,6 +1353,8 @@ export class Fp3dView3d extends LitElement {
     const sun = hass.states["sun.sun"]?.attributes;
     const elevation = typeof sun?.elevation === "number" ? sun.elevation : null;
     v.setSun(elevation !== null && typeof sun?.azimuth === "number" ? { elevation, azimuth: sun.azimuth } : null);
+    // the automatic look follows the sun (setTheme ignores a look it already shows)
+    if (this.theme === "auto") v.setTheme(this.effectiveTheme());
     // the weather outside: clouds darken the sky, rain, snow and fog fall over the plot
     const raw = this.weather && !this.dimmed && hasFeature("weather") ? weatherState(hass, weatherEntity(hass, this.weatherEntityId ?? b.settings.weather_entity), b.settings.rain_entity) : null;
     const weather = raw ? limitEffects(raw, b.settings.weather_effects) : null;
@@ -2620,10 +2623,14 @@ export class Fp3dView3d extends LitElement {
         const appliance = f.type === "washer" || f.type === "dryer" || f.type === "dishwasher";
         const extraRef = f.type === "home_battery" ? f.soc : f.type === "wallbox" ? f.status : f.type === "parking" && car ? (f.car?.device ?? car.entities.soc) : household && appliance ? (f.remaining ?? null) : null;
         const extra = extraRef && extraRef !== "none" ? extraRef : null;
-        const link = linked ?? (extra ? { entity: null, power: null } : undefined);
+        // a sensor whose value stands at the symbol (a boiler's water temperature, D619): a pin even without a link
+        const extraSensor = f.extra && f.extra !== "none" && hass.states[f.extra] ? f.extra : null;
+        const extraText = extraSensor ? stateText(hass, hass.states[extraSensor]) : "";
+        const withExtra = (t: string) => (extraText ? (t ? `${t} · ${extraText}` : extraText) : t);
+        const link = linked ?? (extra || extraSensor ? { entity: null, power: null } : undefined);
         if (!link) continue;
         // a battery goes by its charge first: its power sensor is often placed on its own as well
-        const id = (f.type === "home_battery" ? (extra ?? link.entity ?? link.power) : (link.entity ?? link.power ?? extra))!;
+        const id = (f.type === "home_battery" ? (extra ?? link.entity ?? link.power) : (link.entity ?? link.power ?? extra ?? extraSensor))!;
         targets.set(f.id, id);
         const st = link.entity ? hass.states[link.entity] : undefined;
         // the meter's sensor is the grid (+ = import), the battery's can point the other way as well
@@ -2736,7 +2743,7 @@ export class Fp3dView3d extends LitElement {
           name: f.name || (link.entity ? entityName(hass, link.entity) : furnitureName(hass, f.type)),
           ownName: f.name || undefined,
           showName: !!f.show_name,
-          text: hhText ??
+          text: withExtra(hhText ??
             (car
               ? this.carText(hass, car, !!st && !PRESENT_STATES.has(st.state.toLowerCase()))
               : f.type === "home_battery"
@@ -2749,14 +2756,14 @@ export class Fp3dView3d extends LitElement {
                     ? stateText(hass, st)
                     : power !== null
                       ? formatPower(hass, Math.max(0, power))
-                      : ""),
+                      : "")),
           active: hhText ? true : car ? car.charging : st ? isActive(st) : (power ?? 0) > (typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 5),
           unavailable: st ? isUnavailable(st) : false,
           glow: null,
           // its pin grabs the item when furnishing
           furnitureId: f.id,
           // inverter, battery, wallbox: their own text (watts, charge, status) is always worth a pin
-          energyDevice: f.type === "inverter" || f.type === "home_battery" || f.type === "wallbox" || f.type === "meter" || !!car,
+          energyDevice: f.type === "inverter" || f.type === "home_battery" || f.type === "wallbox" || f.type === "meter" || !!car || !!extraSensor,
           // Auto Pro: the car's charge and range are the point of the pin – shown in full by default
           show: f.marker ?? (car || hhText ? "always" : undefined),
           fromFurniture: true,
@@ -3395,8 +3402,8 @@ export class Fp3dView3d extends LitElement {
     // the device's own setting wins over the marker mode (except "none", which hides every marker)
     if (m.show === "never" || this.markerMode === "none") return false;
     if (m.show === "always" || this.markerMode === "all") return true;
-    // only in rooms: none in the house and floor views, in a room only its own (then like "important")
-    if (this.markerMode === "room" && !this.inOpenRoom(m)) return false;
+    // only in rooms: none in the house and floor views, in an open room every symbol of that room (D477)
+    if (this.markerMode === "room") return this.inOpenRoom(m);
     if (m.lamp || m.model) return false;
     const kind = kindOf(m.id);
     if (kind === "light") return false;
@@ -4559,6 +4566,12 @@ export class Fp3dView3d extends LitElement {
     } else openMoreInfo(this, entityId);
   }
 
+  /** The look shown: the chosen one, or by the sun for "auto" – Day above the horizon, Neon below. */
+  private effectiveTheme(): Theme {
+    if (this.theme !== "auto") return this.theme;
+    return this.hass?.states["sun.sun"]?.state === "above_horizon" ? "day" : "neon";
+  }
+
   /** The start view: the card's own, else the one remembered in the editor. */
   private startViewOf(): StartView | null {
     return this.startView ?? this.building?.settings.start_view ?? null;
@@ -4652,7 +4665,7 @@ export class Fp3dView3d extends LitElement {
 
   /** The sky colour behind the house right now (night: deep blue-black, day: lighter and bluer, clouds in between). */
   private skyColor(): [number, number, number] {
-    const stage = STAGE[this.theme] ?? STAGE.neon;
+    const stage = STAGE[this.effectiveTheme()] ?? STAGE.neon;
     const sky = this._sky;
     return stage.night[0].map((v, i) => Math.round(v + (stage.day[0][i] - v) * sky)) as [number, number, number];
   }
@@ -4680,7 +4693,7 @@ export class Fp3dView3d extends LitElement {
   protected render() {
     const sky = this._sky;
     const mix = (a: number[], b: number[]) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * sky)).join(",")})`;
-    const stage = STAGE[this.theme] ?? STAGE.neon;
+    const stage = STAGE[this.effectiveTheme()] ?? STAGE.neon;
     // an own background (colour, gradient, picture) replaces the look's sky
     const own = backdropCss(this.building?.settings.backdrop);
     const pinK = this.pinSize === "small" ? 0.8 : this.pinSize === "large" ? 1.25 : 1;

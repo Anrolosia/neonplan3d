@@ -1959,5 +1959,8 @@
  "settings_weather": "Meteo e avvisi",
  "settings_modules": "Moduli",
  "roof_basics": "Forma del tetto",
- "module_no_settings": "Questo modulo non ha impostazioni proprie."
+ "module_no_settings": "Questo modulo non ha impostazioni proprie.",
+ "side_resize": "Allarga o restringi la barra laterale",
+ "furn_extra": "Valore aggiuntivo al simbolo (sensore, es. temperatura dell'acqua)",
+ "theme_auto": "Auto (Giorno/Neon secondo il sole)"
 }

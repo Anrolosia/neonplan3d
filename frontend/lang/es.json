@@ -1959,5 +1959,8 @@
  "settings_weather": "Tiempo y avisos",
  "settings_modules": "Módulos",
  "roof_basics": "Forma del tejado",
- "module_no_settings": "Este módulo no tiene ajustes propios."
+ "module_no_settings": "Este módulo no tiene ajustes propios.",
+ "side_resize": "Arrastra el panel lateral más ancho o más estrecho",
+ "furn_extra": "Valor adicional en el símbolo (sensor, p. ej. temperatura del agua)",
+ "theme_auto": "Auto (Día/Neón según el sol)"
 }

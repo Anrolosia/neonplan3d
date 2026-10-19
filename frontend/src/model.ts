@@ -249,6 +249,8 @@ export interface Furniture {
   state_split?: "left_right" | "top_bottom" | null;
   /** Lamps: a second entity whose colour and brightness the lamp shows while the linked switch is on (a relay switches the light, the bulb itself knows its colour). */
   color_entity?: EntityRef;
+  /** Any electric item: a sensor whose value stands at its symbol – a boiler's water temperature, a humidity (D619). */
+  extra?: EntityRef;
   /** Mirrored (left-right) – an L-sofa the other way round, a cabinet with its door on the other side. */
   mirror?: boolean;
   /** LED strip: tilt about its length (°; 0 = lying flat, 90 = its face points sideways, e.g. along a roof slope). */

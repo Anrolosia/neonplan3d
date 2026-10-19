@@ -1959,5 +1959,8 @@
  "settings_weather": "Weer en waarschuwingen",
  "settings_modules": "Modules",
  "roof_basics": "Dakvorm",
- "module_no_settings": "Deze module heeft geen eigen instellingen."
+ "module_no_settings": "Deze module heeft geen eigen instellingen.",
+ "side_resize": "Zijbalk breder of smaller slepen",
+ "furn_extra": "Extra waarde bij het symbool (sensor, bijv. watertemperatuur)",
+ "theme_auto": "Auto (Dag/Neon naar de zon)"
 }

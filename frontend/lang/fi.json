@@ -1959,5 +1959,8 @@
  "settings_weather": "Sää ja varoitukset",
  "settings_modules": "Moduulit",
  "roof_basics": "Katon muoto",
- "module_no_settings": "Tällä moduulilla ei ole omia asetuksia."
+ "module_no_settings": "Tällä moduulilla ei ole omia asetuksia.",
+ "side_resize": "Vedä sivupalkki leveämmäksi tai kapeammaksi",
+ "furn_extra": "Lisäarvo symbolissa (anturi, esim. veden lämpötila)",
+ "theme_auto": "Auto (Päivä/Neon auringon mukaan)"
 }
