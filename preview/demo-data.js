@@ -95,6 +95,10 @@ export const DEMO_PICTURES = {
     '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="#101010"/><text x="160" y="105" text-anchor="middle" font-family="sans-serif" font-size="56" font-weight="900" fill="#e50914">LOGO</text></svg>',
   ),
 };
+const DOOR_STILL = svgPicture(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#3b3350"/></linearGradient></defs><rect width="320" height="180" fill="url(#s)"/><rect x="0" y="118" width="320" height="62" fill="#2b2f38"/><polygon points="120,180 200,180 178,118 142,118" fill="#4a4f5c"/><rect x="40" y="70" width="36" height="48" fill="#1d3b2a"/><rect x="250" y="62" width="44" height="56" fill="#1d3b2a"/><rect x="146" y="96" width="28" height="22" fill="#20242c"/><circle cx="160" cy="62" r="12" fill="#c9a27a"/><rect x="146" y="74" width="28" height="46" rx="8" fill="#3c6ea8"/><rect x="0" y="0" width="320" height="16" fill="#00000066"/><text x="8" y="12" font-family="monospace" font-size="10" fill="#e6eefc">HAUSTUER  18:42:07</text></svg>',
+);
+
 const CAMERA_STILL = svgPicture(
   '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="#1b2230"/><rect x="0" y="120" width="320" height="60" fill="#2a3444"/><rect x="40" y="60" width="90" height="70" fill="#3b4a60"/><rect x="190" y="40" width="80" height="90" fill="#324055"/><text x="12" y="20" font-family="monospace" font-size="12" fill="#cfd8e6">KAMERA 1  12:04:31</text></svg>',
 );
@@ -161,6 +165,9 @@ const DEVICES = [
   entity("media_player.bad_lautsprecher", "bad", "playing", { friendly_name: "Bad Lautsprecher", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.3, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
   entity("switch.kaffeemaschine", "kueche", "on", { friendly_name: "Kaffeemaschine" }),
   entity("camera.wohnzimmer", "wohnzimmer", "idle", { friendly_name: "Wohnzimmer Kamera", entity_picture: CAMERA_STILL }),
+  // the front door: a camera and its doorbell (one device), for the live director
+  entity("camera.haustuer", "flur", "idle", { friendly_name: "Haustür Kamera", entity_picture: DOOR_STILL }),
+  entity("event.haustuer_klingel", "flur", "2026-10-19T08:00:00.000Z", { friendly_name: "Haustür Klingel", device_class: "doorbell", event_type: "ring" }),
   entity("sensor.wohnzimmer_temperatur", "wohnzimmer", "21.4", { friendly_name: "Wohnzimmer Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("sensor.kueche_temperatur", "kueche", "23.4", { friendly_name: "Küche Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
   entity("sensor.schlafzimmer_temperatur", "schlafzimmer", "18.1", { friendly_name: "Schlafzimmer Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
@@ -264,6 +271,8 @@ for (const [suffix, name] of [
 // devices with a power sensor of their own
 for (const [id, device] of [
   ["camera.wohnzimmer", "d_cam"],
+  ["camera.haustuer", "d_door"],
+  ["event.haustuer_klingel", "d_door"],
   ["binary_sensor.wohnzimmer_kamera_bewegung", "d_cam"],
   ["binary_sensor.wohnzimmer_kamera_person", "d_cam"],
   ["media_player.fernseher", "d_tv"],
@@ -281,6 +290,7 @@ const place = (entity_id, x, z) => ({ entity_id, x, z, y: null });
 DEMO_BUILDING.floors[0].placements = [
   place("light.wohnzimmer_decke", 3.6, 2.6),
   { ...place("camera.wohnzimmer", 0.2, 0.2), mount: "wall", rotation: 315 },
+  { ...place("camera.haustuer", 8.25, 9.3), mount: "wall", rotation: 90 },
   { entity_id: "light.stehlampe", x: 5.3, z: 0.7, y: null, mount: "floor" },
   place("cover.wohnzimmer", 1.6, 0.4),
   place("climate.wohnzimmer", 0.5, 2.2),

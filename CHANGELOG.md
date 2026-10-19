@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- Ceiling lamps and LED panels can be lowered like spots (Height above floor), e.g. under a staircase.
 - Own background behind the 3D house: the look's sky (default), one colour, a gradient or a picture with a darkening veil (editor → Background; idea from damonxxu's fork).
 
 ## 1.20.2

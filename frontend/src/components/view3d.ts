@@ -2325,7 +2325,13 @@ export class Fp3dView3d extends LitElement {
     if (!b) return;
     // a camera at the door (or the one that saw someone): look through it, when it is placed in the plan
     if (shot.camera && b.floors.some((f) => f.placements.some((p) => p.entity_id === shot.camera))) {
-      this.lookThrough(shot.camera);
+      const camera = shot.camera;
+      // an open room panel would lie over the camera picture: the room closes first (the way back reopens it)
+      if (this.roomId) {
+        // a tap on the open room closes it (panel and card toggle it)
+        this.fire("room-tap", { floorId: this.floorId, roomId: this.roomId });
+        setTimeout(() => this.lookThrough(camera), 250);
+      } else this.lookThrough(camera);
       return;
     }
     if (shot.kind === "appliance") {

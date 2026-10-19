@@ -1252,18 +1252,21 @@ export const WALL_LAMP_Y = 1.75;
  * light (a downstand beam, ceiling beams) start under the ceiling and can be lowered (#287).
  */
 export function canLift(f: Pick<Furniture, "type">): boolean {
-  if (["lamp_ceiling", "lamp_panel", "lamp_pendant", "stairwell", "parking"].includes(f.type) || STAIR_TYPES.has(f.type)) return false;
+  if (["lamp_pendant", "stairwell", "parking"].includes(f.type) || STAIR_TYPES.has(f.type)) return false;
   const item = packItem(f.type);
   return !(item?.mount === "ceiling" && item.light);
 }
 
 /**
- * Spots and downlights sit under the ceiling but can be lowered, say under a wall cabinet to light the worktop
- * (#311): their height above the floor is that of their underside, this far below the top they hang from.
+ * Spots, downlights, ceiling lamps and LED panels sit under the ceiling but can be lowered – under a wall cabinet to
+ * light the worktop (#311), under a staircase: their height above the floor is that of their underside, this far
+ * below the top they hang from. Without a height of their own they stay at the ceiling.
  */
-export const LIFT_SPOTS = new Set<string>(["lamp_downlight", "lamp_spot"]);
+export const LIFT_SPOTS = new Set<string>(["lamp_downlight", "lamp_spot", "lamp_ceiling", "lamp_panel"]);
 export function spotDepth(type: string, h: number): number {
-  return type === "lamp_spot" ? Math.max(0.06, h) + 0.008 : 0.02;
+  if (type === "lamp_spot") return Math.max(0.06, h) + 0.008;
+  if (type === "lamp_ceiling" || type === "lamp_panel") return Math.max(0.02, h) + 0.005;
+  return 0.02;
 }
 
 /** Built-in stairs: they reach up to the next floor and cut its opening (the straight one and the U-stair). */
