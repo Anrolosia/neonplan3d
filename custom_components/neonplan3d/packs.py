@@ -152,6 +152,18 @@ KNOWN_FEATURES = [
     "fun_halloween",
 ]
 
+# A module: code the shop delivers (not part of the public repository), run by NeonPlan's module loader.
+# `api` is the loader interface it was written for, `kind` where it plugs in. Signed and bound like any pack.
+MODULE_KINDS = ["voice"]
+MODULE_SCHEMA = vol.Schema(
+    {
+        vol.Required("api"): 1,
+        vol.Required("kind"): vol.In(MODULE_KINDS),
+        # the module's JavaScript (an ES module with a default export)
+        vol.Required("code"): vol.All(str, vol.Length(min=1, max=400_000)),
+    }
+)
+
 PAYLOAD_SCHEMA = vol.Schema(
     {
         vol.Required("format"): PACK_FORMAT,
@@ -172,6 +184,8 @@ PAYLOAD_SCHEMA = vol.Schema(
             vol.Length(max=10),
         ),
         vol.Required("items"): vol.All([ITEM_SCHEMA], vol.Length(min=0, max=200)),
+        # a module (see MODULE_SCHEMA); such a pack usually carries no furniture
+        vol.Optional("module"): MODULE_SCHEMA,
     }
 )
 
@@ -235,8 +249,8 @@ def validate_payload(payload: Any) -> dict[str, Any]:
     ids = [item["id"] for item in clean["items"]]
     if len(ids) != len(set(ids)):
         raise PackError("invalid_content", "item ids must be unique")
-    if not ids and not clean["features"]:
-        raise PackError("invalid_content", "a pack needs items or features")
+    if not ids and not clean["features"] and not clean.get("module"):
+        raise PackError("invalid_content", "a pack needs items, features or a module")
     return clean
 
 
@@ -275,7 +289,9 @@ def verify_pack(text: str, keys: dict[str, str] | None = None, instance: str | N
     except (InvalidSignature, ValueError) as err:
         raise PackError("bad_signature") from err
     payload = validate_payload(data["payload"])
-    if signature["key"] in STUDIO_KEYS and (not str(payload["id"]).startswith("studio.") or payload["features"]):
+    if signature["key"] in STUDIO_KEYS and (
+        not str(payload["id"]).startswith("studio.") or payload["features"] or payload.get("module")
+    ):
         raise PackError("bad_signature", "the studio key signs studio furniture only")
     if instance is not None and payload["instance"] is not None and payload["instance"] != instance:
         raise PackError("wrong_instance", "the pack is bound to another installation")

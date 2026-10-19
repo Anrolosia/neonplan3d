@@ -6,8 +6,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## Unreleased
 
+### New
+
+- **Modules:** NeonPlan can load code the shop delivers as a signed pack ("Modul von …" on the extensions page). The first module answers spoken questions ("Was ist offen?", "Wo ist es kalt?", "Läuft die Waschmaschine?", "Was zieht Strom?") in the house and out loud through the Assist pipeline's text-to-speech. Modules are checked and bound to the installation like furniture packs.
+
 ### Improved
 
+- Voice control: a bigger microphone button.
 - Voice control: furniture can be asked for by its kind ("Zeig den Trockner"), its own name and everyday words ("TV", "Glotze", "Heizung", "Auto"), with or without an entity; a sensor called "Waschmaschine Leistung" answers to "Waschmaschine"; with several of a kind the one in the room named wins.
 
 ### Fixed

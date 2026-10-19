@@ -1953,5 +1953,6 @@
  "ap_hint": "O anel brilha a azul enquanto o ponto de acesso está lá e a vermelho quando falta – então aparece também o seu símbolo. As entidades de diagnóstico (p. ex. da UniFi) também estão disponíveis aqui.",
  "heater_entity": "Dispositivo (water_heater, termóstato ou interruptor)",
  "heater_temp": "Sensor: temperatura da água (opcional)",
- "heater_hint": "O termoacumulador brilha quente enquanto aquece (termóstato a aquecer, interruptor ligado ou potência acima do limiar) e mostra a temperatura da água – do sensor ou do próprio aparelho."
+ "heater_hint": "O termoacumulador brilha quente enquanto aquece (termóstato a aquecer, interruptor ligado ou potência acima do limiar) e mostra a temperatura da água – do sensor ou do próprio aparelho.",
+ "pack_module": "Módulo de {publisher} · ativo na casa"
 }

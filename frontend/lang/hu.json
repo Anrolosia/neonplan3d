@@ -1953,5 +1953,6 @@
  "ap_hint": "A gyűrű kéken világít, amíg a hozzáférési pont elérhető, és pirosan, ha hiányzik – ekkor a szimbóluma is megjelenik. Itt a diagnosztikai entitások (pl. a UniFi-é) is választhatók.",
  "heater_entity": "Eszköz (water_heater, termosztát vagy kapcsoló)",
  "heater_temp": "Érzékelő: vízhőmérséklet (opcionális)",
- "heater_hint": "A tároló melegen izzik, amíg fűt (a termosztát fűt, a kapcsoló be van kapcsolva vagy a teljesítmény a küszöb felett van), és mutatja a víz hőmérsékletét – az érzékelőből vagy magától az eszköztől."
+ "heater_hint": "A tároló melegen izzik, amíg fűt (a termosztát fűt, a kapcsoló be van kapcsolva vagy a teljesítmény a küszöb felett van), és mutatja a víz hőmérsékletét – az érzékelőből vagy magától az eszköztől.",
+ "pack_module": "{publisher} modulja · fut a házban"
 }

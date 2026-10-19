@@ -41,6 +41,7 @@ def async_register_commands(hass: HomeAssistant) -> None:
         ws_packs_import,
         ws_packs_remove,
         ws_packs_install,
+        ws_modules_code,
         ws_license_get,
         ws_license_activate,
         ws_license_remove,
@@ -200,7 +201,44 @@ def ws_packs_list(hass: HomeAssistant, connection: websocket_api.ActiveConnectio
     """Return the imported furniture packs (every user needs them to see the furniture)."""
     if (data := _data(hass, connection, msg)) is None:
         return
-    connection.send_result(msg["id"], {"packs": data.packs})
+    connection.send_result(msg["id"], {"packs": [_without_code(p) for p in data.packs]})
+
+
+def _without_code(pack: dict[str, Any]) -> dict[str, Any]:
+    """A module's code is fetched on its own (neonplan3d/modules/code): the list stays small."""
+    module = pack.get("module")
+    if not isinstance(module, dict):
+        return pack
+    slim = {**pack, "module": {k: v for k, v in module.items() if k != "code"}}
+    # the signed source carries the code as well
+    if isinstance(slim.get("source"), dict):
+        slim["source"] = {**slim["source"], "module": slim["module"]}
+    return slim
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "neonplan3d/modules/code", vol.Required("pack_id"): vol.All(str, vol.Length(max=64))}
+)
+@callback
+def ws_modules_code(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """The code of an installed module (every user runs the modules, like everyone sees the furniture)."""
+    if (data := _data(hass, connection, msg)) is None:
+        return
+    pack = next((p for p in data.packs if p["id"] == msg["pack_id"]), None)
+    module = pack.get("module") if pack else None
+    if not isinstance(module, dict) or not isinstance(module.get("code"), str):
+        connection.send_error(msg["id"], "not_found", "no such module")
+        return
+    connection.send_result(
+        msg["id"],
+        {
+            "id": pack["id"],
+            "release": pack.get("release") or 1,
+            "api": module["api"],
+            "kind": module["kind"],
+            "code": module["code"],
+        },
+    )
 
 
 @websocket_api.websocket_command(

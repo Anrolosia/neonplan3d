@@ -1953,5 +1953,6 @@
  "ap_hint": "Inelul luminează albastru cât timp punctul de acces e prezent și roșu când lipsește – atunci apare și simbolul lui. Aici se pot alege și entitățile de diagnostic (de ex. de la UniFi).",
  "heater_entity": "Dispozitiv (water_heater, termostat sau comutator)",
  "heater_temp": "Senzor: temperatura apei (opțional)",
- "heater_hint": "Boilerul strălucește cald cât timp încălzește (termostat în încălzire, comutator pornit sau putere peste prag) și arată temperatura apei – din senzor sau de la dispozitivul însuși."
+ "heater_hint": "Boilerul strălucește cald cât timp încălzește (termostat în încălzire, comutator pornit sau putere peste prag) și arată temperatura apei – din senzor sau de la dispozitivul însuși.",
+ "pack_module": "Modul de la {publisher} · activ în casă"
 }

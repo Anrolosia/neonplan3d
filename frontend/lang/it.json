@@ -1953,5 +1953,6 @@
  "ap_hint": "L'anello si illumina di blu finché l'access point c'è e di rosso quando manca – allora compare anche il suo simbolo. Qui si possono scegliere anche le entità diagnostiche (ad es. di UniFi).",
  "heater_entity": "Dispositivo (water_heater, termostato o interruttore)",
  "heater_temp": "Sensore: temperatura dell'acqua (facoltativo)",
- "heater_hint": "Il bollitore si illumina di caldo mentre scalda (termostato in riscaldamento, interruttore acceso o potenza oltre la soglia) e mostra la temperatura dell'acqua – dal sensore o dal dispositivo stesso."
+ "heater_hint": "Il bollitore si illumina di caldo mentre scalda (termostato in riscaldamento, interruttore acceso o potenza oltre la soglia) e mostra la temperatura dell'acqua – dal sensore o dal dispositivo stesso.",
+ "pack_module": "Modulo di {publisher} · attivo nella casa"
 }

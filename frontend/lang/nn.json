@@ -1953,5 +1953,6 @@
  "ap_hint": "Ringen lyser blått så lenge tilgangspunktet er der, og raudt når det manglar – då kjem òg symbolet fram. Diagnose-entitetar (t.d. frå UniFi) kan òg veljast her.",
  "heater_entity": "Eining (water_heater, termostat eller brytar)",
  "heater_temp": "Sensor: vasstemperatur (valfri)",
- "heater_hint": "Beredaren gløder varmt medan han varmar (termostat varmar, brytar på eller effekt over terskelen) og viser vasstemperaturen – frå sensoren eller frå eininga sjølv."
+ "heater_hint": "Beredaren gløder varmt medan han varmar (termostat varmar, brytar på eller effekt over terskelen) og viser vasstemperaturen – frå sensoren eller frå eininga sjølv.",
+ "pack_module": "Modul frå {publisher} · køyrer i huset"
 }

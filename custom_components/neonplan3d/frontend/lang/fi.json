@@ -1953,5 +1953,6 @@
  "ap_hint": "Rengas palaa sinisenä niin kauan kuin tukiasema on paikalla ja punaisena, kun se puuttuu – silloin näkyy myös sen symboli. Myös diagnostiikkaentiteetit (esim. UniFin) ovat tässä valittavissa.",
  "heater_entity": "Laite (water_heater, termostaatti tai kytkin)",
  "heater_temp": "Anturi: veden lämpötila (valinnainen)",
- "heater_hint": "Varaaja hehkuu lämpimänä lämmittäessään (termostaatti lämmittää, kytkin päällä tai teho yli kynnyksen) ja näyttää veden lämpötilan – anturista tai laitteesta itsestään."
+ "heater_hint": "Varaaja hehkuu lämpimänä lämmittäessään (termostaatti lämmittää, kytkin päällä tai teho yli kynnyksen) ja näyttää veden lämpötilan – anturista tai laitteesta itsestään.",
+ "pack_module": "Moduuli: {publisher} · käytössä talossa"
 }

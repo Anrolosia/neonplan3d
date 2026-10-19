@@ -1953,5 +1953,6 @@
  "ap_hint": "El anillo brilla en azul mientras el punto de acceso está y en rojo cuando falta; entonces también aparece su símbolo. Aquí también se ofrecen las entidades de diagnóstico (p. ej. de UniFi).",
  "heater_entity": "Dispositivo (water_heater, termostato o interruptor)",
  "heater_temp": "Sensor: temperatura del agua (opcional)",
- "heater_hint": "El termo brilla cálido mientras calienta (termostato calentando, interruptor encendido o potencia sobre el umbral) y muestra la temperatura del agua, del sensor o del propio aparato."
+ "heater_hint": "El termo brilla cálido mientras calienta (termostato calentando, interruptor encendido o potencia sobre el umbral) y muestra la temperatura del agua, del sensor o del propio aparato.",
+ "pack_module": "Módulo de {publisher} · activo en la casa"
 }

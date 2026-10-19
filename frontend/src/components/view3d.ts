@@ -98,6 +98,7 @@ import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
+import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice } from "../modules.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
@@ -446,6 +447,8 @@ export class Fp3dView3d extends LitElement {
   declare startView: StartView | null;
   /** Search index (rooms and devices), built when the search opens and reused while it is open. */
   private findIndex: SearchItem[] | null = null;
+  /** The consumers of the last sync (the modules ask what draws power right now). */
+  private lastConsumers: Consumer[] = [];
   /** Room colours (heatmap) as last sent to the viewer. */
   private tintSig = "";
   private thumbTimer: ReturnType<typeof setTimeout> | undefined;
@@ -784,6 +787,7 @@ export class Fp3dView3d extends LitElement {
       this.viewer.setHideRoof(this.hideRoof);
       this._low = this.viewer.low;
       this.viewer.setPacks([...getPacks()]);
+      if (this.hass) void syncModules(this.hass, getPacks());
       this.shownPacks = packsVersion();
       if (this.building) {
         this.shownStartView = JSON.stringify(this.startViewOf());
@@ -825,6 +829,7 @@ export class Fp3dView3d extends LitElement {
     if (this.shownPacks !== packsVersion()) {
       this.shownPacks = packsVersion();
       v.setPacks([...getPacks()]);
+      if (this.hass) void syncModules(this.hass, getPacks());
       // vehicles in parking spots come from packs too: look them up again now that the packs are here
       if (this.hass && this.building) v.setParked(parkedVehicles(this.hass, this.building));
       // a feature pack may have arrived with them (Energie Pro): the cables and modules follow
@@ -931,6 +936,7 @@ export class Fp3dView3d extends LitElement {
     const deviceMarkers = buildMarkers(hass, b);
     const furniture = this.furnitureMarkers(hass, b, new Set(deviceMarkers.map((m) => m.id)), new Set(consumers.map((c) => c.powerEntity)));
     consumers.push(...furniture.consumers);
+    this.lastConsumers = consumers;
     const summary = energySummary(hass, b, consumers, deviceSensors(b, (f) => this.furnitureLinks?.get(f.id)?.power ?? null));
     // a placed power sensor shows its value as state text already, so only devices get a watt badge
     const byDevice = new Map(consumers.filter((c) => c.id !== c.powerEntity).map((c) => [c.id, c.power]));
@@ -4025,33 +4031,7 @@ export class Fp3dView3d extends LitElement {
         say("error", translate(hass, "voice_none"));
         return;
       }
-      // what can be shown: every piece of furniture (with or without an entity) by its own name, its kind, its
-      // entity's name and everyday words for it ("TV", "Glotze"); placed devices by their name – each with its room
-      const index = (this.findIndex ??= searchIndex(hass, b));
-      const roomName = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
-      const devices: Shown[] = [];
-      const items = new Map<string, SearchItem>();
-      for (const it of index) if (it.kind === "device" && it.entity) items.set(it.entity, it);
-      const ofFurniture = new Set<string>();
-      for (const floor of b.floors) {
-        const zones = zonesOf(floor);
-        for (const f of floor.furniture) {
-          if (UNSPOKEN.has(f.type)) continue;
-          const link = this.furnitureLinks.get(f.id);
-          const entity = link?.entity ?? link?.power ?? null;
-          const id = entity ?? `furniture:${f.id}`;
-          const zone = zones.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
-          const kindName = furnitureName(hass, f.type);
-          const names = [f.name, kindName, entity ? entityName(hass, entity) : null, ...(v.SYNONYMS[f.type] ?? [])].filter((n): n is string => !!n);
-          devices.push({ id, entity, name: f.name || (entity ? entityName(hass, entity) : kindName), names, room: zone?.name ?? "", camera: !!entity && kindOf(entity) === "camera" });
-          if (entity) ofFurniture.add(entity);
-          else items.set(id, { kind: "device", name: f.name || kindName, where: "", floorId: floor.id, roomId: zone?.id ?? null, entity: null, icon: null, x: f.x, z: f.z, y: Math.min(floor.height - 0.3, Math.max(0.5, f.h)) });
-        }
-      }
-      for (const [entity, it] of items) {
-        if (ofFurniture.has(entity) || entity.startsWith("furniture:")) continue;
-        devices.push({ id: entity, entity, name: it.name, room: (it.roomId && roomName.get(it.roomId)) || "", camera: kindOf(entity) === "camera" });
-      }
+      const { devices, items } = this.spokenDevices(hass, b, v.SYNONYMS);
       const place = v.showTarget(text, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
       if (place) {
         say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.kind === "cameras" ? translate(hass, "camera_wall_title") : place.name}`);
@@ -4072,6 +4052,25 @@ export class Fp3dView3d extends LitElement {
         }
         return;
       }
+      // a module of the house answers (installed from the shop): what to say and what to show
+      const host = this.moduleHost(hass, b, v.SYNONYMS, (s) => v.showTarget(s, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null)));
+      const own = await moduleVoice(text, host);
+      if (own) {
+        say("done", own.text ? `“${text}” – ${own.text}` : `“${text}”`);
+        this.directing.touch(Date.now());
+        if (own.highlight?.length) this.viewer?.flashDevices(own.highlight);
+        const f = own.focus;
+        if (f?.roomId && f.floorId) {
+          if (this.floorId !== f.floorId) this.fire("floor-tap", { floorId: f.floorId });
+          setTimeout(() => this.fire("room-tap", { floorId: f.floorId, roomId: f.roomId }), 60);
+        } else if (f?.floorId && !f.entity && !f.furnitureId) this.fire("floor-tap", { floorId: f.floorId });
+        else if (f?.entity || f?.furnitureId) {
+          const item = items.get(f.entity ?? `furniture:${f.furnitureId}`);
+          if (item) this.goTo(item);
+        }
+        if (own.text && own.speak !== false) void v.speak(hass, own.text, voicePipeline());
+        return;
+      }
       say("wait", `“${text}” …`);
       const answer = await v.converse(hass, text);
       say("done", answer ? `“${text}” – ${answer}` : `“${text}”`);
@@ -4087,6 +4086,65 @@ export class Fp3dView3d extends LitElement {
               : null;
       say("error", key ? translate(hass, key) : translate(hass, "voice_error", { msg: String(e?.message ?? e?.name ?? err) }));
     }
+  }
+
+  /**
+   * What can be shown by voice: every piece of furniture (with or without an entity) by its own name, its kind, its
+   * entity's name and everyday words for it ("TV", "Glotze"); placed devices by their name – each with its room.
+   * `items` says where each of them is, for the flight there.
+   */
+  private spokenDevices(hass: HomeAssistant, b: Building, synonyms: Record<string, string[]>): { devices: Shown[]; items: Map<string, SearchItem>; spoken: SpokenDevice[] } {
+    const index = (this.findIndex ??= searchIndex(hass, b));
+    const roomName = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
+    const devices: Shown[] = [];
+    const spoken: SpokenDevice[] = [];
+    const items = new Map<string, SearchItem>();
+    for (const it of index) if (it.kind === "device" && it.entity) items.set(it.entity, it);
+    const ofFurniture = new Set<string>();
+    for (const floor of b.floors) {
+      const zones = zonesOf(floor);
+      for (const f of floor.furniture) {
+        if (UNSPOKEN.has(f.type)) continue;
+        const link = this.furnitureLinks.get(f.id);
+        const entity = link?.entity ?? link?.power ?? null;
+        const id = entity ?? `furniture:${f.id}`;
+        const zone = zones.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+        const kindName = furnitureName(hass, f.type);
+        const names = [f.name, kindName, entity ? entityName(hass, entity) : null, ...(synonyms[f.type] ?? [])].filter((n): n is string => !!n);
+        const name = f.name || (entity ? entityName(hass, entity) : kindName);
+        devices.push({ id, entity, name, names, room: zone?.name ?? "", camera: !!entity && kindOf(entity) === "camera" });
+        spoken.push({ id, entity, name, names, room: zone?.name ?? "", floorId: floor.id, roomId: zone?.id ?? null, power: link?.power ?? null, type: f.type });
+        if (entity) ofFurniture.add(entity);
+        else items.set(id, { kind: "device", name, where: "", floorId: floor.id, roomId: zone?.id ?? null, entity: null, icon: null, x: f.x, z: f.z, y: Math.min(floor.height - 0.3, Math.max(0.5, f.h)) });
+      }
+    }
+    for (const [entity, it] of items) {
+      if (ofFurniture.has(entity) || entity.startsWith("furniture:")) continue;
+      const room = (it.roomId && roomName.get(it.roomId)) || "";
+      devices.push({ id: entity, entity, name: it.name, room, camera: kindOf(entity) === "camera" });
+      spoken.push({ id: entity, entity, name: it.name, names: [it.name], room, floorId: it.floorId, roomId: it.roomId, power: null, type: "device" });
+    }
+    return { devices, items, spoken };
+  }
+
+  /** What a module may ask: the house, its devices, the host's own matching of a spoken device, the consumers. */
+  private moduleHost(hass: HomeAssistant, b: Building, synonyms: Record<string, string[]>, find: (sentence: string) => { kind: string; id?: string } | null): ModuleHost {
+    const { spoken } = this.spokenDevices(hass, b, synonyms);
+    return {
+      api: 1,
+      hass: () => this.hass,
+      building: () => this.building,
+      language: () => hass.language || "en",
+      devices: () => spoken,
+      findDevice: (sentence) => {
+        const hit = find(sentence);
+        return hit?.kind === "device" && hit.id ? (spoken.find((d) => d.id === hit.id) ?? null) : null;
+      },
+      consumers: () =>
+        [...this.lastConsumers]
+          .map((c) => ({ id: c.id, entity: c.powerEntity, name: spoken.find((d) => d.entity === c.id || d.power === c.powerEntity)?.name ?? entityName(hass, c.id), watts: c.power }))
+          .sort((x, y) => y.watts - x.watts),
+    };
   }
 
   private renderSwipe() {

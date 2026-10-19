@@ -1953,5 +1953,6 @@
  "ap_hint": "L'anneau brille en bleu tant que le point d'accès est là et en rouge s'il manque – son symbole apparaît alors aussi. Les entités de diagnostic (UniFi par exemple) sont aussi proposées ici.",
  "heater_entity": "Appareil (water_heater, thermostat ou interrupteur)",
  "heater_temp": "Capteur : température de l'eau (facultatif)",
- "heater_hint": "Le ballon brille en chaud tant qu'il chauffe (thermostat en chauffe, interrupteur allumé ou puissance au-dessus du seuil) et affiche la température de l'eau – du capteur ou de l'appareil lui-même."
+ "heater_hint": "Le ballon brille en chaud tant qu'il chauffe (thermostat en chauffe, interrupteur allumé ou puissance au-dessus du seuil) et affiche la température de l'eau – du capteur ou de l'appareil lui-même.",
+ "pack_module": "Module de {publisher} · actif dans la maison"
 }

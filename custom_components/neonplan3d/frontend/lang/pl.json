@@ -1953,5 +1953,6 @@
  "ap_hint": "Pierścień świeci na niebiesko, dopóki punkt dostępowy jest dostępny, a na czerwono, gdy go brak – wtedy pojawia się też jego symbol. Można tu wybrać także encje diagnostyczne (np. z UniFi).",
  "heater_entity": "Urządzenie (water_heater, termostat lub przełącznik)",
  "heater_temp": "Czujnik: temperatura wody (opcjonalnie)",
- "heater_hint": "Zasobnik świeci ciepło, dopóki grzeje (termostat grzeje, przełącznik włączony lub moc powyżej progu), i pokazuje temperaturę wody – z czujnika lub z samego urządzenia."
+ "heater_hint": "Zasobnik świeci ciepło, dopóki grzeje (termostat grzeje, przełącznik włączony lub moc powyżej progu), i pokazuje temperaturę wody – z czujnika lub z samego urządzenia.",
+ "pack_module": "Moduł od {publisher} · działa w domu"
 }

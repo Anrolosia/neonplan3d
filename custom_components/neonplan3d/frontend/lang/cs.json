@@ -1953,5 +1953,6 @@
  "ap_hint": "Kroužek svítí modře, dokud je přístupový bod dostupný, a červeně, když chybí – pak se ukáže i jeho symbol. Lze tu vybrat i diagnostické entity (např. z UniFi).",
  "heater_entity": "Zařízení (water_heater, termostat nebo spínač)",
  "heater_temp": "Senzor: teplota vody (volitelné)",
- "heater_hint": "Zásobník žhne teple, dokud topí (termostat topí, spínač zapnutý nebo příkon nad prahem), a ukazuje teplotu vody – ze senzoru nebo přímo ze zařízení."
+ "heater_hint": "Zásobník žhne teple, dokud topí (termostat topí, spínač zapnutý nebo příkon nad prahem), a ukazuje teplotu vody – ze senzoru nebo přímo ze zařízení.",
+ "pack_module": "Modul od {publisher} · běží v domě"
 }
