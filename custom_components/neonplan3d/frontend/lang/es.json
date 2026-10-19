@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Dirección de la imagen",
  "backdrop_dim": "Oscurecer",
  "backdrop_image_bad": "Esta dirección no funciona: https://… o una ruta como /local/fondo.jpg",
- "backdrop_hint": "Pon la imagen en config/www de Home Assistant; será /local/archivo.jpg. Oscurecer mantiene legibles las líneas neón. No cuesta rendimiento, también en tabletas antiguas."
+ "backdrop_hint": "Pon la imagen en config/www de Home Assistant; será /local/archivo.jpg. Oscurecer mantiene legibles las líneas neón. No cuesta rendimiento, también en tabletas antiguas.",
+ "markers_room": "En la habitación",
+ "pin_size": "Tamaño de símbolos",
+ "pin_size_small": "Pequeño",
+ "pin_size_normal": "Normal",
+ "pin_size_large": "Grande"
 }

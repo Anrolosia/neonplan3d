@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Adresse de l'image",
  "backdrop_dim": "Assombrir",
  "backdrop_image_bad": "Cette adresse ne fonctionne pas : https://… ou un chemin comme /local/fond.jpg",
- "backdrop_hint": "Placez l'image dans config/www de Home Assistant, elle devient /local/nomdefichier.jpg. L'assombrissement garde les lignes néon lisibles. Aucun coût de performance – même sur de vieilles tablettes."
+ "backdrop_hint": "Placez l'image dans config/www de Home Assistant, elle devient /local/nomdefichier.jpg. L'assombrissement garde les lignes néon lisibles. Aucun coût de performance – même sur de vieilles tablettes.",
+ "markers_room": "Dans la pièce",
+ "pin_size": "Taille des symboles",
+ "pin_size_small": "Petit",
+ "pin_size_normal": "Normal",
+ "pin_size_large": "Grand"
 }

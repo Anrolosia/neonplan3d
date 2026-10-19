@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Adres obrazu",
  "backdrop_dim": "Przyciemnij",
  "backdrop_image_bad": "Ten adres nie działa: https://… lub ścieżka jak /local/tlo.jpg",
- "backdrop_hint": "Umieść obraz w config/www w Home Assistant, wtedy jego adres to /local/plik.jpg. Przyciemnienie utrzymuje czytelność linii neonowych. Nie kosztuje wydajności – także na starych tabletach."
+ "backdrop_hint": "Umieść obraz w config/www w Home Assistant, wtedy jego adres to /local/plik.jpg. Przyciemnienie utrzymuje czytelność linii neonowych. Nie kosztuje wydajności – także na starych tabletach.",
+ "markers_room": "W pokoju",
+ "pin_size": "Rozmiar symboli",
+ "pin_size_small": "Mały",
+ "pin_size_normal": "Normalny",
+ "pin_size_large": "Duży"
 }

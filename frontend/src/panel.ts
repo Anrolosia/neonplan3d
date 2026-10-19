@@ -69,6 +69,7 @@ export class Floorplan3dPanel extends LitElement {
     _quality: { state: true },
     _stats: { state: true },
     _markers: { state: true },
+    _pinSize: { state: true },
     _heat: { state: true },
     _theme: { state: true },
     _furnish: { state: true },
@@ -117,6 +118,8 @@ export class Floorplan3dPanel extends LitElement {
   /** Performance display (per device; also switched on by ?fp3d_stats in the URL). */
   private declare _stats: boolean;
   private declare _markers: MarkerMode;
+  /** How large the device symbols are (this device). */
+  private declare _pinSize: "small" | "normal" | "large";
   private declare _heat: HeatMode;
   private declare _theme: Theme;
   private declare _furnish: boolean;
@@ -174,7 +177,9 @@ export class Floorplan3dPanel extends LitElement {
     this._quality = quality === "low" || quality === "high" ? quality : "auto";
     this._stats = prefs.get("stats") === "1" || new URLSearchParams(location.search).has("fp3d_stats");
     const markers = prefs.get("markers");
-    this._markers = markers === "none" || markers === "all" ? markers : "important";
+    this._markers = markers === "none" || markers === "all" || markers === "room" ? markers : "important";
+    const pinSize = prefs.get("pinSize");
+    this._pinSize = pinSize === "small" || pinSize === "large" ? pinSize : "normal";
     const heat = prefs.get("heat");
     this._heat = heat === "temperature" || heat === "humidity" || heat === "co2" || heat === "values" ? heat : "none";
     const theme = prefs.get("theme") as Theme | null;
@@ -597,7 +602,7 @@ export class Floorplan3dPanel extends LitElement {
                 </label>
               </div>
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("markers")}>
-                ${(["none", "important", "all"] as MarkerMode[]).map(
+                ${(["none", "room", "important", "all"] as MarkerMode[]).map(
                   (m) =>
                     html`<button
                       aria-pressed=${this._markers === m}
@@ -608,6 +613,20 @@ export class Floorplan3dPanel extends LitElement {
                       }}
                     >
                       ${this.t(`markers_${m}`)}
+                    </button>`,
+                )}
+              </div>
+              <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("pin_size")} title=${this.t("pin_size")}>
+                ${(["small", "normal", "large"] as const).map(
+                  (k) =>
+                    html`<button
+                      aria-pressed=${this._pinSize === k}
+                      @click=${() => {
+                        this._pinSize = k;
+                        prefs.set("pinSize", k);
+                      }}
+                    >
+                      ${this.t(`pin_size_${k}`)}
                     </button>`,
                 )}
               </div>
@@ -893,6 +912,7 @@ export class Floorplan3dPanel extends LitElement {
           .explode=${this._explode}
           .keepRoof=${this._keepRoof}
           .markerMode=${this._markers}
+          .pinSize=${this._pinSize}
           .heatMode=${this._heat}
           .theme=${this._theme}
           .accent=${this._accent}

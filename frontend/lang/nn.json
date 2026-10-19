@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Biletadresse",
  "backdrop_dim": "Gjer mørkare",
  "backdrop_image_bad": "Denne adressa verkar ikkje: https://… eller ein sti som /local/bakgrunn.jpg",
- "backdrop_hint": "Legg biletet i config/www i Home Assistant, då heiter det /local/filnamn.jpg. Mørkare bakgrunn held neonlinjene lesbare. Kostar inga yting – heller ikkje på gamle nettbrett."
+ "backdrop_hint": "Legg biletet i config/www i Home Assistant, då heiter det /local/filnamn.jpg. Mørkare bakgrunn held neonlinjene lesbare. Kostar inga yting – heller ikkje på gamle nettbrett.",
+ "markers_room": "I rommet",
+ "pin_size": "Symbolstorleik",
+ "pin_size_small": "Liten",
+ "pin_size_normal": "Normal",
+ "pin_size_large": "Stor"
 }

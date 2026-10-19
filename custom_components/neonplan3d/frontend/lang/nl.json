@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Adres van de afbeelding",
  "backdrop_dim": "Verdonkeren",
  "backdrop_image_bad": "Dit adres werkt niet: https://… of een pad zoals /local/achtergrond.jpg",
- "backdrop_hint": "Zet de afbeelding in Home Assistant in config/www, dan heet ze /local/bestandsnaam.jpg. Verdonkeren houdt de neonlijnen leesbaar. Kost geen prestaties – ook op oude tablets."
+ "backdrop_hint": "Zet de afbeelding in Home Assistant in config/www, dan heet ze /local/bestandsnaam.jpg. Verdonkeren houdt de neonlijnen leesbaar. Kost geen prestaties – ook op oude tablets.",
+ "markers_room": "In de kamer",
+ "pin_size": "Symboolgrootte",
+ "pin_size_small": "Klein",
+ "pin_size_normal": "Normaal",
+ "pin_size_large": "Groot"
 }

@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "图片地址",
  "backdrop_dim": "调暗",
  "backdrop_image_bad": "此地址无效：请用 https://… 或 /local/background.jpg 这样的路径",
- "backdrop_hint": "把图片放到 Home Assistant 的 config/www 中，地址即为 /local/文件名.jpg。调暗可让霓虹线条保持清晰。不消耗性能——旧平板也一样。"
+ "backdrop_hint": "把图片放到 Home Assistant 的 config/www 中，地址即为 /local/文件名.jpg。调暗可让霓虹线条保持清晰。不消耗性能——旧平板也一样。",
+ "markers_room": "仅房间内",
+ "pin_size": "符号大小",
+ "pin_size_small": "小",
+ "pin_size_normal": "正常",
+ "pin_size_large": "大"
 }

@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Adresa imaginii",
  "backdrop_dim": "Întunecă",
  "backdrop_image_bad": "Această adresă nu merge: https://… sau o cale ca /local/fundal.jpg",
- "backdrop_hint": "Pune imaginea în config/www din Home Assistant, atunci devine /local/fisier.jpg. Întunecarea păstrează liniile neon lizibile. Nu costă performanță – nici pe tablete vechi."
+ "backdrop_hint": "Pune imaginea în config/www din Home Assistant, atunci devine /local/fisier.jpg. Întunecarea păstrează liniile neon lizibile. Nu costă performanță – nici pe tablete vechi.",
+ "markers_room": "În cameră",
+ "pin_size": "Mărimea simbolurilor",
+ "pin_size_small": "Mic",
+ "pin_size_normal": "Normal",
+ "pin_size_large": "Mare"
 }

@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "A kép címe",
  "backdrop_dim": "Sötétítés",
  "backdrop_image_bad": "Ez a cím nem működik: https://… vagy egy útvonal, mint /local/hatter.jpg",
- "backdrop_hint": "Tedd a képet a Home Assistant config/www mappájába, akkor a címe /local/fajlnev.jpg. A sötétítés olvashatóan tartja a neonvonalakat. Nem kerül teljesítménybe – régi tableteken sem."
+ "backdrop_hint": "Tedd a képet a Home Assistant config/www mappájába, akkor a címe /local/fajlnev.jpg. A sötétítés olvashatóan tartja a neonvonalakat. Nem kerül teljesítménybe – régi tableteken sem.",
+ "markers_room": "A szobában",
+ "pin_size": "Szimbólumméret",
+ "pin_size_small": "Kicsi",
+ "pin_size_normal": "Normál",
+ "pin_size_large": "Nagy"
 }

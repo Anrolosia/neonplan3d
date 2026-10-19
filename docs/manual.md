@@ -532,7 +532,8 @@ At the top right:
 |---|---|
 | **Auto** / **Tablet** / **High** | Quality level. Tablet leaves out patterns, shadows and halos and is chosen automatically on Fire tablets. High adds light cones under spots |
 | **Neon** / **Blueprint** / **Day** | The look. The colour well beside it sets an **accent colour of your own**: in the neon look lines and glowing edges take it, the buttons and pins in every look; ↺ brings the cyan back |
-| **None** / **Important** / **All** | Which device markers appear. Important shows only devices without their own 3D model and values such as watts or the running app |
+| **None** / **In the room** / **Important** / **All** | Which device markers appear. Important shows only devices without their own 3D model and values such as watts or the running app. **In the room** shows no markers in the house and floor views and, in an open room, only that room's own – handy with many sockets and sensors |
+| **Small** / **Normal** / **Large** | How large the device markers are; the device remembers the choice (card: `marker_size`) |
 | **◧ / ◨** | Floor pictures, star, search and eye on the left or on the right – handy when the view sits at the left edge of a dashboard |
 | **⌖ Keep view** | Switching from floor to floor keeps the camera where it is; only its height follows |
 | **FPS** | Frame rate, slowest frame and the reason for every drawn frame. At rest it reads 0 fps |
@@ -1020,7 +1021,8 @@ floor_stack: dim        # floors below: dim | stacked | single
 quality: auto           # auto | low | high
 theme: neon             # neon | blueprint | day
 accent: "#ff8a00"       # an accent colour of your own (neon lines, buttons, pins); leave out for cyan
-markers: important      # none | important | all
+markers: important      # none | room | important | all
+marker_size: normal     # small | normal | large
 marker_names: false     # true: devices with an own name show it under their marker
 central: true           # the star with the central menu (all lights, blinds, favourites)
 buttons:                # own buttons for this card only (replace the ones from the editor)

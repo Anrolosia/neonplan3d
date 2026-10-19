@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Bildeadresse",
  "backdrop_dim": "Gjør mørkere",
  "backdrop_image_bad": "Denne adressen virker ikke: https://… eller en sti som /local/bakgrunn.jpg",
- "backdrop_hint": "Legg bildet i config/www i Home Assistant, da heter det /local/filnavn.jpg. Mørkere bakgrunn holder neonlinjene lesbare. Koster ingen ytelse – heller ikke på gamle nettbrett."
+ "backdrop_hint": "Legg bildet i config/www i Home Assistant, da heter det /local/filnavn.jpg. Mørkere bakgrunn holder neonlinjene lesbare. Koster ingen ytelse – heller ikke på gamle nettbrett.",
+ "markers_room": "I rommet",
+ "pin_size": "Symbolstørrelse",
+ "pin_size_small": "Liten",
+ "pin_size_normal": "Normal",
+ "pin_size_large": "Stor"
 }

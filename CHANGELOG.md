@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- Device symbols: a new mode **In the room** (none in the house and floor views, in an open room only its own; D477, D595) and a **symbol size** small / normal / large (panel display menu, card option `marker_size`; D596).
 - Ceiling lamps and LED panels can be lowered like spots (Height above floor), e.g. under a staircase.
 - Own background behind the 3D house: the look's sky (default), one colour, a gradient or a picture with a darkening veil (editor → Background; idea from damonxxu's fork).
 

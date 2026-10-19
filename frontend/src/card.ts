@@ -333,6 +333,7 @@ clearTimeout(this.cleanTimer);
               .quality=${this._config?.quality ?? "auto"}
               ?showStats=${this._config?.stats ?? false}
               .markerMode=${this._config?.markers ?? "important"}
+              .pinSize=${this._config?.marker_size ?? "normal"}
               .markerNames=${this._config?.marker_names === true}
               .central=${this._config?.central !== false}
               .walkable=${this._config?.walk !== false}

@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Naslov slike",
  "backdrop_dim": "Potemni",
  "backdrop_image_bad": "Ta naslov ne deluje: https://… ali pot, kot je /local/ozadje.jpg",
- "backdrop_hint": "Sliko daj v Home Assistantu v config/www, potem je /local/datoteka.jpg. Potemnitev ohrani neonske črte berljive. Ne stane nič zmogljivosti – tudi na starih tablicah."
+ "backdrop_hint": "Sliko daj v Home Assistantu v config/www, potem je /local/datoteka.jpg. Potemnitev ohrani neonske črte berljive. Ne stane nič zmogljivosti – tudi na starih tablicah.",
+ "markers_room": "V prostoru",
+ "pin_size": "Velikost simbolov",
+ "pin_size_small": "Majhna",
+ "pin_size_normal": "Običajna",
+ "pin_size_large": "Velika"
 }

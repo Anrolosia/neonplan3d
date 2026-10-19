@@ -121,7 +121,8 @@ import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, 
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
 /** Which HTML markers are shown: none, only what has no 3D object or shows a value, or all. */
-export type MarkerMode = "none" | "important" | "all";
+/** "room": no symbols in the house and floor views, in a room only that room's (D477, D595). */
+export type MarkerMode = "none" | "important" | "all" | "room";
 
 
 
@@ -166,6 +167,7 @@ export class Fp3dView3d extends LitElement {
     explode: { type: Boolean },
     keepRoof: { attribute: false },
     markerMode: { attribute: false },
+    pinSize: { attribute: false },
     markerNames: { attribute: false },
     heatMode: { attribute: false },
     theme: { attribute: false },
@@ -275,6 +277,8 @@ export class Fp3dView3d extends LitElement {
   /** The roof stays while zooming in (no lift, no fade). */
   declare keepRoof: boolean;
   declare markerMode: MarkerMode;
+  /** How large the device symbols are (D596). */
+  declare pinSize: "small" | "normal" | "large";
   /** Card option marker_names: every device with an own name shows it under its pin. */
   declare markerNames: boolean;
   declare heatMode: HeatMode;
@@ -536,6 +540,7 @@ export class Fp3dView3d extends LitElement {
     this.explode = true;
     this.keepRoof = false;
     this.markerMode = "important";
+    this.pinSize = "normal";
     this.heatMode = "none";
     this.theme = "neon";
     this.accent = null;
@@ -829,7 +834,8 @@ export class Fp3dView3d extends LitElement {
       if (this.floorId === null) v.resetView();
     }
     if (changed.has("building") || changed.has("theme") || changed.has("floorThumbs") || changed.has("packs")) this.scheduleThumbs();
-    const forced = ["building", "markerMode", "heatMode", "flows", "alerts", "dimmed"].some((k) => changed.has(k));
+    // with symbols only in rooms, opening or closing a room changes which ones show
+    const forced = ["building", "markerMode", "heatMode", "flows", "alerts", "dimmed"].some((k) => changed.has(k)) || (this.markerMode === "room" && changed.has("roomId"));
     // time travel: a tick moves the clock even when no replayed state changed – the trail and a camera's
     // detections follow it (one sync per tick at most, and only when they are shown)
     const ticked = this.replayTicked && !!this.replay;
@@ -3119,12 +3125,23 @@ export class Fp3dView3d extends LitElement {
    * Marker rule: "important" leaves out devices that their 3D object stands for (lamps, a TV that is
    * off) and keeps devices without an object (sensors, heating, switches) and values (watts, the app).
    */
+  /** Whether a symbol stands in the room (or outdoor area) open now: by its room, else by where it stands. */
+  private inOpenRoom(m: DeviceMarker): boolean {
+    if (!this.roomId) return false;
+    if (m.roomId) return m.roomId === this.roomId;
+    const floor = this.building?.floors.find((f) => f.id === m.floorId);
+    const zone = floor ? zonesOf(floor).find((r) => r.id === this.roomId) : undefined;
+    return !!zone && pointInPolygon([m.x, m.z], zone.points);
+  }
+
   private showPin(m: DeviceMarker & { fromFurniture?: boolean; energyDevice?: boolean }): boolean {
     // while furnishing every placed device has a pin to grab it by
     if (this.furnish && !m.fromFurniture) return true;
     // the device's own setting wins over the marker mode (except "none", which hides every marker)
     if (m.show === "never" || this.markerMode === "none") return false;
     if (m.show === "always" || this.markerMode === "all") return true;
+    // only in rooms: none in the house and floor views, in a room only its own (then like "important")
+    if (this.markerMode === "room" && !this.inOpenRoom(m)) return false;
     if (m.lamp || m.model) return false;
     const kind = kindOf(m.id);
     if (kind === "light") return false;
@@ -4185,7 +4202,8 @@ export class Fp3dView3d extends LitElement {
     const stage = STAGE[this.theme] ?? STAGE.neon;
     // an own background (colour, gradient, picture) replaces the look's sky
     const own = backdropCss(this.building?.settings.backdrop);
-    const style = `--fp3d-sky:${mix(stage.night[0], stage.day[0])};--fp3d-ground:${mix(stage.night[1], stage.day[1])}${own ? `;background:${own}` : ""}`;
+    const pinK = this.pinSize === "small" ? 0.8 : this.pinSize === "large" ? 1.25 : 1;
+    const style = `--fp3d-pin-k:${pinK};--fp3d-sky:${mix(stage.night[0], stage.day[0])};--fp3d-ground:${mix(stage.night[1], stage.day[1])}${own ? `;background:${own}` : ""}`;
     return html`<div
       class="fp3d-stage ${this.roomLabels ? "" : "fp3d-no-room-names"} ${this._low ? "fp3d-low" : ""} ${this.panelOpen ? "fp3d-panel-open" : ""} ${this.controlsRight ? "fp3d-side-right" : ""} ${this._alerts.length ? "fp3d-has-alerts" : ""} ${this._through ? "fp3d-through-on" : ""} ${this._flash ? "fp3d-flash" : ""} ${this.replay ? "fp3d-replay" : ""}"
       style=${style}
@@ -4480,7 +4498,8 @@ export class Fp3dView3d extends LitElement {
         border: 1px solid var(--fp3d-line);
         background: var(--fp3d-chrome);
         color: var(--fp3d-muted);
-        font: 600 12px var(--fp3d-font);
+        /* the symbol size (small 0.8, normal 1, large 1.25) scales the pin from inside, not its position */
+        font: 600 calc(12px * var(--fp3d-pin-k, 1)) var(--fp3d-font);
         cursor: pointer;
         white-space: nowrap;
         backdrop-filter: blur(6px);
@@ -4492,10 +4511,14 @@ export class Fp3dView3d extends LitElement {
       .fp3d-dev-icon {
         display: grid;
         place-items: center;
-        width: 24px;
-        height: 24px;
+        width: calc(24px * var(--fp3d-pin-k, 1));
+        height: calc(24px * var(--fp3d-pin-k, 1));
         border-radius: 50%;
         background: rgba(91, 124, 255, 0.14);
+      }
+      .fp3d-dev-icon svg {
+        width: calc(18px * var(--fp3d-pin-k, 1));
+        height: calc(18px * var(--fp3d-pin-k, 1));
       }
       .fp3d-dev[data-entity^="trail:"] {
         padding: 2px 4px 2px 2px;

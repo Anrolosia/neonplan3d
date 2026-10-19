@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Indirizzo dell'immagine",
  "backdrop_dim": "Scurisci",
  "backdrop_image_bad": "Questo indirizzo non funziona: https://… o un percorso come /local/sfondo.jpg",
- "backdrop_hint": "Metti l'immagine in config/www di Home Assistant, diventa /local/nomefile.jpg. Scurire mantiene leggibili le linee neon. Nessun costo di prestazioni – anche sui vecchi tablet."
+ "backdrop_hint": "Metti l'immagine in config/www di Home Assistant, diventa /local/nomefile.jpg. Scurire mantiene leggibili le linee neon. Nessun costo di prestazioni – anche sui vecchi tablet.",
+ "markers_room": "Nella stanza",
+ "pin_size": "Dimensione simboli",
+ "pin_size_small": "Piccolo",
+ "pin_size_normal": "Normale",
+ "pin_size_large": "Grande"
 }

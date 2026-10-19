@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Kuvan osoite",
  "backdrop_dim": "Tummenna",
  "backdrop_image_bad": "Tämä osoite ei toimi: https://… tai polku kuten /local/tausta.jpg",
- "backdrop_hint": "Laita kuva Home Assistantin kansioon config/www, sen osoite on /local/tiedosto.jpg. Tummennus pitää neonviivat luettavina. Ei vie tehoa – vanhoillakaan tableteilla."
+ "backdrop_hint": "Laita kuva Home Assistantin kansioon config/www, sen osoite on /local/tiedosto.jpg. Tummennus pitää neonviivat luettavina. Ei vie tehoa – vanhoillakaan tableteilla.",
+ "markers_room": "Huoneessa",
+ "pin_size": "Symbolien koko",
+ "pin_size_small": "Pieni",
+ "pin_size_normal": "Normaali",
+ "pin_size_large": "Suuri"
 }

@@ -1901,5 +1901,10 @@
  "backdrop_image_url": "Adresa obrázku",
  "backdrop_dim": "Ztmavit",
  "backdrop_image_bad": "Tato adresa nefunguje: https://… nebo cesta jako /local/pozadi.jpg",
- "backdrop_hint": "Obrázek dej v Home Assistantu do config/www, pak má adresu /local/soubor.jpg. Ztmavení udrží neonové čáry čitelné. Nestojí žádný výkon – ani na starých tabletech."
+ "backdrop_hint": "Obrázek dej v Home Assistantu do config/www, pak má adresu /local/soubor.jpg. Ztmavení udrží neonové čáry čitelné. Nestojí žádný výkon – ani na starých tabletech.",
+ "markers_room": "V místnosti",
+ "pin_size": "Velikost symbolů",
+ "pin_size_small": "Malá",
+ "pin_size_normal": "Normální",
+ "pin_size_large": "Velká"
 }
