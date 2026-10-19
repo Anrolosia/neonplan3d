@@ -6,8 +6,11 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 
 **Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## ✅ Recently done (1.13 – 1.20)
+## ✅ Recently done (1.13 – 1.21)
 
+- **Home technology** (1.21): light switches and sockets with 1–4 gangs (the same relay on several sockets), ceiling fans with light whose blades turn with the speed, a Wi-Fi access point that glows red when it is gone, a water heater with its temperature.
+- **Sloping walls**, a **3D lock** for wall tablets, your **own background**, symbols **only in the room** and in three sizes, **rising LED strips** (1.21).
+- **Live director**: own triggers (garage door, gate, a second doorbell) and the live picture when looking through a camera (1.21).
 - **Voice control** (1.20, free, new and still growing): a microphone button – "Show the living room", "Where is the washing machine?", "Show the front door camera"; anything else goes to Assist.
 - **Live director** (Camera Cockpit): the wall tablet flies to the front door when the doorbell rings and looks through the camera, and to a camera that sees someone, a finished washer or a warning.
 - **Outdoor areas like rooms**, **light between floors** and **pets that walk around furniture** (1.20).
@@ -23,15 +26,16 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 - **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
 - A tidied-up editor, furniture blocks and multi-select, 18 languages.
 
-## 🔨 Next up (1.21)
+## 🔨 Next up (1.22)
 
 | Topic | What it is about | Wish |
 |---|---|---|
-| Wall switches | A switch plate with 1–4 keys on the wall, each key switches its own light, blind or fan, with a small LED; optionally a light ring in the lamp's colour | Discord, idea from the CasaNeon fork |
-| Wall sockets | 1–4 sockets in one frame, each with its own switch and power reading – several sockets in one room for the same plug | Discord |
-| Ceiling fans | Blades that turn with the fan's speed, the light separately | Discord, idea from a fork (ProvUK) |
 | Voice control, round 2 | More sentences ("lights off upstairs", "what is open?"), answers spoken by the tablet, a voice view for the live director | your sentences on Discord |
 | Even faster on old tablets | Fewer redraws, calmer warning pulses, a lower resolution on weak devices by itself | – |
+| Desk with height | A standing desk whose top moves with its height from Home Assistant (IKEA Idasen and others) | discussion #610 |
+| Underfloor heating | Heating zones on the floor that glow while they heat | discussion #607 |
+| Air quality | VOC, CO₂ and particulate values in the room card and as a colour in the room | discussion #485 |
+| Buttons per room | Own buttons (a scene, a script) in a room or on a floor | discussion #603 |
 
 ## Free – planned
 
@@ -105,8 +109,11 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 
 **Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
-## ✅ Zuletzt erledigt (1.13 – 1.20)
+## ✅ Zuletzt erledigt (1.13 – 1.21)
 
+- **Haustechnik** (1.21): Lichtschalter und Steckdosen mit 1–4 Tasten bzw. Dosen (dasselbe Relais an mehreren Dosen), Deckenventilatoren mit Licht, deren Flügel sich mit der Stufe drehen, ein WLAN-Access-Point, der rot leuchtet, wenn er fehlt, ein Warmwasserspeicher mit Temperatur.
+- **Schräge Wände**, eine **3D-Sperre** fürs Wandtablet, ein **eigener Hintergrund**, Symbole **nur im Raum** und in drei Größen, **ansteigende LED-Streifen** (1.21).
+- **Live-Regie**: eigene Auslöser (Garagentor, Gartentor, zweite Klingel) und das Livebild beim Durchschauen durch eine Kamera (1.21).
 - **Sprachsteuerung** (1.20, kostenlos, neu und wächst weiter): ein Mikrofon-Knopf – „Zeig das Wohnzimmer“, „Wo ist die Waschmaschine?“, „Zeig die Kamera Haustür“; alles andere geht an Assist.
 - **Live-Regie** (Kamera-Cockpit): Das Wandtablet fliegt beim Klingeln zur Haustür und schaut durch die Kamera, außerdem zu einer Kamera, die jemanden sieht, zur fertigen Waschmaschine oder zu einer Warnung.
 - **Außenflächen wie Räume**, **Licht zwischen den Etagen** und **Haustiere, die um Möbel herumlaufen** (1.20).
@@ -122,15 +129,16 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 - **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
 - Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## 🔨 Als Nächstes (1.21)
+## 🔨 Als Nächstes (1.22)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
-| Wandschalter | Eine Schalterplatte mit 1–4 Tasten an der Wand, jede Taste schaltet ihr eigenes Licht, ihren Rollladen oder Ventilator, mit kleiner LED; auf Wunsch ein Leuchtring in der Lampenfarbe | Discord, Idee aus dem Fork CasaNeon |
-| Wandsteckdosen | 1–4 Steckdosen in einem Rahmen, jede mit eigenem Schalter und Verbrauch – auch mehrere Steckdosen im Raum für denselben Stecker | Discord |
-| Deckenventilatoren | Flügel, die sich mit der Stufe des Ventilators drehen, das Licht getrennt | Discord, Idee aus einem Fork (ProvUK) |
 | Sprachsteuerung, Runde 2 | Mehr Sätze („oben alles aus“, „was ist offen?“), Antworten vom Tablet vorgelesen, Sprache auch in der Live-Regie | eure Sätze im Discord |
 | Noch schneller auf alten Tablets | Weniger Neuberechnungen, ruhigeres Pulsieren der Warnungen, auf schwachen Geräten von selbst eine niedrigere Auflösung | – |
+| Schreibtisch mit Höhe | Ein Steh-Schreibtisch, dessen Platte mit der Höhe aus Home Assistant hoch- und runterfährt (IKEA Idasen u. a.) | Diskussion #610 |
+| Fußbodenheizung | Heizzonen im Boden, die leuchten, solange sie heizen | Diskussion #607 |
+| Luftqualität | VOC-, CO₂- und Feinstaubwerte in der Raumkarte und als Farbe im Raum | Diskussion #485 |
+| Knöpfe pro Raum | Eigene Knöpfe (eine Szene, ein Skript) in einem Raum oder auf einer Etage | Diskussion #603 |
 
 ## Kostenlos – geplant
 
