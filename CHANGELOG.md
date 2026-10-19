@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## Unreleased
+
+### Fixed
+
+- Editor: a pool (or any smaller area) inside a lawn or terrace could not be selected with the select tool – the larger area caught the tap; the smallest area under the pointer now wins, like with rooms.
+
 ## 1.21.0
 
 ### New

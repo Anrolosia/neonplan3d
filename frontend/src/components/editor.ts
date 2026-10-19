@@ -1727,7 +1727,8 @@ export class Fp3dEditor extends LitElement {
     }
     const outdoorEl = target.closest("[data-outdoor]");
     if (outdoorEl && !target.closest("[data-room]") && !this.roomAt(world)) {
-      const id = outdoorEl.getAttribute("data-outdoor")!;
+      // the drawn element is the topmost area; a smaller one under the point (a pool in the lawn) wins
+      const id = this.outdoorAt(world) ?? outdoorEl.getAttribute("data-outdoor")!;
       this.selectItem("outdoor", id);
       this.drag = this.isAdmin ? { kind: "outdoor", id, start: world, startScreen: local, base: this._doc, moved: false } : { kind: "pan", last: local };
       return;
@@ -2455,6 +2456,13 @@ export class Fp3dEditor extends LitElement {
     const rooms = this.floor?.rooms ?? [];
     // smallest room first so nested rooms stay reachable
     const hits = rooms.filter((r) => pointInPolygon(p, r.points)).sort((a, b) => polygonArea(a.points) - polygonArea(b.points));
+    return hits[0]?.id ?? null;
+  }
+
+  /** The outdoor area under a point: the smallest one, so a pool in a lawn or a bed on a terrace stays reachable. */
+  private outdoorAt(p: Vec2): string | null {
+    const areas = this.floor?.outdoor ?? [];
+    const hits = areas.filter((a) => a.points.length >= 3 && pointInPolygon(p, a.points)).sort((a, b) => polygonArea(a.points) - polygonArea(b.points));
     return hits[0]?.id ?? null;
   }
 
@@ -4296,7 +4304,7 @@ export class Fp3dEditor extends LitElement {
     const opening = attr("data-opening");
     const furniture = target.closest("[data-vertex], [data-mid]") ? null : attr("data-furniture");
     const wall = attr("data-free-wall");
-    const outdoor = attr("data-outdoor");
+    const outdoor = attr("data-outdoor") ? (this.outdoorAt(world) ?? attr("data-outdoor")) : null;
     const room = attr("data-room") ?? this.roomAt(world);
     if (device) hit = ["device", device];
     else if (opening) hit = ["opening", opening];
@@ -8307,7 +8315,8 @@ export class Fp3dEditor extends LitElement {
         return true;
       }
     }
-    const out = target.closest("[data-outdoor]")?.getAttribute("data-outdoor");
+    // the smallest area under the point: a pool inside a lawn is still the pool
+    const out = target.closest("[data-outdoor]") ? (this.outdoorAt(world) ?? target.closest("[data-outdoor]")!.getAttribute("data-outdoor")) : null;
     if (out && floor.outdoor.some((x) => x.id === out && x.type === "pool")) {
       this.selectItem("outdoor", out);
       this._pipeId = null;
