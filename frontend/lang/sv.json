@@ -1889,5 +1889,17 @@
  "card_roof": "Visa taket",
  "card_roof_hint": "Av: huset visas utan tak, som om det inte hade något – rummen ligger öppna (solfält på taket försvinner också)",
  "room_order_up": "Flytta rummet upp (tidigare i rumsfältet)",
- "room_order_down": "Flytta rummet ned (senare i rumsfältet)"
+ "room_order_down": "Flytta rummet ned (senare i rumsfältet)",
+ "backdrop": "Bakgrund",
+ "backdrop_kind": "Bakom huset",
+ "backdrop_look": "Lookens himmel (standard)",
+ "backdrop_color": "En färg",
+ "backdrop_gradient": "Färgövergång",
+ "backdrop_image": "Bild",
+ "backdrop_top": "Färg upptill",
+ "backdrop_bottom": "Färg nedtill",
+ "backdrop_image_url": "Bildadress",
+ "backdrop_dim": "Mörkare",
+ "backdrop_image_bad": "Den här adressen fungerar inte: https://… eller en sökväg som /local/bakgrund.jpg",
+ "backdrop_hint": "Lägg bilden i config/www i Home Assistant, då heter den /local/filnamn.jpg. Mörkare bakgrund håller neonlinjerna läsbara. Kostar ingen prestanda – inte heller på gamla plattor."
 }

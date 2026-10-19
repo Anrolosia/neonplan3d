@@ -1889,5 +1889,17 @@
  "card_roof": "Dak tonen",
  "card_roof_hint": "Uit: het huis verschijnt zonder dak, alsof het er geen heeft – de kamers liggen open (zonnepanelen op het dak verdwijnen mee)",
  "room_order_up": "Kamer omhoog (eerder in de kamerbalk)",
- "room_order_down": "Kamer omlaag (later in de kamerbalk)"
+ "room_order_down": "Kamer omlaag (later in de kamerbalk)",
+ "backdrop": "Achtergrond",
+ "backdrop_kind": "Achter het huis",
+ "backdrop_look": "Lucht van de look (standaard)",
+ "backdrop_color": "Eén kleur",
+ "backdrop_gradient": "Kleurverloop",
+ "backdrop_image": "Afbeelding",
+ "backdrop_top": "Kleur boven",
+ "backdrop_bottom": "Kleur onder",
+ "backdrop_image_url": "Adres van de afbeelding",
+ "backdrop_dim": "Verdonkeren",
+ "backdrop_image_bad": "Dit adres werkt niet: https://… of een pad zoals /local/achtergrond.jpg",
+ "backdrop_hint": "Zet de afbeelding in Home Assistant in config/www, dan heet ze /local/bestandsnaam.jpg. Verdonkeren houdt de neonlijnen leesbaar. Kost geen prestaties – ook op oude tablets."
 }

@@ -1889,5 +1889,17 @@
  "card_roof": "Mostrar el tejado",
  "card_roof_hint": "Desactivado: la casa aparece sin tejado, como si no tuviera – las habitaciones quedan abiertas (los campos solares del tejado también desaparecen)",
  "room_order_up": "Subir la habitación (antes en la barra de habitaciones)",
- "room_order_down": "Bajar la habitación (después en la barra de habitaciones)"
+ "room_order_down": "Bajar la habitación (después en la barra de habitaciones)",
+ "backdrop": "Fondo",
+ "backdrop_kind": "Detrás de la casa",
+ "backdrop_look": "Cielo del estilo (predeterminado)",
+ "backdrop_color": "Un color",
+ "backdrop_gradient": "Degradado",
+ "backdrop_image": "Imagen",
+ "backdrop_top": "Color arriba",
+ "backdrop_bottom": "Color abajo",
+ "backdrop_image_url": "Dirección de la imagen",
+ "backdrop_dim": "Oscurecer",
+ "backdrop_image_bad": "Esta dirección no funciona: https://… o una ruta como /local/fondo.jpg",
+ "backdrop_hint": "Pon la imagen en config/www de Home Assistant; será /local/archivo.jpg. Oscurecer mantiene legibles las líneas neón. No cuesta rendimiento, también en tabletas antiguas."
 }

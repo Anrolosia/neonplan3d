@@ -24,6 +24,7 @@ import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlan
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
+import { backdropImage } from "../backdrop.ts";
 import { setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
@@ -9774,7 +9775,7 @@ export class Fp3dEditor extends LitElement {
       ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing} ${this.renderVoice()}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
-      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderTerrain() : nothing}
+      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderBackdrop() : nothing} ${admin ? this.renderTerrain() : nothing}
       ${admin ? this.renderBackup() : nothing} ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
   }
@@ -12252,6 +12253,43 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** The ground around the house: its height, a hillside, the earth around cellars. */
+  /** The background behind the 3D house: the look's own sky, one colour, a gradient or a picture. */
+  private renderBackdrop() {
+    const bd = this._doc.settings.backdrop ?? {};
+    const set = (patch: Partial<NonNullable<Building["settings"]["backdrop"]>>) => this.change((d) => (d.settings.backdrop = { ...(d.settings.backdrop ?? {}), ...patch }));
+    const kind = bd.kind ?? "";
+    const colour = (label: I18nKey, value: string | null | undefined, fallback: string, key: "color" | "color2") =>
+      html`<label class="fp3d-field"
+        >${this.t(label)}
+        <input type="color" .value=${value ?? fallback} @change=${(e: Event) => set({ [key]: (e.target as HTMLInputElement).value })} />
+      </label>`;
+    return html`<details class="fp3d-section">
+      <summary>🖼 ${this.t("backdrop")}</summary>
+      <div class="fp3d-form">
+        <label class="fp3d-field fp3d-wide"
+          >${this.t("backdrop_kind")}
+          <select @change=${(e: Event) => set({ kind: (((e.target as HTMLSelectElement).value || null) as "color" | "gradient" | "image" | null) })}>
+            ${(["", "color", "gradient", "image"] as const).map((k) => html`<option value=${k} ?selected=${kind === k}>${this.t(`backdrop_${k || "look"}` as I18nKey)}</option>`)}
+          </select></label
+        >
+        ${kind === "color" || kind === "gradient" ? colour(kind === "gradient" ? "backdrop_top" : "backdrop_color", bd.color, "#0b1426", "color") : nothing}
+        ${kind === "gradient" ? colour("backdrop_bottom", bd.color2, "#03060c", "color2") : nothing}
+        ${kind === "image"
+          ? html`<label class="fp3d-field fp3d-wide"
+                >${this.t("backdrop_image_url")}
+                <input type="text" placeholder="/local/hintergrund.jpg" .value=${bd.image ?? ""} @change=${(e: Event) => set({ image: (e.target as HTMLInputElement).value.trim() || null })}
+              /></label>
+              <label class="fp3d-field fp3d-wide"
+                >${this.t("backdrop_dim")} (${Math.round((bd.dim ?? 0.45) * 100)} %)
+                <input type="range" min="0" max="90" .value=${String(Math.round((bd.dim ?? 0.45) * 100))} @change=${(e: Event) => set({ dim: Number((e.target as HTMLInputElement).value) / 100 })}
+              /></label>
+              ${bd.image && !backdropImage(bd.image) ? html`<p class="fp3d-sub fp3d-wide fp3d-pack-error">${this.t("backdrop_image_bad")}</p>` : nothing}`
+          : nothing}
+      </div>
+      <p class="fp3d-sub">${this.t("backdrop_hint")}</p>
+    </details>`;
+  }
+
   private renderTerrain() {
     const t = this._doc.settings.terrain ?? {};
     const set = (patch: Partial<NonNullable<Building["settings"]["terrain"]>>) => {

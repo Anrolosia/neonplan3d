@@ -1889,5 +1889,17 @@
  "card_roof": "Näytä katto",
  "card_roof_hint": "Pois: talo näkyy ilman kattoa, kuin sillä ei olisi sitä – huoneet ovat avoimina (katon aurinkopaneelit poistuvat myös)",
  "room_order_up": "Siirrä huone ylös (aiemmaksi huonepalkissa)",
- "room_order_down": "Siirrä huone alas (myöhemmäksi huonepalkissa)"
+ "room_order_down": "Siirrä huone alas (myöhemmäksi huonepalkissa)",
+ "backdrop": "Tausta",
+ "backdrop_kind": "Talon takana",
+ "backdrop_look": "Tyylin taivas (oletus)",
+ "backdrop_color": "Yksi väri",
+ "backdrop_gradient": "Liukuväri",
+ "backdrop_image": "Kuva",
+ "backdrop_top": "Väri ylhäällä",
+ "backdrop_bottom": "Väri alhaalla",
+ "backdrop_image_url": "Kuvan osoite",
+ "backdrop_dim": "Tummenna",
+ "backdrop_image_bad": "Tämä osoite ei toimi: https://… tai polku kuten /local/tausta.jpg",
+ "backdrop_hint": "Laita kuva Home Assistantin kansioon config/www, sen osoite on /local/tiedosto.jpg. Tummennus pitää neonviivat luettavina. Ei vie tehoa – vanhoillakaan tableteilla."
 }

@@ -1889,5 +1889,17 @@
  "card_roof": "Pokaż dach",
  "card_roof_hint": "Wył.: dom wyświetla się bez dachu, jakby go nie miał – pokoje są odkryte (pola solarne na dachu też znikają)",
  "room_order_up": "Przesuń pokój w górę (wcześniej na pasku pokoi)",
- "room_order_down": "Przesuń pokój w dół (później na pasku pokoi)"
+ "room_order_down": "Przesuń pokój w dół (później na pasku pokoi)",
+ "backdrop": "Tło",
+ "backdrop_kind": "Za domem",
+ "backdrop_look": "Niebo stylu (domyślne)",
+ "backdrop_color": "Jeden kolor",
+ "backdrop_gradient": "Gradient",
+ "backdrop_image": "Obraz",
+ "backdrop_top": "Kolor u góry",
+ "backdrop_bottom": "Kolor na dole",
+ "backdrop_image_url": "Adres obrazu",
+ "backdrop_dim": "Przyciemnij",
+ "backdrop_image_bad": "Ten adres nie działa: https://… lub ścieżka jak /local/tlo.jpg",
+ "backdrop_hint": "Umieść obraz w config/www w Home Assistant, wtedy jego adres to /local/plik.jpg. Przyciemnienie utrzymuje czytelność linii neonowych. Nie kosztuje wydajności – także na starych tabletach."
 }

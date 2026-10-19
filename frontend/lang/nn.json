@@ -1889,5 +1889,17 @@
  "card_roof": "Vis taket",
  "card_roof_hint": "Av: huset vert vist utan tak, som om det ikkje hadde noko – romma ligg opne (solfelt på taket forsvinn òg)",
  "room_order_up": "Flytt rommet opp (tidlegare i romlinja)",
- "room_order_down": "Flytt rommet ned (seinare i romlinja)"
+ "room_order_down": "Flytt rommet ned (seinare i romlinja)",
+ "backdrop": "Bakgrunn",
+ "backdrop_kind": "Bak huset",
+ "backdrop_look": "Himmelen til looken (standard)",
+ "backdrop_color": "Éin farge",
+ "backdrop_gradient": "Fargeovergang",
+ "backdrop_image": "Bilete",
+ "backdrop_top": "Farge øvst",
+ "backdrop_bottom": "Farge nedst",
+ "backdrop_image_url": "Biletadresse",
+ "backdrop_dim": "Gjer mørkare",
+ "backdrop_image_bad": "Denne adressa verkar ikkje: https://… eller ein sti som /local/bakgrunn.jpg",
+ "backdrop_hint": "Legg biletet i config/www i Home Assistant, då heiter det /local/filnamn.jpg. Mørkare bakgrunn held neonlinjene lesbare. Kostar inga yting – heller ikkje på gamle nettbrett."
 }

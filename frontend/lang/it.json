@@ -1889,5 +1889,17 @@
  "card_roof": "Mostra il tetto",
  "card_roof_hint": "Spento: la casa appare senza tetto, come se non lo avesse – le stanze restano aperte (i campi solari sul tetto spariscono anch'essi)",
  "room_order_up": "Sposta la stanza su (prima nella barra stanze)",
- "room_order_down": "Sposta la stanza giù (dopo nella barra stanze)"
+ "room_order_down": "Sposta la stanza giù (dopo nella barra stanze)",
+ "backdrop": "Sfondo",
+ "backdrop_kind": "Dietro la casa",
+ "backdrop_look": "Cielo del look (predefinito)",
+ "backdrop_color": "Un colore",
+ "backdrop_gradient": "Sfumatura",
+ "backdrop_image": "Immagine",
+ "backdrop_top": "Colore in alto",
+ "backdrop_bottom": "Colore in basso",
+ "backdrop_image_url": "Indirizzo dell'immagine",
+ "backdrop_dim": "Scurisci",
+ "backdrop_image_bad": "Questo indirizzo non funziona: https://… o un percorso come /local/sfondo.jpg",
+ "backdrop_hint": "Metti l'immagine in config/www di Home Assistant, diventa /local/nomefile.jpg. Scurire mantiene leggibili le linee neon. Nessun costo di prestazioni – anche sui vecchi tablet."
 }

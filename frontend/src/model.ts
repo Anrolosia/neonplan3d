@@ -592,6 +592,8 @@ export const PET_FURS_OF: Record<Pet["kind"], readonly string[]> = {
 export const DOG_BREEDS = ["dachshund", "pug", "terrier", "labrador", "shepherd"] as const;
 
 export interface BuildingSettings {
+  /** The background behind the 3D house (null: the look's own sky): a colour, a gradient or a picture. */
+  backdrop?: { kind?: "color" | "gradient" | "image" | null; color?: string | null; color2?: string | null; image?: string | null; dim?: number | null } | null;
   /**
    * Kamera-Cockpit: the live director – which events make a screen (that has it switched on) show them by itself.
    * Every event is off unless switched on.

@@ -190,6 +190,7 @@ Walls are created automatically: every shared edge of two rooms becomes an inter
 | **Weather effects in 3D** | Which effects are shown |
 | **Start view** | Turn, zoom and move the house in the 3D pane on the right the way it should open (e.g. from the garden side) and press **Remember the current 3D view as the start**. The 3D view, the card and the kiosk then open the house like that – angle, zoom and framing – and an opened floor is shown from the same side as well; **Default** resets it |
 | **Favourites** | Scenes, scripts, automations, buttons and switches for the central menu (star) of the 3D view: party, presence simulation, shading, watering. Pick them with the search, order them with ↑ ↓, ✕ removes one. Below them **Own buttons** with a label, an icon and an action: **Open a path** (e.g. `/lovelace/blinds`), **Entity details**, **Call a service** (`domain.service` with data as JSON) or **fire-dom-event** – with it a button opens a browser_mod popup with your own card, e.g. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Blinds", "content": {"type": "custom:my-blind-card"}}}}` |
+| **🖼 Background** | What lies behind the 3D house: the look's sky (default), **one colour**, a **gradient** or a **picture**. Put the picture into `config/www` in Home Assistant and enter `/local/filename.jpg`; **Darken** lays a dark veil over it so the neon lines stay readable. Applies to the panel and cards and costs no performance |
 
 ### 4.6 Floor plan image as a template
 

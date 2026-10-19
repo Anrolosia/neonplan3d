@@ -1889,5 +1889,17 @@
  "card_roof": "Afficher le toit",
  "card_roof_hint": "Désactivé : la maison s'affiche sans toit, comme si elle n'en avait pas – les pièces sont visibles (les champs solaires du toit disparaissent aussi)",
  "room_order_up": "Monter la pièce (plus tôt dans la barre des pièces)",
- "room_order_down": "Descendre la pièce (plus tard dans la barre des pièces)"
+ "room_order_down": "Descendre la pièce (plus tard dans la barre des pièces)",
+ "backdrop": "Arrière-plan",
+ "backdrop_kind": "Derrière la maison",
+ "backdrop_look": "Ciel du style (par défaut)",
+ "backdrop_color": "Une couleur",
+ "backdrop_gradient": "Dégradé",
+ "backdrop_image": "Image",
+ "backdrop_top": "Couleur en haut",
+ "backdrop_bottom": "Couleur en bas",
+ "backdrop_image_url": "Adresse de l'image",
+ "backdrop_dim": "Assombrir",
+ "backdrop_image_bad": "Cette adresse ne fonctionne pas : https://… ou un chemin comme /local/fond.jpg",
+ "backdrop_hint": "Placez l'image dans config/www de Home Assistant, elle devient /local/nomdefichier.jpg. L'assombrissement garde les lignes néon lisibles. Aucun coût de performance – même sur de vieilles tablettes."
 }

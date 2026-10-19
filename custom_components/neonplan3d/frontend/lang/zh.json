@@ -1889,5 +1889,17 @@
  "card_roof": "显示屋顶",
  "card_roof_hint": "关闭：房子显示为没有屋顶——房间敞开（屋顶上的太阳能板也一起隐藏）",
  "room_order_up": "房间上移（在房间栏中更靠前）",
- "room_order_down": "房间下移（在房间栏中更靠后）"
+ "room_order_down": "房间下移（在房间栏中更靠后）",
+ "backdrop": "背景",
+ "backdrop_kind": "房子后方",
+ "backdrop_look": "外观自带天空（默认）",
+ "backdrop_color": "单一颜色",
+ "backdrop_gradient": "渐变",
+ "backdrop_image": "图片",
+ "backdrop_top": "顶部颜色",
+ "backdrop_bottom": "底部颜色",
+ "backdrop_image_url": "图片地址",
+ "backdrop_dim": "调暗",
+ "backdrop_image_bad": "此地址无效：请用 https://… 或 /local/background.jpg 这样的路径",
+ "backdrop_hint": "把图片放到 Home Assistant 的 config/www 中，地址即为 /local/文件名.jpg。调暗可让霓虹线条保持清晰。不消耗性能——旧平板也一样。"
 }

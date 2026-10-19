@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## Unreleased
+
+### New
+
+- Own background behind the 3D house: the look's sky (default), one colour, a gradient or a picture with a darkening veil (editor → Background; idea from damonxxu's fork).
+
 ## 1.20.2
 
 ### Fixed

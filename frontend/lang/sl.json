@@ -1889,5 +1889,17 @@
  "card_roof": "Pokaži streho",
  "card_roof_hint": "Izklop: hiša se prikaže brez strehe, kot da je nima – prostori so odprti (sončna polja na strehi izginejo tudi)",
  "room_order_up": "Premakni prostor gor (prej v vrstici prostorov)",
- "room_order_down": "Premakni prostor dol (pozneje v vrstici prostorov)"
+ "room_order_down": "Premakni prostor dol (pozneje v vrstici prostorov)",
+ "backdrop": "Ozadje",
+ "backdrop_kind": "Za hišo",
+ "backdrop_look": "Nebo videza (privzeto)",
+ "backdrop_color": "Ena barva",
+ "backdrop_gradient": "Preliv",
+ "backdrop_image": "Slika",
+ "backdrop_top": "Barva zgoraj",
+ "backdrop_bottom": "Barva spodaj",
+ "backdrop_image_url": "Naslov slike",
+ "backdrop_dim": "Potemni",
+ "backdrop_image_bad": "Ta naslov ne deluje: https://… ali pot, kot je /local/ozadje.jpg",
+ "backdrop_hint": "Sliko daj v Home Assistantu v config/www, potem je /local/datoteka.jpg. Potemnitev ohrani neonske črte berljive. Ne stane nič zmogljivosti – tudi na starih tablicah."
 }

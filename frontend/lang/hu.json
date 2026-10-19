@@ -1889,5 +1889,17 @@
  "card_roof": "Tető mutatása",
  "card_roof_hint": "Ki: a ház tető nélkül látszik, mintha nem is lenne – a szobák nyitottak (a tetőn lévő napelemmezők is eltűnnek)",
  "room_order_up": "Szoba feljebb (előbb a szobasávban)",
- "room_order_down": "Szoba lejjebb (később a szobasávban)"
+ "room_order_down": "Szoba lejjebb (később a szobasávban)",
+ "backdrop": "Háttér",
+ "backdrop_kind": "A ház mögött",
+ "backdrop_look": "A stílus ege (alapértelmezett)",
+ "backdrop_color": "Egy szín",
+ "backdrop_gradient": "Színátmenet",
+ "backdrop_image": "Kép",
+ "backdrop_top": "Szín felül",
+ "backdrop_bottom": "Szín alul",
+ "backdrop_image_url": "A kép címe",
+ "backdrop_dim": "Sötétítés",
+ "backdrop_image_bad": "Ez a cím nem működik: https://… vagy egy útvonal, mint /local/hatter.jpg",
+ "backdrop_hint": "Tedd a képet a Home Assistant config/www mappájába, akkor a címe /local/fajlnev.jpg. A sötétítés olvashatóan tartja a neonvonalakat. Nem kerül teljesítménybe – régi tableteken sem."
 }

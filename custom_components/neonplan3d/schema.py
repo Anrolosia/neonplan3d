@@ -735,6 +735,22 @@ SETTINGS_SCHEMA = vol.Schema(
                 extra=vol.ALLOW_EXTRA,
             ),
         ),
+        # the background behind the 3D house (None = the look's own sky): a colour, a gradient or a picture
+        vol.Optional("backdrop", default=None): vol.Any(
+            None,
+            vol.Schema(
+                {
+                    vol.Optional("kind", default=None): vol.Any(None, vol.In(["color", "gradient", "image"])),
+                    vol.Optional("color", default=None): vol.Any(None, vol.All(str, vol.Length(max=16))),
+                    vol.Optional("color2", default=None): vol.Any(None, vol.All(str, vol.Length(max=16))),
+                    vol.Optional("image", default=None): vol.Any(None, vol.All(str, vol.Length(max=2048))),
+                    vol.Optional("dim", default=None): vol.Any(
+                        None, vol.All(vol.Coerce(float), vol.Range(min=0, max=0.9))
+                    ),
+                },
+                extra=vol.ALLOW_EXTRA,
+            ),
+        ),
         # Kamera-Cockpit: the live director - events a wall screen shows by itself (all off unless switched on)
         vol.Optional("director", default=None): vol.Any(
             None,

@@ -1889,5 +1889,17 @@
  "card_roof": "Afișează acoperișul",
  "card_roof_hint": "Oprit: casa apare fără acoperiș, ca și cum nu ar avea – camerele sunt deschise (câmpurile solare de pe acoperiș dispar și ele)",
  "room_order_up": "Mută camera în sus (mai devreme în bara de camere)",
- "room_order_down": "Mută camera în jos (mai târziu în bara de camere)"
+ "room_order_down": "Mută camera în jos (mai târziu în bara de camere)",
+ "backdrop": "Fundal",
+ "backdrop_kind": "În spatele casei",
+ "backdrop_look": "Cerul stilului (implicit)",
+ "backdrop_color": "O culoare",
+ "backdrop_gradient": "Degrade",
+ "backdrop_image": "Imagine",
+ "backdrop_top": "Culoare sus",
+ "backdrop_bottom": "Culoare jos",
+ "backdrop_image_url": "Adresa imaginii",
+ "backdrop_dim": "Întunecă",
+ "backdrop_image_bad": "Această adresă nu merge: https://… sau o cale ca /local/fundal.jpg",
+ "backdrop_hint": "Pune imaginea în config/www din Home Assistant, atunci devine /local/fisier.jpg. Întunecarea păstrează liniile neon lizibile. Nu costă performanță – nici pe tablete vechi."
 }

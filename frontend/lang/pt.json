@@ -1889,5 +1889,17 @@
  "card_roof": "Mostrar o telhado",
  "card_roof_hint": "Desligado: a casa aparece sem telhado, como se não tivesse – as divisões ficam abertas (os painéis solares do telhado também desaparecem)",
  "room_order_up": "Subir a divisão (mais cedo na barra de divisões)",
- "room_order_down": "Descer a divisão (mais tarde na barra de divisões)"
+ "room_order_down": "Descer a divisão (mais tarde na barra de divisões)",
+ "backdrop": "Fundo",
+ "backdrop_kind": "Atrás da casa",
+ "backdrop_look": "Céu do estilo (padrão)",
+ "backdrop_color": "Uma cor",
+ "backdrop_gradient": "Gradiente",
+ "backdrop_image": "Imagem",
+ "backdrop_top": "Cor em cima",
+ "backdrop_bottom": "Cor em baixo",
+ "backdrop_image_url": "Endereço da imagem",
+ "backdrop_dim": "Escurecer",
+ "backdrop_image_bad": "Este endereço não funciona: https://… ou um caminho como /local/fundo.jpg",
+ "backdrop_hint": "Coloca a imagem em config/www do Home Assistant; fica /local/ficheiro.jpg. Escurecer mantém as linhas neon legíveis. Não custa desempenho – também em tablets antigos."
 }

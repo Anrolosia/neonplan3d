@@ -1889,5 +1889,17 @@
  "card_roof": "Zobrazit střechu",
  "card_roof_hint": "Vyp.: dům se zobrazí bez střechy, jako by žádnou neměl – místnosti jsou otevřené (solární pole na střeše zmizí také)",
  "room_order_up": "Posunout místnost nahoru (dříve v liště místností)",
- "room_order_down": "Posunout místnost dolů (později v liště místností)"
+ "room_order_down": "Posunout místnost dolů (později v liště místností)",
+ "backdrop": "Pozadí",
+ "backdrop_kind": "Za domem",
+ "backdrop_look": "Obloha vzhledu (výchozí)",
+ "backdrop_color": "Jedna barva",
+ "backdrop_gradient": "Přechod",
+ "backdrop_image": "Obrázek",
+ "backdrop_top": "Barva nahoře",
+ "backdrop_bottom": "Barva dole",
+ "backdrop_image_url": "Adresa obrázku",
+ "backdrop_dim": "Ztmavit",
+ "backdrop_image_bad": "Tato adresa nefunguje: https://… nebo cesta jako /local/pozadi.jpg",
+ "backdrop_hint": "Obrázek dej v Home Assistantu do config/www, pak má adresu /local/soubor.jpg. Ztmavení udrží neonové čáry čitelné. Nestojí žádný výkon – ani na starých tabletech."
 }

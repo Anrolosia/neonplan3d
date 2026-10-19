@@ -1889,5 +1889,17 @@
  "card_roof": "Vis taget",
  "card_roof_hint": "Fra: huset vises uden tag, som om det ikke havde noget – rummene ligger åbne (solfelter på taget forsvinder med)",
  "room_order_up": "Flyt rummet op (tidligere i rumbjælken)",
- "room_order_down": "Flyt rummet ned (senere i rumbjælken)"
+ "room_order_down": "Flyt rummet ned (senere i rumbjælken)",
+ "backdrop": "Baggrund",
+ "backdrop_kind": "Bag huset",
+ "backdrop_look": "Lookets himmel (standard)",
+ "backdrop_color": "Én farve",
+ "backdrop_gradient": "Farveforløb",
+ "backdrop_image": "Billede",
+ "backdrop_top": "Farve foroven",
+ "backdrop_bottom": "Farve forneden",
+ "backdrop_image_url": "Billedadresse",
+ "backdrop_dim": "Gør mørkere",
+ "backdrop_image_bad": "Denne adresse virker ikke: https://… eller en sti som /local/baggrund.jpg",
+ "backdrop_hint": "Læg billedet i config/www i Home Assistant, så hedder det /local/filnavn.jpg. Mørkere baggrund holder neonlinjerne læsbare. Koster ingen ydelse – heller ikke på gamle tablets."
 }
