@@ -55,7 +55,7 @@ import { buildFloorGeometry, SLAB, stairHoleParts, type FloorGeometry } from "./
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { CameraProjections, PROJECTION_LAYER, type ProjectionSurface, type ProjectorPose } from "./projection.ts";
-import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors } from "./furniture.ts";
+import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -1152,6 +1152,10 @@ export class FloorplanViewer {
     if (theme === this.theme) return;
     this.theme = theme;
     this.themeUniform.value = themeIndex(theme);
+    // waste bins keep their colours in the light looks: drawn anew in full colour (#609)
+    const light = theme !== "neon";
+    setLightLook(light);
+    if (this.building?.floors.some((f) => f.furniture.some((m) => m.type === "waste_bin"))) this.rebuild();
     const blending = lineBlending(theme);
     const lineMats = [...this.floors.map((f) => f.materials.lines), ...(this.roof ? [this.roof.lines] : [])];
     for (const m of lineMats) {
