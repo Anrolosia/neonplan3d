@@ -37,6 +37,60 @@ export interface SpokenDevice {
   /** Its power sensor, when it has one. */
   power: string | null;
   type: string;
+  /** Haushalt Pro: minutes left of its program (a washer, dryer, dishwasher with a time sensor), null without. */
+  remaining?: number | null;
+  /** A plant with a moisture sensor: whether it is thirsty (null: not a plant, or no sensor). */
+  thirsty?: boolean | null;
+}
+
+/** Haushalt Pro: a line of "Today in the household" ("Restmüll: morgen", "Waschmaschine: 23 min"). */
+export interface SpokenHousehold {
+  text: string;
+  entity: string | null;
+  /** Something to do now (glows in amber). */
+  hot: boolean;
+}
+
+/** A warning shown in 3D right now (smoke, water, a window open in the rain …). */
+export interface SpokenAlert {
+  kind: string;
+  entity: string;
+  /** The sensor's name as Home Assistant has it. */
+  name: string;
+  room: string | null;
+  floorId: string | null;
+  roomId: string | null;
+}
+
+/** Auto Pro: a car in its parking spot. */
+export interface SpokenCar {
+  name: string;
+  /** The parking spot (furniture id) and its floor. */
+  spot: string;
+  floorId: string;
+  /** Whether the car stands in its spot; `away` names the zone it is in otherwise (null: unknown). */
+  present: boolean;
+  away: string | null;
+  soc: number | null;
+  range: number | null;
+  rangeUnit: string;
+  charging: boolean;
+  chargingW: number | null;
+  plugged: boolean | null;
+  locked: boolean | null;
+}
+
+/** Pool Pro: a pool with links. */
+export interface SpokenPool {
+  name: string;
+  floorId: string;
+  areaId: string;
+  temp: number | null;
+  unit: string;
+  pumpOn: boolean | null;
+  heating: boolean | null;
+  ph: { value: number; ok: boolean } | null;
+  chlorine: { value: number; unit: string; ok: boolean } | null;
 }
 
 /** A door, window, garage door or roof window of the plan, by one of its entities (contact, blind, lock …). */
@@ -72,6 +126,16 @@ export interface ModuleHost {
   energy(): { consumption: number | null; solar: number | null; grid: number | null; battery: number | null; soc: number | null } | null;
   /** Consumers drawing power right now (from the plan's sensors), highest first. */
   consumers(): { id: string; entity: string | null; name: string; watts: number }[];
+  /** Haushalt Pro: today's household lines (empty without the Pro, or when nothing is due). */
+  household?(): SpokenHousehold[];
+  /** The warnings shown right now. */
+  alerts?(): SpokenAlert[];
+  /** Auto Pro: the cars of the plan (empty without the Pro). */
+  cars?(): SpokenCar[];
+  /** Pool Pro: the pools with links (empty without the Pro). */
+  pools?(): SpokenPool[];
+  /** The weather entity the plan uses (null without one). */
+  weather?(): string | null;
 }
 
 export interface NeonModule {

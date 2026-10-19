@@ -98,7 +98,7 @@ import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
-import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
+import { moduleVoice, syncModules, type ModuleHost, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type SpokenPool, type VoiceAnswer } from "../modules.ts";
 import { openingHost, pointOnRoomEdge } from "../geometry/walls.ts";
 import { signedArea } from "../model.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
@@ -4206,7 +4206,9 @@ export class Fp3dView3d extends LitElement {
         const names = [f.name, ...(f.aliases ?? []), kindName, entity ? entityName(hass, entity) : null, ...(synonyms[f.type] ?? [])].filter((n): n is string => !!n);
         const name = f.name || (entity ? entityName(hass, entity) : kindName);
         devices.push({ id, entity, name, names, room: zone?.name ?? "", camera: !!entity && kindOf(entity) === "camera" });
-        spoken.push({ id, entity, name, names, room: zone?.name ?? "", floorId: floor.id, roomId: zone?.id ?? null, power: link?.power ?? null, type: f.type });
+        const plant = (f.type === "plant" || isPackPlant(f.type)) && !!f.moisture && f.moisture !== "none";
+        const remaining = hasFeature("household") && typeof f.remaining === "string" && f.remaining !== "none" ? remainingMinutes(hass.states[f.remaining]) : null;
+        spoken.push({ id, entity, name, names, room: zone?.name ?? "", floorId: floor.id, roomId: zone?.id ?? null, power: link?.power ?? null, type: f.type, remaining, thirsty: plant && hasFeature("household") ? plantThirsty(f, hass) : null });
         if (entity) ofFurniture.add(entity);
         else items.set(id, { kind: "device", name, where: "", floorId: floor.id, roomId: zone?.id ?? null, entity: null, icon: null, x: f.x, z: f.z, y: Math.min(floor.height - 0.3, Math.max(0.5, f.h)) });
       }
@@ -4343,7 +4345,56 @@ export class Fp3dView3d extends LitElement {
         [...this.lastConsumers]
           .map((c) => ({ id: c.id, entity: c.powerEntity, name: spoken.find((d) => d.entity === c.id || d.power === c.powerEntity)?.name ?? entityName(hass, c.id), watts: c.power }))
           .sort((x, y) => y.watts - x.watts),
+      household: () => this._household.map((it) => ({ text: it.text, entity: it.entity, hot: !!it.hot })),
+      alerts: () => this.spokenAlerts(hass, b),
+      cars: () => this.spokenCars(hass, b),
+      pools: () => this.spokenPools(hass, b),
+      weather: () => weatherEntity(hass, this.weatherEntityId ?? b.settings.weather_entity),
     };
+  }
+
+  private spokenAlerts(hass: HomeAssistant, b: Building): SpokenAlert[] {
+    const rooms = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
+    return this._alerts.map((a) => ({ kind: a.kind, entity: a.entity, name: entityName(hass, a.entity), room: a.roomId ? (rooms.get(a.roomId) ?? null) : null, floorId: a.floorId, roomId: a.roomId }));
+  }
+
+  /** Auto Pro: every parking spot with a car, as its card shows it. */
+  private spokenCars(hass: HomeAssistant, b: Building): SpokenCar[] {
+    if (!hasFeature("auto_pro")) return [];
+    const out: SpokenCar[] = [];
+    for (const floor of b.floors) {
+      for (const f of floor.furniture) {
+        if (f.type !== "parking" || !f.car) continue;
+        const vehicle = parkedVehicle(hass, f);
+        const car = carState(hass, f);
+        const st = car.entities.tracker ? hass.states[car.entities.tracker] : undefined;
+        const present = !!vehicle && !(st && !PRESENT_STATES.has(st.state.toLowerCase()));
+        out.push({ name: f.name || (vehicle ? furnitureName(hass, vehicle) : furnitureName(hass, "car")), spot: f.id, floorId: floor.id, present, away: car.away, soc: car.soc, range: car.range, rangeUnit: car.rangeUnit, charging: car.charging, chargingW: car.chargingW, plugged: car.plugged, locked: car.locked });
+      }
+    }
+    return out;
+  }
+
+  /** Pool Pro: every pool with links, as its card shows it. */
+  private spokenPools(hass: HomeAssistant, b: Building): SpokenPool[] {
+    if (!hasFeature("pool")) return [];
+    const out: SpokenPool[] = [];
+    for (const { floor, area } of poolAreas(b.floors)) {
+      const st = poolState(hass, poolLinksWithDevices(area.pool, b.floors));
+      if (!Object.values(st.entities).some(Boolean)) continue;
+      out.push({
+        name: area.name || translate(hass, "out_pool"),
+        floorId: floor.id,
+        areaId: area.id,
+        temp: st.temp,
+        unit: st.unit,
+        pumpOn: st.pump ? st.pump.on : null,
+        heating: st.heater ? st.heater.heating || st.heater.on : null,
+        ph: st.ph ? { value: st.ph.value, ok: st.ph.range === "ok" } : null,
+        chlorine: st.chlorine ? { value: st.chlorine.value, unit: st.chlorine.unit, ok: st.chlorine.range === "ok" } : null,
+      });
+    }
+    return out;
   }
 
   private renderSwipe() {
