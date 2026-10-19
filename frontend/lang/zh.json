@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "触发器",
  "director_trigger_add": "+ 添加触发器",
  "strip_rise": "上升角度（°）",
- "strip_rise_hint": "灯带沿长度方向上升，例如沿楼梯或扶手（约 35–40°）。此时离地高度指其中点。"
+ "strip_rise_hint": "灯带沿长度方向上升，例如沿楼梯或扶手（约 35–40°）。此时离地高度指其中点。",
+ "furn_wall_switch": "电灯开关",
+ "furn_wall_socket": "插座",
+ "furn_group_switches": "开关和插座",
+ "wv_cat_switches": "开关",
+ "gang_count_switch": "面板上的按键数",
+ "gang_count_socket": "面板上的插座数",
+ "socket_kind": "类型",
+ "socket_indoor": "室内",
+ "socket_outdoor": "带盖户外插座",
+ "gang_switch": "按键控制",
+ "gang_socket": "插座控制",
+ "gang_switch_hint": "每个按键都有自己的实体（灯、开关、风扇），打开时会发光——灯会显示它的颜色。点按即可切换；有多个按键时会打开一个小菜单。",
+ "gang_socket_hint": "每个插座都有自己的实体（继电器、智能插头），也可以加一个功率传感器；打开时发绿光。同一个实体可以用在多个插座上——一个继电器控制两个插座。"
 }

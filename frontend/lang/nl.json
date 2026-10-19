@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Trigger",
  "director_trigger_add": "+ Trigger toevoegen",
  "strip_rise": "Stijging (°)",
- "strip_rise_hint": "De strip loopt omhoog over zijn lengte, bijv. langs de trap of een leuning (~35–40°). De hoogte boven de vloer is dan zijn midden."
+ "strip_rise_hint": "De strip loopt omhoog over zijn lengte, bijv. langs de trap of een leuning (~35–40°). De hoogte boven de vloer is dan zijn midden.",
+ "furn_wall_switch": "Lichtschakelaar",
+ "furn_wall_socket": "Stopcontact",
+ "furn_group_switches": "Schakelaars en stopcontacten",
+ "wv_cat_switches": "Schakelaars",
+ "gang_count_switch": "Knoppen in het frame",
+ "gang_count_socket": "Stopcontacten in het frame",
+ "socket_kind": "Uitvoering",
+ "socket_indoor": "Binnen",
+ "socket_outdoor": "Buitenstopcontact met klep",
+ "gang_switch": "Knop schakelt",
+ "gang_socket": "Stopcontact schakelt",
+ "gang_switch_hint": "Elke knop krijgt een eigen entiteit (een lamp, een schakelaar, een ventilator) en licht op zolang hij aan is – een lamp in zijn kleur. Tikken schakelt; bij meerdere knoppen opent een klein menu.",
+ "gang_socket_hint": "Elk stopcontact krijgt een eigen entiteit (het relais, de slimme stekker) en desgewenst een vermogenssensor; het licht groen op zolang het aan is. Dezelfde entiteit mag aan meerdere stopcontacten hangen – twee stopcontacten aan één relais."
 }

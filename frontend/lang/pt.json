@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Gatilho",
  "director_trigger_add": "+ Adicionar gatilho",
  "strip_rise": "Subida (°)",
- "strip_rise_hint": "A fita sobe ao longo do comprimento, p. ex. pela escada ou num corrimão (~35–40°). A altura acima do chão é então o seu centro."
+ "strip_rise_hint": "A fita sobe ao longo do comprimento, p. ex. pela escada ou num corrimão (~35–40°). A altura acima do chão é então o seu centro.",
+ "furn_wall_switch": "Interruptor",
+ "furn_wall_socket": "Tomada",
+ "furn_group_switches": "Interruptores e tomadas",
+ "wv_cat_switches": "Interruptores",
+ "gang_count_switch": "Teclas no espelho",
+ "gang_count_socket": "Tomadas no espelho",
+ "socket_kind": "Tipo",
+ "socket_indoor": "Interior",
+ "socket_outdoor": "Tomada exterior com tampa",
+ "gang_switch": "A tecla comanda",
+ "gang_socket": "A tomada comanda",
+ "gang_switch_hint": "Cada tecla tem a sua própria entidade (uma luz, um interruptor, uma ventoinha) e brilha enquanto está ligada – uma luz na sua cor. Um toque comuta-a; com várias teclas abre-se um pequeno menu.",
+ "gang_socket_hint": "Cada tomada tem a sua própria entidade (o relé, a tomada inteligente) e, se quiser, um sensor de potência; brilha a verde enquanto está ligada. A mesma entidade pode estar em várias tomadas – duas tomadas num relé."
 }

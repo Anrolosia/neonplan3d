@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Déclencheur",
  "director_trigger_add": "+ Ajouter un déclencheur",
  "strip_rise": "Montée (°)",
- "strip_rise_hint": "Le ruban monte le long de sa longueur, p. ex. le long de l'escalier ou d'une main courante (~35–40°). Sa hauteur au-dessus du sol est alors son milieu."
+ "strip_rise_hint": "Le ruban monte le long de sa longueur, p. ex. le long de l'escalier ou d'une main courante (~35–40°). Sa hauteur au-dessus du sol est alors son milieu.",
+ "furn_wall_switch": "Interrupteur",
+ "furn_wall_socket": "Prise",
+ "furn_group_switches": "Interrupteurs et prises",
+ "wv_cat_switches": "Interrupteurs",
+ "gang_count_switch": "Touches dans le cadre",
+ "gang_count_socket": "Prises dans le cadre",
+ "socket_kind": "Modèle",
+ "socket_indoor": "Intérieur",
+ "socket_outdoor": "Prise extérieure à clapet",
+ "gang_switch": "La touche commande",
+ "gang_socket": "La prise commande",
+ "gang_switch_hint": "Chaque touche reçoit sa propre entité (une lumière, un interrupteur, un ventilateur) et brille tant qu'elle est allumée – une lumière dans sa couleur. Un appui la commute ; avec plusieurs touches un petit menu s'ouvre.",
+ "gang_socket_hint": "Chaque prise reçoit sa propre entité (le relais, la prise connectée) et, au besoin, un capteur de puissance ; elle brille en vert tant qu'elle est allumée. La même entité peut être sur plusieurs prises – deux prises sur un relais."
 }

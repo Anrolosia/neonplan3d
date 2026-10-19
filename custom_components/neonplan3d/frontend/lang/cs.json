@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Spouštěč",
  "director_trigger_add": "+ Přidat spouštěč",
  "strip_rise": "Stoupání (°)",
- "strip_rise_hint": "Pásek stoupá po své délce, např. podél schodů nebo madla (~35–40°). Výška nad podlahou je pak jeho střed."
+ "strip_rise_hint": "Pásek stoupá po své délce, např. podél schodů nebo madla (~35–40°). Výška nad podlahou je pak jeho střed.",
+ "furn_wall_switch": "Vypínač",
+ "furn_wall_socket": "Zásuvka",
+ "furn_group_switches": "Vypínače a zásuvky",
+ "wv_cat_switches": "Vypínače",
+ "gang_count_switch": "Tlačítka v rámečku",
+ "gang_count_socket": "Zásuvky v rámečku",
+ "socket_kind": "Provedení",
+ "socket_indoor": "Vnitřní",
+ "socket_outdoor": "Venkovní zásuvka s víčkem",
+ "gang_switch": "Tlačítko spíná",
+ "gang_socket": "Zásuvka spíná",
+ "gang_switch_hint": "Každé tlačítko dostane vlastní entitu (světlo, spínač, ventilátor) a svítí, dokud je zapnuté – světlo ve své barvě. Klepnutí ho přepne; u více tlačítek se otevře malé menu.",
+ "gang_socket_hint": "Každá zásuvka dostane vlastní entitu (relé, chytrou zásuvku) a případně snímač výkonu; svítí zeleně, dokud je zapnutá. Stejná entita smí být na více zásuvkách – dvě zásuvky na jednom relé."
 }

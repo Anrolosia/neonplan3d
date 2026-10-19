@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- **Light switches and sockets** (Furniture → Switches & sockets): 1–4 gangs in a frame, each with its own entity. A gang glows while it is on (a light in its colour, a socket green). A socket can also have a power sensor and then counts as a consumer. A tap switches the entity; several gangs open a small menu. The same entity may sit on several sockets, e.g. two sockets on one relay, or indoor and outdoor (#593, D523, D540).
 - LED strips can **rise** along their length (Rise °), e.g. up the stairs or along a handrail; light and glow climb with them (D539).
 - Live director: **own triggers** – any entity that goes on or open (a second doorbell, the garage door, a gate), each with its camera (D615).
 - Live director / look through a camera: an option **Live picture when looking through** shows the camera's video instead of a still every few seconds (D589).

@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Udløser",
  "director_trigger_add": "+ Tilføj udløser",
  "strip_rise": "Stigning (°)",
- "strip_rise_hint": "Strimlen stiger langs sin længde, f.eks. op ad trappen eller langs et gelænder (~35–40°). Højden over gulvet er så dens midte."
+ "strip_rise_hint": "Strimlen stiger langs sin længde, f.eks. op ad trappen eller langs et gelænder (~35–40°). Højden over gulvet er så dens midte.",
+ "furn_wall_switch": "Lyskontakt",
+ "furn_wall_socket": "Stikkontakt",
+ "furn_group_switches": "Kontakter og stikkontakter",
+ "wv_cat_switches": "Kontakter",
+ "gang_count_switch": "Taster i rammen",
+ "gang_count_socket": "Stik i rammen",
+ "socket_kind": "Udførelse",
+ "socket_indoor": "Inde",
+ "socket_outdoor": "Udendørs stikkontakt med låg",
+ "gang_switch": "Tasten styrer",
+ "gang_socket": "Stikket styrer",
+ "gang_switch_hint": "Hver tast får sin egen entitet (et lys, en kontakt, en ventilator) og lyser, så længe den er tændt – et lys i sin farve. Et tryk skifter den; med flere taster åbnes en lille menu.",
+ "gang_socket_hint": "Hvert stik får sin egen entitet (relæet, smartstikket) og evt. en effektsensor; det lyser grønt, så længe det er tændt. Samme entitet må sidde på flere stik – to stikkontakter på ét relæ."
 }

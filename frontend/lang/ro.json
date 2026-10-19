@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Declanșator",
  "director_trigger_add": "+ Adaugă declanșator",
  "strip_rise": "Urcare (°)",
- "strip_rise_hint": "Banda urcă pe lungimea ei, de ex. pe scări sau pe o balustradă (~35–40°). Înălțimea deasupra podelei este atunci mijlocul ei."
+ "strip_rise_hint": "Banda urcă pe lungimea ei, de ex. pe scări sau pe o balustradă (~35–40°). Înălțimea deasupra podelei este atunci mijlocul ei.",
+ "furn_wall_switch": "Întrerupător",
+ "furn_wall_socket": "Priză",
+ "furn_group_switches": "Întrerupătoare și prize",
+ "wv_cat_switches": "Întrerupătoare",
+ "gang_count_switch": "Taste în ramă",
+ "gang_count_socket": "Prize în ramă",
+ "socket_kind": "Tip",
+ "socket_indoor": "Interior",
+ "socket_outdoor": "Priză exterioară cu capac",
+ "gang_switch": "Tasta comandă",
+ "gang_socket": "Priza comandă",
+ "gang_switch_hint": "Fiecare tastă primește propria entitate (o lumină, un întrerupător, un ventilator) și luminează cât timp e pornită – o lumină în culoarea ei. O atingere o comută; cu mai multe taste se deschide un mic meniu.",
+ "gang_socket_hint": "Fiecare priză primește propria entitate (releul, priza inteligentă) și, dacă vrei, un senzor de putere; luminează verde cât timp e pornită. Aceeași entitate poate sta pe mai multe prize – două prize pe un releu."
 }

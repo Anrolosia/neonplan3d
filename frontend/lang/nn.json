@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Utløysar",
  "director_trigger_add": "+ Legg til utløysar",
  "strip_rise": "Stigning (°)",
- "strip_rise_hint": "Stripa stig langs lengda, t.d. opp trappa eller langs eit rekkverk (~35–40°). Høgda over golvet er då midten."
+ "strip_rise_hint": "Stripa stig langs lengda, t.d. opp trappa eller langs eit rekkverk (~35–40°). Høgda over golvet er då midten.",
+ "furn_wall_switch": "Lysbrytar",
+ "furn_wall_socket": "Stikkontakt",
+ "furn_group_switches": "Brytarar og stikkontaktar",
+ "wv_cat_switches": "Brytarar",
+ "gang_count_switch": "Knappar i ramma",
+ "gang_count_socket": "Kontaktar i ramma",
+ "socket_kind": "Utføring",
+ "socket_indoor": "Inne",
+ "socket_outdoor": "Utandørs stikkontakt med lok",
+ "gang_switch": "Knappen styrer",
+ "gang_socket": "Kontakten styrer",
+ "gang_switch_hint": "Kvar knapp får si eiga entitet (eit lys, ein brytar, ei vifte) og lyser så lenge han er på – eit lys i sin farge. Eit trykk slår han av og på; med fleire knappar opnar ein liten meny seg.",
+ "gang_socket_hint": "Kvar kontakt får si eiga entitet (releet, smartpluggen) og om ønskeleg ein effektsensor; han lyser grønt så lenge han er på. Same entitet kan sitje på fleire kontaktar – to stikkontaktar på eitt rele."
 }

@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Indító",
  "director_trigger_add": "+ Indító hozzáadása",
  "strip_rise": "Emelkedés (°)",
- "strip_rise_hint": "A szalag a hossza mentén emelkedik, pl. a lépcsőn felfelé vagy a korlát mentén (~35–40°). A padló feletti magasság ekkor a közepe."
+ "strip_rise_hint": "A szalag a hossza mentén emelkedik, pl. a lépcsőn felfelé vagy a korlát mentén (~35–40°). A padló feletti magasság ekkor a közepe.",
+ "furn_wall_switch": "Villanykapcsoló",
+ "furn_wall_socket": "Konnektor",
+ "furn_group_switches": "Kapcsolók és konnektorok",
+ "wv_cat_switches": "Kapcsolók",
+ "gang_count_switch": "Gombok a keretben",
+ "gang_count_socket": "Aljzatok a keretben",
+ "socket_kind": "Kivitel",
+ "socket_indoor": "Beltéri",
+ "socket_outdoor": "Kültéri konnektor fedéllel",
+ "gang_switch": "A gomb kapcsolja",
+ "gang_socket": "Az aljzat kapcsolja",
+ "gang_switch_hint": "Minden gomb saját entitást kap (lámpa, kapcsoló, ventilátor), és világít, amíg be van kapcsolva – egy lámpa a saját színében. Egy koppintás kapcsolja; több gombnál kis menü nyílik.",
+ "gang_socket_hint": "Minden aljzat saját entitást kap (a relé, az okoscsatlakozó) és igény szerint teljesítményérzékelőt; zölden világít, amíg be van kapcsolva. Ugyanaz az entitás több aljzaton is lehet – két konnektor egy relén."
 }

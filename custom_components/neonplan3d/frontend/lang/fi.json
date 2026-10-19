@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Laukaisin",
  "director_trigger_add": "+ Lisää laukaisin",
  "strip_rise": "Nousu (°)",
- "strip_rise_hint": "Nauha nousee pituutensa suuntaan, esim. portaita ylös tai kaidetta pitkin (~35–40°). Korkeus lattiasta on silloin sen keskikohta."
+ "strip_rise_hint": "Nauha nousee pituutensa suuntaan, esim. portaita ylös tai kaidetta pitkin (~35–40°). Korkeus lattiasta on silloin sen keskikohta.",
+ "furn_wall_switch": "Valokatkaisin",
+ "furn_wall_socket": "Pistorasia",
+ "furn_group_switches": "Katkaisimet ja pistorasiat",
+ "wv_cat_switches": "Katkaisimet",
+ "gang_count_switch": "Painikkeita kehyksessä",
+ "gang_count_socket": "Pistorasioita kehyksessä",
+ "socket_kind": "Malli",
+ "socket_indoor": "Sisä",
+ "socket_outdoor": "Ulkopistorasia kannella",
+ "gang_switch": "Painike ohjaa",
+ "gang_socket": "Pistorasia ohjaa",
+ "gang_switch_hint": "Jokainen painike saa oman entiteettinsä (valo, katkaisin, tuuletin) ja hehkuu, kun se on päällä – valo omassa värissään. Napautus kytkee sen; useammalla painikkeella aukeaa pieni valikko.",
+ "gang_socket_hint": "Jokainen pistorasia saa oman entiteettinsä (rele, älypistoke) ja halutessa tehoanturin; se hehkuu vihreänä, kun se on päällä. Sama entiteetti voi olla useassa pistorasiassa – kaksi pistorasiaa yhdellä releellä."
 }

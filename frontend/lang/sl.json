@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Sprožilec",
  "director_trigger_add": "+ Dodaj sprožilec",
  "strip_rise": "Vzpon (°)",
- "strip_rise_hint": "Trak se dviga po svoji dolžini, npr. po stopnicah ali ob ograji (~35–40°). Višina nad tlemi je tedaj njegova sredina."
+ "strip_rise_hint": "Trak se dviga po svoji dolžini, npr. po stopnicah ali ob ograji (~35–40°). Višina nad tlemi je tedaj njegova sredina.",
+ "furn_wall_switch": "Stikalo za luč",
+ "furn_wall_socket": "Vtičnica",
+ "furn_group_switches": "Stikala in vtičnice",
+ "wv_cat_switches": "Stikala",
+ "gang_count_switch": "Tipke v okvirju",
+ "gang_count_socket": "Vtičnice v okvirju",
+ "socket_kind": "Izvedba",
+ "socket_indoor": "Notranja",
+ "socket_outdoor": "Zunanja vtičnica s pokrovom",
+ "gang_switch": "Tipka preklaplja",
+ "gang_socket": "Vtičnica preklaplja",
+ "gang_switch_hint": "Vsaka tipka dobi svojo entiteto (luč, stikalo, ventilator) in sveti, dokler je vklopljena – luč v svoji barvi. Dotik jo preklopi; pri več tipkah se odpre majhen meni.",
+ "gang_socket_hint": "Vsaka vtičnica dobi svojo entiteto (rele, pametni vtikač) in po želji senzor moči; sveti zeleno, dokler je vklopljena. Ista entiteta je lahko na več vtičnicah – dve vtičnici na enem releju."
 }

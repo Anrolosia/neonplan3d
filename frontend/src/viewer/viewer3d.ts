@@ -254,7 +254,8 @@ export interface ScreenState {
   plain?: boolean;
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon"; color: [number, number, number]; level: number }[];
+  // "gang": one rocker or socket of a wall switch or socket (`index` of `of`)
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang"; color: [number, number, number]; level: number; index?: number; of?: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -2988,6 +2989,31 @@ export class FloorplanViewer {
               // the screen material is double-sided: one winding is enough (both would add up twice)
               buf.tri(p00, p10, p11, col);
               buf.tri(p00, p11, p01, col);
+            }
+            continue;
+          }
+          if (face.part === "gang") {
+            // a wall switch's or socket's gang: its rocker (socket) glows in front, with a soft halo on the wall
+            const n = Math.max(1, face.of ?? 1);
+            const aw = Math.abs(w);
+            const gw = aw / n;
+            const cx = (-aw / 2 + gw * ((face.index ?? 0) + 0.5)) * Math.sign(w);
+            const zf = d / 2 + (f.variant === "outdoor" ? 0.02 : 0.008);
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.35 + 0.65 * face.level))) as [number, number, number]);
+            const halo = col.clone().multiplyScalar(0.5);
+            const dark = new Color(0, 0, 0);
+            const hx = gw * 0.34;
+            const y0 = base + h * 0.16;
+            const y1 = base + h * 0.84;
+            const q = [P(cx - hx, y0, zf), P(cx + hx, y0, zf), P(cx + hx, y1, zf), P(cx - hx, y1, zf)];
+            buf.tri(q[0], q[1], q[2], col);
+            buf.tri(q[0], q[2], q[3], col);
+            const g = 0.012 + 0.015 * face.level;
+            const o = [P(cx - hx - g, y0 - g, zf - 0.001), P(cx + hx + g, y0 - g, zf - 0.001), P(cx + hx + g, y1 + g, zf - 0.001), P(cx - hx - g, y1 + g, zf - 0.001)];
+            for (let i = 0; i < 4; i++) {
+              const j = (i + 1) % 4;
+              buf.tri(q[i], o[j], o[i], halo, dark, dark);
+              buf.tri(q[i], q[j], o[j], halo, halo, dark);
             }
             continue;
           }

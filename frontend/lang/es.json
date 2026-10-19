@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Disparador",
  "director_trigger_add": "+ Añadir disparador",
  "strip_rise": "Subida (°)",
- "strip_rise_hint": "La tira sube a lo largo de su longitud, p. ej. por la escalera o un pasamanos (~35–40°). Su altura sobre el suelo es entonces su centro."
+ "strip_rise_hint": "La tira sube a lo largo de su longitud, p. ej. por la escalera o un pasamanos (~35–40°). Su altura sobre el suelo es entonces su centro.",
+ "furn_wall_switch": "Interruptor",
+ "furn_wall_socket": "Enchufe",
+ "furn_group_switches": "Interruptores y enchufes",
+ "wv_cat_switches": "Interruptores",
+ "gang_count_switch": "Teclas en el marco",
+ "gang_count_socket": "Enchufes en el marco",
+ "socket_kind": "Tipo",
+ "socket_indoor": "Interior",
+ "socket_outdoor": "Enchufe exterior con tapa",
+ "gang_switch": "La tecla controla",
+ "gang_socket": "El enchufe controla",
+ "gang_switch_hint": "Cada tecla tiene su propia entidad (una luz, un interruptor, un ventilador) y brilla mientras está encendida – una luz en su color. Un toque la conmuta; con varias teclas se abre un pequeño menú.",
+ "gang_socket_hint": "Cada enchufe tiene su propia entidad (el relé, el enchufe inteligente) y, si quieres, un sensor de potencia; brilla en verde mientras está encendido. La misma entidad puede estar en varios enchufes – dos enchufes en un relé."
 }

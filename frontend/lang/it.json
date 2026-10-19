@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Attivatore",
  "director_trigger_add": "+ Aggiungi attivatore",
  "strip_rise": "Salita (°)",
- "strip_rise_hint": "La striscia sale lungo la sua lunghezza, ad es. lungo le scale o un corrimano (~35–40°). L'altezza dal pavimento è allora il suo centro."
+ "strip_rise_hint": "La striscia sale lungo la sua lunghezza, ad es. lungo le scale o un corrimano (~35–40°). L'altezza dal pavimento è allora il suo centro.",
+ "furn_wall_switch": "Interruttore",
+ "furn_wall_socket": "Presa",
+ "furn_group_switches": "Interruttori e prese",
+ "wv_cat_switches": "Interruttori",
+ "gang_count_switch": "Tasti nella placca",
+ "gang_count_socket": "Prese nella placca",
+ "socket_kind": "Tipo",
+ "socket_indoor": "Interna",
+ "socket_outdoor": "Presa esterna con sportello",
+ "gang_switch": "Il tasto comanda",
+ "gang_socket": "La presa comanda",
+ "gang_switch_hint": "Ogni tasto ha la sua entità (una luce, un interruttore, un ventilatore) e si illumina finché è acceso – una luce nel suo colore. Un tocco lo commuta; con più tasti si apre un piccolo menu.",
+ "gang_socket_hint": "Ogni presa ha la sua entità (il relè, la presa smart) e, se vuoi, un sensore di potenza; si illumina di verde finché è accesa. La stessa entità può stare su più prese – due prese su un relè."
 }

@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Wyzwalacz",
  "director_trigger_add": "+ Dodaj wyzwalacz",
  "strip_rise": "Wznios (°)",
- "strip_rise_hint": "Taśma wznosi się wzdłuż swojej długości, np. po schodach lub wzdłuż poręczy (~35–40°). Wysokość nad podłogą to wtedy jej środek."
+ "strip_rise_hint": "Taśma wznosi się wzdłuż swojej długości, np. po schodach lub wzdłuż poręczy (~35–40°). Wysokość nad podłogą to wtedy jej środek.",
+ "furn_wall_switch": "Włącznik światła",
+ "furn_wall_socket": "Gniazdko",
+ "furn_group_switches": "Włączniki i gniazdka",
+ "wv_cat_switches": "Włączniki",
+ "gang_count_switch": "Klawisze w ramce",
+ "gang_count_socket": "Gniazda w ramce",
+ "socket_kind": "Rodzaj",
+ "socket_indoor": "Wewnętrzne",
+ "socket_outdoor": "Gniazdo zewnętrzne z klapką",
+ "gang_switch": "Klawisz steruje",
+ "gang_socket": "Gniazdo steruje",
+ "gang_switch_hint": "Każdy klawisz dostaje własną encję (światło, przełącznik, wentylator) i świeci, dopóki jest włączony – światło w swoim kolorze. Dotknięcie przełącza; przy kilku klawiszach otwiera się małe menu.",
+ "gang_socket_hint": "Każde gniazdo dostaje własną encję (przekaźnik, inteligentną wtyczkę) i opcjonalnie czujnik mocy; świeci na zielono, dopóki jest włączone. Ta sama encja może być na kilku gniazdach – dwa gniazdka na jednym przekaźniku."
 }

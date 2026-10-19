@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Utløser",
  "director_trigger_add": "+ Legg til utløser",
  "strip_rise": "Stigning (°)",
- "strip_rise_hint": "Stripen stiger langs lengden, f.eks. opp trappen eller langs et rekkverk (~35–40°). Høyden over gulvet er da midten."
+ "strip_rise_hint": "Stripen stiger langs lengden, f.eks. opp trappen eller langs et rekkverk (~35–40°). Høyden over gulvet er da midten.",
+ "furn_wall_switch": "Lysbryter",
+ "furn_wall_socket": "Stikkontakt",
+ "furn_group_switches": "Brytere og stikkontakter",
+ "wv_cat_switches": "Brytere",
+ "gang_count_switch": "Knapper i rammen",
+ "gang_count_socket": "Kontakter i rammen",
+ "socket_kind": "Utførelse",
+ "socket_indoor": "Inne",
+ "socket_outdoor": "Utendørs stikkontakt med lokk",
+ "gang_switch": "Knappen styrer",
+ "gang_socket": "Kontakten styrer",
+ "gang_switch_hint": "Hver knapp får sin egen entitet (et lys, en bryter, en vifte) og lyser så lenge den er på – et lys i sin farge. Et trykk slår den av og på; med flere knapper åpnes en liten meny.",
+ "gang_socket_hint": "Hver kontakt får sin egen entitet (releet, smartpluggen) og om ønskelig en effektsensor; den lyser grønt så lenge den er på. Samme entitet kan sitte på flere kontakter – to stikkontakter på ett rele."
 }

@@ -1918,5 +1918,18 @@
  "director_trigger_entity": "Utlösare",
  "director_trigger_add": "+ Lägg till utlösare",
  "strip_rise": "Stigning (°)",
- "strip_rise_hint": "Slingan stiger längs sin längd, t.ex. uppför trappan eller längs en ledstång (~35–40°). Höjden över golvet är då dess mitt."
+ "strip_rise_hint": "Slingan stiger längs sin längd, t.ex. uppför trappan eller längs en ledstång (~35–40°). Höjden över golvet är då dess mitt.",
+ "furn_wall_switch": "Strömbrytare",
+ "furn_wall_socket": "Eluttag",
+ "furn_group_switches": "Strömbrytare och uttag",
+ "wv_cat_switches": "Strömbrytare",
+ "gang_count_switch": "Knappar i ramen",
+ "gang_count_socket": "Uttag i ramen",
+ "socket_kind": "Utförande",
+ "socket_indoor": "Inomhus",
+ "socket_outdoor": "Utomhusuttag med lock",
+ "gang_switch": "Knappen styr",
+ "gang_socket": "Uttaget styr",
+ "gang_switch_hint": "Varje knapp får en egen entitet (en lampa, en brytare, en fläkt) och lyser så länge den är på – en lampa i sin färg. Ett tryck växlar den; med flera knappar öppnas en liten meny.",
+ "gang_socket_hint": "Varje uttag får en egen entitet (reläet, den smarta kontakten) och vid behov en effektsensor; det lyser grönt så länge det är på. Samma entitet får sitta på flera uttag – två uttag på ett relä."
 }
