@@ -1016,7 +1016,7 @@
  "holo_grid": "Nett",
  "holo_house": "Hus",
  "holo_wallbox": "Ladeboks",
- "holo_autarky": "Selvforsyning",
+ "holo_autarky": "Selvforsyning nå",
  "holo_house_now": "Huset nå",
  "chk_title": "Oppsett",
  "chk_hint": "Dette trenger energi og Energi Pro. Trykk på en rad for å gå dit.",
@@ -1910,5 +1910,7 @@
  "wall_slope": "Skrå",
  "wall_slope_hint": "Skrå vegg: en egen høyde ved hvert hjørne, toppen går rett imellom – pulttak, skråning, overlys på den høye siden. Vinduer og dører blir under toppen.",
  "wall_slope_start": "Høyde ved hjørne {n} (m)",
- "wall_slope_end": "Høyde ved hjørne {n} (m)"
+ "wall_slope_end": "Høyde ved hjørne {n} (m)",
+ "director_live": "Livebilde når du ser gjennom",
+ "director_live_hint": "I stedet for et stillbilde med noen sekunders mellomrom spilles kameraets video (via Home Assistants spiller). Krever mer kraft – la det heller være av på svært gamle nettbrett."
 }

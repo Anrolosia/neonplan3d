@@ -1910,5 +1910,7 @@
  "wall_slope": "Vino",
  "wall_slope_hint": "Vino seinä: oma korkeus kummassakin kulmassa, yläreuna kulkee suoraan niiden välillä – pulpettikatto, rinne, ikkunat korkealla puolella. Ikkunat ja ovet pysyvät yläreunan alla.",
  "wall_slope_start": "Korkeus kulmassa {n} (m)",
- "wall_slope_end": "Korkeus kulmassa {n} (m)"
+ "wall_slope_end": "Korkeus kulmassa {n} (m)",
+ "director_live": "Live-kuva läpi katsottaessa",
+ "director_live_hint": "Muutaman sekunnin välein päivittyvän kuvan sijaan kameran video pyörii (Home Assistantin soittimella). Vaatii enemmän tehoa – hyvin vanhoissa tableteissa parempi pitää pois päältä."
 }

@@ -1910,5 +1910,7 @@
  "wall_slope": "倾斜",
  "wall_slope_hint": "倾斜墙：两个角各有自己的高度，顶边在两者之间呈直线——单坡屋顶、坡地、高侧的高窗。门窗保持在顶边以下。",
  "wall_slope_start": "第 {n} 角高度（米）",
- "wall_slope_end": "第 {n} 角高度（米）"
+ "wall_slope_end": "第 {n} 角高度（米）",
+ "director_live": "透视时显示实时画面",
+ "director_live_hint": "不再每隔几秒显示一张静态图，而是播放摄像头视频（通过 Home Assistant 播放器）。需要更多性能——很旧的平板建议关闭。"
 }

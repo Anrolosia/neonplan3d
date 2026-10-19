@@ -1016,7 +1016,7 @@
  "holo_grid": "Réseau",
  "holo_house": "Maison",
  "holo_wallbox": "Borne",
- "holo_autarky": "Autonomie",
+ "holo_autarky": "Autonomie maintenant",
  "holo_house_now": "Maison maintenant",
  "chk_title": "Configuration",
  "chk_hint": "Ce dont Énergie et Énergie Pro ont besoin. Appuie sur une ligne pour y aller.",
@@ -1910,5 +1910,7 @@
  "wall_slope": "Inclinée",
  "wall_slope_hint": "Mur incliné : une hauteur propre à chaque angle, le haut est droit entre les deux – appentis, pente, impostes du côté haut. Fenêtres et portes restent sous le haut.",
  "wall_slope_start": "Hauteur à l'angle {n} (m)",
- "wall_slope_end": "Hauteur à l'angle {n} (m)"
+ "wall_slope_end": "Hauteur à l'angle {n} (m)",
+ "director_live": "Image en direct en regardant à travers",
+ "director_live_hint": "Au lieu d'une image fixe toutes les quelques secondes, la vidéo de la caméra défile (via le lecteur de Home Assistant). Demande plus de puissance – à laisser désactivé sur les très vieilles tablettes."
 }

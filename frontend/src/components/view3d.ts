@@ -3859,6 +3859,8 @@ export class Fp3dView3d extends LitElement {
     const t = this._through;
     if (!t) return;
     this._through = null;
+    // the stream player goes with the look (the camera wall makes its own when it opens)
+    if (this.live?.id === t.entity) this.live = null;
     this.viewer?.flyTo(t.back);
     if (this.throughWall) {
       this.throughWall = false;
@@ -3992,11 +3994,13 @@ export class Fp3dView3d extends LitElement {
     const st = this.hass.states[t.entity];
     const picture = st?.attributes.entity_picture as string | undefined;
     const src = picture && !isUnavailable(st) ? (picture.startsWith("data:") ? picture : `${picture}${picture.includes("?") ? "&" : "?"}fp3d=${this.cameraTick}`) : null;
+    // the live stream when it is switched on (D589), the still until the player is there or when it fails
+    const stream = this.building?.settings.director?.live ? this.liveFor(t.entity) : null;
     return html`<div class="fp3d-through" style="--fp3d-blend:${this._blend}">
-      ${src ? html`<img class="fp3d-through-img" src=${src} alt="" />` : nothing}
+      ${stream ? html`<div class="fp3d-through-img fp3d-through-live">${stream}</div>` : src ? html`<img class="fp3d-through-img" src=${src} alt="" />` : nothing}
       <div class="fp3d-through-bar">
         <span class="fp3d-through-name">${entityName(this.hass, t.entity)}</span>
-        <span class="fp3d-still">${translate(this.hass, "camera_still", { s: this._low ? 10 : 5 })}</span>
+        <span class="fp3d-still">${stream ? "● Live" : translate(this.hass, "camera_still", { s: this._low ? 10 : 5 })}</span>
         <input
           type="range"
           min="0"
@@ -5275,6 +5279,18 @@ export class Fp3dView3d extends LitElement {
         height: 100%;
         object-fit: cover;
         opacity: var(--fp3d-blend);
+      }
+      .fp3d-through-live {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .fp3d-through-live > * {
+        width: 100%;
+        --ha-card-background: transparent;
+        --ha-card-border-width: 0;
+        --ha-card-box-shadow: none;
       }
       .fp3d-through-bar {
         position: absolute;

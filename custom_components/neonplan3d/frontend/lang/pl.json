@@ -1016,7 +1016,7 @@
  "holo_grid": "Sieć",
  "holo_house": "Dom",
  "holo_wallbox": "Wallbox",
- "holo_autarky": "Autarkia",
+ "holo_autarky": "Autarkia teraz",
  "holo_house_now": "Dom teraz",
  "chk_title": "Konfiguracja",
  "chk_hint": "Czego potrzebują energia i Energia Pro. Dotknij wiersza, aby tam przejść.",
@@ -1910,5 +1910,7 @@
  "wall_slope": "Skośna",
  "wall_slope_hint": "Skośna ściana: własna wysokość w każdym narożniku, górna krawędź biegnie prosto między nimi – dach jednospadowy, zbocze, okna u góry po wysokiej stronie. Okna i drzwi zostają pod górną krawędzią.",
  "wall_slope_start": "Wysokość w narożniku {n} (m)",
- "wall_slope_end": "Wysokość w narożniku {n} (m)"
+ "wall_slope_end": "Wysokość w narożniku {n} (m)",
+ "director_live": "Obraz na żywo przy patrzeniu przez kamerę",
+ "director_live_hint": "Zamiast zdjęcia co kilka sekund leci wideo z kamery (przez odtwarzacz Home Assistant). Wymaga więcej mocy – na bardzo starych tabletach lepiej zostawić wyłączone."
 }

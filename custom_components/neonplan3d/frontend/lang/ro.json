@@ -1016,7 +1016,7 @@
  "holo_grid": "Rețea",
  "holo_house": "Casă",
  "holo_wallbox": "Wallbox",
- "holo_autarky": "Autonomie energetică",
+ "holo_autarky": "Autonomie acum",
  "holo_house_now": "Casa acum",
  "chk_title": "Configurare",
  "chk_hint": "De ce au nevoie energia și Energie Pro. Atinge un rând pentru a sări acolo.",
@@ -1910,5 +1910,7 @@
  "wall_slope": "Înclinat",
  "wall_slope_hint": "Perete înclinat: o înălțime proprie la fiecare colț, partea de sus merge drept între ele – acoperiș într-o apă, pantă, ferestre sus pe partea înaltă. Ferestrele și ușile rămân sub partea de sus.",
  "wall_slope_start": "Înălțimea la colțul {n} (m)",
- "wall_slope_end": "Înălțimea la colțul {n} (m)"
+ "wall_slope_end": "Înălțimea la colțul {n} (m)",
+ "director_live": "Imagine live când privești prin cameră",
+ "director_live_hint": "În loc de o imagine statică la câteva secunde rulează video-ul camerei (prin playerul Home Assistant). Cere mai multă putere – pe tablete foarte vechi mai bine lăsat oprit."
 }

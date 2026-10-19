@@ -1910,5 +1910,7 @@
  "wall_slope": "Ferde",
  "wall_slope_hint": "Ferde fal: minden sarokban saját magasság, a felső él egyenesen fut köztük – félnyeregtető, lejtő, felülvilágítók a magas oldalon. Az ablakok és ajtók a felső él alatt maradnak.",
  "wall_slope_start": "Magasság a(z) {n}. saroknál (m)",
- "wall_slope_end": "Magasság a(z) {n}. saroknál (m)"
+ "wall_slope_end": "Magasság a(z) {n}. saroknál (m)",
+ "director_live": "Élő kép a kamerán át nézve",
+ "director_live_hint": "Néhány másodpercenkénti állókép helyett a kamera videója fut (a Home Assistant lejátszójával). Több teljesítményt igényel – nagyon régi tableteken inkább maradjon kikapcsolva."
 }

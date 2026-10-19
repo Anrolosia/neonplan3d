@@ -617,6 +617,8 @@ export interface BuildingSettings {
     alerts?: boolean;
     /** Seconds before the view goes back (the doorbell twice as long; default 30). */
     hold?: number | null;
+    /** Looking through a camera shows its live stream instead of a still every few seconds (D589; off: old tablets). */
+    live?: boolean;
   } | null;
   /** Fun pack "pets": the animals and whether they are shown. */
   pets?: { on: boolean; list: Pet[] } | null;

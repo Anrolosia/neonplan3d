@@ -1016,7 +1016,7 @@
  "holo_grid": "Rete",
  "holo_house": "Casa",
  "holo_wallbox": "Wallbox",
- "holo_autarky": "Autosufficienza",
+ "holo_autarky": "Autosufficienza ora",
  "holo_house_now": "Casa adesso",
  "chk_title": "Configurazione",
  "chk_hint": "Cosa serve a Energia ed Energia Pro. Tocca una riga per andare lì.",
@@ -1910,5 +1910,7 @@
  "wall_slope": "Inclinato",
  "wall_slope_hint": "Muro inclinato: un'altezza propria a ogni angolo, la sommità corre dritta in mezzo – tettoia, pendio, finestre alte sul lato alto. Finestre e porte restano sotto la sommità.",
  "wall_slope_start": "Altezza all'angolo {n} (m)",
- "wall_slope_end": "Altezza all'angolo {n} (m)"
+ "wall_slope_end": "Altezza all'angolo {n} (m)",
+ "director_live": "Immagine live guardando attraverso",
+ "director_live_hint": "Invece di un fermo immagine ogni pochi secondi scorre il video della telecamera (con il player di Home Assistant). Richiede più potenza: sui tablet molto vecchi meglio lasciarlo spento."
 }

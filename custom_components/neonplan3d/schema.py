@@ -772,6 +772,7 @@ SETTINGS_SCHEMA = vol.Schema(
                     vol.Optional("motion", default="off"): vol.In(["off", "person", "all"]),
                     vol.Optional("appliances", default=False): bool,
                     vol.Optional("alerts", default=False): bool,
+                    vol.Optional("live", default=False): bool,
                     vol.Optional("hold", default=None): vol.Any(
                         None, vol.All(vol.Coerce(float), vol.Range(min=10, max=600))
                     ),

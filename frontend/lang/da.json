@@ -1910,5 +1910,7 @@
  "wall_slope": "Skrå",
  "wall_slope_hint": "Skrå væg: en egen højde ved hvert hjørne, toppen løber lige imellem – halvtag, skråning, ovenlys på den høje side. Vinduer og døre bliver under toppen.",
  "wall_slope_start": "Højde ved hjørne {n} (m)",
- "wall_slope_end": "Højde ved hjørne {n} (m)"
+ "wall_slope_end": "Højde ved hjørne {n} (m)",
+ "director_live": "Livebillede ved gennemkig",
+ "director_live_hint": "I stedet for et stillbillede hvert par sekunder kører kameraets video (via Home Assistants afspiller). Kræver mere kraft – lad det hellere være slået fra på meget gamle tablets."
 }

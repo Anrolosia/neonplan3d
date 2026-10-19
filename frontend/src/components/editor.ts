@@ -10795,6 +10795,8 @@ export class Fp3dEditor extends LitElement {
         >
         ${check("director_appliances", !!d.appliances, (on) => set({ appliances: on }))}
         ${check("director_alerts", !!d.alerts, (on) => set({ alerts: on }))}
+        ${check("director_live", !!d.live, (on) => set({ live: on }))}
+        <p class="fp3d-sub fp3d-wide">${this.t("director_live_hint")}</p>
         ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}
       </div>
       <p class="fp3d-sub">${this.t("director_back_hint")}</p>

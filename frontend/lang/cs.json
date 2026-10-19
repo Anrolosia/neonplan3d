@@ -1910,5 +1910,7 @@
  "wall_slope": "Šikmá",
  "wall_slope_hint": "Šikmá stěna: vlastní výška v každém rohu, horní hrana vede rovně mezi nimi – pultová střecha, svah, horní okna na vysoké straně. Okna a dveře zůstanou pod horní hranou.",
  "wall_slope_start": "Výška v rohu {n} (m)",
- "wall_slope_end": "Výška v rohu {n} (m)"
+ "wall_slope_end": "Výška v rohu {n} (m)",
+ "director_live": "Živý obraz při pohledu kamerou",
+ "director_live_hint": "Místo statického snímku každých pár sekund běží video kamery (přes přehrávač Home Assistantu). Potřebuje víc výkonu – na velmi starých tabletech raději nechat vypnuté."
 }

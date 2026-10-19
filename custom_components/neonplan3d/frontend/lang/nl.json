@@ -1016,7 +1016,7 @@
  "holo_grid": "Net",
  "holo_house": "Huis",
  "holo_wallbox": "Laadpaal",
- "holo_autarky": "Zelfvoorziening",
+ "holo_autarky": "Zelfvoorziening nu",
  "holo_house_now": "Huis nu",
  "chk_title": "Inrichting",
  "chk_hint": "Wat Energie en Energie Pro nodig hebben. Tik op een regel om ernaartoe te springen.",
@@ -1910,5 +1910,7 @@
  "wall_slope": "Schuin",
  "wall_slope_hint": "Schuine muur: een eigen hoogte op elke hoek, de bovenkant loopt recht ertussen – lessenaarsdak, helling, bovenlichten aan de hoge kant. Ramen en deuren blijven onder de bovenkant.",
  "wall_slope_start": "Hoogte bij hoek {n} (m)",
- "wall_slope_end": "Hoogte bij hoek {n} (m)"
+ "wall_slope_end": "Hoogte bij hoek {n} (m)",
+ "director_live": "Livebeeld bij doorkijken",
+ "director_live_hint": "In plaats van elke paar seconden een stilstaand beeld loopt de video van de camera (via de speler van Home Assistant). Vraagt meer rekenkracht – op heel oude tablets liever uit laten."
 }

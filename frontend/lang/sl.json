@@ -1910,5 +1910,7 @@
  "wall_slope": "Poševna",
  "wall_slope_hint": "Poševna stena: lastna višina v vsakem kotu, zgornji rob teče naravnost vmes – enokapnica, pobočje, zgornja okna na visoki strani. Okna in vrata ostanejo pod zgornjim robom.",
  "wall_slope_start": "Višina v kotu {n} (m)",
- "wall_slope_end": "Višina v kotu {n} (m)"
+ "wall_slope_end": "Višina v kotu {n} (m)",
+ "director_live": "Slika v živo ob pogledu skozi kamero",
+ "director_live_hint": "Namesto mirujoče slike vsakih nekaj sekund teče video kamere (prek predvajalnika Home Assistanta). Potrebuje več moči – na zelo starih tablicah raje pusti izklopljeno."
 }
