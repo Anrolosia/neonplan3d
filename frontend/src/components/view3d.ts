@@ -98,7 +98,8 @@ import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
-import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice, type SpokenOpening } from "../modules.ts";
+import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
+import { openingHost, pointOnRoomEdge } from "../geometry/walls.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
@@ -449,6 +450,9 @@ export class Fp3dView3d extends LitElement {
   private findIndex: SearchItem[] | null = null;
   /** The consumers of the last sync (the modules ask what draws power right now). */
   private lastConsumers: Consumer[] = [];
+  /** A tour of the house (a module's answer): its stops run one after the other until a tap ends them. */
+  private tourToken = 0;
+  private tourTimer: ReturnType<typeof setTimeout> | undefined;
   /** Room colours (heatmap) as last sent to the viewer. */
   private tintSig = "";
   private thumbTimer: ReturnType<typeof setTimeout> | undefined;
@@ -4015,6 +4019,7 @@ export class Fp3dView3d extends LitElement {
       if (phase === "done" || phase === "error") this.voiceTimer = setTimeout(() => (this._voice = null), phase === "error" ? 9000 : 6000);
     };
     say("wait", "…");
+    this.tourToken++;
     // the audio context starts here, on the tap itself: made later (after loading) Android WebViews keep it mute (#579)
     let started: AudioContext | undefined;
     try {
@@ -4060,7 +4065,8 @@ export class Fp3dView3d extends LitElement {
         this.directing.touch(Date.now());
         if (own.highlight?.length) this.viewer?.flashDevices(own.highlight);
         const f = own.focus;
-        if (f?.roomId && f.floorId) {
+        if (own.tour?.length) this.runTour(own.tour, b, items);
+        else if (f?.roomId && f.floorId) {
           if (this.floorId !== f.floorId) this.fire("floor-tap", { floorId: f.floorId });
           setTimeout(() => this.fire("room-tap", { floorId: f.floorId, roomId: f.roomId }), 60);
         } else if (f?.floorId && !f.entity && !f.furnitureId) this.fire("floor-tap", { floorId: f.floorId });
@@ -4127,6 +4133,56 @@ export class Fp3dView3d extends LitElement {
     return { devices, items, spoken };
   }
 
+  /** Where an opening of the plan is: the middle of its frame, at the height of its middle (null: not drawn). */
+  private openingSpot(b: Building, openingId: string): { floorId: string; x: number; z: number; y: number } | null {
+    for (const floor of b.floors) {
+      const o = floor.openings.find((x) => x.id === openingId);
+      if (!o) continue;
+      const host = openingHost(o, floor.rooms, floor.walls ?? []);
+      if (!host) return null;
+      const [x, z] = pointOnRoomEdge(host.room, host.edge, o.offset + o.width / 2);
+      return { floorId: floor.id, x, z, y: Math.max(0.5, o.sill + o.height / 2) };
+    }
+    return null;
+  }
+
+  /**
+   * A tour (a module's answer): the view flies to each stop – an open window, a running appliance – and stays
+   * there a moment before the next. A tap on the house, or the next spoken sentence, ends it.
+   */
+  private runTour(stops: NonNullable<VoiceAnswer["tour"]>, b: Building, items: Map<string, SearchItem>): void {
+    const token = ++this.tourToken;
+    clearTimeout(this.tourTimer);
+    const spots = stops
+      .map((s) => {
+        if (s.openingId) return this.openingSpot(b, s.openingId);
+        const item = items.get(s.entity ?? `furniture:${s.furnitureId}`);
+        return item ? { floorId: item.floorId, x: item.x, z: item.z, y: item.y, entity: item.entity } : null;
+      })
+      .filter((s): s is NonNullable<typeof s> => !!s)
+      .slice(0, 6);
+    if (!spots.length) return;
+    const stage = this.renderRoot.querySelector(".fp3d-stage");
+    const stop = () => {
+      this.tourToken++;
+      clearTimeout(this.tourTimer);
+    };
+    stage?.addEventListener("pointerdown", stop, { once: true });
+    const go = (i: number) => {
+      if (token !== this.tourToken || i >= spots.length) {
+        stage?.removeEventListener("pointerdown", stop);
+        return;
+      }
+      const s = spots[i];
+      if (this.floorId !== s.floorId) this.fire("floor-tap", { floorId: s.floorId });
+      setTimeout(() => {
+        if (token === this.tourToken) this.viewer?.focus(s.floorId, s.x, s.z, s.y, "entity" in s ? (s.entity ?? null) : null);
+      }, 120);
+      this.tourTimer = setTimeout(() => go(i + 1), 3000);
+    };
+    go(0);
+  }
+
   /** The plan's doors, windows, garage doors and roof windows by their entities, each with its room's name. */
   private spokenOpenings(hass: HomeAssistant, b: Building): SpokenOpening[] {
     const out: SpokenOpening[] = [];
@@ -4138,13 +4194,13 @@ export class Fp3dView3d extends LitElement {
         if (!e) continue;
         const kind = o.type === "garage" ? "garage" : o.type === "door" ? "door" : "window";
         for (const id of [e.contact, e.contact2, e.cover, e.tilt, e.tilt2]) {
-          if (id && id !== "none") out.push({ entity: id, kind, name: t(`opening_${o.type}`), room: rooms.get(o.room_id) ?? "", floorId: floor.id, roomId: o.room_id });
+          if (id && id !== "none") out.push({ id: o.id, entity: id, kind, name: t(`opening_${o.type}`), room: rooms.get(o.room_id) ?? "", floorId: floor.id, roomId: o.room_id });
         }
       }
     }
     for (const w of b.settings.roof?.windows ?? []) {
       for (const id of [w.contact, w.cover]) {
-        if (id && id !== "none") out.push({ entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null });
+        if (id && id !== "none") out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null });
       }
     }
     return out;

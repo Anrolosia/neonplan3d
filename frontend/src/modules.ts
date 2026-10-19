@@ -17,6 +17,8 @@ export interface VoiceAnswer {
   focus?: { entity?: string; furnitureId?: string; roomId?: string; floorId?: string } | null;
   /** Devices that flash in 3D (the open windows, the appliances running). */
   highlight?: string[];
+  /** A tour: the view flies to each stop in turn (an open window, a running appliance) and stays a moment; a tap ends it. */
+  tour?: { entity?: string; furnitureId?: string; openingId?: string }[];
 }
 
 /** A piece of furniture or a placed device the house knows, with where it stands. */
@@ -37,6 +39,8 @@ export interface SpokenDevice {
 
 /** A door, window, garage door or roof window of the plan, by one of its entities (contact, blind, lock …). */
 export interface SpokenOpening {
+  /** The opening's id in the plan (for a tour stop). */
+  id: string;
   entity: string;
   kind: "door" | "window" | "garage" | "roof_window";
   /** The kind's word in the user's language ("Fenster"), or the roof window's own name. */
