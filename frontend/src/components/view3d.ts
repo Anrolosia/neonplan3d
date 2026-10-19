@@ -227,6 +227,7 @@ export class Fp3dView3d extends LitElement {
     alerts: { attribute: false },
     alertJump: { attribute: false },
     director: { attribute: false },
+    hideRoof: { attribute: false },
     voice: { attribute: false },
     _voice: { state: true },
     scenes: { attribute: false },
@@ -400,6 +401,8 @@ export class Fp3dView3d extends LitElement {
   declare alertJump: boolean;
   /** Kamera-Cockpit: this screen shows by itself what happens (the events chosen in the settings; default off). */
   declare director: boolean;
+  /** The roof left out altogether (card option `roof: false`). */
+  declare hideRoof: boolean;
   /** Voice control: a microphone button – "Zeig das Wohnzimmer" shows it, other sentences go to Assist (default off). */
   declare voice: boolean;
   private declare _voice: { phase: "wait" | "listen" | "done" | "error"; text: string } | null;
@@ -591,6 +594,7 @@ export class Fp3dView3d extends LitElement {
     this.alerts = true;
     this.alertJump = false;
     this.director = false;
+    this.hideRoof = false;
     this.voice = false;
     this._voice = null;
     this._micProbe = micProbeAsked();
@@ -759,6 +763,7 @@ export class Fp3dView3d extends LitElement {
       countView("3d");
       this.viewer.setAutoOrbit(this.autoOrbit ? 0.06 : 0);
       this.viewer.setKeepRoof(this.keepRoof);
+      this.viewer.setHideRoof(this.hideRoof);
       this._low = this.viewer.low;
       this.viewer.setPacks([...getPacks()]);
       this.shownPacks = packsVersion();
@@ -838,6 +843,7 @@ export class Fp3dView3d extends LitElement {
     if (changed.has("keepView")) v.setKeepView(this.keepView);
     if (changed.has("explode")) v.setExplode(this.explode);
     if (changed.has("keepRoof")) v.setKeepRoof(this.keepRoof);
+    if (changed.has("hideRoof")) v.setHideRoof(this.hideRoof);
     if (changed.has("floorStack")) v.setFloorStack(this.floorStack);
     if (changed.has("theme")) v.setTheme(this.theme);
     if (changed.has("accent")) v.setAccent(this.accent ?? null);

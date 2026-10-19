@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "bez rozpoznawania mowy",
  "beta_ready": "Gotowe dla ciebie – zainstaluj poniżej razem z pakietami.",
  "beta_supporter_missing": "Jako supporter dostajesz tę betę. Nie ma jej jeszcze na twoim kluczu – napisz do nas na Discordzie, a ją odblokujemy.",
- "voice_silent": "Mikrofon daje tylko ciszę. Zwykle trzyma go inna aplikacja – w Fully Kiosk wyłącz akustyczne wykrywanie ruchu (Motion Detection → Acoustic Detection) i przeładuj."
+ "voice_silent": "Mikrofon daje tylko ciszę. Zwykle trzyma go inna aplikacja – w Fully Kiosk wyłącz akustyczne wykrywanie ruchu (Motion Detection → Acoustic Detection) i przeładuj.",
+ "card_roof": "Pokaż dach",
+ "card_roof_hint": "Wył.: dom wyświetla się bez dachu, jakby go nie miał – pokoje są odkryte (pola solarne na dachu też znikają)",
+ "room_order_up": "Przesuń pokój w górę (wcześniej na pasku pokoi)",
+ "room_order_down": "Przesuń pokój w dół (później na pasku pokoi)"
 }

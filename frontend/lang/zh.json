@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "无语音识别",
  "beta_ready": "已为你准备好——在下方的包中安装。",
  "beta_supporter_missing": "作为支持者，你可以获得此测试版。它还不在你的密钥上——请在 Discord 上告诉我们，我们会为你解锁。",
- "voice_silent": "麦克风只有静音。通常是其他应用占用了它——在 Fully Kiosk 中关闭声音移动检测（Motion Detection → Acoustic Detection）并重新加载。"
+ "voice_silent": "麦克风只有静音。通常是其他应用占用了它——在 Fully Kiosk 中关闭声音移动检测（Motion Detection → Acoustic Detection）并重新加载。",
+ "card_roof": "显示屋顶",
+ "card_roof_hint": "关闭：房子显示为没有屋顶——房间敞开（屋顶上的太阳能板也一起隐藏）",
+ "room_order_up": "房间上移（在房间栏中更靠前）",
+ "room_order_down": "房间下移（在房间栏中更靠后）"
 }

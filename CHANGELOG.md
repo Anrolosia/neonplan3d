@@ -16,6 +16,8 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Improved
 
+- Room bar order: ↑ and ↓ in the editor's room list move a room, and the room bar follows (D599).
+- Card option `roof: false` ("Show the roof" off) leaves the roof out altogether, as if the house had none (D601).
 - Outdoor areas like rooms: their device list in the editor has the room list's buttons – ☆ for the room panel without placing, 👁 hide, Aa without state (#597).
 
 ## 1.20.1

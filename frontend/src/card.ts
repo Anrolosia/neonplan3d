@@ -329,6 +329,7 @@ clearTimeout(this.cleanTimer);
               .wallMode=${walls}
               .explode=${explode}
               .keepRoof=${c?.roof_fade === false}
+              .hideRoof=${c?.roof === false}
               .quality=${this._config?.quality ?? "auto"}
               ?showStats=${this._config?.stats ?? false}
               .markerMode=${this._config?.markers ?? "important"}

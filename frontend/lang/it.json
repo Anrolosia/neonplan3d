@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "senza riconoscimento vocale",
  "beta_ready": "Pronto per te – installalo qui sotto con i tuoi pacchetti.",
  "beta_supporter_missing": "Come supporter ricevi questa beta. Non è ancora sulla tua chiave – scrivici su Discord e la sblocchiamo.",
- "voice_silent": "Il microfono dà solo silenzio. Di solito un'altra app lo occupa – in Fully Kiosk disattiva il rilevamento acustico del movimento (Motion Detection → Acoustic Detection) e ricarica."
+ "voice_silent": "Il microfono dà solo silenzio. Di solito un'altra app lo occupa – in Fully Kiosk disattiva il rilevamento acustico del movimento (Motion Detection → Acoustic Detection) e ricarica.",
+ "card_roof": "Mostra il tetto",
+ "card_roof_hint": "Spento: la casa appare senza tetto, come se non lo avesse – le stanze restano aperte (i campi solari sul tetto spariscono anch'essi)",
+ "room_order_up": "Sposta la stanza su (prima nella barra stanze)",
+ "room_order_down": "Sposta la stanza giù (dopo nella barra stanze)"
 }

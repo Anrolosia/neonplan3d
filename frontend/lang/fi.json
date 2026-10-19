@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "ei puheentunnistusta",
  "beta_ready": "Valmiina sinulle – asenna se alta pakettiesi kanssa.",
  "beta_supporter_missing": "Tukijana saat tämän betan. Se ei ole vielä avaimellasi – kirjoita meille Discordissa, niin avaamme sen.",
- "voice_silent": "Mikrofoni antaa vain hiljaisuutta. Yleensä toinen sovellus varaa sen – poista Fully Kioskista äänipohjainen liiketunnistus (Motion Detection → Acoustic Detection) ja lataa uudelleen."
+ "voice_silent": "Mikrofoni antaa vain hiljaisuutta. Yleensä toinen sovellus varaa sen – poista Fully Kioskista äänipohjainen liiketunnistus (Motion Detection → Acoustic Detection) ja lataa uudelleen.",
+ "card_roof": "Näytä katto",
+ "card_roof_hint": "Pois: talo näkyy ilman kattoa, kuin sillä ei olisi sitä – huoneet ovat avoimina (katon aurinkopaneelit poistuvat myös)",
+ "room_order_up": "Siirrä huone ylös (aiemmaksi huonepalkissa)",
+ "room_order_down": "Siirrä huone alas (myöhemmäksi huonepalkissa)"
 }

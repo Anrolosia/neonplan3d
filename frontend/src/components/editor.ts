@@ -9779,15 +9779,32 @@ export class Fp3dEditor extends LitElement {
     `;
   }
 
+  /** A room one place up or down in its floor's list – the room bar of the 3D view shows them in this order (D599). */
+  private moveRoom(id: string, by: number): void {
+    this.change((_d, floor) => {
+      const i = floor.rooms.findIndex((r) => r.id === id);
+      const j = i + by;
+      if (i < 0 || j < 0 || j >= floor.rooms.length) return;
+      const [room] = floor.rooms.splice(i, 1);
+      floor.rooms.splice(j, 0, room);
+    });
+  }
+
   private renderRoomList(floor: Floor) {
     if (!floor.rooms.length) return nothing;
     return html`<section>
       <h3>${this.t("rooms")}</h3>
       <div class="fp3d-room-list">
         ${floor.rooms.map(
-          (r) => html`<button class="fp3d-row" @click=${() => this.selectItem("room", r.id)}>
-            <span>${r.name}</span><span class="fp3d-muted">${this.area(polygonArea(r.points))}</span>
-          </button>`,
+          (r, i) => html`<div class="fp3d-row fp3d-dev-row">
+            <button class="fp3d-row fp3d-room-btn" @click=${() => this.selectItem("room", r.id)}>
+              <span>${r.name}</span><span class="fp3d-muted">${this.area(polygonArea(r.points))}</span>
+            </button>
+            ${this.isAdmin && floor.rooms.length > 1
+              ? html`<button class="fp3d-pin" title=${this.t("room_order_up")} ?disabled=${i === 0} @click=${() => this.moveRoom(r.id, -1)}>↑</button>
+                  <button class="fp3d-pin" title=${this.t("room_order_down")} ?disabled=${i === floor.rooms.length - 1} @click=${() => this.moveRoom(r.id, 1)}>↓</button>`
+              : nothing}
+          </div>`,
         )}
       </div>
     </section>`;
@@ -15024,6 +15041,12 @@ export class Fp3dEditor extends LitElement {
       .fp3d-dev-row {
         align-items: center;
         cursor: default;
+      }
+      .fp3d-room-btn {
+        flex: 1;
+        min-width: 0;
+        border-bottom: none;
+        padding: 0;
       }
       .fp3d-dev-row:hover {
         color: var(--fp3d-text);

@@ -22,6 +22,8 @@ export interface CardConfig {
   camera_wall?: boolean;
   /** The roof lifts and fades while zooming in (default true); false keeps it on the house. */
   roof_fade?: boolean;
+  /** Show the roof (default true); false leaves it out altogether, as if the house had none (D601). */
+  roof?: boolean;
   quality?: Quality;
   /** Show the performance display (frames per second, draw calls). */
   stats?: boolean;

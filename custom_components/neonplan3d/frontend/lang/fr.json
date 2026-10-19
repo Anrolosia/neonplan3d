@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "sans reconnaissance vocale",
  "beta_ready": "Prêt pour vous – installez-le ci-dessous avec vos packs.",
  "beta_supporter_missing": "En tant que supporter, vous recevez cette bêta. Elle n'est pas encore sur votre clé – écrivez-nous sur Discord et nous l'activerons.",
- "voice_silent": "Le micro ne fournit que du silence. Souvent une autre app le monopolise – dans Fully Kiosk, désactivez la détection de mouvement acoustique (Motion Detection → Acoustic Detection) et rechargez."
+ "voice_silent": "Le micro ne fournit que du silence. Souvent une autre app le monopolise – dans Fully Kiosk, désactivez la détection de mouvement acoustique (Motion Detection → Acoustic Detection) et rechargez.",
+ "card_roof": "Afficher le toit",
+ "card_roof_hint": "Désactivé : la maison s'affiche sans toit, comme si elle n'en avait pas – les pièces sont visibles (les champs solaires du toit disparaissent aussi)",
+ "room_order_up": "Monter la pièce (plus tôt dans la barre des pièces)",
+ "room_order_down": "Descendre la pièce (plus tard dans la barre des pièces)"
 }
