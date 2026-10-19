@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Varje uttag får en egen entitet (reläet, den smarta kontakten) och vid behov en effektsensor; det lyser grönt så länge det är på. Samma entitet får sitta på flera uttag – två uttag på ett relä.",
  "furn_lamp_fan": "Takfläkt med belysning",
  "fan_entity": "Fläkt (fan-entitet)",
- "fan_hint": "Ljuset ovan styr lampan. Med en fläkt snurrar bladen med dess hastighet och den får en egen symbol bredvid: ett tryck slår på eller av, ett långt tryck ställer in hastigheten."
+ "fan_hint": "Ljuset ovan styr lampan. Med en fläkt snurrar bladen med dess hastighet och den får en egen symbol bredvid: ett tryck slår på eller av, ett långt tryck ställer in hastigheten.",
+ "angle_lock": "3D-lås",
+ "angle_lock_hint": "Vinkeln står still: dra flyttar vyn, zoom fungerar fortfarande – ingen vrider huset av misstag.",
+ "through_full": "Helskärm",
+ "through_full_hint": "Kamerabilden på hela skärmen (Esc eller Tillbaka avslutar). Kan webbläsaren inte det öppnas Home Assistants kameravy – där även med ljud."
 }

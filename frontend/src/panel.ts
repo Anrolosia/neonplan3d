@@ -79,6 +79,7 @@ export class Floorplan3dPanel extends LitElement {
     _roomNames: { state: true },
     _controlsRight: { state: true },
     _keepView: { state: true },
+    _angleLock: { state: true },
     _trail: { state: true },
     _cameraWall: { state: true },
     _clean: { state: true },
@@ -130,6 +131,8 @@ export class Floorplan3dPanel extends LitElement {
   private declare _roomNames: boolean;
   private declare _controlsRight: boolean;
   private declare _keepView: boolean;
+  /** 3D lock on this device: the angle stays fixed. */
+  private declare _angleLock: boolean;
   /** Motion trail of the last half hour in 3D. */
   private declare _trail: boolean;
   private declare _cameraWall: boolean;
@@ -194,6 +197,7 @@ export class Floorplan3dPanel extends LitElement {
     this._roomNames = prefs.get("room_names") !== "0";
     this._controlsRight = prefs.get("controls") === "right";
     this._keepView = prefs.get("keep_view") === "1";
+    this._angleLock = prefs.get("angle_lock") === "1";
     this._trail = prefs.get("trail") === "1";
     this._cameraWall = false;
     this._clean = prefs.get("clean") === "1";
@@ -657,6 +661,17 @@ export class Floorplan3dPanel extends LitElement {
                   ⌖
                 </button>
                 <button
+                  aria-pressed=${this._angleLock}
+                  title=${`${this.t("angle_lock")}: ${this.t("angle_lock_hint")}`}
+                  aria-label=${this.t("angle_lock")}
+                  @click=${() => {
+                    this._angleLock = !this._angleLock;
+                    prefs.set("angle_lock", this._angleLock ? "1" : "0");
+                  }}
+                >
+                  🔒
+                </button>
+                <button
                   aria-pressed=${this._stats}
                   title=${this.t("fps_title")}
                   @click=${() => {
@@ -892,6 +907,7 @@ export class Floorplan3dPanel extends LitElement {
           .roomLabels=${this._roomNames}
           .controlsRight=${this._controlsRight}
           .keepView=${this._keepView}
+          .angleLock=${this._angleLock}
           ?trail=${this._trail}
           .cameraWall=${this._cameraWall && !tt}
           @camera-wall-close=${() => (this._cameraWall = false)}

@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Cada tomada tem a sua própria entidade (o relé, a tomada inteligente) e, se quiser, um sensor de potência; brilha a verde enquanto está ligada. A mesma entidade pode estar em várias tomadas – duas tomadas num relé.",
  "furn_lamp_fan": "Ventoinha de teto com luz",
  "fan_entity": "Ventoinha (entidade fan)",
- "fan_hint": "A luz acima comanda o candeeiro. Com uma ventoinha as pás giram à sua velocidade e ela tem um símbolo próprio ao lado: um toque liga ou desliga, um toque longo ajusta a velocidade."
+ "fan_hint": "A luz acima comanda o candeeiro. Com uma ventoinha as pás giram à sua velocidade e ela tem um símbolo próprio ao lado: um toque liga ou desliga, um toque longo ajusta a velocidade.",
+ "angle_lock": "Bloqueio 3D",
+ "angle_lock_hint": "O ângulo fica fixo: arrastar desloca a vista, o zoom continua a funcionar – ninguém roda a casa sem querer.",
+ "through_full": "Ecrã inteiro",
+ "through_full_hint": "A imagem da câmara em todo o ecrã (Esc ou Voltar termina). Se o navegador não conseguir, abre-se a vista de câmara do Home Assistant – aí também com som."
 }

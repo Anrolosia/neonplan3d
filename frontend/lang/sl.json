@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Vsaka vtičnica dobi svojo entiteto (rele, pametni vtikač) in po želji senzor moči; sveti zeleno, dokler je vklopljena. Ista entiteta je lahko na več vtičnicah – dve vtičnici na enem releju.",
  "furn_lamp_fan": "Stropni ventilator z lučjo",
  "fan_entity": "Ventilator (entiteta fan)",
- "fan_hint": "Luč zgoraj upravlja svetilko. Z ventilatorjem se lopatice vrtijo z njegovo hitrostjo in dobi svoj simbol ob strani: dotik ga vklopi ali izklopi, dolg pritisk nastavi hitrost."
+ "fan_hint": "Luč zgoraj upravlja svetilko. Z ventilatorjem se lopatice vrtijo z njegovo hitrostjo in dobi svoj simbol ob strani: dotik ga vklopi ali izklopi, dolg pritisk nastavi hitrost.",
+ "angle_lock": "3D-zaklep",
+ "angle_lock_hint": "Kot ostane nespremenjen: vlečenje premakne pogled, povečava še deluje – nihče hiše ne zavrti po nesreči.",
+ "through_full": "Celozaslonsko",
+ "through_full_hint": "Slika kamere čez cel zaslon (Esc ali Nazaj konča). Če brskalnik tega ne zmore, se odpre pogled kamere v Home Assistantu – tam tudi z zvokom."
 }

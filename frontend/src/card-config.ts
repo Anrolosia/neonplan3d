@@ -16,6 +16,8 @@ export interface CardConfig {
   controls_side?: "left" | "right";
   /** Switching floors keeps the camera (#191). */
   keep_view?: boolean;
+  /** 3D lock: the angle stays fixed, a drag moves the view (a wall tablet with children around). */
+  angle_lock?: boolean;
   /** Pull floors apart in the house view (default true). */
   explode?: boolean;
   /** A "Cameras" button that opens the camera wall, every camera's live picture (Pro: camera cockpit). */

@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Jokainen pistorasia saa oman entiteettinsä (rele, älypistoke) ja halutessa tehoanturin; se hehkuu vihreänä, kun se on päällä. Sama entiteetti voi olla useassa pistorasiassa – kaksi pistorasiaa yhdellä releellä.",
  "furn_lamp_fan": "Kattotuuletin valolla",
  "fan_entity": "Tuuletin (fan-entiteetti)",
- "fan_hint": "Yllä oleva valo ohjaa valaisinta. Tuulettimen kanssa siivet pyörivät sen nopeudella, ja se saa oman symbolin viereen: napautus kytkee sen, pitkä painallus säätää nopeutta."
+ "fan_hint": "Yllä oleva valo ohjaa valaisinta. Tuulettimen kanssa siivet pyörivät sen nopeudella, ja se saa oman symbolin viereen: napautus kytkee sen, pitkä painallus säätää nopeutta.",
+ "angle_lock": "3D-lukitus",
+ "angle_lock_hint": "Kulma pysyy paikallaan: vetäminen siirtää näkymää, zoomaus toimii yhä – kukaan ei käännä taloa vahingossa.",
+ "through_full": "Koko näyttö",
+ "through_full_hint": "Kameran kuva koko näytölle (Esc tai Takaisin lopettaa). Jos selain ei siihen pysty, avautuu Home Assistantin kameranäkymä – siellä myös äänen kanssa."
 }

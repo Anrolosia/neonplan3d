@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Ogni presa ha la sua entità (il relè, la presa smart) e, se vuoi, un sensore di potenza; si illumina di verde finché è accesa. La stessa entità può stare su più prese – due prese su un relè.",
  "furn_lamp_fan": "Ventilatore da soffitto con luce",
  "fan_entity": "Ventilatore (entità fan)",
- "fan_hint": "La luce sopra comanda la lampada. Con un ventilatore le pale girano con la sua velocità e ha un simbolo proprio accanto: un tocco lo accende o spegne, una pressione lunga regola la velocità."
+ "fan_hint": "La luce sopra comanda la lampada. Con un ventilatore le pale girano con la sua velocità e ha un simbolo proprio accanto: un tocco lo accende o spegne, una pressione lunga regola la velocità.",
+ "angle_lock": "Blocco 3D",
+ "angle_lock_hint": "L'angolo resta fisso: trascinare sposta la vista, lo zoom funziona ancora – nessuno ruota la casa per sbaglio.",
+ "through_full": "Schermo intero",
+ "through_full_hint": "L'immagine della telecamera a tutto schermo (Esc o Indietro per uscire). Se il browser non può, si apre la vista telecamera di Home Assistant – lì anche con l'audio."
 }

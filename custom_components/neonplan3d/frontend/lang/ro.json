@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Fiecare priză primește propria entitate (releul, priza inteligentă) și, dacă vrei, un senzor de putere; luminează verde cât timp e pornită. Aceeași entitate poate sta pe mai multe prize – două prize pe un releu.",
  "furn_lamp_fan": "Ventilator de tavan cu lumină",
  "fan_entity": "Ventilator (entitate fan)",
- "fan_hint": "Lumina de mai sus comandă lampa. Cu un ventilator, palele se rotesc după treapta lui și primește propriul simbol alături: o atingere îl pornește sau oprește, o apăsare lungă reglează treapta."
+ "fan_hint": "Lumina de mai sus comandă lampa. Cu un ventilator, palele se rotesc după treapta lui și primește propriul simbol alături: o atingere îl pornește sau oprește, o apăsare lungă reglează treapta.",
+ "angle_lock": "Blocare 3D",
+ "angle_lock_hint": "Unghiul rămâne fix: tragerea mută vederea, zoomul merge în continuare – nimeni nu rotește casa din greșeală.",
+ "through_full": "Ecran complet",
+ "through_full_hint": "Imaginea camerei pe tot ecranul (Esc sau Înapoi o închide). Dacă browserul nu poate, se deschide vizualizarea camerei din Home Assistant – acolo și cu sunet."
 }

@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Každá zásuvka dostane vlastní entitu (relé, chytrou zásuvku) a případně snímač výkonu; svítí zeleně, dokud je zapnutá. Stejná entita smí být na více zásuvkách – dvě zásuvky na jednom relé.",
  "furn_lamp_fan": "Stropní ventilátor se světlem",
  "fan_entity": "Ventilátor (entita fan)",
- "fan_hint": "Světlo výše ovládá svítidlo. S ventilátorem se lopatky točí podle jeho stupně a dostane vlastní symbol vedle: klepnutí ho zapne či vypne, dlouhý stisk nastaví stupeň."
+ "fan_hint": "Světlo výše ovládá svítidlo. S ventilátorem se lopatky točí podle jeho stupně a dostane vlastní symbol vedle: klepnutí ho zapne či vypne, dlouhý stisk nastaví stupeň.",
+ "angle_lock": "3D zámek",
+ "angle_lock_hint": "Úhel zůstává pevný: tažení posouvá pohled, přiblížení funguje dál – nikdo dům omylem neotočí.",
+ "through_full": "Celá obrazovka",
+ "through_full_hint": "Obraz kamery přes celou obrazovku (Esc nebo Zpět ukončí). Když to prohlížeč neumí, otevře se zobrazení kamery Home Assistantu – tam i se zvukem."
 }

@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Elk stopcontact krijgt een eigen entiteit (het relais, de slimme stekker) en desgewenst een vermogenssensor; het licht groen op zolang het aan is. Dezelfde entiteit mag aan meerdere stopcontacten hangen – twee stopcontacten aan één relais.",
  "furn_lamp_fan": "Plafondventilator met licht",
  "fan_entity": "Ventilator (fan-entiteit)",
- "fan_hint": "Het licht hierboven schakelt de lamp. Met een ventilator draaien de bladen mee met zijn stand en krijgt hij een eigen symbool ernaast: tikken schakelt hem, lang drukken stelt de stand in."
+ "fan_hint": "Het licht hierboven schakelt de lamp. Met een ventilator draaien de bladen mee met zijn stand en krijgt hij een eigen symbool ernaast: tikken schakelt hem, lang drukken stelt de stand in.",
+ "angle_lock": "3D-vergrendeling",
+ "angle_lock_hint": "De kijkhoek blijft vast: slepen verschuift het beeld, zoomen werkt nog – niemand draait het huis per ongeluk.",
+ "through_full": "Volledig scherm",
+ "through_full_hint": "Het camerabeeld op het hele scherm (Esc of Terug beëindigt het). Kan de browser dat niet, dan opent de cameraweergave van Home Assistant – daar ook met geluid."
 }

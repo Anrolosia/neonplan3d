@@ -228,6 +228,7 @@ export class Fp3dView3d extends LitElement {
     panelOpen: { attribute: false },
     controlsRight: { attribute: false },
     keepView: { attribute: false },
+    angleLock: { attribute: false },
     alerts: { attribute: false },
     alertJump: { attribute: false },
     director: { attribute: false },
@@ -400,6 +401,8 @@ export class Fp3dView3d extends LitElement {
   declare controlsRight: boolean;
   /** Floor switches keep the camera (#191). */
   declare keepView: boolean;
+  /** 3D lock: the angle stays fixed (a wall tablet nobody should turn the house on). */
+  declare angleLock: boolean;
   /** The stage is narrower than 700 px (smaller floor pictures, phone layout). */
   private declare _narrowStage: boolean;
   private resizeObs: ResizeObserver | null = null;
@@ -600,6 +603,7 @@ export class Fp3dView3d extends LitElement {
     this.panelOpen = false;
     this.controlsRight = false;
     this.keepView = false;
+    this.angleLock = false;
     this._narrowStage = false;
     this.alerts = true;
     this.alertJump = false;
@@ -763,6 +767,7 @@ export class Fp3dView3d extends LitElement {
       });
       this.viewer.setWallMode(this.wallMode);
       this.viewer.setKeepView(this.keepView);
+      this.viewer.setAngleLock(this.angleLock);
       this.viewer.setTheme(this.theme);
       this.viewer.setAccent(this.accent ?? null);
       this.viewer.setFurnishMode(this.furnish);
@@ -853,6 +858,7 @@ export class Fp3dView3d extends LitElement {
     if (changed.has("roomId") && (this.roomId || changed.get("roomId"))) v.selectRoom(this.roomId);
     if (changed.has("wallMode")) v.setWallMode(this.wallMode);
     if (changed.has("keepView")) v.setKeepView(this.keepView);
+    if (changed.has("angleLock")) v.setAngleLock(this.angleLock);
     if (changed.has("explode")) v.setExplode(this.explode);
     if (changed.has("keepRoof")) v.setKeepRoof(this.keepRoof);
     if (changed.has("hideRoof")) v.setHideRoof(this.hideRoof);
@@ -2629,7 +2635,7 @@ export class Fp3dView3d extends LitElement {
           const name = f.name || (link.entity ? entityName(hass, link.entity) : furnitureName(hass, f.type));
           if (busy) {
             // running by its time left alone: it glows like one that draws power
-            if (!running) screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
+            if (!running) screens.set(f.id, runGlow(f.type));
             if (min !== null) {
               hhText = translate(hass, "hh_left", { t: remainingText(min) });
               today.push({ icon: "timer-outline", text: `${name}: ${hhText}`, entity: f.remaining ?? link.entity });
@@ -2669,7 +2675,7 @@ export class Fp3dView3d extends LitElement {
           const glow = climateModeGlow(st);
           if (glow) screens.set(f.id, glow);
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
-          screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
+          screens.set(f.id, runGlow(f.type));
         } else if (f.type === "stove" || isPackCooktop(f.type)) {
           // the burners glow while it cooks (or draws power), faintly while it is ready
           const level = cooktopLevel(st, running);
@@ -3200,7 +3206,7 @@ export class Fp3dView3d extends LitElement {
       : item || model === "wall" || model === "strip"
       ? mountBase(floor, f)
       : model === "table"
-        ? surfaceHeight(floor, f.x, f.z)
+        ? surfaceHeight(floor, f.x, f.z, f.h)
         : model === "bollard" || model === "garden"
           ? outdoorGround(floor, f.x, f.z)
           : 0;
@@ -4166,9 +4172,20 @@ export class Fp3dView3d extends LitElement {
           aria-label=${translate(this.hass, "through_blend")}
           @input=${(e: Event) => (this._blend = Number((e.target as HTMLInputElement).value) / 100)}
         />
+        <button class="fp3d-chip" title=${translate(this.hass, "through_full_hint")} @click=${() => this.throughFull(t.entity)}>⛶ ${translate(this.hass, "through_full")}</button>
         <button class="fp3d-chip" @click=${() => this.endThrough()}>${translate(this.hass, "through_back")}</button>
       </div>
     </div>`;
+  }
+
+  /**
+   * The camera's picture on the whole screen (idea from dlavrantonis' fork); where the browser cannot (old tablet
+   * WebViews), Home Assistant's own camera view opens instead – it also has the sound.
+   */
+  private throughFull(entity: string): void {
+    const el = this.renderRoot.querySelector(".fp3d-through-img") as (HTMLElement & { requestFullscreen?: () => Promise<void> }) | null;
+    if (el && typeof el.requestFullscreen === "function") el.requestFullscreen().catch(() => openMoreInfo(this, entity));
+    else openMoreInfo(this, entity);
   }
 
   private renderMenu() {
@@ -5484,6 +5501,11 @@ export class Fp3dView3d extends LitElement {
         --ha-card-border-width: 0;
         --ha-card-box-shadow: none;
       }
+      .fp3d-through-img:fullscreen {
+        opacity: 1;
+        object-fit: contain;
+        background: #000;
+      }
       .fp3d-through-bar {
         position: absolute;
         left: 50%;
@@ -6147,6 +6169,12 @@ function formatPower(hass: HomeAssistant | undefined, w: number): string {
 }
 
 /** Marker height above furniture: in front of a screen, above wall units, else just above the top. */
+/** A running washer or dryer: a ring of light round its round door (#516); a dishwasher: its front. */
+function runGlow(type: string): ScreenState {
+  const color: [number, number, number] = [0.3, 0.85, 1];
+  return type === "washer" || type === "dryer" ? { color, level: 0.8, faces: [{ part: "drum", color, level: 0.8 }] } : { color, level: 0.8 };
+}
+
 function markerHeight(f: Furniture): number {
   if (f.type === "tv_board") return f.h + 0.9;
   // wall TV and wall cabinet: above the item (their height above the floor comes from mountBase)

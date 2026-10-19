@@ -11908,10 +11908,12 @@ export class Fp3dEditor extends LitElement {
         const r = f.rooms.find((x) => pointInPolygon([id[1], id[2]], x.points));
         if (r && r.id !== room.id) placedIn.set(id[0], r.name);
       }
-    const row = (id: string, extra = false, nameArea = areaName) => {
+    // extra: an entity from another area (shown only to place it); sub: a further entity of a device, with the same
+    // buttons as its main one – hidden or without state on its own (D484)
+    const row = (id: string, extra = false, nameArea = areaName, sub = false) => {
       const placed = placedHere.has(id);
       const elsewhere = placed ? undefined : placedIn.get(id);
-      return html`<div class="fp3d-row fp3d-dev-row ${extra ? "fp3d-dev-extra" : ""} ${hidden.has(id) ? "fp3d-dev-hidden" : ""}">
+      return html`<div class="fp3d-row fp3d-dev-row ${extra || sub ? "fp3d-dev-extra" : ""} ${hidden.has(id) ? "fp3d-dev-hidden" : ""}">
         <button class="fp3d-dev-name ${placed ? "" : "fp3d-muted"}" ?disabled=${!placed} @click=${() => this.selectItem("device", id)}>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d=${iconPath(kindOf(id)!)} />
@@ -12009,7 +12011,7 @@ export class Fp3dEditor extends LitElement {
                         ${open ? this.t("devices_less") : this.t("devices_more", { n: g.others.length })}
                       </button>`
                     : nothing}
-                  ${open ? (q ? others : g.others).map((id) => row(id, true)) : nothing}`;
+                  ${open ? (q ? others : g.others).map((id) => row(id, false, areaName, true)) : nothing}`;
                 })}
               </div>
               ${admin && unplacedMain.length > 1

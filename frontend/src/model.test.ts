@@ -199,3 +199,14 @@ test("a wall switch or socket has one to four gangs; the same entity on two sock
   assert.equal(gangPlateWidth(9), gangPlateWidth(4));
   assert.deepEqual(gangEntities({ gangs: [{ entity: "switch.relais" }, { entity: "switch.relais" }, { entity: "none" }, { entity: "light.flur" }] }), ["switch.relais", "light.flur"]);
 });
+
+test("a lamp fits under a high worktop step and stands on the floor; on a kitchen worktop it stands on top (#614)", () => {
+  const floor = newFloor("f", "F", 0);
+  const top = (h: number): Furniture => ({ id: `w${h}`, type: "worktop", x: 1, z: 1, rotation: 0, w: 1, d: 0.6, h, variant: null });
+  floor.furniture = [top(1.6)];
+  assert.equal(surfaceHeight(floor, 1, 1, 0.45), 0);
+  assert.equal(surfaceHeight(floor, 1, 1, 1.8), 1.6);
+  assert.equal(surfaceHeight(floor, 1, 1), 1.6);
+  floor.furniture = [top(0.92)];
+  assert.equal(surfaceHeight(floor, 1, 1, 0.45), 0.92);
+});

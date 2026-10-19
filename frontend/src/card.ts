@@ -350,6 +350,7 @@ clearTimeout(this.cleanTimer);
               .roomLabels=${c?.room_names !== false}
               .controlsRight=${c?.controls_side === "right"}
               .keepView=${c?.keep_view === true}
+              .angleLock=${c?.angle_lock === true}
               .floorStack=${c?.floor_stack ?? "dim"}
               .panelOpen=${!!this._roomId && c?.room_panel !== false}
               .alerts=${c?.alerts !== false}

@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Hvert stik får sin egen entitet (relæet, smartstikket) og evt. en effektsensor; det lyser grønt, så længe det er tændt. Samme entitet må sidde på flere stik – to stikkontakter på ét relæ.",
  "furn_lamp_fan": "Loftventilator med lys",
  "fan_entity": "Ventilator (fan-entitet)",
- "fan_hint": "Lyset ovenfor styrer lampen. Med en ventilator drejer vingerne med dens trin, og den får sit eget symbol ved siden af: et tryk tænder eller slukker, et langt tryk indstiller trinnet."
+ "fan_hint": "Lyset ovenfor styrer lampen. Med en ventilator drejer vingerne med dens trin, og den får sit eget symbol ved siden af: et tryk tænder eller slukker, et langt tryk indstiller trinnet.",
+ "angle_lock": "3D-lås",
+ "angle_lock_hint": "Vinklen står fast: træk flytter visningen, zoom virker stadig – ingen drejer huset ved et uheld.",
+ "through_full": "Fuld skærm",
+ "through_full_hint": "Kamerabilledet på hele skærmen (Esc eller Tilbage afslutter). Kan browseren ikke det, åbnes Home Assistants kameravisning – der også med lyd."
 }

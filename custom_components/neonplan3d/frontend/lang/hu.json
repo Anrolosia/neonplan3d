@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Minden aljzat saját entitást kap (a relé, az okoscsatlakozó) és igény szerint teljesítményérzékelőt; zölden világít, amíg be van kapcsolva. Ugyanaz az entitás több aljzaton is lehet – két konnektor egy relén.",
  "furn_lamp_fan": "Mennyezeti ventilátor lámpával",
  "fan_entity": "Ventilátor (fan entitás)",
- "fan_hint": "A fenti fény kapcsolja a lámpát. Ventilátorral a lapátok a fokozatával forognak, és saját szimbólumot kap mellette: koppintás be- vagy kikapcsolja, hosszú nyomás beállítja a fokozatot."
+ "fan_hint": "A fenti fény kapcsolja a lámpát. Ventilátorral a lapátok a fokozatával forognak, és saját szimbólumot kap mellette: koppintás be- vagy kikapcsolja, hosszú nyomás beállítja a fokozatot.",
+ "angle_lock": "3D-zár",
+ "angle_lock_hint": "A nézőszög rögzített: húzással a nézet eltolódik, a nagyítás továbbra is működik – senki sem forgatja el véletlenül a házat.",
+ "through_full": "Teljes képernyő",
+ "through_full_hint": "A kamera képe a teljes képernyőn (Esc vagy Vissza zárja be). Ha a böngésző ezt nem tudja, a Home Assistant kameranézete nyílik meg – ott hanggal is."
 }

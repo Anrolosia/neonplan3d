@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Każde gniazdo dostaje własną encję (przekaźnik, inteligentną wtyczkę) i opcjonalnie czujnik mocy; świeci na zielono, dopóki jest włączone. Ta sama encja może być na kilku gniazdach – dwa gniazdka na jednym przekaźniku.",
  "furn_lamp_fan": "Wentylator sufitowy z oświetleniem",
  "fan_entity": "Wentylator (encja fan)",
- "fan_hint": "Światło powyżej steruje lampą. Z wentylatorem łopatki obracają się z jego prędkością, a on dostaje własny symbol obok: dotknięcie go włącza lub wyłącza, długie przytrzymanie ustawia prędkość."
+ "fan_hint": "Światło powyżej steruje lampą. Z wentylatorem łopatki obracają się z jego prędkością, a on dostaje własny symbol obok: dotknięcie go włącza lub wyłącza, długie przytrzymanie ustawia prędkość.",
+ "angle_lock": "Blokada 3D",
+ "angle_lock_hint": "Kąt pozostaje stały: przeciąganie przesuwa widok, powiększanie nadal działa – nikt nie obróci domu przypadkiem.",
+ "through_full": "Pełny ekran",
+ "through_full_hint": "Obraz z kamery na całym ekranie (Esc lub Wstecz kończy). Gdy przeglądarka tego nie potrafi, otwiera się widok kamery Home Assistant – tam także z dźwiękiem."
 }

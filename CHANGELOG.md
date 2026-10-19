@@ -8,6 +8,9 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- **3D lock** (🔒 in the view settings, card `angle_lock: true`): the angle stays fixed, a drag moves the view, zooming still works – for wall tablets (idea from dlavrantonis' fork).
+- Looking through a camera: **⛶ Full screen** for the camera picture; where the browser cannot, Home Assistant's camera view opens (with sound) – idea from dlavrantonis' fork.
+- Room devices: a device's further entities (under "more") can be hidden (👁) or shown without state (Aa) on their own (D484).
 - **Ceiling fan with light** (Furniture → Lights): the light switches the lamp, a fan entity turns the blades with its speed; the fan gets its own symbol with its speed (tap: on/off, hold: speed). Blades only move while the fan runs, at a reduced frame rate (D606).
 - **Light switches and sockets** (Furniture → Switches & sockets): 1–4 gangs in a frame, each with its own entity. A gang glows while it is on (a light in its colour, a socket green). A socket can also have a power sensor and then counts as a consumer. A tap switches the entity; several gangs open a small menu. The same entity may sit on several sockets, e.g. two sockets on one relay, or indoor and outdoor (#593, D523, D540).
 - LED strips can **rise** along their length (Rise °), e.g. up the stairs or along a handrail; light and glow climb with them (D539).
@@ -21,6 +24,9 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
+- A lamp under a high worktop step (stairs built from worktops) jumped onto the step: what fits under a worktop from 1.2 m up stays on the floor (#614).
+- Washer and dryer glowed with a square patch over their round door; now a ring of light runs round the door (#516).
+- Roof windows shown over the room: the pane was opaque, so a closed blind was hard to tell; the pane is see-through now and the blind has slats like the wall windows' (#598).
 - Furniture packs: on Home Assistant 2026.9 and newer a pack with an item kind this version does not know yet showed "invalid content" instead of asking for an update (pointed out by hohoanganh).
 - Waste bins in the Blueprint and Day looks: the lower half fell back to the look's grey; coloured bins now keep their colour down to the ground (#609, thanks TheBhim).
 

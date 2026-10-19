@@ -257,7 +257,7 @@ export interface ScreenState {
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
   // "gang": one rocker or socket of a wall switch or socket (`index` of `of`)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang"; color: [number, number, number]; level: number; index?: number; of?: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang" | "drum"; color: [number, number, number]; level: number; index?: number; of?: number }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -579,6 +579,7 @@ export class FloorplanViewer {
     wins: Group;
     winSolid: MeshBasicMaterial;
     winLines: LineBasicMaterial;
+    winGlass: MeshBasicMaterial;
   } | null = null;
   /** The hologram's anchor: a point on the solar field (building coordinates) and the field's normal. */
   private anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null; near?: number }[] = [];
@@ -789,6 +790,11 @@ export class FloorplanViewer {
   /** Switching from one floor to another keeps the camera where it is (only its height follows), #191. */
   setKeepView(on: boolean): void {
     this.keepView = on;
+  }
+
+  /** 3D lock: the angle stays where it is; dragging moves the view, zooming still works. */
+  setAngleLock(on: boolean): void {
+    this.controls.angleLock = on;
   }
 
   setFloor(floorId: string | null, animate = true): void {
@@ -2260,6 +2266,7 @@ export class FloorplanViewer {
       this.roof.wins.traverse((o) => ((o as Mesh).geometry as BufferGeometry | undefined)?.dispose());
       this.roof.winSolid.dispose();
       this.roof.winLines.dispose();
+      this.roof.winGlass.dispose();
       this.scene.remove(this.roof.wins);
       this.scene.remove(this.roof.group);
       this.roof = null;
@@ -2278,6 +2285,8 @@ export class FloorplanViewer {
     const glass = themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, side: DoubleSide, depthWrite: false }), this.themeUniform);
     const wins = new Group();
     const winSolid = themed(new MeshBasicMaterial({ vertexColors: true, side: DoubleSide }), this.themeUniform);
+    // the glass of the windows over a room: see-through like the windows in the walls (#598)
+    const winGlass = themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.35, side: DoubleSide, depthWrite: false }), this.themeUniform);
     const winLines = themed(new LineBasicMaterial({ vertexColors: true, transparent: true, blending: lineBlending(this.theme), depthWrite: false }), this.themeUniform, true);
     const below: { floorId: string; win: Group }[] = [];
     const parts = geos.map((geo) => {
@@ -2299,18 +2308,22 @@ export class FloorplanViewer {
       }
       // roof windows that only show in the roof ride and fade with it
       if (geo.winRoof?.solid.count) part.add(new Mesh(geo.winRoof.solid.geometry(), winSolid), new LineSegments(geo.winRoof.lines.geometry(), winLines));
+      // their glass fades with the roof's canopy glass
+      if (geo.winRoof?.glass.count) part.add(new Mesh(geo.winRoof.glass.geometry(), glass));
       part.renderOrder = 8;
       group.add(part);
       let win: Group | null = null;
-      if (geo.win?.solid.count) {
+      if (geo.win?.solid.count || geo.win?.glass.count) {
         win = new Group();
         win.add(new Mesh(geo.win.solid.geometry(), winSolid), new LineSegments(geo.win.lines.geometry(), winLines));
+        if (geo.win.glass.count) win.add(new Mesh(geo.win.glass.geometry(), winGlass));
         wins.add(win);
       }
       for (const [floorId, w] of geo.winBelow ?? []) {
-        if (!w.solid.count) continue;
+        if (!w.solid.count && !w.glass.count) continue;
         const g = new Group();
         g.add(new Mesh(w.solid.geometry(), winSolid), new LineSegments(w.lines.geometry(), winLines));
+        if (w.glass.count) g.add(new Mesh(w.glass.geometry(), winGlass));
         wins.add(g);
         below.push({ floorId, win: g });
       }
@@ -2319,7 +2332,7 @@ export class FloorplanViewer {
     group.renderOrder = 8;
     this.scene.add(group);
     this.scene.add(wins);
-    this.roof = { group, parts, below, solid, lines, glass, live, lives, wins, winSolid, winLines };
+    this.roof = { group, parts, below, solid, lines, glass, live, lives, wins, winSolid, winLines, winGlass };
     this.placeRoof();
   }
 
@@ -3008,6 +3021,29 @@ export class FloorplanViewer {
               // the screen material is double-sided: one winding is enough (both would add up twice)
               buf.tri(p00, p10, p11, col);
               buf.tri(p00, p11, p01, col);
+            }
+            continue;
+          }
+          if (face.part === "drum") {
+            // a washer's or dryer's round door: a ring of light round the glass and a faint glow inside (#516)
+            const aw = Math.abs(w);
+            const r = Math.min(aw * 0.36, (h - 0.2) * 0.42);
+            const cy = base + (h - 0.14) / 2 + 0.04;
+            const zf = d / 2 - 0.006;
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.35 + 0.65 * face.level))) as [number, number, number]);
+            const glass = col.clone().multiplyScalar(0.12);
+            const dark = new Color(0, 0, 0);
+            const n = 28;
+            const at = (a: number, rr: number) => P(Math.cos(a) * rr, cy + Math.sin(a) * rr, zf);
+            for (let i = 0; i < n; i++) {
+              const a0 = (i / n) * Math.PI * 2;
+              const a1 = ((i + 1) / n) * Math.PI * 2;
+              // the glass, the bright ring and its soft halo on the front
+              buf.tri(P(0, cy, zf), at(a0, r * 0.78), at(a1, r * 0.78), glass);
+              buf.tri(at(a0, r * 0.78), at(a0, r), at(a1, r), col);
+              buf.tri(at(a0, r * 0.78), at(a1, r), at(a1, r * 0.78), col);
+              buf.tri(at(a0, r), at(a0, r * 1.18), at(a1, r * 1.18), col, dark, dark);
+              buf.tri(at(a0, r), at(a1, r * 1.18), at(a1, r), col, dark, col);
             }
             continue;
           }

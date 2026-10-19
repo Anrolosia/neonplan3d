@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Chaque prise reçoit sa propre entité (le relais, la prise connectée) et, au besoin, un capteur de puissance ; elle brille en vert tant qu'elle est allumée. La même entité peut être sur plusieurs prises – deux prises sur un relais.",
  "furn_lamp_fan": "Ventilateur de plafond avec lumière",
  "fan_entity": "Ventilateur (entité fan)",
- "fan_hint": "La lumière ci-dessus commande la lampe. Avec un ventilateur, les pales tournent à sa vitesse et il a son propre symbole à côté : un appui l'allume ou l'éteint, un appui long règle la vitesse."
+ "fan_hint": "La lumière ci-dessus commande la lampe. Avec un ventilateur, les pales tournent à sa vitesse et il a son propre symbole à côté : un appui l'allume ou l'éteint, un appui long règle la vitesse.",
+ "angle_lock": "Verrou 3D",
+ "angle_lock_hint": "L'angle reste fixe : glisser déplace la vue, le zoom fonctionne toujours – personne ne tourne la maison par erreur.",
+ "through_full": "Plein écran",
+ "through_full_hint": "L'image de la caméra sur tout l'écran (Échap ou Retour pour quitter). Si le navigateur ne le permet pas, la vue caméra de Home Assistant s'ouvre – avec le son."
 }

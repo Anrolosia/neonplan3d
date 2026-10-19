@@ -1404,10 +1404,20 @@ export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: strin
   }
 }
 
-export function surfaceHeight(floor: Floor, x: number, z: number): number {
+/** A worktop is only its slab; above this height its underside leaves room to stand things under it. */
+const WORKTOP_SLAB = 0.04;
+const HIGH_SLAB = 1.2;
+
+/**
+ * Where something placed at (x, z) stands: on the highest surface there (a table, a worktop), else the floor. A
+ * worktop high up (a step of stairs built from worktops, a shelf board) has room beneath it: what fits under it stays
+ * on the floor (#614) – one at kitchen or bar height still carries what is put on it.
+ */
+export function surfaceHeight(floor: Floor, x: number, z: number, itemH = 0): number {
   let top = 0;
   for (const f of floor.furniture) {
     if (!(SURFACES.has(f.type) || packItem(f.type)?.surface) || !pointInPolygon([x, z], furnitureFootprint(f))) continue;
+    if (f.type === "worktop" && itemH > 0 && f.h - WORKTOP_SLAB >= HIGH_SLAB && itemH <= f.h - WORKTOP_SLAB - 0.02) continue;
     top = Math.max(top, f.h);
   }
   return top;

@@ -1934,5 +1934,9 @@
  "gang_socket_hint": "Kvar kontakt får si eiga entitet (releet, smartpluggen) og om ønskeleg ein effektsensor; han lyser grønt så lenge han er på. Same entitet kan sitje på fleire kontaktar – to stikkontaktar på eitt rele.",
  "furn_lamp_fan": "Takvifte med lys",
  "fan_entity": "Vifte (fan-entitet)",
- "fan_hint": "Lyset over styrer lampa. Med ei vifte går blada rundt med trinnet, og ho får sitt eige symbol ved sida av: eit trykk slår henne av og på, eit langt trykk stiller inn trinnet."
+ "fan_hint": "Lyset over styrer lampa. Med ei vifte går blada rundt med trinnet, og ho får sitt eige symbol ved sida av: eit trykk slår henne av og på, eit langt trykk stiller inn trinnet.",
+ "angle_lock": "3D-lås",
+ "angle_lock_hint": "Vinkelen står fast: dra flyttar visinga, zoom verkar framleis – ingen snur huset ved eit uhell.",
+ "through_full": "Fullskjerm",
+ "through_full_hint": "Kamerabiletet på heile skjermen (Esc eller Tilbake avsluttar). Kan ikkje nettlesaren det, opnar kameravisinga i Home Assistant seg – der òg med lyd."
 }
