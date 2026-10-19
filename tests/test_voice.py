@@ -64,6 +64,8 @@ async def test_intent_speaks_the_answer_or_that_nothing_was_understood(hass: Hom
     await _setup(hass)
     view = await _view(hass_ws_client, hass)
 
+    ids = iter(range(10, 100))
+
     async def answer(text: str, answered: bool) -> intent.IntentResponse:
         task = hass.async_create_task(
             intent.async_handle(hass, "test", "NeonPlanAsk", {"text": {"value": text}}, text_input=text, language="de")
@@ -72,7 +74,7 @@ async def test_intent_speaks_the_answer_or_that_nothing_was_understood(hass: Hom
         assert ask["text"] == text
         await view.send_json(
             {
-                "id": 99,
+                "id": next(ids),
                 "type": "neonplan3d/voice/answer",
                 "ask_id": ask["ask_id"],
                 "text": "Drei Fenster sind offen.",

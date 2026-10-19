@@ -239,6 +239,10 @@ def validate_payload(payload: Any) -> dict[str, Any]:
         if unknown:
             # a Pro add-on newer than this installation (#218): ask for an update, not a cryptic error
             raise PackError("needs_update", ", ".join(unknown))
+    # a module written for a newer loader: an update, not a broken pack
+    module = payload.get("module") if isinstance(payload, dict) else None
+    if isinstance(module, dict) and isinstance(module.get("api"), int) and module["api"] > 1:
+        raise PackError("needs_update", f"module api {module['api']}")
     try:
         clean = PAYLOAD_SCHEMA(payload)
     except vol.Invalid as err:

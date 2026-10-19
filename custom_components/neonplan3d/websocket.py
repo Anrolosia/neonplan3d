@@ -229,7 +229,7 @@ def ws_modules_code(hass: HomeAssistant, connection: websocket_api.ActiveConnect
         return
     pack = next((p for p in data.packs if p["id"] == msg["pack_id"]), None)
     module = pack.get("module") if pack else None
-    if not isinstance(module, dict) or not isinstance(module.get("code"), str):
+    if pack is None or not isinstance(module, dict) or not isinstance(module.get("code"), str):
         connection.send_error(msg["id"], "not_found", "no such module")
         return
     connection.send_result(
