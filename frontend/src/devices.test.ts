@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { climateModeGlow, cooktopLevel, onlyColor, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
+import { isRelevant, climateModeGlow, cooktopLevel, onlyColor, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -751,4 +751,20 @@ test("a lamp with one colour only glows for that colour (customer mail: yellow =
   assert.equal(onlyColor(g([0, 0.3, 1]), "#ffd400"), null);
   assert.equal(onlyColor(g([1, 0.95, 0.9]), "#ffd400"), null);
   assert.ok(onlyColor(g([1, 0, 0]), null));
+});
+
+test("water values of a pool count as sensors: pH by its class, redox and salt by their units (D600)", () => {
+  const hass = {
+    states: {
+      "sensor.pool_ph": { entity_id: "sensor.pool_ph", state: "7.2", attributes: { device_class: "ph" } },
+      "sensor.pool_redox": { entity_id: "sensor.pool_redox", state: "720", attributes: { unit_of_measurement: "mV" } },
+      "sensor.pool_salt": { entity_id: "sensor.pool_salt", state: "3200", attributes: { unit_of_measurement: "mg/L" } },
+      "sensor.pool_firmware": { entity_id: "sensor.pool_firmware", state: "1.2", attributes: {} },
+    },
+    entities: {},
+  } as unknown as Parameters<typeof isRelevant>[0];
+  assert.equal(isRelevant(hass, "sensor.pool_ph"), true);
+  assert.equal(isRelevant(hass, "sensor.pool_redox"), true);
+  assert.equal(isRelevant(hass, "sensor.pool_salt"), true);
+  assert.equal(isRelevant(hass, "sensor.pool_firmware"), false);
 });

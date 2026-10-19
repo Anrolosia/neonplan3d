@@ -2,6 +2,7 @@
 
 ### Fixed
 
+- **Pool values (discussion #600):** pH, redox/ORP (mV), salt (mg/L, ppm) and conductivity sensors were left out of a room's or area's devices – only the water temperature showed. They count now. Thanks @Deninho91, and @Anrolosia for finding the cause!
 - **Waste bin colours in Blueprint and Day (#609):** the bins lost their colours in the light looks (only the yellow lid stayed). They now keep their full colour in every look. Thanks @TheBhim!
 - **Waste bins showed "in 2026 days" (Household Pro):** a sensor that shows a date, like Waste Collection Schedule's "on Mon, 26.10.2026", was read as a number – since 1.20.1 the year, before that the day of the month. A date in the text is now read as a date (also "28.10.", "29/10/2026", "2026-10-29"). Thanks km65 and the Discord beta testers!
 - **Light well switch missing (discussion #575):** the **Light well** tick in a cellar window's form did not show unless the plan had its own ground height, so light wells could not be switched off. It shows now for every window below the ground. Thanks @LortusX and @1970lexi!
@@ -26,6 +27,7 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ### Behoben
 
+- **Pool-Werte (Diskussion #600):** pH-, Redox- (mV), Salz- (mg/L, ppm) und Leitfähigkeitssensoren fehlten bei den Geräten eines Raums oder einer Fläche – nur die Wassertemperatur erschien. Jetzt zählen sie mit. Danke an @Deninho91 und an @Anrolosia fürs Finden der Ursache!
 - **Mülltonnen-Farben in Blueprint und Tag (#609):** In den hellen Looks verloren die Tonnen ihre Farben (nur der gelbe Deckel blieb). Jetzt behalten sie in jedem Look ihre volle Farbe. Danke an @TheBhim!
 - **Mülltonnen zeigten „in 2026 Tagen“ (Haushalt Pro):** Ein Sensor, der ein Datum zeigt, etwa „on Mon, 26.10.2026“ von Waste Collection Schedule, wurde als Zahl gelesen – seit 1.20.1 das Jahr, davor der Tag im Monat. Jetzt wird ein Datum im Text als Datum gelesen (auch „28.10.“, „29/10/2026“, „2026-10-29“). Danke an km65 und die Beta-Tester im Discord!
 - **Lichtschacht-Haken fehlte (Diskussion #575):** Der Haken **Lichtschacht** im Formular eines Kellerfensters erschien nur, wenn der Plan eine eigene Geländehöhe hatte. Lichtschächte ließen sich so nicht abschalten. Jetzt erscheint er bei jedem Fenster unter dem Gelände. Danke an @LortusX und @1970lexi!

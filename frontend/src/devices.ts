@@ -61,9 +61,15 @@ const SENSOR_CLASSES = new Set([
   "nitrogen_dioxide",
   "moisture",
   "sound_pressure",
+  // water values of a pool or a pond (D600): pH, and conductivity for salt
+  "ph",
+  "conductivity",
 ]);
-/** Sensors without a class still count when their unit is a meter's (e.g. older meter readers). */
-const METER_UNITS = new Set(["m³", "m3", "L", "l", "kWh", "Wh", "MWh", "lx"]);
+/**
+ * Sensors without a class still count when their unit is a meter's (e.g. older meter readers) or a water value's:
+ * redox / ORP in mV, salt or chlorine in mg/L or ppm, conductivity in µS/cm (D600).
+ */
+const METER_UNITS = new Set(["m³", "m3", "L", "l", "kWh", "Wh", "MWh", "lx", "mV", "mg/L", "mg/l", "ppm", "µS/cm", "μS/cm", "mS/cm"]);
 const BINARY_CLASSES = new Set(["door", "window", "opening", "garage_door", "motion", "occupancy", "presence", "smoke", "moisture", "gas", "carbon_monoxide"]);
 
 /** Order in lists and panels. */
