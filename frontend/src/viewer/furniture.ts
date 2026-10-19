@@ -402,12 +402,26 @@ function fridge(b: Builder, w: number, d: number, h: number): void {
 const tone = (hex: string, k: number) => shade(parseInt(hex.slice(1), 16), k).getHex();
 
 /**
+ * The blueprint and day looks keep only bright, strong colours and turn the rest into their own tones: waste bins
+ * are drawn in their full colour there, or a brown or blue bin turns blue or grey like any cupboard (#609).
+ */
+let lightLook = false;
+export function setLightLook(on: boolean): void {
+  lightLook = on;
+}
+
+/**
  * A waste bin in its shape and colours (household.ts): wheelie bins taper to the bottom and have their wheels and
  * handle at the back (-z), a 1100 l container stands on four castors, a sack is tied at the top.
  */
 function wasteBin(b: Builder, w: number, d: number, h: number, shape: BinShape, colors: [string, string]): void {
-  const body = tone(colors[0], 0.55);
-  const lid = tone(colors[1], 0.8);
+  // in the light looks at least as bright as the looks keep a colour (a dark brown or green bin too)
+  const full = (hex: string) => {
+    const mx = Math.max(...new Color(hex).toArray());
+    return tone(hex, mx > 0.05 ? Math.max(1, 0.62 / mx) : 1);
+  };
+  const body = lightLook ? full(colors[0]) : tone(colors[0], 0.55);
+  const lid = lightLook ? full(colors[1]) : tone(colors[1], 0.8);
   const lidTop = tone(colors[1], 1);
   if (shape === "bag") {
     // a full sack: wider in the middle, gathered and tied at the top
