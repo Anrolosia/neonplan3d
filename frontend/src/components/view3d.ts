@@ -100,6 +100,7 @@ import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
 import { openingHost, pointOnRoomEdge } from "../geometry/walls.ts";
+import { signedArea } from "../model.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
@@ -4065,8 +4066,15 @@ export class Fp3dView3d extends LitElement {
         this.directing.touch(Date.now());
         if (own.highlight?.length) this.viewer?.flashDevices(own.highlight);
         const f = own.focus;
-        if (own.tour?.length) this.runTour(own.tour, b, items);
-        else if (f?.roomId && f.floorId) {
+        if (own.tour?.length) {
+          // the intro is spoken first, then the tour speaks at its stops
+          const talk = own.speak !== false ? (t: string) => v.speak(hass, t, voicePipeline()) : null;
+          const intro = own.spoken ?? own.text;
+          if (intro && talk) await talk(intro);
+          void this.runTour(own.tour, b, items, talk);
+          return;
+        }
+        if (f?.roomId && f.floorId) {
           if (this.floorId !== f.floorId) this.fire("floor-tap", { floorId: f.floorId });
           setTimeout(() => this.fire("room-tap", { floorId: f.floorId, roomId: f.roomId }), 60);
         } else if (f?.floorId && !f.entity && !f.furnitureId) this.fire("floor-tap", { floorId: f.floorId });
@@ -4133,15 +4141,27 @@ export class Fp3dView3d extends LitElement {
     return { devices, items, spoken };
   }
 
-  /** Where an opening of the plan is: the middle of its frame, at the height of its middle (null: not drawn). */
-  private openingSpot(b: Building, openingId: string): { floorId: string; x: number; z: number; y: number } | null {
+  /**
+   * Where an opening of the plan is: the middle of its frame at the height of its middle, and from which side to
+   * look at it – from inside its room (null: not drawn).
+   */
+  private openingSpot(b: Building, openingId: string): { floorId: string; x: number; z: number; y: number; theta: number } | null {
     for (const floor of b.floors) {
       const o = floor.openings.find((x) => x.id === openingId);
       if (!o) continue;
       const host = openingHost(o, floor.rooms, floor.walls ?? []);
       if (!host) return null;
+      const pts = host.room.points;
+      const p = pts[host.edge];
+      const q = pts[(host.edge + 1) % pts.length];
+      const len = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1;
+      const d = [(q[0] - p[0]) / len, (q[1] - p[1]) / len];
+      // the room lies to the left of the edge when its outline runs counter-clockwise, else to the right
+      const left = signedArea(pts) > 0;
+      const n = left ? [-d[1], d[0]] : [d[1], -d[0]];
       const [x, z] = pointOnRoomEdge(host.room, host.edge, o.offset + o.width / 2);
-      return { floorId: floor.id, x, z, y: Math.max(0.5, o.sill + o.height / 2) };
+      // the camera stands on the room side: its horizontal offset from the target points along n
+      return { floorId: floor.id, x: x + n[0] * 0.2, z: z + n[1] * 0.2, y: Math.max(0.5, o.sill + o.height / 2), theta: Math.atan2(n[0], n[1]) };
     }
     return null;
   }
@@ -4150,17 +4170,20 @@ export class Fp3dView3d extends LitElement {
    * A tour (a module's answer): the view flies to each stop – an open window, a running appliance – and stays
    * there a moment before the next. A tap on the house, or the next spoken sentence, ends it.
    */
-  private runTour(stops: NonNullable<VoiceAnswer["tour"]>, b: Building, items: Map<string, SearchItem>): void {
+  private async runTour(stops: NonNullable<VoiceAnswer["tour"]>, b: Building, items: Map<string, SearchItem>, speak: ((text: string) => Promise<boolean>) | null): Promise<void> {
     const token = ++this.tourToken;
     clearTimeout(this.tourTimer);
     const spots = stops
       .map((s) => {
-        if (s.openingId) return this.openingSpot(b, s.openingId);
+        if (s.openingId) {
+          const spot = this.openingSpot(b, s.openingId);
+          return spot ? { ...spot, entity: null as string | null, say: s.say, inside: true } : null;
+        }
         const item = items.get(s.entity ?? `furniture:${s.furnitureId}`);
-        return item ? { floorId: item.floorId, x: item.x, z: item.z, y: item.y, entity: item.entity } : null;
+        return item ? { floorId: item.floorId, x: item.x, z: item.z, y: item.y, theta: undefined as number | undefined, entity: item.entity, say: s.say, inside: false } : null;
       })
       .filter((s): s is NonNullable<typeof s> => !!s)
-      .slice(0, 6);
+      .slice(0, 8);
     if (!spots.length) return;
     const stage = this.renderRoot.querySelector(".fp3d-stage");
     const stop = () => {
@@ -4168,19 +4191,24 @@ export class Fp3dView3d extends LitElement {
       clearTimeout(this.tourTimer);
     };
     stage?.addEventListener("pointerdown", stop, { once: true });
-    const go = (i: number) => {
-      if (token !== this.tourToken || i >= spots.length) {
-        stage?.removeEventListener("pointerdown", stop);
-        return;
+    const wait = (ms: number) => new Promise<void>((r) => (this.tourTimer = setTimeout(r, ms)));
+    for (const s of spots) {
+      if (token !== this.tourToken) break;
+      if (this.floorId !== s.floorId) {
+        this.fire("floor-tap", { floorId: s.floorId });
+        await wait(150);
       }
-      const s = spots[i];
-      if (this.floorId !== s.floorId) this.fire("floor-tap", { floorId: s.floorId });
-      setTimeout(() => {
-        if (token === this.tourToken) this.viewer?.focus(s.floorId, s.x, s.z, s.y, "entity" in s ? (s.entity ?? null) : null);
-      }, 120);
-      this.tourTimer = setTimeout(() => go(i + 1), 3000);
-    };
-    go(0);
+      if (token !== this.tourToken) break;
+      // an opening is looked at from inside its room, closer and lower than a device
+      this.viewer?.focus(s.floorId, s.x, s.z, s.y, s.entity, s.inside ? { radius: 3.2, phi: 1.05, theta: s.theta } : undefined);
+      await wait(900);
+      if (token !== this.tourToken) break;
+      // the words of this stop are spoken here, and the next stop waits for them
+      const spoken = s.say && speak ? await speak(s.say) : false;
+      if (token !== this.tourToken) break;
+      await wait(spoken ? 1200 : 2600);
+    }
+    stage?.removeEventListener("pointerdown", stop);
   }
 
   /** The plan's doors, windows, garage doors and roof windows by their entities, each with its room's name. */

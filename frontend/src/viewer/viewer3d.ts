@@ -4188,10 +4188,10 @@ export class FloorplanViewer {
   }
 
   /** Fly to a point of a floor (search) and let the device there flash. */
-  focus(floorId: string, x: number, z: number, y: number, entityId: string | null): void {
+  focus(floorId: string, x: number, z: number, y: number, entityId: string | null, view?: { radius?: number; phi?: number; theta?: number }): void {
     const fv = this.floorMap.get(floorId);
     if (!fv) return;
-    this.controls.flyTo({ target: new Vector3(x, fv.floor.elevation + fv.ty + y, z), radius: 5.5, phi: 0.78 }, 900);
+    this.controls.flyTo({ target: new Vector3(x, fv.floor.elevation + fv.ty + y, z), radius: view?.radius ?? 5.5, phi: view?.phi ?? 0.78, ...(view?.theta !== undefined ? { theta: view.theta } : {}) }, 900);
     if (entityId) {
       this.flashes.set(entityId, performance.now() + 2400);
       const pin = this.host.querySelector<HTMLElement>(`.fp3d-dev[data-entity="${CSS.escape(entityId)}"]`);

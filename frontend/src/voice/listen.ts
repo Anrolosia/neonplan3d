@@ -204,6 +204,16 @@ export async function speak(hass: HomeAssistant, text: string, chosen: string | 
   try {
     const audio = new Audio(url.startsWith("http") ? url : new URL(url, location.origin).href);
     await audio.play();
+    // resolves when the words are spoken (a tour waits for them); never hangs on a stalled stream
+    await new Promise<void>((done) => {
+      const stop = setTimeout(done, 20000);
+      const end = () => {
+        clearTimeout(stop);
+        done();
+      };
+      audio.addEventListener("ended", end, { once: true });
+      audio.addEventListener("error", end, { once: true });
+    });
     return true;
   } catch {
     return false;

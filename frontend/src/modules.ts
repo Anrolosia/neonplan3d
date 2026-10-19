@@ -12,13 +12,15 @@ export const MODULE_API = 1;
 export interface VoiceAnswer {
   /** The answer (shown as a bubble, spoken when `speak` is not false); empty when only something is shown. */
   text?: string;
+  /** What is spoken instead of `text` (a short intro before a tour whose stops speak for themselves). */
+  spoken?: string;
   speak?: boolean;
   /** Where to fly: a device by its entity, a piece of furniture, a room or a floor. */
   focus?: { entity?: string; furnitureId?: string; roomId?: string; floorId?: string } | null;
   /** Devices that flash in 3D (the open windows, the appliances running). */
   highlight?: string[];
   /** A tour: the view flies to each stop in turn (an open window, a running appliance) and stays a moment; a tap ends it. */
-  tour?: { entity?: string; furnitureId?: string; openingId?: string }[];
+  tour?: { entity?: string; furnitureId?: string; openingId?: string; say?: string }[];
 }
 
 /** A piece of furniture or a placed device the house knows, with where it stands. */
