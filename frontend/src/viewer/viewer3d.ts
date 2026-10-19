@@ -161,6 +161,8 @@ export interface DeviceMarker {
   /** LED strip: roll about its length (degrees) and standing upright (its length runs up from the base). */
   roll?: number;
   upright?: boolean;
+  /** LED strip: rising along its length (degrees; D539). */
+  rise?: number;
   /** Show the HTML marker (false: the 3D object alone stands for the device). */
   pin?: boolean;
   /** A placed device fixed against moving. */
@@ -1831,7 +1833,11 @@ export class FloorplanViewer {
         const sideways = !!d.upright || Math.abs(d.roll ?? 0) > 45;
         for (const t of [-1 / 3, 0, 1 / 3]) {
           if (d.upright) out.push({ x: d.x, y: base + w * (0.5 + t), z: d.z, color, level: glow.level * 0.55, kind: "omni", room });
-          else out.push({ x: d.x + Math.cos(a) * w * t, y, z: d.z + Math.sin(a) * w * t, color, level: glow.level * 0.55, kind: sideways ? "omni" : kind, room });
+          else {
+            // a rising strip: its sources climb with it
+            const r = (d.rise ?? 0) * DEG;
+            out.push({ x: d.x + Math.cos(a) * w * t * Math.cos(r), y: y + Math.sin(r) * w * t, z: d.z + Math.sin(a) * w * t * Math.cos(r), color, level: glow.level * 0.55, kind: sideways || r ? "omni" : kind, room });
+          }
         }
       } else out.push({ x: d.x, y, z: d.z, color, level: glow.level, kind, room });
     }
@@ -2565,7 +2571,7 @@ export class FloorplanViewer {
     const shapeSig =
       this.wallMode +
       (this.lowQuality ? "L" : this.highQuality ? "H" : "M") +
-      lamps.map((d) => `${d.id},${d.lamp ?? d.model},${d.variant},${d.x},${d.z},${d.y},${d.rotation ?? 0},${d.roll ?? 0},${d.upright ? 1 : 0},${d.size?.join("/")},${d.base ?? 0},${d.pack ?? ""},${d.mirror ? 1 : 0}`).join(";");
+      lamps.map((d) => `${d.id},${d.lamp ?? d.model},${d.variant},${d.x},${d.z},${d.y},${d.rotation ?? 0},${d.roll ?? 0},${d.upright ? 1 : 0},${d.rise ?? 0},${d.size?.join("/")},${d.base ?? 0},${d.pack ?? ""},${d.mirror ? 1 : 0}`).join(";");
     const glows = lamps.map((d) => this.glowOf(d));
     const colorSig = lamps.map((d, i) => `${flash(d.id)},${glows[i] ? `${glows[i]!.level.toFixed(3)},${glows[i]!.color.map((c) => c.toFixed(3)).join("/")}` : "off"}`).join(";");
     if (shapeSig !== fv.lampShapeSig || !fv.lampMesh.geometry.getAttribute("position")) {
@@ -2854,6 +2860,11 @@ export class FloorplanViewer {
           if (d.upright) {
             // an upright strip glows up its length
             hp.push(d.x, base + w * (0.5 + t), d.z);
+            hc.push(...glow.color.map((c) => c * glow.level * 0.7 * 0.6));
+          } else if (d.rise) {
+            // a rising strip glows along its slope
+            const r = d.rise * DEG;
+            hp.push(d.x + Math.cos(ang) * w * t * Math.cos(r), y + Math.sin(r) * w * t, d.z + Math.sin(ang) * w * t * Math.cos(r));
             hc.push(...glow.color.map((c) => c * glow.level * 0.7 * 0.6));
           } else push(d.x + Math.cos(ang) * w * t, d.z + Math.sin(ang) * w * t, 0.6);
         }
@@ -4596,7 +4607,7 @@ export function createViewer(host: HTMLElement, options?: ViewerOptions): Floorp
 /** Model of a lamp into a buffer (3D view and furniture previews); `H` is the ceiling height. */
 export function pushLampModel(
   buf: GeoBuffer,
-  d: Pick<DeviceMarker, "x" | "z" | "size" | "base" | "rotation" | "variant" | "roll" | "upright"> & { lamp: LampModel },
+  d: Pick<DeviceMarker, "x" | "z" | "size" | "base" | "rotation" | "variant" | "roll" | "upright" | "rise"> & { lamp: LampModel },
   H: number,
   shadeCol: number,
 ): void {
@@ -4701,7 +4712,7 @@ export function pushLampModel(
       // length it lies against a slope, standing upright it climbs from its mount height
       const t = Math.max(0.02, h);
       const y1 = d.base != null ? d.base + t : H - 0.04;
-      if (!d.roll && !d.upright) {
+      if (!d.roll && !d.upright && !d.rise) {
         box(-w / 2, w / 2, -dd / 2, dd / 2, y1 - t, y1, shadeCol);
         break;
       }
@@ -4710,10 +4721,13 @@ export function pushLampModel(
       const sr = Math.sin(roll);
       const cy = d.upright ? base + w / 2 : y1 - t / 2;
       // local: x along the length, y through the thickness, z across the depth
+      // rising along its length (D539): turned about its depth, its middle stays at its height
+      const rise = (d.upright ? 0 : (d.rise ?? 0)) * DEG;
       const P = (lx: number, ly: number, lz: number): number[] => {
         let x = lx;
         let y = ly * cr - lz * sr;
         const z = ly * sr + lz * cr;
+        if (rise) [x, y] = [x * Math.cos(rise) - y * Math.sin(rise), x * Math.sin(rise) + y * Math.cos(rise)];
         if (d.upright) [x, y] = [-y, x];
         return [d.x + x * ca - z * sa, cy + y, d.z + x * sa + z * ca];
       };

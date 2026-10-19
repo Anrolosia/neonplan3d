@@ -1916,5 +1916,7 @@
  "director_triggers": "自定义触发器",
  "director_triggers_hint": "当其中一个实体打开或开启时——第二个门铃、车库门、花园门——视图会飞过去并通过所选摄像头查看（没有摄像头时：飞到该设备）。",
  "director_trigger_entity": "触发器",
- "director_trigger_add": "+ 添加触发器"
+ "director_trigger_add": "+ 添加触发器",
+ "strip_rise": "上升角度（°）",
+ "strip_rise_hint": "灯带沿长度方向上升，例如沿楼梯或扶手（约 35–40°）。此时离地高度指其中点。"
 }

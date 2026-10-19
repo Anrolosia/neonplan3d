@@ -1916,5 +1916,7 @@
  "director_triggers": "Egne utløsere",
  "director_triggers_hint": "Når en av disse entitetene slås på eller åpnes – en ekstra dørklokke, garasjeporten, grinden –, flyr visningen dit og ser gjennom det valgte kameraet (uten kamera: til enheten).",
  "director_trigger_entity": "Utløser",
- "director_trigger_add": "+ Legg til utløser"
+ "director_trigger_add": "+ Legg til utløser",
+ "strip_rise": "Stigning (°)",
+ "strip_rise_hint": "Stripen stiger langs lengden, f.eks. opp trappen eller langs et rekkverk (~35–40°). Høyden over gulvet er da midten."
 }

@@ -247,6 +247,8 @@ export interface Furniture {
   mirror?: boolean;
   /** LED strip: tilt about its length (°; 0 = lying flat, 90 = its face points sideways, e.g. along a roof slope). */
   tilt?: number;
+  /** LED strip: rising along its length (°; up the stairs, a handrail; D539); its height above the floor is its middle. */
+  rise?: number;
   /** LED strip: standing upright – its length runs up from the mount height (door frame, light column). */
   upright?: boolean;
   /** Screens: pictures shown while an entity is in a state (first match wins; "*" = any state). */

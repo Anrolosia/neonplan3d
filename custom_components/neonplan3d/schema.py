@@ -292,6 +292,8 @@ FURNITURE_SCHEMA = vol.Schema(
         # LED strip: tilt about its length (degrees) and standing upright
         vol.Optional("tilt", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
         vol.Optional("upright", default=False): bool,
+        # LED strip: rising along its length (degrees), e.g. up the stairs
+        vol.Optional("rise"): vol.All(vol.Coerce(float), vol.Range(min=-80, max=80)),
         vol.Optional("pictures", default=[]): vol.All([_SCREEN_PICTURE_SCHEMA], vol.Length(max=20)),
         # screens: the screen around a rule picture is dark (default) or white
         vol.Optional("screen_bg", default="black"): vol.In(["black", "white"]),

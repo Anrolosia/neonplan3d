@@ -1916,5 +1916,7 @@
  "director_triggers": "Gatilhos próprios",
  "director_triggers_hint": "Quando uma destas entidades liga ou abre – uma segunda campainha, o portão da garagem, o portão do jardim –, a vista voa até lá e olha pela câmara escolhida (sem câmara: para o dispositivo).",
  "director_trigger_entity": "Gatilho",
- "director_trigger_add": "+ Adicionar gatilho"
+ "director_trigger_add": "+ Adicionar gatilho",
+ "strip_rise": "Subida (°)",
+ "strip_rise_hint": "A fita sobe ao longo do comprimento, p. ex. pela escada ou num corrimão (~35–40°). A altura acima do chão é então o seu centro."
 }

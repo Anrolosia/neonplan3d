@@ -1916,5 +1916,7 @@
  "director_triggers": "Egna utlösare",
  "director_triggers_hint": "När en av dessa entiteter slås på eller öppnas – en andra dörrklocka, garageporten, grinden –, flyger vyn dit och tittar genom den valda kameran (utan kamera: till enheten).",
  "director_trigger_entity": "Utlösare",
- "director_trigger_add": "+ Lägg till utlösare"
+ "director_trigger_add": "+ Lägg till utlösare",
+ "strip_rise": "Stigning (°)",
+ "strip_rise_hint": "Slingan stiger längs sin längd, t.ex. uppför trappan eller längs en ledstång (~35–40°). Höjden över golvet är då dess mitt."
 }

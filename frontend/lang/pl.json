@@ -1916,5 +1916,7 @@
  "director_triggers": "Własne wyzwalacze",
  "director_triggers_hint": "Gdy jedna z tych encji się włączy lub otworzy – drugi dzwonek, brama garażowa, furtka –, widok leci tam i patrzy przez wybraną kamerę (bez kamery: do urządzenia).",
  "director_trigger_entity": "Wyzwalacz",
- "director_trigger_add": "+ Dodaj wyzwalacz"
+ "director_trigger_add": "+ Dodaj wyzwalacz",
+ "strip_rise": "Wznios (°)",
+ "strip_rise_hint": "Taśma wznosi się wzdłuż swojej długości, np. po schodach lub wzdłuż poręczy (~35–40°). Wysokość nad podłogą to wtedy jej środek."
 }

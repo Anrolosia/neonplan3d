@@ -1916,5 +1916,7 @@
  "director_triggers": "Eigne utløysarar",
  "director_triggers_hint": "Når ein av desse entitetane vert slått på eller opna – ei ekstra dørklokke, garasjeporten, grinda –, flyg visinga dit og ser gjennom det valde kameraet (utan kamera: til eininga).",
  "director_trigger_entity": "Utløysar",
- "director_trigger_add": "+ Legg til utløysar"
+ "director_trigger_add": "+ Legg til utløysar",
+ "strip_rise": "Stigning (°)",
+ "strip_rise_hint": "Stripa stig langs lengda, t.d. opp trappa eller langs eit rekkverk (~35–40°). Høgda over golvet er då midten."
 }

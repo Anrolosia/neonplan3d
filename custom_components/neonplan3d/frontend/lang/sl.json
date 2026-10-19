@@ -1916,5 +1916,7 @@
  "director_triggers": "Lastni sprožilci",
  "director_triggers_hint": "Ko se ena od teh entitet vklopi ali odpre – drugi zvonec, garažna vrata, vrtna vrata –, pogled odleti tja in gleda skozi izbrano kamero (brez kamere: k napravi).",
  "director_trigger_entity": "Sprožilec",
- "director_trigger_add": "+ Dodaj sprožilec"
+ "director_trigger_add": "+ Dodaj sprožilec",
+ "strip_rise": "Vzpon (°)",
+ "strip_rise_hint": "Trak se dviga po svoji dolžini, npr. po stopnicah ali ob ograji (~35–40°). Višina nad tlemi je tedaj njegova sredina."
 }

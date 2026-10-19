@@ -1916,5 +1916,7 @@
  "director_triggers": "Déclencheurs personnels",
  "director_triggers_hint": "Quand l'une de ces entités s'allume ou s'ouvre – une deuxième sonnette, la porte du garage, le portail –, la vue s'y rend et regarde par la caméra choisie (sans caméra : vers l'appareil).",
  "director_trigger_entity": "Déclencheur",
- "director_trigger_add": "+ Ajouter un déclencheur"
+ "director_trigger_add": "+ Ajouter un déclencheur",
+ "strip_rise": "Montée (°)",
+ "strip_rise_hint": "Le ruban monte le long de sa longueur, p. ex. le long de l'escalier ou d'une main courante (~35–40°). Sa hauteur au-dessus du sol est alors son milieu."
 }

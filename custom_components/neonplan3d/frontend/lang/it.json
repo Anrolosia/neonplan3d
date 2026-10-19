@@ -1916,5 +1916,7 @@
  "director_triggers": "Attivatori propri",
  "director_triggers_hint": "Quando una di queste entità si accende o si apre – un secondo campanello, la porta del garage, il cancello –, la vista vola lì e guarda attraverso la telecamera scelta (senza: verso il dispositivo).",
  "director_trigger_entity": "Attivatore",
- "director_trigger_add": "+ Aggiungi attivatore"
+ "director_trigger_add": "+ Aggiungi attivatore",
+ "strip_rise": "Salita (°)",
+ "strip_rise_hint": "La striscia sale lungo la sua lunghezza, ad es. lungo le scale o un corrimano (~35–40°). L'altezza dal pavimento è allora il suo centro."
 }

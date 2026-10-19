@@ -1916,5 +1916,7 @@
  "director_triggers": "Egne udløsere",
  "director_triggers_hint": "Når en af disse entiteter tændes eller åbnes – en ekstra dørklokke, garageporten, havelågen –, flyver visningen derhen og kigger gennem det valgte kamera (uden kamera: til enheden).",
  "director_trigger_entity": "Udløser",
- "director_trigger_add": "+ Tilføj udløser"
+ "director_trigger_add": "+ Tilføj udløser",
+ "strip_rise": "Stigning (°)",
+ "strip_rise_hint": "Strimlen stiger langs sin længde, f.eks. op ad trappen eller langs et gelænder (~35–40°). Højden over gulvet er så dens midte."
 }

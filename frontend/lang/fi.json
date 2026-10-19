@@ -1916,5 +1916,7 @@
  "director_triggers": "Omat laukaisimet",
  "director_triggers_hint": "Kun jokin näistä entiteeteistä menee päälle tai auki – toinen ovikello, autotallin ovi, portti –, näkymä lentää sinne ja katsoo valitun kameran läpi (ilman kameraa: laitteeseen).",
  "director_trigger_entity": "Laukaisin",
- "director_trigger_add": "+ Lisää laukaisin"
+ "director_trigger_add": "+ Lisää laukaisin",
+ "strip_rise": "Nousu (°)",
+ "strip_rise_hint": "Nauha nousee pituutensa suuntaan, esim. portaita ylös tai kaidetta pitkin (~35–40°). Korkeus lattiasta on silloin sen keskikohta."
 }

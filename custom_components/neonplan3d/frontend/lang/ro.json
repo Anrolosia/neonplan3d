@@ -1916,5 +1916,7 @@
  "director_triggers": "Declanșatoare proprii",
  "director_triggers_hint": "Când una dintre aceste entități pornește sau se deschide – o a doua sonerie, ușa garajului, poarta –, vederea zboară acolo și privește prin camera aleasă (fără cameră: spre dispozitiv).",
  "director_trigger_entity": "Declanșator",
- "director_trigger_add": "+ Adaugă declanșator"
+ "director_trigger_add": "+ Adaugă declanșator",
+ "strip_rise": "Urcare (°)",
+ "strip_rise_hint": "Banda urcă pe lungimea ei, de ex. pe scări sau pe o balustradă (~35–40°). Înălțimea deasupra podelei este atunci mijlocul ei."
 }

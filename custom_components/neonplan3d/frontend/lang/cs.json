@@ -1916,5 +1916,7 @@
  "director_triggers": "Vlastní spouštěče",
  "director_triggers_hint": "Když se jedna z těchto entit zapne nebo otevře – druhý zvonek, garážová vrata, branka –, pohled tam přeletí a dívá se zvolenou kamerou (bez kamery: k zařízení).",
  "director_trigger_entity": "Spouštěč",
- "director_trigger_add": "+ Přidat spouštěč"
+ "director_trigger_add": "+ Přidat spouštěč",
+ "strip_rise": "Stoupání (°)",
+ "strip_rise_hint": "Pásek stoupá po své délce, např. podél schodů nebo madla (~35–40°). Výška nad podlahou je pak jeho střed."
 }

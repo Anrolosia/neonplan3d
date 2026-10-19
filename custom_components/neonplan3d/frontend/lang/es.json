@@ -1916,5 +1916,7 @@
  "director_triggers": "Disparadores propios",
  "director_triggers_hint": "Cuando una de estas entidades se enciende o se abre – un segundo timbre, la puerta del garaje, la cancela –, la vista vuela allí y mira por la cámara elegida (sin cámara: hacia el dispositivo).",
  "director_trigger_entity": "Disparador",
- "director_trigger_add": "+ Añadir disparador"
+ "director_trigger_add": "+ Añadir disparador",
+ "strip_rise": "Subida (°)",
+ "strip_rise_hint": "La tira sube a lo largo de su longitud, p. ej. por la escalera o un pasamanos (~35–40°). Su altura sobre el suelo es entonces su centro."
 }

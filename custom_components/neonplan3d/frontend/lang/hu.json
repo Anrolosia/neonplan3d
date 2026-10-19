@@ -1916,5 +1916,7 @@
  "director_triggers": "Saját indítók",
  "director_triggers_hint": "Ha ezek közül valamelyik entitás bekapcsol vagy kinyílik – egy második csengő, a garázskapu, a kertkapu –, a nézet odarepül, és a választott kamerán át néz (kamera nélkül: az eszközhöz).",
  "director_trigger_entity": "Indító",
- "director_trigger_add": "+ Indító hozzáadása"
+ "director_trigger_add": "+ Indító hozzáadása",
+ "strip_rise": "Emelkedés (°)",
+ "strip_rise_hint": "A szalag a hossza mentén emelkedik, pl. a lépcsőn felfelé vagy a korlát mentén (~35–40°). A padló feletti magasság ekkor a közepe."
 }
