@@ -582,6 +582,7 @@ export class FloorplanViewer {
   private roofO = 0;
   /** The roof stays put while the camera comes close (no lift, no fade): the editor's roof tool, or a choice of the viewer. */
   private keepRoof = false;
+  private hideRoof = false;
   /** Robot vacuums: their info from Home Assistant, how they move, and their meshes. */
   private robots = new Map<string, { info: RobotInfo; motion: RobotMotion; group: Group; led: MeshBasicMaterial }>();
   private robotGeo: BufferGeometry | null = null;
@@ -793,6 +794,13 @@ export class FloorplanViewer {
     if (mode === this.floorStack) return;
     this.floorStack = mode;
     this.applyTargets(false);
+  }
+
+  /** Leave the roof out altogether (a card option, D601): the house looks as if it had none. */
+  setHideRoof(on: boolean): void {
+    if (on === this.hideRoof) return;
+    this.hideRoof = on;
+    this.invalidate();
   }
 
   setKeepRoof(on: boolean): void {
@@ -2302,7 +2310,7 @@ export class FloorplanViewer {
     const zoom = this.keepRoof ? 1 : Math.min(1, Math.max(0, (this.controls.view.radius / this.houseRadius - 0.62) / 0.3));
     // a house with a single floor shows that floor as its house view, roof included (D208)
     const house = this.floorId === null || this.floors.length === 1;
-    const target = house && this.wallMode !== "cut" ? ROOF_OPACITY * zoom : 0;
+    const target = house && this.wallMode !== "cut" && !this.hideRoof ? ROOF_OPACITY * zoom : 0;
     const k = 1 - Math.exp(-dt / FLOOR_TAU);
     const before = this.roofO;
     this.roofO += (target - this.roofO) * k;

@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "uten talegjenkjenning",
  "beta_ready": "Klar for deg – installer den nedenfor med pakkene dine.",
  "beta_supporter_missing": "Som supporter får du denne betaen. Den er ikke på nøkkelen din ennå – skriv til oss på Discord, så låser vi den opp.",
- "voice_silent": "Mikrofonen gir bare stillhet. Som regel holder en annen app den – slå av akustisk bevegelsesdeteksjon i Fully Kiosk (Motion Detection → Acoustic Detection) og last inn på nytt."
+ "voice_silent": "Mikrofonen gir bare stillhet. Som regel holder en annen app den – slå av akustisk bevegelsesdeteksjon i Fully Kiosk (Motion Detection → Acoustic Detection) og last inn på nytt.",
+ "card_roof": "Vis taket",
+ "card_roof_hint": "Av: huset vises uten tak, som om det ikke hadde noe – rommene ligger åpne (solfelt på taket forsvinner også)",
+ "room_order_up": "Flytt rommet opp (tidligere i romlinjen)",
+ "room_order_down": "Flytt rommet ned (senere i romlinjen)"
 }

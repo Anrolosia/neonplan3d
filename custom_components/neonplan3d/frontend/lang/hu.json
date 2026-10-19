@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "beszédfelismerés nélkül",
  "beta_ready": "Elkészült neked – telepítsd lent a csomagjaid között.",
  "beta_supporter_missing": "Támogatóként megkapod ezt a bétát. Még nincs a kulcsodon – írj nekünk Discordon, és feloldjuk.",
- "voice_silent": "A mikrofon csak csendet ad. Általában egy másik alkalmazás foglalja – a Fully Kioskban kapcsold ki a hangalapú mozgásérzékelést (Motion Detection → Acoustic Detection), és töltsd újra."
+ "voice_silent": "A mikrofon csak csendet ad. Általában egy másik alkalmazás foglalja – a Fully Kioskban kapcsold ki a hangalapú mozgásérzékelést (Motion Detection → Acoustic Detection), és töltsd újra.",
+ "card_roof": "Tető mutatása",
+ "card_roof_hint": "Ki: a ház tető nélkül látszik, mintha nem is lenne – a szobák nyitottak (a tetőn lévő napelemmezők is eltűnnek)",
+ "room_order_up": "Szoba feljebb (előbb a szobasávban)",
+ "room_order_down": "Szoba lejjebb (később a szobasávban)"
 }

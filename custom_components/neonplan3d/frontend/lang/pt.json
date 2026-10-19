@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "sem reconhecimento de voz",
  "beta_ready": "Pronto para ti – instala-o abaixo com os teus pacotes.",
  "beta_supporter_missing": "Como supporter recebes esta beta. Ainda não está na tua chave – escreve-nos no Discord e nós ativamos.",
- "voice_silent": "O microfone só dá silêncio. Normalmente outra app está a usá-lo – no Fully Kiosk desliga a deteção acústica de movimento (Motion Detection → Acoustic Detection) e recarrega."
+ "voice_silent": "O microfone só dá silêncio. Normalmente outra app está a usá-lo – no Fully Kiosk desliga a deteção acústica de movimento (Motion Detection → Acoustic Detection) e recarrega.",
+ "card_roof": "Mostrar o telhado",
+ "card_roof_hint": "Desligado: a casa aparece sem telhado, como se não tivesse – as divisões ficam abertas (os painéis solares do telhado também desaparecem)",
+ "room_order_up": "Subir a divisão (mais cedo na barra de divisões)",
+ "room_order_down": "Descer a divisão (mais tarde na barra de divisões)"
 }

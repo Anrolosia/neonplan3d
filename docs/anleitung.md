@@ -519,7 +519,7 @@ Die Schalter für Wände, Etagen, Dach, Heatmap und die Pro-Anzeigen stecken unt
 | **Spur** | Bewegungsspur, Pro, siehe [6.1](#61-kamera-cockpit) |
 | **Wetter** | Wetter draußen, Pro, siehe [6.2](#62-wetter-draußen) |
 | **⏪ Zeitreise** | Die letzten 24 Stunden im Haus abspielen, nur ansehen, Pro, siehe [6.7](#67-zeitreise) |
-| **≡ / ↔** (rechts in der Etagen- und Raumleiste) | Die Leiste oben auf mehrere Zeilen umbrechen, wenn viele Räume nicht in eine Zeile passen, oder zurück in eine Zeile; in einer Zeile scrollt sie seitlich, am PC auch mit dem Mausrad. In der Hausansicht steht vor den Räumen jeder Etage ihr Name |
+| **≡ / ↔** (rechts in der Etagen- und Raumleiste) | Die Leiste oben auf mehrere Zeilen umbrechen, wenn viele Räume nicht in eine Zeile passen, oder zurück in eine Zeile; in einer Zeile scrollt sie seitlich, am PC auch mit dem Mausrad. In der Hausansicht steht vor den Räumen jeder Etage ihr Name. Die Reihenfolge der Räume änderst du im Editor: ohne Auswahl in der Raumliste der Etage mit **↑** und **↓** |
 | **⚙** (oben neben der Version) | Klappt die Ansichtsoptionen Qualität, Look, Symbole und FPS auf und wieder zu; so bleibt die Kopfzeile schlank |
 | **Auge** (unten links, neben der Lupe) | Blendet alles aus, was nicht die 3D-Ansicht ist: Kopfzeile, Etagen- und Raumleiste, Energiewerte, Etagenbilder, Schalter. Übrig bleibt die Bühne – auf dem Handy die halbe Bildschirmhöhe mehr. Ein Tipp aufs Auge holt alles zurück; ein Raum lässt sich weiter antippen. Das Gerät merkt sich die Wahl |
 
@@ -1049,6 +1049,7 @@ camera_wall: false      # Pro: Knopf „Kameras“ unten in der Karte öffnet di
 time_travel: false      # Pro: Knopf „Zeitreise“ unten in der Karte spielt die letzten 24 Stunden ab (nur ansehen)
 time_travel_speed: 360  # Tempo der Zeitreise: 60 | 360 | 900 | 3600 | 14400 (eine Stunde in 1 min, 10 s, 4 s, 1 s; ein Tag in 6 s, nur in der Woche)
 time_travel_range: 24h  # Start der Zeitreise: 24h oder 7d (die Woche; auch auf der Stufe Tablet, die sonst zwei Tage hält)
+roof: true              # false: Haus ganz ohne Dach zeigen
 roof_fade: true         # false: Dach bleibt beim Heranzoomen auf dem Haus
 start_view: { theta: 0.8, phi: 1.0, radius: 20 }   # eigene Startansicht dieser Karte; die Zeile steht im Editor unter Startansicht (weglassen = die des Plans)
 idle_return: 0          # Sekunden ohne Berührung bis zur Startansicht

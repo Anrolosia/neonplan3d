@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "utan taligenkänning",
  "beta_ready": "Redo för dig – installera den nedan med dina paket.",
  "beta_supporter_missing": "Som supporter får du den här betan. Den finns inte på din nyckel än – skriv till oss på Discord så låser vi upp den.",
- "voice_silent": "Mikrofonen ger bara tystnad. Oftast håller en annan app i den – stäng av den akustiska rörelsedetekteringen i Fully Kiosk (Motion Detection → Acoustic Detection) och ladda om."
+ "voice_silent": "Mikrofonen ger bara tystnad. Oftast håller en annan app i den – stäng av den akustiska rörelsedetekteringen i Fully Kiosk (Motion Detection → Acoustic Detection) och ladda om.",
+ "card_roof": "Visa taket",
+ "card_roof_hint": "Av: huset visas utan tak, som om det inte hade något – rummen ligger öppna (solfält på taket försvinner också)",
+ "room_order_up": "Flytta rummet upp (tidigare i rumsfältet)",
+ "room_order_down": "Flytta rummet ned (senare i rumsfältet)"
 }

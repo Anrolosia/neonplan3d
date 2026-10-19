@@ -10,6 +10,8 @@
 
 ### Improved
 
+- **Order of the room bar (discussion #599):** in the editor's room list (nothing selected), **↑** and **↓** move a room – the room bar of the 3D view follows. Thanks @groby66!
+- **House without roof in the card (discussion #601):** the card option **Show the roof** (`roof: false`) leaves the roof out altogether, for those who drew it only for the solar fields. Thanks @Kanecaine!
 - **Devices of outdoor areas (#597):** an outdoor area acting as a room lists its area's devices in the editor with the same buttons as a room. **☆** shows a device in the room panel without placing it, **👁** hides it there, and **Aa** leaves out its state text. Thanks @RkcCorian!
 
 ### How to update
@@ -30,6 +32,8 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ### Verbessert
 
+- **Reihenfolge der Raumleiste (Diskussion #599):** In der Raumliste des Editors (ohne Auswahl) verschieben **↑** und **↓** einen Raum, und die Raumleiste der 3D-Ansicht folgt. Danke an @groby66!
+- **Haus ohne Dach in der Karte (Diskussion #601):** Die Karten-Option **Dach zeigen** (`roof: false`) lässt das Dach ganz weg, für alle, die es nur wegen der Solarfelder gezeichnet haben. Danke an @Kanecaine!
 - **Geräte von Außenflächen (#597):** Eine Außenfläche, die wie ein Raum wirkt, listet die Geräte ihres Bereichs im Editor mit denselben Knöpfen wie ein Raum. **☆** zeigt ein Gerät im Raumfenster, ohne es zu platzieren, **👁** blendet es dort aus, und **Aa** lässt seinen Zustandstext weg. Danke an @RkcCorian!
 
 ### So bekommst du das Update

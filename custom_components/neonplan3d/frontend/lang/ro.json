@@ -1885,5 +1885,9 @@
  "voice_pipeline_no_stt": "fără recunoaștere vocală",
  "beta_ready": "Gata pentru tine – instalează mai jos, la pachetele tale.",
  "beta_supporter_missing": "Ca supporter primești această beta. Nu este încă pe cheia ta – scrie-ne pe Discord și o deblocăm.",
- "voice_silent": "Microfonul dă doar liniște. De obicei îl ține ocupat altă aplicație – în Fully Kiosk oprește detectarea acustică a mișcării (Motion Detection → Acoustic Detection) și reîncarcă."
+ "voice_silent": "Microfonul dă doar liniște. De obicei îl ține ocupat altă aplicație – în Fully Kiosk oprește detectarea acustică a mișcării (Motion Detection → Acoustic Detection) și reîncarcă.",
+ "card_roof": "Afișează acoperișul",
+ "card_roof_hint": "Oprit: casa apare fără acoperiș, ca și cum nu ar avea – camerele sunt deschise (câmpurile solare de pe acoperiș dispar și ele)",
+ "room_order_up": "Mută camera în sus (mai devreme în bara de camere)",
+ "room_order_down": "Mută camera în jos (mai târziu în bara de camere)"
 }
