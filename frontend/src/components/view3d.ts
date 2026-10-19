@@ -2147,7 +2147,8 @@ export class Fp3dView3d extends LitElement {
     const open = !this.holoFolded.has(index);
     const day = this.dayOf(card);
     const main = card.kind === "main";
-    const autarky = main && e.consumption !== null && e.consumption > 0 ? Math.round(Math.min(100, Math.max(0, (1 - Math.max(0, e.grid ?? 0) / e.consumption) * 100))) : null;
+    // self-sufficiency right now (D590): without a grid reading it is unknown, not 100 %
+    const autarky = main && e.grid !== null && e.consumption !== null && e.consumption > 0 ? Math.round(Math.min(100, Math.max(0, (1 - Math.max(0, e.grid) / e.consumption) * 100))) : null;
     const curve = day && day.curve.length > 1 ? solarCurvePath(day.curve, day.peak) : null;
     const nowAt = new Date(this.now());
     const nowX = ((nowAt.getHours() + nowAt.getMinutes() / 60) / 24) * 220;

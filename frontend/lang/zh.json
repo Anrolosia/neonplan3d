@@ -1016,7 +1016,7 @@
  "holo_grid": "电网",
  "holo_house": "房屋",
  "holo_wallbox": "充电桩",
- "holo_autarky": "自给率",
+ "holo_autarky": "当前自给率",
  "holo_house_now": "当前房屋",
  "chk_title": "设置",
  "chk_hint": "能源和能源 Pro 所需的内容。点按某行可跳转到该处。",
