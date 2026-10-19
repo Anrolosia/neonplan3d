@@ -168,3 +168,11 @@ def test_live_director_is_off_unless_switched_on() -> None:
         SETTINGS_SCHEMA({**base, "director": {"motion": "cats"}})
     with pytest.raises(vol.Invalid):
         SETTINGS_SCHEMA({**base, "director": {"hold": 2}})
+
+
+def test_sloping_walls_keep_two_heights_per_edge() -> None:
+    """A sloping wall (D569): two heights on an edge, or None for a plain one."""
+    room = {**ROOM, "wall_slopes": [[1.0, 2.6], None, None]}
+    assert ROOM_SCHEMA(room)["wall_slopes"] == [[1.0, 2.6], None, None]
+    with pytest.raises(vol.Invalid):
+        ROOM_SCHEMA({**ROOM, "wall_slopes": [[1.0]]})

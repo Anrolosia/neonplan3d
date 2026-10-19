@@ -1906,5 +1906,9 @@
  "pin_size": "Symbolstørrelse",
  "pin_size_small": "Lille",
  "pin_size_normal": "Normal",
- "pin_size_large": "Stor"
+ "pin_size_large": "Stor",
+ "wall_slope": "Skrå",
+ "wall_slope_hint": "Skrå væg: en egen højde ved hvert hjørne, toppen løber lige imellem – halvtag, skråning, ovenlys på den høje side. Vinduer og døre bliver under toppen.",
+ "wall_slope_start": "Højde ved hjørne {n} (m)",
+ "wall_slope_end": "Højde ved hjørne {n} (m)"
 }

@@ -1906,5 +1906,9 @@
  "pin_size": "Dimensione simboli",
  "pin_size_small": "Piccolo",
  "pin_size_normal": "Normale",
- "pin_size_large": "Grande"
+ "pin_size_large": "Grande",
+ "wall_slope": "Inclinato",
+ "wall_slope_hint": "Muro inclinato: un'altezza propria a ogni angolo, la sommità corre dritta in mezzo – tettoia, pendio, finestre alte sul lato alto. Finestre e porte restano sotto la sommità.",
+ "wall_slope_start": "Altezza all'angolo {n} (m)",
+ "wall_slope_end": "Altezza all'angolo {n} (m)"
 }

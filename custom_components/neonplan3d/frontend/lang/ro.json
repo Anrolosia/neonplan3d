@@ -1906,5 +1906,9 @@
  "pin_size": "Mărimea simbolurilor",
  "pin_size_small": "Mic",
  "pin_size_normal": "Normal",
- "pin_size_large": "Mare"
+ "pin_size_large": "Mare",
+ "wall_slope": "Înclinat",
+ "wall_slope_hint": "Perete înclinat: o înălțime proprie la fiecare colț, partea de sus merge drept între ele – acoperiș într-o apă, pantă, ferestre sus pe partea înaltă. Ferestrele și ușile rămân sub partea de sus.",
+ "wall_slope_start": "Înălțimea la colțul {n} (m)",
+ "wall_slope_end": "Înălțimea la colțul {n} (m)"
 }

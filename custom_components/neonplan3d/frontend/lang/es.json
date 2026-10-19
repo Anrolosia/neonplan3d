@@ -1906,5 +1906,9 @@
  "pin_size": "Tamaño de símbolos",
  "pin_size_small": "Pequeño",
  "pin_size_normal": "Normal",
- "pin_size_large": "Grande"
+ "pin_size_large": "Grande",
+ "wall_slope": "Inclinada",
+ "wall_slope_hint": "Pared inclinada: una altura propia en cada esquina, la parte superior va recta entre ellas – cobertizo, pendiente, ventanas altas en el lado alto. Ventanas y puertas quedan bajo la parte superior.",
+ "wall_slope_start": "Altura en la esquina {n} (m)",
+ "wall_slope_end": "Altura en la esquina {n} (m)"
 }

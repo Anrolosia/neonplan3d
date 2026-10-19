@@ -1906,5 +1906,9 @@
  "pin_size": "Symboolgrootte",
  "pin_size_small": "Klein",
  "pin_size_normal": "Normaal",
- "pin_size_large": "Groot"
+ "pin_size_large": "Groot",
+ "wall_slope": "Schuin",
+ "wall_slope_hint": "Schuine muur: een eigen hoogte op elke hoek, de bovenkant loopt recht ertussen – lessenaarsdak, helling, bovenlichten aan de hoge kant. Ramen en deuren blijven onder de bovenkant.",
+ "wall_slope_start": "Hoogte bij hoek {n} (m)",
+ "wall_slope_end": "Hoogte bij hoek {n} (m)"
 }

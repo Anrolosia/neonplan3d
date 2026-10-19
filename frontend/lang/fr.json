@@ -1906,5 +1906,9 @@
  "pin_size": "Taille des symboles",
  "pin_size_small": "Petit",
  "pin_size_normal": "Normal",
- "pin_size_large": "Grand"
+ "pin_size_large": "Grand",
+ "wall_slope": "Inclinée",
+ "wall_slope_hint": "Mur incliné : une hauteur propre à chaque angle, le haut est droit entre les deux – appentis, pente, impostes du côté haut. Fenêtres et portes restent sous le haut.",
+ "wall_slope_start": "Hauteur à l'angle {n} (m)",
+ "wall_slope_end": "Hauteur à l'angle {n} (m)"
 }

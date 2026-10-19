@@ -1906,5 +1906,9 @@
  "pin_size": "Rozmiar symboli",
  "pin_size_small": "Mały",
  "pin_size_normal": "Normalny",
- "pin_size_large": "Duży"
+ "pin_size_large": "Duży",
+ "wall_slope": "Skośna",
+ "wall_slope_hint": "Skośna ściana: własna wysokość w każdym narożniku, górna krawędź biegnie prosto między nimi – dach jednospadowy, zbocze, okna u góry po wysokiej stronie. Okna i drzwi zostają pod górną krawędzią.",
+ "wall_slope_start": "Wysokość w narożniku {n} (m)",
+ "wall_slope_end": "Wysokość w narożniku {n} (m)"
 }

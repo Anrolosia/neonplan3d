@@ -1906,5 +1906,9 @@
  "pin_size": "符号大小",
  "pin_size_small": "小",
  "pin_size_normal": "正常",
- "pin_size_large": "大"
+ "pin_size_large": "大",
+ "wall_slope": "倾斜",
+ "wall_slope_hint": "倾斜墙：两个角各有自己的高度，顶边在两者之间呈直线——单坡屋顶、坡地、高侧的高窗。门窗保持在顶边以下。",
+ "wall_slope_start": "第 {n} 角高度（米）",
+ "wall_slope_end": "第 {n} 角高度（米）"
 }

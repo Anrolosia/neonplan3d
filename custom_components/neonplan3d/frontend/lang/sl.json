@@ -1906,5 +1906,9 @@
  "pin_size": "Velikost simbolov",
  "pin_size_small": "Majhna",
  "pin_size_normal": "Običajna",
- "pin_size_large": "Velika"
+ "pin_size_large": "Velika",
+ "wall_slope": "Poševna",
+ "wall_slope_hint": "Poševna stena: lastna višina v vsakem kotu, zgornji rob teče naravnost vmes – enokapnica, pobočje, zgornja okna na visoki strani. Okna in vrata ostanejo pod zgornjim robom.",
+ "wall_slope_start": "Višina v kotu {n} (m)",
+ "wall_slope_end": "Višina v kotu {n} (m)"
 }

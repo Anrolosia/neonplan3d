@@ -1906,5 +1906,9 @@
  "pin_size": "Symbolstorlek",
  "pin_size_small": "Liten",
  "pin_size_normal": "Normal",
- "pin_size_large": "Stor"
+ "pin_size_large": "Stor",
+ "wall_slope": "Sned",
+ "wall_slope_hint": "Sned vägg: en egen höjd vid varje hörn, överkanten löper rakt emellan – pulpettak, slänt, höga fönster på den höga sidan. Fönster och dörrar stannar under överkanten.",
+ "wall_slope_start": "Höjd vid hörn {n} (m)",
+ "wall_slope_end": "Höjd vid hörn {n} (m)"
 }

@@ -1669,6 +1669,13 @@ export class Fp3dEditor extends LitElement {
           if (target.wall_heights) target.wall_heights.splice(i + 1, 0, target.wall_heights[i] ?? null);
           if (target.wall_thickness) target.wall_thickness.splice(i + 1, 0, target.wall_thickness[i] ?? null);
           const first = Math.hypot(mid[0] - a[0], mid[1] - a[1]);
+          if (target.wall_slopes) {
+            const sl = target.wall_slopes[i] ?? null;
+            const whole = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+            const hm = sl ? Math.round((sl[0] + ((sl[1] - sl[0]) * first) / whole) * 1000) / 1000 : 0;
+            if (sl) target.wall_slopes[i] = [sl[0], hm];
+            target.wall_slopes.splice(i + 1, 0, sl ? [hm, sl[1]] : null);
+          }
           for (const o of floor.openings) {
             if (o.room_id !== roomId || o.wall) continue;
             if (o.edge > i) o.edge += 1;
@@ -4891,6 +4898,11 @@ export class Fp3dEditor extends LitElement {
       // the edge starting at the removed corner goes away; the one before it keeps its height
       if (target.wall_heights) target.wall_heights.splice(index, 1);
       if (target.wall_thickness) target.wall_thickness.splice(index, 1);
+      if (target.wall_slopes) {
+        target.wall_slopes.splice(index, 1);
+        target.wall_slopes[(index - 1 + target.points.length) % target.points.length] = null;
+        if (target.wall_slopes.every((x) => !x)) target.wall_slopes = undefined;
+      }
       // the two edges at the removed corner merge; openings on them cannot keep their place
       floor.openings = floor.openings
         .filter((o) => o.room_id !== room.id || o.wall || (o.edge !== index && o.edge !== prev))
@@ -5544,6 +5556,19 @@ export class Fp3dEditor extends LitElement {
     return starts.length ? [...new Set(starts)].sort((a, b) => a - b) : [0];
   }
 
+  /** A sloping wall on a room edge: its heights at the edge's start and end corner, or null for a plain wall (D569). */
+  private setEdgeSlope(room: Room, edge: number, slope: [number, number] | null): void {
+    if (!this.isAdmin) return;
+    this.change((_, f) => {
+      const r = f.rooms.find((x) => x.id === room.id);
+      if (!r) return;
+      const list = (r.wall_slopes ?? []).slice(0, r.points.length);
+      while (list.length < r.points.length) list.push(null);
+      list[edge] = slope ? [Math.round(Math.max(0.05, slope[0]) * 1000) / 1000, Math.round(Math.max(0.05, slope[1]) * 1000) / 1000] : null;
+      r.wall_slopes = list.every((x) => !x) ? undefined : list;
+    });
+  }
+
   /** Set a wall height on a room edge (and on the rooms sharing it), or on one part of a split edge only. */
   private setEdgeHeight(room: Room, edge: number, height: number | null, part?: number): void {
     const floor = this.floor;
@@ -5695,6 +5720,7 @@ export class Fp3dEditor extends LitElement {
         const b = room.points[(i + 1) % n];
         const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
         const entry = room.wall_heights?.[i] ?? null;
+        const slope = room.wall_slopes?.[i] ?? null;
         const on = () => (this._edgeHi = i);
         const off = () => (this._edgeHi = null);
         // an edge another room splits: one row per part, each with its own height (#77)
@@ -5718,7 +5744,13 @@ export class Fp3dEditor extends LitElement {
             >
             ${h === 0
               ? html`<span class="fp3d-muted">${this.t("wall_none")}</span>`
-              : this.len(this.t("wall_height"), h ?? H, (v) => set(v >= H - 0.005 ? null : Math.max(0.05, v)), 0.05, 0.05)}
+              : slope && part === undefined
+                ? html`${this.len(this.t("wall_slope_start", { n: i + 1 }), slope[0], (v) => this.setEdgeSlope(room, i, [v, slope[1]]), 0.05, 0.05)}
+                  ${this.len(this.t("wall_slope_end", { n: ((i + 1) % n) + 1 }), slope[1], (v) => this.setEdgeSlope(room, i, [slope[0], v]), 0.05, 0.05)}`
+                : this.len(this.t("wall_height"), h ?? H, (v) => set(v >= H - 0.005 ? null : Math.max(0.05, v)), 0.05, 0.05)}
+            ${this.isAdmin && part === undefined && h !== 0
+              ? html`<button class="fp3d-btn" aria-pressed=${!!slope} title=${this.t("wall_slope_hint")} @click=${() => this.setEdgeSlope(room, i, slope ? null : [h ?? H, h ?? H])}>◢ ${this.t("wall_slope")}</button>`
+              : nothing}
             ${this.isAdmin && h !== null ? html`<button class="fp3d-btn" title=${this.t("wall_height_full")} @click=${() => set(null)}>↥</button>` : nothing}
             ${this.isAdmin && h !== 0 ? html`<button class="fp3d-btn" title=${this.t("wall_none_hint")} @click=${() => set(0)}>${this.t("wall_none")}</button>` : nothing}
             ${this.isAdmin && partLen >= 0.4 ? html`<button class="fp3d-btn" title=${this.t("wall_split_hint")} @click=${() => this.splitEdge(room, i, part)}>✂</button>` : nothing}

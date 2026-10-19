@@ -1906,5 +1906,9 @@
  "pin_size": "Symbolien koko",
  "pin_size_small": "Pieni",
  "pin_size_normal": "Normaali",
- "pin_size_large": "Suuri"
+ "pin_size_large": "Suuri",
+ "wall_slope": "Vino",
+ "wall_slope_hint": "Vino seinä: oma korkeus kummassakin kulmassa, yläreuna kulkee suoraan niiden välillä – pulpettikatto, rinne, ikkunat korkealla puolella. Ikkunat ja ovet pysyvät yläreunan alla.",
+ "wall_slope_start": "Korkeus kulmassa {n} (m)",
+ "wall_slope_end": "Korkeus kulmassa {n} (m)"
 }

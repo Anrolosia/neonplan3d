@@ -1906,5 +1906,9 @@
  "pin_size": "Tamanho dos símbolos",
  "pin_size_small": "Pequeno",
  "pin_size_normal": "Normal",
- "pin_size_large": "Grande"
+ "pin_size_large": "Grande",
+ "wall_slope": "Inclinada",
+ "wall_slope_hint": "Parede inclinada: uma altura própria em cada canto, o topo segue reto entre eles – telheiro, encosta, janelas altas no lado alto. Janelas e portas ficam abaixo do topo.",
+ "wall_slope_start": "Altura no canto {n} (m)",
+ "wall_slope_end": "Altura no canto {n} (m)"
 }

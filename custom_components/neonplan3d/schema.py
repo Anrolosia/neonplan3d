@@ -90,6 +90,16 @@ ROOM_SCHEMA = vol.Schema(
             ],
             vol.Length(max=MAX_POINTS),
         ),
+        # sloping walls: the height at an edge's start and end corner (None = its plain height)
+        vol.Optional("wall_slopes"): vol.All(
+            [
+                vol.Any(
+                    None,
+                    vol.All([vol.All(vol.Coerce(float), vol.Range(min=0.05, max=20))], vol.Length(min=2, max=2)),
+                )
+            ],
+            vol.Length(max=MAX_POINTS),
+        ),
     },
     extra=vol.ALLOW_EXTRA,
 )

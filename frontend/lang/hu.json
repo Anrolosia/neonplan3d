@@ -1906,5 +1906,9 @@
  "pin_size": "Szimbólumméret",
  "pin_size_small": "Kicsi",
  "pin_size_normal": "Normál",
- "pin_size_large": "Nagy"
+ "pin_size_large": "Nagy",
+ "wall_slope": "Ferde",
+ "wall_slope_hint": "Ferde fal: minden sarokban saját magasság, a felső él egyenesen fut köztük – félnyeregtető, lejtő, felülvilágítók a magas oldalon. Az ablakok és ajtók a felső él alatt maradnak.",
+ "wall_slope_start": "Magasság a(z) {n}. saroknál (m)",
+ "wall_slope_end": "Magasság a(z) {n}. saroknál (m)"
 }

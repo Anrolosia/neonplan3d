@@ -1906,5 +1906,9 @@
  "pin_size": "Velikost symbolů",
  "pin_size_small": "Malá",
  "pin_size_normal": "Normální",
- "pin_size_large": "Velká"
+ "pin_size_large": "Velká",
+ "wall_slope": "Šikmá",
+ "wall_slope_hint": "Šikmá stěna: vlastní výška v každém rohu, horní hrana vede rovně mezi nimi – pultová střecha, svah, horní okna na vysoké straně. Okna a dveře zůstanou pod horní hranou.",
+ "wall_slope_start": "Výška v rohu {n} (m)",
+ "wall_slope_end": "Výška v rohu {n} (m)"
 }

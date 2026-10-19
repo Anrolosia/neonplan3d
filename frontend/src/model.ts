@@ -40,6 +40,11 @@ export interface Room {
    */
   wall_heights?: WallHeight[];
   /**
+   * Sloping walls (D569): the height of the wall at the edge's start and end corner (index = edge); the top runs
+   * straight between them – a lean-to, a garage on a slope. null = the edge's plain height.
+   */
+  wall_slopes?: ([number, number] | null)[];
+  /**
    * Ceiling height of this room in m (null = the floor height): its walls end there unless a neighbour is
    * taller, and its ceiling lamps hang from it – a 2.5 m living room beside a 5 m garage (#30).
    */
