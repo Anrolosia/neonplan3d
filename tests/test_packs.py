@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import copy
 import json
+from types import SimpleNamespace
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -12,6 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+import voluptuous as vol
 
 from custom_components.neonplan3d import packs
 from custom_components.neonplan3d.const import DOMAIN
@@ -214,3 +216,24 @@ def test_studio_key_signs_studio_furniture_only(monkeypatch: pytest.MonkeyPatch)
         with pytest.raises(packs.PackError) as err:
             packs.verify_pack(_sign(private, keys, bad), keys)
         assert err.value.code == "bad_signature"
+
+
+def test_a_newer_part_shape_asks_for_an_update() -> None:
+    """An unknown value of a newer pack asks for an update (voluptuous and Probatio); other faults stay errors."""
+    item = copy.deepcopy(PAYLOAD["items"][0])
+    item["parts"][0]["shape"] = "some_future_shape"
+    with pytest.raises(packs.PackError) as err:
+        packs.validate_payload({**PAYLOAD, "items": [item]})
+    assert err.value.code == "needs_update"
+    item["parts"][0]["shape"] = "box"
+    item["parts"][0]["w"] = "wide"
+    with pytest.raises(packs.PackError) as err:
+        packs.validate_payload({**PAYLOAD, "items": [item]})
+    assert err.value.code == "invalid_content"
+
+
+def test_probatio_marks_an_unknown_value_by_its_code() -> None:
+    """Probatio (Home Assistant 2026.9+) words its errors its own way but gives the code "not_in_list"."""
+    probatio = SimpleNamespace(errors=[SimpleNamespace(code="not_in_list")])
+    assert packs._unknown_value(probatio)  # type: ignore[arg-type]
+    assert not packs._unknown_value(vol.MultipleInvalid([vol.Invalid("expected float")]))

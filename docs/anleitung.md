@@ -171,6 +171,8 @@ Wände entstehen automatisch: Jede gemeinsame Kante zweier Räume wird eine Inne
 
 **Wandstärke je Wand:** Im selben Kasten hat jede Wand ein Feld **Dicke (m)**. Voreingestellt ist die Dicke des Hauses (Außen- oder Innenwand, Kapitel 4.4); eine eigene Angabe macht etwa die 36,5-cm-Außenwand neben einer 24er oder die 11,5-cm-Trennwand. Teilen sich zwei Räume die Wand, gilt die dickere Angabe, die Wand bleibt auf der Raumgrenze mittig. ↺ setzt auf die Hausdicke zurück. Fenster und Türen passen sich der Dicke an.
 
+**Schräge Wand:** **◢ Schräg** in einer Zeile der Wandhöhen gibt der Wand eine eigene Höhe an jeder ihrer beiden Ecken; die Oberkante läuft gerade dazwischen – für ein Pultdach, eine Garage am Hang oder Oberlichter auf der hohen Seite. Die hohe Seite darf über die Etagenhöhe hinausreichen. Fenster und Türen bleiben unter der Oberkante, ein Fenster am niedrigen Ende wird also niedriger. Teilst du die Kante mit einem neuen Eckpunkt, treffen sich beide Hälften auf der Höhe dazwischen. Noch einmal **◢ Schräg** macht die Wand wieder gerade.
+
 **Keine Wand:** Bei offenen Grundrissen gehören Flur, Küche und Wohnzimmer baulich zusammen, sind in Home Assistant aber getrennte Bereiche. Dafür hat jede Zeile im Kasten **Wandhöhen** den Knopf **Keine Wand**: Die Wand fällt im Grundriss und in 3D ganz weg, auch wenn der Nachbarraum sie teilt. ↥ holt sie zurück. Das Licht folgt dem: Eine Lampe leuchtet durch die weggelassene Wand in den Nachbarraum, als wäre es ein Raum.
 
 **Geteilte Wände:** Teilt ein Nachbarraum eine Wand in mehrere Stücke (etwa zwei kleine Räume an einer langen Wand), bekommt jedes Stück eine eigene Zeile „Wand 2–3 · Teil 1“, „… Teil 2“ mit seiner Länge, und jedes Stück kann seine eigene Höhe haben oder wegfallen.
@@ -190,6 +192,7 @@ Unten in der Seitenleiste klappt **Einstellungen** auf:
 | **Wetter-Effekte in 3D** | Welche Effekte gezeigt werden |
 | **Startansicht** | Drehe, zoome und verschiebe das Haus in der 3D-Ansicht rechts so, wie es sich öffnen soll (zum Beispiel von der Gartenseite), und drücke **Aktuelle 3D-Ansicht als Start merken**. 3D-Ansicht, Karte und Kiosk öffnen das Haus dann so – mit Blickwinkel, Zoom und Bildausschnitt –, und auch eine geöffnete Etage wird von derselben Seite gezeigt; **Standard** setzt zurück |
 | **Favoriten** | Szenen, Skripte, Automationen, Tasten und Schalter für das Zentral-Menü (Stern) der 3D-Ansicht: Party, Anwesenheitssimulation, Verschattung, Bewässerung. Auswählen mit der Suche, Reihenfolge mit ↑ ↓, ✕ entfernt. Darunter **Eigene Knöpfe** mit Beschriftung, Symbol und Aktion: **Seite öffnen** (Pfad wie `/lovelace/rollos`), **Details einer Entität**, **Dienst aufrufen** (`domain.service` mit Daten als JSON) oder **fire-dom-event** – damit öffnet ein Knopf ein browser_mod-Popup mit deiner eigenen Karte, z. B. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Rollos", "content": {"type": "custom:meine-rollo-karte"}}}}` |
+| **🖼 Hintergrund** | Was hinter dem 3D-Haus liegt: der Himmel des Looks (Standard), **eine Farbe**, ein **Farbverlauf** oder ein **Bild**. Das Bild legst du in Home Assistant unter `config/www` ab und trägst `/local/dateiname.jpg` ein; **Abdunkeln** legt einen dunklen Schleier darüber, damit die Neonlinien lesbar bleiben. Gilt für Panel und Karten und kostet keine Leistung |
 
 ### 4.6 Grundriss-Bild als Vorlage
 
@@ -287,7 +290,7 @@ Sensoren erscheinen, wenn sie etwas für den Raum messen: Temperatur, Luftfeucht
 
 - **Platzieren** setzt ein Gerät in den Raum. **Alle … platzieren** unter der Liste setzt nach einer Rückfrage alle Hauptgeräte auf einmal; **Rückgängig** (Strg+Z) nimmt sie in einem Schritt zurück.
 - Lichter werden dabei als Leuchten aus der Bibliothek gesetzt, damit sie in 3D leuchten.
-- **☆** nimmt ein Gerät ins Raumfenster der 3D-Ansicht auf, ohne es in den Plan zu setzen. **👁** blendet ein Gerät des Bereichs im Raumfenster aus (durchgestrichen in der Liste, 🙈 holt es zurück) – für Entitäten, die dort nur stören. **Aa** blendet nur den Zustand eines Geräts im Raumfenster aus (∅ zeigt ihn wieder), etwa bei einem Rollladen ohne Rückmeldung; ein reines „unbekannt“ lässt das Raumfenster bei Schaltern, Rollläden und Lampen ohnehin weg.
+- **☆** nimmt ein Gerät ins Raumfenster der 3D-Ansicht auf, ohne es in den Plan zu setzen. **👁** blendet ein Gerät des Bereichs im Raumfenster aus (durchgestrichen in der Liste, 🙈 holt es zurück) – für Entitäten, die dort nur stören. **Aa** blendet nur den Zustand eines Geräts im Raumfenster aus (∅ zeigt ihn wieder), etwa bei einem Rollladen ohne Rückmeldung. Beides geht auch für die weiteren Entitäten eines Geräts unter „mehr“, jede für sich; ein reines „unbekannt“ lässt das Raumfenster bei Schaltern, Rollläden und Lampen ohnehin weg.
 - Ein platziertes Gerät ziehst du im Plan an seinen Platz.
 
 ![Ein Gerät ausgewählt](images/editor-device.jpg)
@@ -304,12 +307,13 @@ Ein ausgewähltes Gerät hat:
 
 ### 4.11 Leuchten
 
-Leuchten sind Möbel mit einem verknüpften Licht. Es gibt Deckenleuchte, Einbauspot, Aufbau-Spot, LED-Panel, Pendelleuchte, Stehlampe, Deckenfluter, Tischlampe, Wandleuchte, LED-Streifen, Wegleuchte und Garten-Spot.
+Leuchten sind Möbel mit einem verknüpften Licht. Es gibt Deckenleuchte, Einbauspot, Aufbau-Spot, LED-Panel, Pendelleuchte, Deckenventilator mit Licht, Stehlampe, Deckenfluter, Tischlampe, Wandleuchte, LED-Streifen, Wegleuchte und Garten-Spot.
 
 - Das 3D-Modell leuchtet in Farbe und Helligkeit des Lichts. Boden und Wände des Raums werden mit beleuchtet, zwei farbige Deckenleuchten mischen sich dazwischen. In den Nachbarraum fällt das Licht nur durch Türen. Eine Lampe über einer Treppe oder Deckenöffnung (bis 1,5 m daneben) leuchtet auch durch die Öffnung in die Etage darunter.
 - Farbeffekte wie ein Farbwechsel werden in 3D animiert.
-- Tischlampen stehen auf dem Möbel darunter, Wandleuchten und LED-Streifen rasten an der Wand ein, bei Pendelleuchten ist die Höhe die Abhängung unter der Decke.
-- **Höhe über Boden:** Wandleuchten hängen von sich aus auf 1,75 m, LED-Streifen direkt unter der Decke. Im Formular stellst du für beide eine eigene **Höhe über Boden** ein, etwa für einen Streifen unter den Hängeschränken oder hinter dem TV-Board. **Höhe automatisch** setzt sie zurück. Auch Einbauspots und Aufbau-Spots haben das Feld: Von sich aus sitzen sie unter der Decke, mit einer eigenen Höhe etwa unter den Hängeschränken – Modell und Lichtkegel strahlen dann von dort nach unten auf die Arbeitsplatte. Unter einer Dachschräge hängen Deckenleuchten, Spots und Pendelleuchten an der Dachunterseite statt in der Luft. Ein Streifen unter 1 m Höhe (Sockelleiste, hinter dem Schrank) strahlt nach oben an die Wand, höher montierte strahlen nach unten. Ein Streifen unterhalb der Schnitthöhe bleibt auch bei geschnittenen Wänden sichtbar. **Neigung um die Länge** legt den Streifen an eine Dachschräge oder kippt ihn zur Seite (90° = die Leuchtfläche zeigt seitlich), **Senkrecht** stellt ihn hochkant: Dann läuft er von der Höhe über Boden nach oben, am Türrahmen oder als Lichtsäule, und leuchtet rundum.
+- Tischlampen stehen auf dem Möbel darunter (unter einer hoch liegenden Arbeitsplatte ab 1,2 m – etwa einer Treppenstufe aus Arbeitsplatten – bleibt, was darunter passt, auf dem Boden), Wandleuchten und LED-Streifen rasten an der Wand ein, bei Pendelleuchten ist die Höhe die Abhängung unter der Decke.
+- **Deckenventilator mit Licht:** Das Licht schaltet die Leuchte unter dem Motor. Unter **Ventilator (fan-Entität)** wählst du den Ventilator: Seine Flügel drehen sich in 3D mit seiner Stufe (bei 100 % etwa einmal pro Sekunde, aus = still). Er bekommt ein eigenes Symbol neben der Leuchte mit seiner Stufe; Tippen schaltet ihn, lange drücken öffnet das Menü mit der Stufe. Die Breite ist die Spannweite der Flügel, die Höhe die Abhängung unter der Decke. Auf alten Tablets drehen die Flügel mit wenigen Bildern pro Sekunde, und nur solange der Ventilator läuft.
+- **Höhe über Boden:** Wandleuchten hängen von sich aus auf 1,75 m, LED-Streifen direkt unter der Decke. Im Formular stellst du für beide eine eigene **Höhe über Boden** ein, etwa für einen Streifen unter den Hängeschränken oder hinter dem TV-Board. **Höhe automatisch** setzt sie zurück. Auch Einbauspots, Aufbau-Spots, Deckenleuchten und LED-Panels haben das Feld: Von sich aus sitzen sie unter der Decke, mit einer eigenen Höhe etwa unter den Hängeschränken oder unter einer Treppe – Modell und Lichtkegel strahlen dann von dort nach unten auf die Arbeitsplatte. Unter einer Dachschräge hängen Deckenleuchten, Spots und Pendelleuchten an der Dachunterseite statt in der Luft. Ein Streifen unter 1 m Höhe (Sockelleiste, hinter dem Schrank) strahlt nach oben an die Wand, höher montierte strahlen nach unten. Ein Streifen unterhalb der Schnitthöhe bleibt auch bei geschnittenen Wänden sichtbar. **Neigung um die Länge** legt den Streifen an eine Dachschräge oder kippt ihn zur Seite (90° = die Leuchtfläche zeigt seitlich), **Anstieg (°)** lässt ihn entlang seiner Länge ansteigen, etwa die Treppe hinauf oder am Handlauf (rund 35–40°); die Höhe über Boden ist dann seine Mitte. **Senkrecht** stellt ihn hochkant: Dann läuft er von der Höhe über Boden nach oben, am Türrahmen oder als Lichtsäule, und leuchtet rundum.
 - **Farbe und Helligkeit von:** Schaltet ein Relais (Shelly, Schaltaktor) die Lampe, während die Leuchte selbst Farbe und Helligkeit kennt, kommt An/Aus vom Schalter und die Farbe von dieser zweiten Entität.
 - **Nur in einer Farbe leuchten:** Die Lampe leuchtet nur, solange das Licht ungefähr die gewählte Farbe zeigt. So kann ein Farblicht als Signal dienen – gelb für „Wasser“ am Waschbecken –, ohne dass seine anderen Farben (rot, grün, blau für andere Meldungen) dort erscheinen.
 - **Leuchtstärke in 3D (%):** Wie kräftig die Leuchte in 3D leuchtet. Unter 100 % dämpft helle LED-Streifen, damit der Raum nicht überstrahlt, über 100 % lässt eine schwache Lampe stärker leuchten. Gilt auch für Lichter, die als Gerät platziert sind; in Home Assistant schaltet es nichts.
@@ -324,7 +328,7 @@ Leuchten sind Möbel mit einem verknüpften Licht. Es gibt Deckenleuchte, Einbau
 
 Fernseher, Medienwand, Wohnwand mit TV (die Wohnwand ohne TV ist eine Leuchte: Vitrinen und LED-Leisten leuchten mit der verknüpften Lampe), Schreibtisch mit Monitor, Waschmaschine, Trockner, Spülmaschine, Heizkörper, Saugroboter und viele Pack-Möbel lassen sich mit Entitäten verknüpfen:
 
-- **Gerät** oder **Fernseher (Media-Player oder Steckdose)**: Als Gerät geht auch ein **Status-Sensor**, etwa der Druckstatus eines 3D-Druckers (Bambu Lab u. a.). Das Möbel gilt dann als aktiv, solange der Status „running“, „printing“, „prepare“ oder ähnlich meldet.  Ein Fernseher leuchtet, solange er läuft. Ein älterer Fernseher an einer smarten Steckdose nimmt einfach deren Schalter; der Bildschirm leuchtet, solange die Steckdose an ist, und ein Tipp schaltet sie. Waschmaschine, Trockner und Spülmaschine leuchten, solange sie arbeiten. Ein Heizkörper mit Thermostat glüht beim Heizen. Das **Klimagerät (Wand)** hängt oben an der Wand und leuchtet am Luftauslass in der Farbe seines Modus: rot Heizen, blau Kühlen, grün Automatik, gelb Entfeuchten, weiß nur Lüften – hell, solange es arbeitet, gedämpft im Standby. Ein **Herd** glüht auf den Kochfeldern, solange er kocht; ein Betriebszustand-Sensor (z. B. Home Connect: „run“, „ready“, „inactive“) lässt ihn bei „ready“ schwach glühen und bei „inactive“ aus.
+- **Gerät** oder **Fernseher (Media-Player oder Steckdose)**: Als Gerät geht auch ein **Status-Sensor**, etwa der Druckstatus eines 3D-Druckers (Bambu Lab u. a.). Das Möbel gilt dann als aktiv, solange der Status „running“, „printing“, „prepare“ oder ähnlich meldet.  Ein Fernseher leuchtet, solange er läuft. Ein älterer Fernseher an einer smarten Steckdose nimmt einfach deren Schalter; der Bildschirm leuchtet, solange die Steckdose an ist, und ein Tipp schaltet sie. Waschmaschine, Trockner und Spülmaschine leuchten, solange sie arbeiten – Waschmaschine und Trockner mit einem Lichtring um die runde Tür. Ein Heizkörper mit Thermostat glüht beim Heizen. Das **Klimagerät (Wand)** hängt oben an der Wand und leuchtet am Luftauslass in der Farbe seines Modus: rot Heizen, blau Kühlen, grün Automatik, gelb Entfeuchten, weiß nur Lüften – hell, solange es arbeitet, gedämpft im Standby. Ein **Herd** glüht auf den Kochfeldern, solange er kocht; ein Betriebszustand-Sensor (z. B. Home Connect: „run“, „ready“, „inactive“) lässt ihn bei „ready“ schwach glühen und bei „inactive“ aus.
 - **Leistungssensor (W)**: Das Möbel zeigt seine Watt. **Läuft ab (Watt)** legt fest, ab wie viel Watt es als laufend gilt und leuchtet (leer: 10 W) – praktisch für Geräte hinter einer Steckdose, die im Standby ein paar Watt ziehen, etwa 100 W.
 - **Vor dem Schalten nachfragen** und **Symbol in 3D** wie bei Geräten.
 - **Bilder nach Zustand** bei Bildschirmen: eine Pro-Erweiterung, siehe [6.3](#63-bildschirme-live).
@@ -421,7 +425,7 @@ Ein einfaches Haus bekommt unter **Einstellungen → Dach** ein Flach- oder Satt
 
 Unter den Dachflächen legt **+ Dachfenster** ein Fenster in eine Dachfläche (Standard 78 × 118 cm). Es lässt sich im Grundriss verschieben, auch auf eine andere Dachfläche, und hat wie ein normales Fenster **Rollladen**, **Kontakt** und **Kippkontakt**: Offen klappt der Flügel oben angeschlagen nach außen, gekippt ein Stück, und der Rollladen fährt von oben über die Scheibe.
 
-Zu jedem Dachfenster gehören ein **Name** (optional), **Rollladen**, **Kontakt** und **Kippkontakt** – und ein **Fenstermotor**: Velux, Roto oder Fakro melden die Fensterstellung als Cover, der Flügel öffnet in 3D so weit, wie der Motor steht. Offen oder gekippt leuchtet der Rahmen warm wie bei einem Wandfenster. Liegt das Fenster in einer Dachfläche, schneidet es ein Loch in die Schräge, so sieht man aus dem Dachgeschoss hinaus. Blendet das Dach beim Heranzoomen an eine Etage oder einen Raum aus, blenden die Dachfenster mit aus. Mit **Ohne Dach über dem Raum zeigen** bleibt ein Fenster dann an seiner Stelle über dem Raum stehen – offen, gekippt, mit dem Rollladen. Reicht die Schräge über einen Raum der Etage darunter, gehört das Fenster zu dieser Etage und zeigt sich mit ihr. Jedes Dachfenster gehört zu dem Raum darunter: Tippst du den Raum an, stehen Rollladen, Kontakt und Fenstermotor in seiner Raumkarte, und scheint die Sonne auf die Dachfläche, fällt ihr Licht durch das Fenster auf den Boden des Raums (mit dem Rollladen weniger).
+Zu jedem Dachfenster gehören ein **Name** (optional), **Rollladen**, **Kontakt** und **Kippkontakt** – und ein **Fenstermotor**: Velux, Roto oder Fakro melden die Fensterstellung als Cover, der Flügel öffnet in 3D so weit, wie der Motor steht. Offen oder gekippt leuchtet der Rahmen warm wie bei einem Wandfenster. Liegt das Fenster in einer Dachfläche, schneidet es ein Loch in die Schräge, so sieht man aus dem Dachgeschoss hinaus. Blendet das Dach beim Heranzoomen an eine Etage oder einen Raum aus, blenden die Dachfenster mit aus. Mit **Ohne Dach über dem Raum zeigen** bleibt ein Fenster dann an seiner Stelle über dem Raum stehen – offen, gekippt, mit dem Rollladen. Die Scheibe ist durchsichtig wie bei einem Wandfenster, der Rollladen hat Lamellen; so sieht man auch aus der Ferne, ob er zu ist. Reicht die Schräge über einen Raum der Etage darunter, gehört das Fenster zu dieser Etage und zeigt sich mit ihr. Jedes Dachfenster gehört zu dem Raum darunter: Tippst du den Raum an, stehen Rollladen, Kontakt und Fenstermotor in seiner Raumkarte, und scheint die Sonne auf die Dachfläche, fällt ihr Licht durch das Fenster auf den Boden des Raums (mit dem Rollladen weniger).
 
 ### 4.20 Energie: Solarfelder
 
@@ -482,6 +486,22 @@ Unter **Möbel → Haushalt** stehen **Mülltonne** und **Briefkasten**.
 - **Abfallart:** Restmüll, Bio, Papier, Verpackung, Glas, Garten, Recycling oder Sonstiges. Sie gibt der Tonne die Farben, die in deinem Land üblich sind (nach dem Land in Home Assistant: in Deutschland etwa Papier blau, Bio braun, Gelbe Tonne gelb; in Australien zeigt der Deckel die Sorte). **Farbe** und **Deckel** kannst du danach frei wählen.
 - **Briefkasten – Bauform:** Wandbriefkasten (hängt auf 1 m), Briefkasten auf Pfosten mit Fähnchen, Standbriefkasten mit Zeitungsfach, Paketbox oder Briefkastenanlage.
 
+### 4.24 Haustechnik: Lichtschalter, Steckdosen, WLAN und Warmwasser
+
+Unter **Möbel → Haustechnik** (in der Wandansicht unter 🔌 **Schalter**) stehen **Lichtschalter** und **Steckdose**. Sie hängen an der Wand: der Schalter auf 1,05 m, die Steckdose auf 0,3 m (die Außensteckdose auf 0,5 m); mit **Höhe über Boden** setzt du eine eigene Höhe.
+
+- **Tasten / Dosen im Rahmen:** 1 bis 4 in einem Rahmen; der Rahmen wird dabei passend breiter.
+- **Jede Taste, jede Dose bekommt ihre eigene Entität:** ein Licht, ein Schalter (das Relais, der Zwischenstecker) oder ein Lüfter. Sie leuchtet in 3D, solange die Entität an ist – ein Licht in seiner Farbe, eine Steckdose grün.
+- **Dieselbe Entität an mehreren Dosen:** Schaltet ein Relais zwei Steckdosen (innen und außen, oder eine Doppeldose), wählst du bei beiden dieselbe Entität. Das geht über beliebig viele Rahmen.
+- **Leistung (nur Steckdosen):** pro Dose optional ein Leistungssensor. Die Dose leuchtet heller, je mehr sie zieht, und zählt als Verbraucher mit.
+- **Bauform (Steckdose):** innen oder **Außensteckdose mit Klappe**.
+- **Antippen:** Mit nur einer Entität schaltet ein Tippen sie direkt. Bei mehreren öffnet sich ein kleines Menü mit einer Schaltfläche pro Taste. **Vor dem Schalten fragen** gilt für alle Tasten.
+- Das Symbol über dem Rahmen zeigt bei mehreren Tasten, wie viele an sind (z. B. „1/2“), bei Steckdosen auch die Leistung.
+
+**WLAN-Access-Point:** eine flache Scheibe unter der Decke oder eine Platte an der Wand (**Montage**). Als **Status** nimmst du, was sagt, ob er da ist – einen Verbindungs-Sensor, den Zustand, einen device_tracker; auch Diagnose-Entitäten (etwa von UniFi) stehen zur Wahl. Sein Ring leuchtet blau, solange er da ist, und rot, wenn er fehlt; dann zeigt sich auch sein Symbol mit „Offline“. Mit dem Sensor **verbundene Geräte** steht deren Zahl am Symbol.
+
+**Warmwasserspeicher:** ein Standspeicher oder ein flacher Speicher an der Wand (auf 1,1 m). Verknüpft wird die water_heater-Entität, ein Thermostat oder der Schalter des Heizstabs, dazu optional ein Sensor mit der **Wassertemperatur** und ein Leistungssensor. Er glüht warm, solange er heizt (Thermostat „heizt“, Schalter an oder Leistung über der Schwelle), schwach, solange er bereit ist, und zeigt die Wassertemperatur.
+
 ---
 
 ## 5. Die 3D-Ansicht
@@ -531,9 +551,11 @@ Oben rechts stehen:
 |---|---|
 | **Auto** / **Tablet** / **Hoch** | Qualitätsstufe. Tablet lässt Muster, Schatten und Halos weg und wird auf Fire-Tablets automatisch gewählt. Hoch zeigt zusätzlich Lichtkegel unter Spots |
 | **Neon** / **Blueprint** / **Tag** | Der Look. Das Farbfeld daneben setzt eine **eigene Akzentfarbe**: Im Neon-Look nehmen Linien und Leuchtkanten sie an, die Knöpfe und Pins in jedem Look; ↺ bringt das Cyan zurück |
-| **Keine** / **Wichtige** / **Alle** | Welche Gerätesymbole erscheinen. Wichtige zeigt nur Geräte ohne eigenes 3D-Modell und Werte wie Watt oder die laufende App |
+| **Keine** / **Im Raum** / **Wichtige** / **Alle** | Welche Gerätesymbole erscheinen. Wichtige zeigt nur Geräte ohne eigenes 3D-Modell und Werte wie Watt oder die laufende App. **Im Raum** zeigt in der Haus- und Etagenansicht keine Symbole und in einem geöffneten Raum nur dessen eigene – praktisch bei vielen Steckdosen und Sensoren |
+| **Klein** / **Normal** / **Groß** | Wie groß die Gerätesymbole sind; das Gerät merkt sich die Wahl (Karte: `marker_size`) |
 | **◧ / ◨** | Etagenbilder, Stern, Suche und Auge links oder rechts – praktisch, wenn die Ansicht am linken Rand des Dashboards sitzt |
 | **⌖ Ansicht halten** | Beim Wechsel von Etage zu Etage bleibt die Kamera, wo sie ist; nur die Höhe wandert mit |
+| **🔒 3D-Sperre** | Der Blickwinkel bleibt fest: Ziehen verschiebt die Ansicht, Zoomen geht weiter, Flüge zu Räumen behalten den Winkel – auf einem Wandtablet dreht niemand das Haus aus Versehen. Gilt pro Gerät; in der Karte `angle_lock: true` |
 | **FPS** | Bildrate, langsamstes Bild und Grund für jedes gezeichnete Bild. Im Ruhezustand steht dort 0 B/s |
 
 Ganz rechts in der Kopfzeile steht die installierte Version (z. B. v1.11.0); der Mauszeiger darauf zeigt, welche Version die Integration in Home Assistant meldet.
@@ -673,7 +695,7 @@ Pro-Erweiterungen sind kostenpflichtige Zusatzfunktionen, einzeln im Shop erhäl
 
 ### 6.1 Kamera-Cockpit
 
-**Durch die Kamera schauen:** Im Standbild-Menü einer Kamera und im Raumfenster steht „Durch die Kamera schauen“. Die 3D-Ansicht fliegt an die Stelle der Kamera und blickt in ihre Richtung, das Livebild liegt halbtransparent über der Szene. Mit dem Regler unten stellst du die Überblendung ein, „Zurück zur Ansicht“ fliegt zurück. Passt das Bild nicht genau, korrigierst du Drehung und Neigung der Kamera im Editor.
+**Durch die Kamera schauen:** Im Standbild-Menü einer Kamera und im Raumfenster steht „Durch die Kamera schauen“. Die 3D-Ansicht fliegt an die Stelle der Kamera und blickt in ihre Richtung, das Livebild liegt halbtransparent über der Szene. Mit dem Regler unten stellst du die Überblendung ein, „Zurück zur Ansicht“ fliegt zurück. **⛶ Vollbild** zeigt das Kamerabild auf dem ganzen Bildschirm; wo der Browser das nicht kann (alte Tablets), öffnet sich die Kameraansicht von Home Assistant, dort auch mit Ton. Passt das Bild nicht genau, korrigierst du Drehung und Neigung der Kamera im Editor.
 
 ![Durch die Kamera schauen](images/view-camera-through.jpg)
 
@@ -693,6 +715,8 @@ Pro-Erweiterungen sind kostenpflichtige Zusatzfunktionen, einzeln im Shop erhäl
    - **Waschmaschine, Trockner oder Spülmaschine fertig:** Das Gerät muss als Möbel mit Strommessung oder Status verknüpft sein. Als fertig gilt es, wenn es nach dem Lauf 3 Minuten ruht. Eine Pause im Programm zählt also nicht.
    - **Neue Warnung:** Rauch, Wasser, Alarm, Fenster bei Regen und so weiter.
    - **Zurück nach:** die Sekunden bis zur Rückkehr (Standard 30). Die Klingel bleibt doppelt so lange.
+   - **Eigene Auslöser:** weitere Entitäten, jeweils mit einer Kamera. Geht eine davon an oder auf, z. B. eine zweite Klingel, das Garagentor oder das Gartentor, fliegt die Ansicht hin und schaut durch diese Kamera. Ohne Kamera fliegt sie zum Gerät.
+   - **Livebild beim Durchschauen:** Statt eines Standbilds alle paar Sekunden läuft das Video der Kamera. Das gilt auch für „Durch die Kamera schauen“ von Hand. Braucht mehr Leistung, auf sehr alten Tablets lieber aus lassen.
 2. **Auf welchem Bildschirm:** im selben Abschnitt **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet mit dem NeonPlan-Panel. Auf einer Dashboard-Karte schaltest du stattdessen **Live-Regie** in den Karten-Einstellungen ein (`director: true`).
 
 Wer das Tablet gerade bedient, wird nur von der Klingel und von Warnungen unterbrochen. Berührst du den Bildschirm, während die Regie etwas zeigt, bleibt die Ansicht, wo sie ist. Teil des Kamera-Cockpits.
@@ -765,7 +789,7 @@ Die Module bekommen eine leuchtende Zellstruktur, über die ein Lichtband Richtu
 
 **Hologramm**
 
-In der Hausansicht hängt ein Hologramm aus Glas am größten Solarfeld (ohne Feld neben dem Haus), verbunden durch einen Leuchtstrich. Es zeigt PV jetzt, Ertrag heute und Spitze, die Tageskurve seit Mitternacht (aus den Statistiken deines PV-Sensors), bei mehreren Anlagen eine Zeile je Wechselrichter, Akku mit Pfeil, Netz, Haus, Wallbox und den Autarkie-Balken. Es behält seine Größe in der Welt, wird beim Rauszoomen also kleiner; von hinten siehst du es gespiegelt wie eine Glasscheibe (abschaltbar mit **Von hinten gespiegelt (wie Glas)**, dann bleibt es von überall lesbar). Antippen klappt es auf die große Zahl zusammen. Im Abschnitt **Hologramm** wählst du Feld, Größe und Versatz – der Abschnitt steht auch ohne Solarfeld da (Spiegelung, Größe, Geräte-Karten), nur die Feld-Einstellungen warten auf ein Feld – oder **Frei im Plan**: Dann steht im Plan ein Griff ◈, den du dorthin ziehst, wo die Karte schweben soll, etwa über die Terrasse; Höhe über dem Boden dazu. Die Karte zeigt vom Haus weg.
+In der Hausansicht hängt ein Hologramm aus Glas am größten Solarfeld (ohne Feld neben dem Haus), verbunden durch einen Leuchtstrich. Es zeigt PV jetzt, Ertrag heute und Spitze, die Tageskurve seit Mitternacht (aus den Statistiken deines PV-Sensors), bei mehreren Anlagen eine Zeile je Wechselrichter, Akku mit Pfeil, Netz, Haus, Wallbox und den Balken **Autarkie jetzt** (der Anteil des Hausverbrauchs, der gerade nicht aus dem Netz kommt; ohne Netzwert bleibt er weg). Es behält seine Größe in der Welt, wird beim Rauszoomen also kleiner; von hinten siehst du es gespiegelt wie eine Glasscheibe (abschaltbar mit **Von hinten gespiegelt (wie Glas)**, dann bleibt es von überall lesbar). Antippen klappt es auf die große Zahl zusammen. Im Abschnitt **Hologramm** wählst du Feld, Größe und Versatz – der Abschnitt steht auch ohne Solarfeld da (Spiegelung, Größe, Geräte-Karten), nur die Feld-Einstellungen warten auf ein Feld – oder **Frei im Plan**: Dann steht im Plan ein Griff ◈, den du dorthin ziehst, wo die Karte schweben soll, etwa über die Terrasse; Höhe über dem Boden dazu. Die Karte zeigt vom Haus weg.
 
 **Geräte-Hologramme**
 
@@ -1014,12 +1038,14 @@ fill: false             # den Bildschirm unter der Kopfzeile füllen
 walls: auto             # auto | cut
 controls_side: left     # left | right: Etagenbilder, Stern, Suche und Auge rechts
 keep_view: false        # true: Etagenwechsel ohne neuen Kameraflug
+angle_lock: false       # true: 3D-Sperre – der Blickwinkel bleibt fest, Ziehen verschiebt
 explode: true           # Etagen in der Hausansicht auseinanderziehen
 floor_stack: dim        # Etagen darunter: dim | stacked | single
 quality: auto           # auto | low | high
 theme: neon             # neon | blueprint | day
 accent: "#ff8a00"       # eigene Akzentfarbe (Linien im Neon-Look, Knöpfe, Pins); weglassen = Cyan
-markers: important      # none | important | all
+markers: important      # none | room | important | all
+marker_size: normal     # small | normal | large
 marker_names: false     # true: Geräte mit eigenem Namen zeigen ihn unter dem Symbol
 central: true           # der Stern mit dem Zentral-Menü (alle Lichter, Rollläden, Favoriten)
 buttons:                # eigene Knöpfe nur für diese Karte (ersetzen die aus dem Editor)

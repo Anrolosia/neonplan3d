@@ -24,6 +24,7 @@ import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlan
 import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
+import { backdropImage } from "../backdrop.ts";
 import { setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
@@ -59,6 +60,13 @@ import {
   FLOOR_MATERIALS,
   FURNITURE_GROUPS,
   ENERGY_DEVICES,
+  gangPlateWidth,
+  gangsOf,
+  GANG_TYPES,
+  MAX_GANGS,
+  TECH_SIZE,
+  TECH_TYPES,
+  type Gang,
   DEFAULT_HOLOGRAM,
   type HologramSettings,
   type StartView,
@@ -193,6 +201,7 @@ const WALL_CATS: Record<string, string[]> = {
   tall: ["kitchen_tall", "fridge", "wardrobe", "tall_cabinet", "shelf", "coat_rack"],
   living: ["sofa", "armchair", "bed", "bunk_bed", "bench", "corner_bench", "plant"],
   light: ["lamp_wall", "lamp_floor", "led_strip", "lamp_table"],
+  switches: ["wall_switch", "wall_socket", "wifi_ap", "water_heater"],
 };
 /** Hanging pieces (they go into a gap high on the wall). */
 const HANGING = new Set(["kitchen_wall", "tv_wall", "lamp_wall", "shelf", "led_strip", "ac_unit"]);
@@ -251,7 +260,7 @@ function pathLengthOf(p: PoolPipe, nodeAt: (n: string) => { x: number; z: number
 const ARROWS: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
 
 // furniture without a top to light: no "State from" box
-const NO_STATE_TYPES = new Set(["parking", "stairwell", "rug", "grid_point", "waste_bin", "mailbox"]);
+const NO_STATE_TYPES = new Set(["parking", "stairwell", "rug", "grid_point", "waste_bin", "mailbox", "wall_switch", "wall_socket", "wifi_ap", "water_heater"]);
 
 export class Fp3dEditor extends LitElement {
   static properties = {
@@ -1668,6 +1677,13 @@ export class Fp3dEditor extends LitElement {
           if (target.wall_heights) target.wall_heights.splice(i + 1, 0, target.wall_heights[i] ?? null);
           if (target.wall_thickness) target.wall_thickness.splice(i + 1, 0, target.wall_thickness[i] ?? null);
           const first = Math.hypot(mid[0] - a[0], mid[1] - a[1]);
+          if (target.wall_slopes) {
+            const sl = target.wall_slopes[i] ?? null;
+            const whole = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+            const hm = sl ? Math.round((sl[0] + ((sl[1] - sl[0]) * first) / whole) * 1000) / 1000 : 0;
+            if (sl) target.wall_slopes[i] = [sl[0], hm];
+            target.wall_slopes.splice(i + 1, 0, sl ? [hm, sl[1]] : null);
+          }
           for (const o of floor.openings) {
             if (o.room_id !== roomId || o.wall) continue;
             if (o.edge > i) o.edge += 1;
@@ -4890,6 +4906,11 @@ export class Fp3dEditor extends LitElement {
       // the edge starting at the removed corner goes away; the one before it keeps its height
       if (target.wall_heights) target.wall_heights.splice(index, 1);
       if (target.wall_thickness) target.wall_thickness.splice(index, 1);
+      if (target.wall_slopes) {
+        target.wall_slopes.splice(index, 1);
+        target.wall_slopes[(index - 1 + target.points.length) % target.points.length] = null;
+        if (target.wall_slopes.every((x) => !x)) target.wall_slopes = undefined;
+      }
       // the two edges at the removed corner merge; openings on them cannot keep their place
       floor.openings = floor.openings
         .filter((o) => o.room_id !== room.id || o.wall || (o.edge !== index && o.edge !== prev))
@@ -5543,6 +5564,19 @@ export class Fp3dEditor extends LitElement {
     return starts.length ? [...new Set(starts)].sort((a, b) => a - b) : [0];
   }
 
+  /** A sloping wall on a room edge: its heights at the edge's start and end corner, or null for a plain wall (D569). */
+  private setEdgeSlope(room: Room, edge: number, slope: [number, number] | null): void {
+    if (!this.isAdmin) return;
+    this.change((_, f) => {
+      const r = f.rooms.find((x) => x.id === room.id);
+      if (!r) return;
+      const list = (r.wall_slopes ?? []).slice(0, r.points.length);
+      while (list.length < r.points.length) list.push(null);
+      list[edge] = slope ? [Math.round(Math.max(0.05, slope[0]) * 1000) / 1000, Math.round(Math.max(0.05, slope[1]) * 1000) / 1000] : null;
+      r.wall_slopes = list.every((x) => !x) ? undefined : list;
+    });
+  }
+
   /** Set a wall height on a room edge (and on the rooms sharing it), or on one part of a split edge only. */
   private setEdgeHeight(room: Room, edge: number, height: number | null, part?: number): void {
     const floor = this.floor;
@@ -5694,6 +5728,7 @@ export class Fp3dEditor extends LitElement {
         const b = room.points[(i + 1) % n];
         const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
         const entry = room.wall_heights?.[i] ?? null;
+        const slope = room.wall_slopes?.[i] ?? null;
         const on = () => (this._edgeHi = i);
         const off = () => (this._edgeHi = null);
         // an edge another room splits: one row per part, each with its own height (#77)
@@ -5717,7 +5752,13 @@ export class Fp3dEditor extends LitElement {
             >
             ${h === 0
               ? html`<span class="fp3d-muted">${this.t("wall_none")}</span>`
-              : this.len(this.t("wall_height"), h ?? H, (v) => set(v >= H - 0.005 ? null : Math.max(0.05, v)), 0.05, 0.05)}
+              : slope && part === undefined
+                ? html`${this.len(this.t("wall_slope_start", { n: i + 1 }), slope[0], (v) => this.setEdgeSlope(room, i, [v, slope[1]]), 0.05, 0.05)}
+                  ${this.len(this.t("wall_slope_end", { n: ((i + 1) % n) + 1 }), slope[1], (v) => this.setEdgeSlope(room, i, [slope[0], v]), 0.05, 0.05)}`
+                : this.len(this.t("wall_height"), h ?? H, (v) => set(v >= H - 0.005 ? null : Math.max(0.05, v)), 0.05, 0.05)}
+            ${this.isAdmin && part === undefined && h !== 0
+              ? html`<button class="fp3d-btn" aria-pressed=${!!slope} title=${this.t("wall_slope_hint")} @click=${() => this.setEdgeSlope(room, i, slope ? null : [h ?? H, h ?? H])}>◢ ${this.t("wall_slope")}</button>`
+              : nothing}
             ${this.isAdmin && h !== null ? html`<button class="fp3d-btn" title=${this.t("wall_height_full")} @click=${() => set(null)}>↥</button>` : nothing}
             ${this.isAdmin && h !== 0 ? html`<button class="fp3d-btn" title=${this.t("wall_none_hint")} @click=${() => set(0)}>${this.t("wall_none")}</button>` : nothing}
             ${this.isAdmin && partLen >= 0.4 ? html`<button class="fp3d-btn" title=${this.t("wall_split_hint")} @click=${() => this.splitEdge(room, i, part)}>✂</button>` : nothing}
@@ -7167,6 +7208,7 @@ export class Fp3dEditor extends LitElement {
       ["tall", "▯"],
       ["living", "🛋"],
       ["light", "💡"],
+      ["switches", "🔌"],
       ...((this.packs ?? []).some((p) => p.items.length) ? ([["pack", "🧩"]] as [string, string][]) : []),
       ...(hasFeature("energy_pro") ? ([["energy", "⚡"]] as [string, string][]) : []),
     ];
@@ -9774,7 +9816,7 @@ export class Fp3dEditor extends LitElement {
       ${admin ? this.renderStartView() : nothing} ${admin ? this.renderFavorites() : nothing} ${admin ? this.renderDirector() : nothing} ${this.renderVoice()}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
-      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderTerrain() : nothing}
+      ${floor && admin ? this.renderBackgroundForm(floor) : nothing} ${admin ? this.renderSettings() : nothing} ${admin ? this.renderBackdrop() : nothing} ${admin ? this.renderTerrain() : nothing}
       ${admin ? this.renderBackup() : nothing} ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
   }
@@ -10340,6 +10382,7 @@ export class Fp3dEditor extends LitElement {
             >`}
         ${f.type === "led_strip"
           ? html`${this.num(this.t("strip_tilt"), f.tilt ?? 0, (v) => this.updateFurniture({ tilt: Math.max(-90, Math.min(90, Math.round(v))) }), 5)}
+              ${f.upright ? nothing : html`<span title=${this.t("strip_rise_hint")}>${this.num(this.t("strip_rise"), f.rise ?? 0, (v) => this.updateFurniture({ rise: Math.max(-80, Math.min(80, Math.round(v))) || undefined }), 5)}</span>`}
               <label class="fp3d-check" title=${this.t("strip_upright_hint")}
                 ><input type="checkbox" .checked=${!!f.upright} ?disabled=${!admin} @change=${(ev: Event) => this.updateFurniture({ upright: (ev.target as HTMLInputElement).checked })} />
                 ${this.t("strip_upright")}</label
@@ -10382,7 +10425,7 @@ export class Fp3dEditor extends LitElement {
             >
           </div>`
         : nothing}
-      ${isElectric(f.type) ? this.renderFurnitureLinks(f) : !NO_STATE_TYPES.has(f.type) ? html`<div class="fp3d-form fp3d-links">${this.renderStateLinks(f)}</div>` : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing} ${f.type === "waste_bin" || f.type === "mailbox" ? this.renderHouseholdForm(f) : this.renderHouseholdExtras(f)}
+      ${isElectric(f.type) ? this.renderFurnitureLinks(f) : !NO_STATE_TYPES.has(f.type) ? html`<div class="fp3d-form fp3d-links">${this.renderStateLinks(f)}</div>` : nothing} ${GANG_TYPES.has(f.type) ? this.renderGangsForm(f) : nothing} ${TECH_TYPES.has(f.type) ? this.renderTechForm(f) : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing} ${f.type === "waste_bin" || f.type === "mailbox" ? this.renderHouseholdForm(f) : this.renderHouseholdExtras(f)}
       ${f.type.startsWith("pack:mastershort.vehicles:") && this.isAdmin
         ? html`<section>
             <p class="fp3d-sub">${this.t("vehicle_to_spot_hint")}</p>
@@ -10715,6 +10758,37 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
+  /** Live director: own triggers – an entity that goes on or open and the camera to show for it (D615). */
+  private renderDirectorTriggers(d: DirectorSettings, placed: string[]) {
+    const hass = this.hass;
+    if (!hass) return nothing;
+    const list = d.triggers ?? [];
+    const save = (next: { entity: string; camera: string | null }[]) => this.change((doc) => (doc.settings.director = { ...(doc.settings.director ?? {}), triggers: next.length ? next : null }));
+    const pro = hasFeature("camera_cockpit");
+    return html`<div class="fp3d-wide">
+      <h4 class="fp3d-lib-head">${this.t("director_triggers")}</h4>
+      <p class="fp3d-sub">${this.t("director_triggers_hint")}</p>
+      ${list.map(
+        (t, i) => html`<div class="fp3d-form">
+          ${this.entitySelect(this.t("director_trigger_entity"), t.entity || null, undefined, this.entityOptions((id) => /^(event|binary_sensor|cover|lock|switch|input_boolean)\./.test(id)), (v) =>
+            save(list.map((x, k) => (k === i ? { ...x, entity: v && v !== "none" ? v : "" } : x)).filter((x) => x.entity)),
+          )}
+          ${this.entitySelect(this.t("director_doorbell_camera"), t.camera, undefined, this.entityOptions((id) => id.startsWith("camera.") && placed.includes(id)), (v) =>
+            save(list.map((x, k) => (k === i ? { ...x, camera: v && v !== "none" ? v : null } : x))),
+          )}
+          <button class="fp3d-btn" ?disabled=${!pro} @click=${() => save(list.filter((_, k) => k !== i))}>✕ ${this.t("delete")}</button>
+        </div>`,
+      )}
+      ${list.length < 20 && pro
+        ? html`<div class="fp3d-form">
+            ${this.entitySelect(this.t("director_trigger_add"), null, undefined, this.entityOptions((id) => /^(event|binary_sensor|cover|lock|switch|input_boolean)\./.test(id)), (v) => {
+              if (v && v !== "none") save([...list, { entity: v, camera: null }]);
+            })}
+          </div>`
+        : nothing}
+    </div>`;
+  }
+
   /**
    * Kamera-Cockpit: the live director – which events a screen shows by itself (each off until switched on), and the
    * switch for this device (a card has its own option).
@@ -10762,6 +10836,9 @@ export class Fp3dEditor extends LitElement {
         >
         ${check("director_appliances", !!d.appliances, (on) => set({ appliances: on }))}
         ${check("director_alerts", !!d.alerts, (on) => set({ alerts: on }))}
+        ${this.renderDirectorTriggers(d, placed)}
+        ${check("director_live", !!d.live, (on) => set({ live: on }))}
+        <p class="fp3d-sub fp3d-wide">${this.t("director_live_hint")}</p>
         ${this.num(this.t("director_hold"), d.hold ?? HOLD_DEFAULT, (v) => set({ hold: Math.min(HOLD_MAX, Math.max(HOLD_MIN, Math.round(v))) }), 5, HOLD_MIN)}
       </div>
       <p class="fp3d-sub">${this.t("director_back_hint")}</p>
@@ -11080,6 +11157,79 @@ export class Fp3dEditor extends LitElement {
       >`;
   }
 
+  /** Wi-Fi access point (D582) and water heater: how it is mounted and its entities. */
+  private renderTechForm(f: Furniture) {
+    if (!this.hass) return nothing;
+    const admin = this.isAdmin;
+    const ap = f.type === "wifi_ap";
+    const mounts = ["", "wall"] as const;
+    const setMount = (v: string) => {
+      const [w, d, h] = TECH_SIZE[`${f.type}:${v}`];
+      this.updateFurniture({ variant: v || null, w, d, h, mount_y: null });
+    };
+    const sensors = this.entityOptions((id) => id.startsWith("sensor."));
+    // an access point's entities are often diagnostic (UniFi): every entity of the kinds that tell a state is offered
+    const main = this.entityOptions((id) => (ap ? /^(binary_sensor|sensor|device_tracker|switch|button|update)\./ : /^(water_heater|climate|switch|input_boolean|sensor)\./).test(id));
+    return html`<div class="fp3d-form fp3d-links">
+      <label class="fp3d-field"
+        >${this.t("tech_mount")}
+        <select ?disabled=${!admin} @change=${(e: Event) => setMount((e.target as HTMLSelectElement).value)}>
+          ${mounts.map((v) => html`<option value=${v} ?selected=${(f.variant ?? "") === v}>${this.t(`${f.type}_${v || "std"}` as I18nKey)}</option>`)}
+        </select></label
+      >
+      ${this.entitySelect(this.t(ap ? "ap_status" : "heater_entity"), typeof f.entity === "string" && f.entity !== "none" ? f.entity : null, undefined, main, (v) => this.updateFurniture({ entity: v && v !== "none" ? v : "none" }))}
+      ${ap
+        ? this.entitySelect(this.t("ap_clients_sensor"), f.clients ?? null, undefined, sensors, (v) => this.updateFurniture({ clients: v && v !== "none" ? v : null }))
+        : html`${this.entitySelect(this.t("heater_temp"), f.water_temp ?? null, undefined, sensors, (v) => this.updateFurniture({ water_temp: v && v !== "none" ? v : null }))}
+            ${this.entitySelect(this.t("furn_power"), typeof f.power === "string" && f.power !== "none" ? f.power : null, undefined, this.entityOptions((id) => this.isPowerSensor(id)), (v) => this.updateFurniture({ power: v && v !== "none" ? v : "none" }))}`}
+      <p class="fp3d-sub fp3d-wide">${this.t(ap ? "ap_hint" : "heater_hint")}</p>
+      <div class="fp3d-form">${this.markerSelect(f.marker ?? null, (v) => this.updateFurniture({ marker: v }))}${this.iconInput(f.icon, (v) => this.updateFurniture({ icon: v }))}</div>
+    </div>`;
+  }
+
+  /** Wall switch or socket (D523, #593): its gangs, and per gang what it switches (a socket also its power sensor). */
+  private renderGangsForm(f: Furniture) {
+    if (!this.hass) return nothing;
+    const admin = this.isAdmin;
+    const gangs = gangsOf(f);
+    const socket = f.type === "wall_socket";
+    const switches = this.entityOptions((id) => /^(light|switch|input_boolean|fan)\./.test(id));
+    const power = this.entityOptions((id) => this.isPowerSensor(id));
+    const save = (next: Gang[]) => this.updateFurniture({ gangs: next.length > 1 || next[0]?.entity || next[0]?.power ? next : null });
+    const setGang = (i: number, patch: Partial<Gang>) => save(gangs.map((g, k) => (k === i ? { ...g, ...patch } : g)));
+    // more gangs make the frame wider (a frame turned by hand keeps its own size otherwise)
+    const count = (n: number) => {
+      const next = Array.from({ length: n }, (_, i) => gangs[i] ?? { entity: null });
+      this.updateFurniture({ gangs: n > 1 || next[0].entity || next[0].power ? next : null, w: gangPlateWidth(n) });
+    };
+    return html`<div class="fp3d-form fp3d-links">
+      <label class="fp3d-field"
+        >${this.t(socket ? "gang_count_socket" : "gang_count_switch")}
+        <select ?disabled=${!admin} @change=${(e: Event) => count(Number((e.target as HTMLSelectElement).value))}>
+          ${Array.from({ length: MAX_GANGS }, (_, i) => i + 1).map((n) => html`<option value=${n} ?selected=${gangs.length === n}>${n}</option>`)}
+        </select></label
+      >
+      ${socket
+        ? html`<label class="fp3d-field"
+            >${this.t("socket_kind")}
+            <select ?disabled=${!admin} @change=${(e: Event) => this.updateFurniture({ variant: (e.target as HTMLSelectElement).value || null })}>
+              ${(["", "outdoor"] as const).map((v) => html`<option value=${v} ?selected=${(f.variant ?? "") === v}>${this.t(v ? "socket_outdoor" : "socket_indoor")}</option>`)}
+            </select></label
+          >`
+        : nothing}
+      ${gangs.map(
+        (g, i) => html`${this.entitySelect(`${this.t(socket ? "gang_socket" : "gang_switch")}${gangs.length > 1 ? ` ${i + 1}` : ""}`, g.entity, undefined, switches, (v) => setGang(i, { entity: v && v !== "none" ? v : null }))}
+        ${socket ? this.entitySelect(`${this.t("furn_power")}${gangs.length > 1 ? ` ${i + 1}` : ""}`, g.power ?? null, undefined, power, (v) => setGang(i, { power: v && v !== "none" ? v : null })) : nothing}`,
+      )}
+      <p class="fp3d-sub fp3d-wide">${this.t(socket ? "gang_socket_hint" : "gang_switch_hint")}</p>
+      <label class="fp3d-check fp3d-wide" title=${this.t("device_confirm_hint")}
+        ><input type="checkbox" .checked=${!!f.confirm} ?disabled=${!admin} @change=${(ev: Event) => this.updateFurniture({ confirm: (ev.target as HTMLInputElement).checked })} />
+        ${this.t("device_confirm")}</label
+      >
+      <div class="fp3d-form">${this.markerSelect(f.marker ?? null, (v) => this.updateFurniture({ marker: v }))}${this.iconInput(f.icon, (v) => this.updateFurniture({ icon: v }))}</div>
+    </div>`;
+  }
+
   private renderFurnitureLinks(f: Furniture) {
     const ALARM_CLASSES = new Set(["smoke", "gas", "carbon_monoxide", "heat", "moisture", "safety", "sound", "problem"]);
     if (!this.hass) return nothing;
@@ -11127,6 +11277,10 @@ export class Fp3dEditor extends LitElement {
           : this.entitySelect(this.t(lamp ? "furn_entity_light" : packMotion(f.type) ? "motor_cover" : tvLike ? "furn_entity_tv" : f.type === "awning" ? "awning_cover" : f.type === "radiator" || f.type === "ac_unit" ? "furn_entity_climate" : isRobotVacuum(f.type) ? "furn_entity_vacuum" : "furn_entity"), f.entity ?? null, autoPick("entity"), entities, (v) =>
               this.updateFurniture({ entity: v }),
             )}
+        ${f.type === "lamp_fan"
+          ? html`${this.entitySelect(this.t("fan_entity"), f.fan ?? null, undefined, this.entityOptions((id) => id.startsWith("fan.")), (v) => this.updateFurniture({ fan: v && v !== "none" ? v : null }))}
+              <p class="fp3d-sub fp3d-wide">${this.t("fan_hint")}</p>`
+          : nothing}
         ${f.type === "awning" ? this.renderAwningFields(f) : packMotion(f.type) ? this.renderMotionFields(f) : nothing}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type) ? this.renderStateLinks(f) : nothing}
         ${lamp && f.entity && f.entity !== "none"
@@ -11621,7 +11775,7 @@ export class Fp3dEditor extends LitElement {
   private libraryButton(type: string, label: string) {
     const show = (e: Event) => void this.showPreview(type, e.currentTarget as HTMLElement);
     // a lamp can be switched from 3D, another electric item takes an entity and a power sensor
-    const badge = isLamp(type) ? "light" : isElectric(type) ? "switch" : null;
+    const badge = isLamp(type) ? "light" : isElectric(type) || GANG_TYPES.has(type) || TECH_TYPES.has(type) ? "switch" : null;
     return html`<button
       class="fp3d-btn ${badge ? "fp3d-lib-electric" : ""}"
       title=${badge ? this.t(badge === "light" ? "lib_badge_light" : "lib_badge_electric") : label}
@@ -11786,10 +11940,12 @@ export class Fp3dEditor extends LitElement {
         const r = f.rooms.find((x) => pointInPolygon([id[1], id[2]], x.points));
         if (r && r.id !== room.id) placedIn.set(id[0], r.name);
       }
-    const row = (id: string, extra = false, nameArea = areaName) => {
+    // extra: an entity from another area (shown only to place it); sub: a further entity of a device, with the same
+    // buttons as its main one – hidden or without state on its own (D484)
+    const row = (id: string, extra = false, nameArea = areaName, sub = false) => {
       const placed = placedHere.has(id);
       const elsewhere = placed ? undefined : placedIn.get(id);
-      return html`<div class="fp3d-row fp3d-dev-row ${extra ? "fp3d-dev-extra" : ""} ${hidden.has(id) ? "fp3d-dev-hidden" : ""}">
+      return html`<div class="fp3d-row fp3d-dev-row ${extra || sub ? "fp3d-dev-extra" : ""} ${hidden.has(id) ? "fp3d-dev-hidden" : ""}">
         <button class="fp3d-dev-name ${placed ? "" : "fp3d-muted"}" ?disabled=${!placed} @click=${() => this.selectItem("device", id)}>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d=${iconPath(kindOf(id)!)} />
@@ -11887,7 +12043,7 @@ export class Fp3dEditor extends LitElement {
                         ${open ? this.t("devices_less") : this.t("devices_more", { n: g.others.length })}
                       </button>`
                     : nothing}
-                  ${open ? (q ? others : g.others).map((id) => row(id, true)) : nothing}`;
+                  ${open ? (q ? others : g.others).map((id) => row(id, false, areaName, true)) : nothing}`;
                 })}
               </div>
               ${admin && unplacedMain.length > 1
@@ -12252,6 +12408,43 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** The ground around the house: its height, a hillside, the earth around cellars. */
+  /** The background behind the 3D house: the look's own sky, one colour, a gradient or a picture. */
+  private renderBackdrop() {
+    const bd = this._doc.settings.backdrop ?? {};
+    const set = (patch: Partial<NonNullable<Building["settings"]["backdrop"]>>) => this.change((d) => (d.settings.backdrop = { ...(d.settings.backdrop ?? {}), ...patch }));
+    const kind = bd.kind ?? "";
+    const colour = (label: I18nKey, value: string | null | undefined, fallback: string, key: "color" | "color2") =>
+      html`<label class="fp3d-field"
+        >${this.t(label)}
+        <input type="color" .value=${value ?? fallback} @change=${(e: Event) => set({ [key]: (e.target as HTMLInputElement).value })} />
+      </label>`;
+    return html`<details class="fp3d-section">
+      <summary>🖼 ${this.t("backdrop")}</summary>
+      <div class="fp3d-form">
+        <label class="fp3d-field fp3d-wide"
+          >${this.t("backdrop_kind")}
+          <select @change=${(e: Event) => set({ kind: (((e.target as HTMLSelectElement).value || null) as "color" | "gradient" | "image" | null) })}>
+            ${(["", "color", "gradient", "image"] as const).map((k) => html`<option value=${k} ?selected=${kind === k}>${this.t(`backdrop_${k || "look"}` as I18nKey)}</option>`)}
+          </select></label
+        >
+        ${kind === "color" || kind === "gradient" ? colour(kind === "gradient" ? "backdrop_top" : "backdrop_color", bd.color, "#0b1426", "color") : nothing}
+        ${kind === "gradient" ? colour("backdrop_bottom", bd.color2, "#03060c", "color2") : nothing}
+        ${kind === "image"
+          ? html`<label class="fp3d-field fp3d-wide"
+                >${this.t("backdrop_image_url")}
+                <input type="text" placeholder="/local/hintergrund.jpg" .value=${bd.image ?? ""} @change=${(e: Event) => set({ image: (e.target as HTMLInputElement).value.trim() || null })}
+              /></label>
+              <label class="fp3d-field fp3d-wide"
+                >${this.t("backdrop_dim")} (${Math.round((bd.dim ?? 0.45) * 100)} %)
+                <input type="range" min="0" max="90" .value=${String(Math.round((bd.dim ?? 0.45) * 100))} @change=${(e: Event) => set({ dim: Number((e.target as HTMLInputElement).value) / 100 })}
+              /></label>
+              ${bd.image && !backdropImage(bd.image) ? html`<p class="fp3d-sub fp3d-wide fp3d-pack-error">${this.t("backdrop_image_bad")}</p>` : nothing}`
+          : nothing}
+      </div>
+      <p class="fp3d-sub">${this.t("backdrop_hint")}</p>
+    </details>`;
+  }
+
   private renderTerrain() {
     const t = this._doc.settings.terrain ?? {};
     const set = (patch: Partial<NonNullable<Building["settings"]["terrain"]>>) => {

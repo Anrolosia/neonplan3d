@@ -844,6 +844,8 @@ export function confirmEntities(hass: HomeAssistant, floors: readonly Floor[]): 
     for (const f of floor.furniture) {
       const e = f.confirm ? links.get(f.id)?.entity : null;
       if (e && e !== "none") out.add(e);
+      // a wall switch or socket asks before switching any of its gangs
+      if (f.confirm) for (const g of f.gangs ?? []) if (g.entity && g.entity !== "none") out.add(g.entity);
     }
   }
   return out;
@@ -911,6 +913,7 @@ const LAMP_NAMES: Record<string, RegExp> = {
   lamp_bollard: /(weg|garten|garden|path|poller|außen|aussen|outdoor)/i,
   lamp_garden: /(garten|garden|spot|außen|aussen|outdoor|baum|tree)/i,
   lamp_pendant: /(pendel|pendant|hänge|esstisch|dining)/i,
+  lamp_fan: /(ventilator|fan|lüfter|luefter|decke|ceiling)/i,
   lamp_floor: /(steh|floor)/i,
   lamp_table: /(tisch|nacht|table|bedside|lese|reading)/i,
   lamp_wall: /(wand|wall)/i,
@@ -989,6 +992,22 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
     }
   }
   return out;
+}
+
+/** An access point's status (D582): online, offline, or null when nothing says (unknown). */
+export function apOnline(st: HassEntity | undefined): boolean | null {
+  if (!st) return null;
+  const s = String(st.state).toLowerCase();
+  if (s === "unavailable") return false;
+  if (s === "unknown" || s === "") return null;
+  return !["off", "disconnected", "offline", "not_home", "disabled", "down", "isolated"].includes(s);
+}
+
+/** How fast a ceiling fan's blades turn (0–1): its percentage while it is on, a middle speed when it reports none. */
+export function fanSpeed(st: HassEntity | undefined): number {
+  if (!st || st.state !== "on") return 0;
+  const pct = st.attributes.percentage;
+  return typeof pct === "number" && Number.isFinite(pct) ? Math.max(0, Math.min(1, pct / 100)) : 0.6;
 }
 
 /** Glow colour of a TV screen for the app that is running (brand colours of common apps). */

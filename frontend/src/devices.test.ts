@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { isRelevant, climateModeGlow, cooktopLevel, onlyColor, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
+import { isRelevant, apOnline, fanSpeed, climateModeGlow, cooktopLevel, onlyColor, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -524,6 +524,33 @@ test("a window marked 'ask first' puts its blind on the confirm list", () => {
   assert.equal(confirmEntities(hass, [floor]).has("cover.rollo"), false);
   floor.openings = [o("w1", { confirm: true })];
   assert.equal(confirmEntities(hass, [floor]).has("cover.rollo"), true);
+});
+
+test("an access point is online, offline or unknown by what its status entity says (D582)", () => {
+  const st = (state: string) => ({ entity_id: "binary_sensor.ap", state, attributes: {} }) as unknown as Parameters<typeof apOnline>[0];
+  for (const s of ["on", "connected", "online", "home", "12"]) assert.equal(apOnline(st(s)), true, s);
+  for (const s of ["off", "disconnected", "not_home", "unavailable"]) assert.equal(apOnline(st(s)), false, s);
+  assert.equal(apOnline(st("unknown")), null);
+  assert.equal(apOnline(undefined), null);
+});
+
+test("a ceiling fan's blades turn with its percentage, at a middle speed without one, not at all when off", () => {
+  const st = (state: string, attributes: Record<string, unknown> = {}) => ({ entity_id: "fan.decke", state, attributes }) as unknown as Parameters<typeof fanSpeed>[0];
+  assert.equal(fanSpeed(st("on", { percentage: 33 })), 0.33);
+  assert.equal(fanSpeed(st("on")), 0.6);
+  assert.equal(fanSpeed(st("on", { percentage: 250 })), 1);
+  assert.equal(fanSpeed(st("off", { percentage: 66 })), 0);
+  assert.equal(fanSpeed(undefined), 0);
+});
+
+test("a wall switch marked 'ask first' puts every gang's entity on the confirm list", () => {
+  const hass = hassWith();
+  const sw = { id: "ws", type: "wall_switch", x: 1, z: 0, rotation: 0, w: 0.156, d: 0.012, h: 0.085, variant: null, gangs: [{ entity: "light.flur" }, { entity: "switch.garten" }], confirm: true };
+  const floor: Floor = { ...newFloor("f", "F", 0), furniture: [sw] };
+  const out = confirmEntities(hass, [floor]);
+  assert.ok(out.has("light.flur") && out.has("switch.garten"));
+  floor.furniture = [{ ...sw, confirm: false }];
+  assert.equal(confirmEntities(hass, [floor]).has("light.flur"), false);
 });
 
 test("a status sensor (a 3D printer) counts as active while it prints", () => {

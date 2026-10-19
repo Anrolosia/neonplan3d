@@ -328,7 +328,8 @@ export class Floorplan3dCardEditor extends LitElement {
 
       <h3>${this.t("card_section_show")}</h3>
       <div class="grid">
-        ${this.select("markers", "markers", [["none", "markers_none"], ["important", "markers_important"], ["all", "markers_all"]], v.markers)}
+        ${this.select("markers", "markers", [["none", "markers_none"], ["room", "markers_room"], ["important", "markers_important"], ["all", "markers_all"]], v.markers)}
+        ${this.select("marker_size", "pin_size", [["small", "pin_size_small"], ["normal", "pin_size_normal"], ["large", "pin_size_large"]], v.marker_size ?? "normal")}
         ${this.select("heatmap", "heatmap", [["none", "heat_off"], ["temperature", "heat_temperature"], ["humidity", "heat_humidity"], ["co2", "heat_co2"], ["values", "heat_values"]], v.heatmap)}
         <label class="field wide"
           >${this.t("flows")}

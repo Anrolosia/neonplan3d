@@ -29,6 +29,8 @@ import { carState, type CarState, roomClimateValue,
   climateModeGlow,
   cooktopLevel,
   onlyColor,
+  fanSpeed,
+  apOnline,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
@@ -101,7 +103,7 @@ import { load3d } from "../load3d.ts";
 import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
 import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
-import { centroid, furnitureFootprint, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, zonesOf, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
+import { centroid, furnitureFootprint, gangEntities, gangsOf, GANG_TYPES, TECH_TYPES, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, zonesOf, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
 import { poolAreas, poolLinksWithDevices, poolState, poolWaterGlow, type PoolState } from "../pool.ts";
 import { pipePieces, poolFlow, waterColor, type PipePiece, type PoolDeviceType } from "../pool-flow.ts";
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -115,12 +117,14 @@ import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../
 import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
+import { backdropCss } from "../backdrop.ts";
 import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
-import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, type DirectorSettings, type Shot } from "../director.ts";
+import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, triggerFired, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
 /** Which HTML markers are shown: none, only what has no 3D object or shows a value, or all. */
-export type MarkerMode = "none" | "important" | "all";
+/** "room": no symbols in the house and floor views, in a room only that room's (D477, D595). */
+export type MarkerMode = "none" | "important" | "all" | "room";
 
 
 
@@ -165,6 +169,7 @@ export class Fp3dView3d extends LitElement {
     explode: { type: Boolean },
     keepRoof: { attribute: false },
     markerMode: { attribute: false },
+    pinSize: { attribute: false },
     markerNames: { attribute: false },
     heatMode: { attribute: false },
     theme: { attribute: false },
@@ -224,6 +229,7 @@ export class Fp3dView3d extends LitElement {
     panelOpen: { attribute: false },
     controlsRight: { attribute: false },
     keepView: { attribute: false },
+    angleLock: { attribute: false },
     alerts: { attribute: false },
     alertJump: { attribute: false },
     director: { attribute: false },
@@ -241,6 +247,7 @@ export class Fp3dView3d extends LitElement {
     _household: { state: true },
     _hhFolded: { state: true },
     _binInfo: { state: true },
+    _gangMenu: { state: true },
     householdCard: { attribute: false },
     _sceneFired: { state: true },
     replay: { attribute: false },
@@ -274,6 +281,8 @@ export class Fp3dView3d extends LitElement {
   /** The roof stays while zooming in (no lift, no fade). */
   declare keepRoof: boolean;
   declare markerMode: MarkerMode;
+  /** How large the device symbols are (D596). */
+  declare pinSize: "small" | "normal" | "large";
   /** Card option marker_names: every device with an own name shows it under its pin. */
   declare markerNames: boolean;
   declare heatMode: HeatMode;
@@ -393,6 +402,8 @@ export class Fp3dView3d extends LitElement {
   declare controlsRight: boolean;
   /** Floor switches keep the camera (#191). */
   declare keepView: boolean;
+  /** 3D lock: the angle stays fixed (a wall tablet nobody should turn the house on). */
+  declare angleLock: boolean;
   /** The stage is narrower than 700 px (smaller floor pictures, phone layout). */
   private declare _narrowStage: boolean;
   private resizeObs: ResizeObserver | null = null;
@@ -413,6 +424,8 @@ export class Fp3dView3d extends LitElement {
   private declare _hhFolded: boolean;
   /** Haushalt Pro: the bin tapped – its next pickups in a small pop-up. */
   private declare _binInfo: { furnitureId: string; x: number; y: number } | null;
+  /** A wall switch or socket with several gangs: its small menu (one button per gang). */
+  private declare _gangMenu: { furnitureId: string; x: number; y: number } | null;
   private binInfoTimer: ReturnType<typeof setTimeout> | undefined;
   /** The glass card "Today in the household" (Haushalt Pro; the dashboard card can switch it off). */
   declare householdCard: boolean;
@@ -535,6 +548,7 @@ export class Fp3dView3d extends LitElement {
     this.explode = true;
     this.keepRoof = false;
     this.markerMode = "important";
+    this.pinSize = "normal";
     this.heatMode = "none";
     this.theme = "neon";
     this.accent = null;
@@ -590,6 +604,7 @@ export class Fp3dView3d extends LitElement {
     this.panelOpen = false;
     this.controlsRight = false;
     this.keepView = false;
+    this.angleLock = false;
     this._narrowStage = false;
     this.alerts = true;
     this.alertJump = false;
@@ -602,6 +617,7 @@ export class Fp3dView3d extends LitElement {
     this._household = [];
     this._hhFolded = readFlag("neonplan3d.hhFolded");
     this._binInfo = null;
+    this._gangMenu = null;
     this.householdCard = true;
     this.scenes = true;
     this._sceneFired = null;
@@ -752,6 +768,7 @@ export class Fp3dView3d extends LitElement {
       });
       this.viewer.setWallMode(this.wallMode);
       this.viewer.setKeepView(this.keepView);
+      this.viewer.setAngleLock(this.angleLock);
       this.viewer.setTheme(this.theme);
       this.viewer.setAccent(this.accent ?? null);
       this.viewer.setFurnishMode(this.furnish);
@@ -828,7 +845,8 @@ export class Fp3dView3d extends LitElement {
       if (this.floorId === null) v.resetView();
     }
     if (changed.has("building") || changed.has("theme") || changed.has("floorThumbs") || changed.has("packs")) this.scheduleThumbs();
-    const forced = ["building", "markerMode", "heatMode", "flows", "alerts", "dimmed"].some((k) => changed.has(k));
+    // with symbols only in rooms, opening or closing a room changes which ones show
+    const forced = ["building", "markerMode", "heatMode", "flows", "alerts", "dimmed"].some((k) => changed.has(k)) || (this.markerMode === "room" && changed.has("roomId"));
     // time travel: a tick moves the clock even when no replayed state changed – the trail and a camera's
     // detections follow it (one sync per tick at most, and only when they are shown)
     const ticked = this.replayTicked && !!this.replay;
@@ -841,6 +859,7 @@ export class Fp3dView3d extends LitElement {
     if (changed.has("roomId") && (this.roomId || changed.get("roomId"))) v.selectRoom(this.roomId);
     if (changed.has("wallMode")) v.setWallMode(this.wallMode);
     if (changed.has("keepView")) v.setKeepView(this.keepView);
+    if (changed.has("angleLock")) v.setAngleLock(this.angleLock);
     if (changed.has("explode")) v.setExplode(this.explode);
     if (changed.has("keepRoof")) v.setKeepRoof(this.keepRoof);
     if (changed.has("hideRoof")) v.setHideRoof(this.hideRoof);
@@ -2140,7 +2159,8 @@ export class Fp3dView3d extends LitElement {
     const open = !this.holoFolded.has(index);
     const day = this.dayOf(card);
     const main = card.kind === "main";
-    const autarky = main && e.consumption !== null && e.consumption > 0 ? Math.round(Math.min(100, Math.max(0, (1 - Math.max(0, e.grid ?? 0) / e.consumption) * 100))) : null;
+    // self-sufficiency right now (D590): without a grid reading it is unknown, not 100 %
+    const autarky = main && e.grid !== null && e.consumption !== null && e.consumption > 0 ? Math.round(Math.min(100, Math.max(0, (1 - Math.max(0, e.grid) / e.consumption) * 100))) : null;
     const curve = day && day.curve.length > 1 ? solarCurvePath(day.curve, day.peak) : null;
     const nowAt = new Date(this.now());
     const nowX = ((nowAt.getHours() + nowAt.getMinutes() / 60) / 24) * 220;
@@ -2287,6 +2307,13 @@ export class Fp3dView3d extends LitElement {
         shots.push({ kind: "doorbell", key: `bell:${bell.id}`, entity: bell.id, camera: bell.camera });
       }
     }
+    // own triggers: an entity that goes on or open, with the camera chosen for it (D615)
+    for (const t of s.triggers ?? []) {
+      if (!t.entity) continue;
+      if (this.directing.edge(`trigger:${t.entity}`, hass.states[t.entity], (a, c) => triggerFired(a, c, now))) {
+        shots.push({ kind: "trigger", key: `trigger:${t.entity}`, entity: t.entity, camera: t.camera });
+      }
+    }
     for (const m of this.directorSrc.motion) {
       if (this.directing.edge(m.sensor, hass.states[m.sensor], (a, c) => a?.state === "off" && c?.state === "on")) {
         shots.push({ kind: "motion", key: `cam:${m.cam}`, entity: m.sensor, camera: m.cam });
@@ -2298,7 +2325,7 @@ export class Fp3dView3d extends LitElement {
       clearTimeout(this.restTimer);
       if (this.directing.resting()) this.restTimer = setTimeout(() => this.direct(), 60_000);
     }
-    const order: Shot["kind"][] = ["doorbell", "motion", "appliance"];
+    const order: Shot["kind"][] = ["doorbell", "trigger", "motion", "appliance"];
     shots.sort((x, y) => order.indexOf(x.kind) - order.indexOf(y.kind));
     for (const shot of shots) {
       if (!this.directing.offer(shot, now, hold)) continue;
@@ -2324,7 +2351,13 @@ export class Fp3dView3d extends LitElement {
     if (!b) return;
     // a camera at the door (or the one that saw someone): look through it, when it is placed in the plan
     if (shot.camera && b.floors.some((f) => f.placements.some((p) => p.entity_id === shot.camera))) {
-      this.lookThrough(shot.camera);
+      const camera = shot.camera;
+      // an open room panel would lie over the camera picture: the room closes first (the way back reopens it)
+      if (this.roomId) {
+        // a tap on the open room closes it (panel and card toggle it)
+        this.fire("room-tap", { floorId: this.floorId, roomId: this.roomId });
+        setTimeout(() => this.lookThrough(camera), 250);
+      } else this.lookThrough(camera);
       return;
     }
     if (shot.kind === "appliance") {
@@ -2485,7 +2518,50 @@ export class Fp3dView3d extends LitElement {
         const faces = this.stateFaces(hass, f);
         if (faces.length) screens.set(f.id, { color: faces[0].color, level: faces[0].level, faces });
         if (isLamp(f.type)) {
-          markers.push(this.lampMarker(hass, floor, f, linked?.entity ?? null));
+          const lamp = this.lampMarker(hass, floor, f, linked?.entity ?? null);
+          markers.push(lamp);
+          // a ceiling fan with light: its fan gets a pin of its own beside the light (tap: on/off, hold: speed)
+          const fan = f.type === "lamp_fan" && f.fan && f.fan !== "none" ? f.fan : null;
+          if (fan && !taken.has(fan)) {
+            taken.add(fan);
+            const st = hass.states[fan];
+            const a = (f.rotation * Math.PI) / 180;
+            const off = Math.min(0.45, f.w * 0.3);
+            markers.push({
+              id: fan,
+              floorId: floor.id,
+              roomId: lamp.roomId,
+              x: f.x + Math.cos(a) * off,
+              z: f.z + Math.sin(a) * off,
+              y: lamp.y,
+              icon: f.icon ? mdiIcon(f.icon) : iconSvg("fan"),
+              name: entityName(hass, fan),
+              // its speed while it runs
+              text: st && fanSpeed(st) > 0 && typeof st.attributes.percentage === "number" ? `${Math.round(st.attributes.percentage)} %` : st ? stateText(hass, st) : "",
+              active: st ? isActive(st) : false,
+              unavailable: st ? isUnavailable(st) : false,
+              glow: null,
+              furnitureId: f.id,
+              show: f.marker ?? "always",
+              fromFurniture: true,
+            });
+          }
+          continue;
+        }
+        if (TECH_TYPES.has(f.type)) {
+          const pin = this.techItem(hass, floor, f, screens, taken);
+          if (pin) {
+            markers.push(pin);
+            targets.set(f.id, pin.id);
+          }
+          continue;
+        }
+        if (GANG_TYPES.has(f.type)) {
+          const pin = this.gangItem(hass, floor, f, consumers, screens, consumerSensors);
+          if (pin) {
+            markers.push(pin);
+            targets.set(f.id, pin.id);
+          }
           continue;
         }
         // a home battery with only its charge, a wallbox with only its status still gets its marker;
@@ -2568,7 +2644,7 @@ export class Fp3dView3d extends LitElement {
           const name = f.name || (link.entity ? entityName(hass, link.entity) : furnitureName(hass, f.type));
           if (busy) {
             // running by its time left alone: it glows like one that draws power
-            if (!running) screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
+            if (!running) screens.set(f.id, runGlow(f.type));
             if (min !== null) {
               hhText = translate(hass, "hh_left", { t: remainingText(min) });
               today.push({ icon: "timer-outline", text: `${name}: ${hhText}`, entity: f.remaining ?? link.entity });
@@ -2608,7 +2684,7 @@ export class Fp3dView3d extends LitElement {
           const glow = climateModeGlow(st);
           if (glow) screens.set(f.id, glow);
         } else if ((f.type === "washer" || f.type === "dryer" || f.type === "dishwasher") && running) {
-          screens.set(f.id, { color: [0.3, 0.85, 1], level: 0.8 });
+          screens.set(f.id, runGlow(f.type));
         } else if (f.type === "stove" || isPackCooktop(f.type)) {
           // the burners glow while it cooks (or draws power), faintly while it is ready
           const level = cooktopLevel(st, running);
@@ -2725,6 +2801,182 @@ export class Fp3dView3d extends LitElement {
         this.syncDevices(true);
       });
     }
+  }
+
+  /**
+   * Wall switch or socket (D523, D540, #593): every gang lights while its entity is on (a light in its own colour, a
+   * socket green, brighter with what it draws); a socket's power sensors count as consumers. One pin for the frame –
+   * the same entity may sit on several sockets (two sockets on one relay).
+   */
+  private gangItem(
+    hass: HomeAssistant,
+    floor: Floor,
+    f: Furniture,
+    consumers: Consumer[],
+    screens: Map<string, ScreenState>,
+    consumerSensors: Set<string>,
+  ): (DeviceMarker & { fromFurniture: boolean }) | null {
+    const gangs = gangsOf(f);
+    const socket = f.type === "wall_socket";
+    const faces: NonNullable<ScreenState["faces"]> = [];
+    let on = 0;
+    let used = 0;
+    let watts: number | null = null;
+    let reachable = false;
+    gangs.forEach((g, i) => {
+      const ent = g.entity && g.entity !== "none" ? g.entity : null;
+      const pw = g.power && g.power !== "none" ? g.power : null;
+      if (!ent && !pw) return;
+      used++;
+      const st = ent ? hass.states[ent] : undefined;
+      const w = pw ? readPower(hass.states[pw]) : null;
+      if (pw && w !== null) {
+        watts = (watts ?? 0) + Math.max(0, w);
+        if (!consumerSensors.has(pw)) {
+          consumerSensors.add(pw);
+          consumers.push({ id: ent ?? pw, powerEntity: pw, floorId: floor.id, x: f.x, z: f.z, power: Math.max(0, w) });
+        }
+      }
+      if (st && !isUnavailable(st)) reachable = true;
+      const active = st ? isActive(st) : (w ?? 0) > 5;
+      if (!active) return;
+      on++;
+      const lit = st && kindOf(st.entity_id) === "light" ? lightGlow(st) : null;
+      const color: [number, number, number] = lit ? lit.color : socket ? [0.35, 1, 0.55] : [0.22, 0.88, 1];
+      faces.push({ part: "gang", index: i, of: gangs.length, color, level: socket && w !== null ? Math.min(1, 0.55 + w / 1500) : 0.8 });
+    });
+    if (faces.length) screens.set(f.id, { color: faces[0].color, level: faces[0].level, faces });
+    if (!used) return null;
+    const ids = gangEntities(f);
+    const first = ids[0] ?? null;
+    const st = first ? hass.states[first] : undefined;
+    const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+    const power = watts as number | null;
+    return {
+      id: `gangs:${f.id}`,
+      floorId: floor.id,
+      roomId: room?.id ?? null,
+      x: f.x,
+      z: f.z,
+      y: f.h + 0.2 + mountBase(floor, f),
+      icon: mdiIcon(f.icon || (socket ? "power-socket-de" : "light-switch")),
+      name: f.name || (ids.length === 1 && first ? entityName(hass, first) : furnitureName(hass, f.type)),
+      ownName: f.name || undefined,
+      showName: !!f.show_name,
+      // several gangs: how many are on (and what they draw together)
+      text: used > 1 ? `${on}/${used}${power !== null ? ` · ${formatPower(hass, power)}` : ""}` : power !== null ? formatPower(hass, power) : st ? stateText(hass, st) : "",
+      active: on > 0,
+      unavailable: !!first && !reachable,
+      glow: null,
+      power: power ?? undefined,
+      furnitureId: f.id,
+      show: f.marker ?? undefined,
+      fromFurniture: true,
+    };
+  }
+
+  /**
+   * Wi-Fi access point (D582): its LED ring blue while it is online, red when it is gone, and its clients on the pin
+   * (which then shows by itself). Water heater: it glows warm while it heats and tells its water temperature.
+   */
+  private techItem(hass: HomeAssistant, floor: Floor, f: Furniture, screens: Map<string, ScreenState>, taken: Set<string>): (DeviceMarker & { fromFurniture: boolean; energyDevice?: boolean }) | null {
+    const ref = (v: EntityRef | undefined) => (typeof v === "string" && v !== "none" ? v : null);
+    const main = ref(f.entity);
+    const st = main ? hass.states[main] : undefined;
+    const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+    const base = {
+      floorId: floor.id,
+      roomId: room?.id ?? null,
+      x: f.x,
+      z: f.z,
+      ownName: f.name || undefined,
+      showName: !!f.show_name,
+      glow: null,
+      furnitureId: f.id,
+      fromFurniture: true,
+    };
+    if (f.type === "wifi_ap") {
+      const clientsId = ref(f.clients);
+      const cs = clientsId ? hass.states[clientsId] : undefined;
+      const n = cs && Number.isFinite(Number(cs.state)) ? Math.round(Number(cs.state)) : null;
+      // without a status entity the clients sensor tells whether it is there
+      const online = main ? apOnline(st) : cs ? apOnline(cs) : null;
+      if (online !== null) {
+        const color: [number, number, number] = online ? [0.25, 0.6, 1] : [1, 0.25, 0.2];
+        screens.set(f.id, { color, level: 0.85, faces: [{ part: "apring", color, level: 0.85 }] });
+      }
+      const id = main ?? clientsId;
+      if (!id || taken.has(id)) return null;
+      taken.add(id);
+      return {
+        ...base,
+        id,
+        y: mountBase(floor, f) - (f.variant === "wall" ? -f.h - 0.2 : 0.3),
+        icon: mdiIcon(f.icon || "access-point"),
+        name: f.name || entityName(hass, id),
+        text: online === false ? translate(hass, "ap_offline") : n !== null ? translate(hass, "ap_clients", { n }) : st ? stateText(hass, st) : "",
+        active: online === true,
+        unavailable: online === false,
+        // gone: its pin shows by itself
+        show: f.marker ?? (online === false ? "always" : undefined),
+        energyDevice: n !== null,
+      };
+    }
+    // water heater: heating by its action, a switch that is on, or the power it draws
+    const kind = st ? kindOf(st.entity_id) : null;
+    const pw = ref(f.power);
+    const watts = pw ? readPower(hass.states[pw]) : null;
+    const runW = typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 30;
+    const heating = (st?.attributes.hvac_action === "heating") || (kind === "switch" && st?.state === "on") || (watts ?? 0) > runW;
+    const on = heating || (!!st && !["off", "unavailable", "unknown"].includes(st.state));
+    if (on) screens.set(f.id, { color: [1, 0.45, 0.15], level: heating ? 0.9 : 0.3, faces: [{ part: "band", color: [1, 0.45, 0.15], level: heating ? 0.9 : 0.3 }] });
+    const tempId = ref(f.water_temp);
+    const ts = tempId ? hass.states[tempId] : undefined;
+    const temp = ts && Number.isFinite(Number(ts.state)) ? Number(ts.state) : typeof st?.attributes.current_temperature === "number" ? (st.attributes.current_temperature as number) : null;
+    const unit = (ts?.attributes.unit_of_measurement as string | undefined) ?? "°C";
+    const id = main ?? tempId ?? pw;
+    if (!id || taken.has(id)) return null;
+    taken.add(id);
+    return {
+      ...base,
+      id,
+      y: mountBase(floor, f) + f.h + 0.25,
+      icon: mdiIcon(f.icon || "water-boiler"),
+      name: f.name || (main ? entityName(hass, main) : furnitureName(hass, f.type)),
+      text: temp !== null ? `${formatNumber(hass, Math.round(temp))} ${unit}${heating ? " · 🔥" : ""}` : st ? stateText(hass, st) : "",
+      active: heating,
+      unavailable: st ? isUnavailable(st) : false,
+      power: watts ?? undefined,
+      show: f.marker ?? undefined,
+      // its temperature is worth a pin
+      energyDevice: temp !== null,
+    };
+  }
+
+  /** A wall switch's or socket's menu: one button per gang, tapped it switches that gang. */
+  private renderGangMenu() {
+    const m = this._gangMenu;
+    const hass = this.hass;
+    const f = m && this.building?.floors.flatMap((x) => x.furniture).find((x) => x.id === m.furnitureId);
+    if (!m || !hass || !f) return nothing;
+    const socket = f.type === "wall_socket";
+    const close = () => (this._gangMenu = null);
+    return html`<div class="fp3d-menu-backdrop" @click=${close}></div>
+      <div class="fp3d-swipe fp3d-info fp3d-gang-menu" style="left:${m.x}px;top:${m.y}px">
+        <span>${f.name || furnitureName(hass, f.type)}</span>
+        ${gangsOf(f).map((g, i) => {
+          const id = g.entity && g.entity !== "none" ? g.entity : null;
+          const st = id ? hass.states[id] : undefined;
+          const w = g.power && g.power !== "none" ? readPower(hass.states[g.power]) : null;
+          const label = `${socket ? "🔌" : "▭"} ${i + 1} · ${id ? entityName(hass, id) : "–"}`;
+          return html`<button class="fp3d-chip ${st && isActive(st) ? "fp3d-gang-on" : ""}" ?disabled=${!id || (st ? isUnavailable(st) : true)}
+            @click=${() => {
+              if (!id) return;
+              if (this.confirmSet.has(id) && !confirm(translate(hass, "confirm_switch", { name: entityName(hass, id) }))) return;
+              void toggleEntity(hass, id);
+            }}>${label}${st ? html` <small>${stateText(hass, st)}${w !== null ? ` · ${formatPower(hass, Math.max(0, w))}` : ""}</small>` : nothing}</button>`;
+        })}
+      </div>`;
   }
 
   /** Haushalt Pro: how a bin or a mailbox shows now – its glow and its pin (with the days to the pickup, "post"). */
@@ -3041,14 +3293,14 @@ export class Fp3dView3d extends LitElement {
       : item || model === "wall" || model === "strip"
       ? mountBase(floor, f)
       : model === "table"
-        ? surfaceHeight(floor, f.x, f.z)
+        ? surfaceHeight(floor, f.x, f.z, f.h)
         : model === "bollard" || model === "garden"
           ? outdoorGround(floor, f.x, f.z)
           : 0;
     const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
     // under a sloped roof the ceiling is the roof's underside: lamps hung from it follow the slope (#168)
     const ceiling = this.ceilingAt(floor, f.x, f.z);
-    const hung = (item ? item.mount === "ceiling" : ["ceiling", "downlight", "spot", "panel", "pendant"].includes(model)) && f.mount_y == null;
+    const hung = (item ? item.mount === "ceiling" : ["ceiling", "downlight", "spot", "panel", "pendant", "fan"].includes(model)) && f.mount_y == null;
     const slopeDrop = hung ? floor.height - ceiling : 0;
     const base = item && hung ? Math.max(0, base0 - slopeDrop) : base0;
     // a spot lowered by hand hangs from its own "ceiling" (under a wall cabinet, #311)
@@ -3065,6 +3317,7 @@ export class Fp3dView3d extends LitElement {
       spot: H - 0.35,
       panel: H - 0.25,
       pendant: Math.max(0.6, H - f.h - 0.25),
+      fan: Math.max(0.6, H - f.h - 0.25),
       floor: base + f.h + 0.25,
       uplight: base + f.h + 0.25,
       table: base + f.h + 0.2,
@@ -3092,6 +3345,9 @@ export class Fp3dView3d extends LitElement {
       mirror: !!f.mirror,
       roll: f.tilt ?? 0,
       upright: !!f.upright,
+      rise: f.rise ?? 0,
+      // a ceiling fan's blades turn with its fan entity (D606)
+      fanSpeed: model === "fan" ? fanSpeed(f.fan && f.fan !== "none" ? hass.states[f.fan] : undefined) : undefined,
       size: [f.w, f.d, f.h],
       base,
       top,
@@ -3112,12 +3368,23 @@ export class Fp3dView3d extends LitElement {
    * Marker rule: "important" leaves out devices that their 3D object stands for (lamps, a TV that is
    * off) and keeps devices without an object (sensors, heating, switches) and values (watts, the app).
    */
+  /** Whether a symbol stands in the room (or outdoor area) open now: by its room, else by where it stands. */
+  private inOpenRoom(m: DeviceMarker): boolean {
+    if (!this.roomId) return false;
+    if (m.roomId) return m.roomId === this.roomId;
+    const floor = this.building?.floors.find((f) => f.id === m.floorId);
+    const zone = floor ? zonesOf(floor).find((r) => r.id === this.roomId) : undefined;
+    return !!zone && pointInPolygon([m.x, m.z], zone.points);
+  }
+
   private showPin(m: DeviceMarker & { fromFurniture?: boolean; energyDevice?: boolean }): boolean {
     // while furnishing every placed device has a pin to grab it by
     if (this.furnish && !m.fromFurniture) return true;
     // the device's own setting wins over the marker mode (except "none", which hides every marker)
     if (m.show === "never" || this.markerMode === "none") return false;
     if (m.show === "always" || this.markerMode === "all") return true;
+    // only in rooms: none in the house and floor views, in a room only its own (then like "important")
+    if (this.markerMode === "room" && !this.inOpenRoom(m)) return false;
     if (m.lamp || m.model) return false;
     const kind = kindOf(m.id);
     if (kind === "light") return false;
@@ -3195,6 +3462,14 @@ export class Fp3dView3d extends LitElement {
 
   /** Long press: the quick menu at the device, or the details for devices without one. */
   private onDeviceHold(entityId: string, x: number, y: number): void {
+    // a wall switch or socket: the quick menu of its one entity, else the frame's menu
+    if (entityId.startsWith("gangs:")) {
+      const f = this.building?.floors.flatMap((m) => m.furniture).find((m) => m.id === entityId.slice(6));
+      const ids = f ? gangEntities(f) : [];
+      if (ids.length === 1) this.onDeviceHold(ids[0], x, y);
+      else this.onDeviceTap(entityId, x, y);
+      return;
+    }
     if (this.ro) {
       this.onDeviceTap(entityId, x, y);
       return;
@@ -3834,6 +4109,8 @@ export class Fp3dView3d extends LitElement {
     const t = this._through;
     if (!t) return;
     this._through = null;
+    // the stream player goes with the look (the camera wall makes its own when it opens)
+    if (this.live?.id === t.entity) this.live = null;
     this.viewer?.flyTo(t.back);
     if (this.throughWall) {
       this.throughWall = false;
@@ -3967,11 +4244,13 @@ export class Fp3dView3d extends LitElement {
     const st = this.hass.states[t.entity];
     const picture = st?.attributes.entity_picture as string | undefined;
     const src = picture && !isUnavailable(st) ? (picture.startsWith("data:") ? picture : `${picture}${picture.includes("?") ? "&" : "?"}fp3d=${this.cameraTick}`) : null;
+    // the live stream when it is switched on (D589), the still until the player is there or when it fails
+    const stream = this.building?.settings.director?.live ? this.liveFor(t.entity) : null;
     return html`<div class="fp3d-through" style="--fp3d-blend:${this._blend}">
-      ${src ? html`<img class="fp3d-through-img" src=${src} alt="" />` : nothing}
+      ${stream ? html`<div class="fp3d-through-img fp3d-through-live">${stream}</div>` : src ? html`<img class="fp3d-through-img" src=${src} alt="" />` : nothing}
       <div class="fp3d-through-bar">
         <span class="fp3d-through-name">${entityName(this.hass, t.entity)}</span>
-        <span class="fp3d-still">${translate(this.hass, "camera_still", { s: this._low ? 10 : 5 })}</span>
+        <span class="fp3d-still">${stream ? "● Live" : translate(this.hass, "camera_still", { s: this._low ? 10 : 5 })}</span>
         <input
           type="range"
           min="0"
@@ -3980,9 +4259,20 @@ export class Fp3dView3d extends LitElement {
           aria-label=${translate(this.hass, "through_blend")}
           @input=${(e: Event) => (this._blend = Number((e.target as HTMLInputElement).value) / 100)}
         />
+        <button class="fp3d-chip" title=${translate(this.hass, "through_full_hint")} @click=${() => this.throughFull(t.entity)}>⛶ ${translate(this.hass, "through_full")}</button>
         <button class="fp3d-chip" @click=${() => this.endThrough()}>${translate(this.hass, "through_back")}</button>
       </div>
     </div>`;
+  }
+
+  /**
+   * The camera's picture on the whole screen (idea from dlavrantonis' fork); where the browser cannot (old tablet
+   * WebViews), Home Assistant's own camera view opens instead – it also has the sound.
+   */
+  private throughFull(entity: string): void {
+    const el = this.renderRoot.querySelector(".fp3d-through-img") as (HTMLElement & { requestFullscreen?: () => Promise<void> }) | null;
+    if (el && typeof el.requestFullscreen === "function") el.requestFullscreen().catch(() => openMoreInfo(this, entity));
+    else openMoreInfo(this, entity);
   }
 
   private renderMenu() {
@@ -4011,6 +4301,25 @@ export class Fp3dView3d extends LitElement {
   private onDeviceTap(entityId: string, x = 0, y = 0): void {
     // trail pins and lamps without a light are drawn, but nothing of Home Assistant stands behind them
     if (entityId.startsWith("trail:") || entityId.startsWith("lamp:")) return;
+    // a wall switch or socket: one entity is switched right away, several open the frame's menu
+    if (entityId.startsWith("gangs:")) {
+      const fid = entityId.slice(6);
+      const f = this.building?.floors.flatMap((x) => x.furniture).find((x) => x.id === fid);
+      if (!f) return;
+      const ids = gangEntities(f);
+      if (ids.length === 1) return this.onDeviceTap(ids[0], x, y);
+      if (ids.length > 1) {
+        this._gangMenu = { furnitureId: fid, x, y };
+        return;
+      }
+      // only power sensors: their details
+      const pw = gangsOf(f).find((g) => g.power && g.power !== "none")?.power;
+      if (pw) {
+        if (this.ro) this.showInfo(pw, x, y);
+        else openMoreInfo(this, pw);
+      }
+      return;
+    }
     // Haushalt Pro: a bin shows its next pickups; a mailbox's or a plant's pin opens its sensor
     if (entityId.startsWith("hh:")) {
       const [id, furnitureId] = entityId.slice(3).split("#");
@@ -4176,13 +4485,16 @@ export class Fp3dView3d extends LitElement {
     const sky = this._sky;
     const mix = (a: number[], b: number[]) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * sky)).join(",")})`;
     const stage = STAGE[this.theme] ?? STAGE.neon;
-    const style = `--fp3d-sky:${mix(stage.night[0], stage.day[0])};--fp3d-ground:${mix(stage.night[1], stage.day[1])}`;
+    // an own background (colour, gradient, picture) replaces the look's sky
+    const own = backdropCss(this.building?.settings.backdrop);
+    const pinK = this.pinSize === "small" ? 0.8 : this.pinSize === "large" ? 1.25 : 1;
+    const style = `--fp3d-pin-k:${pinK};--fp3d-sky:${mix(stage.night[0], stage.day[0])};--fp3d-ground:${mix(stage.night[1], stage.day[1])}${own ? `;background:${own}` : ""}`;
     return html`<div
       class="fp3d-stage ${this.roomLabels ? "" : "fp3d-no-room-names"} ${this._low ? "fp3d-low" : ""} ${this.panelOpen ? "fp3d-panel-open" : ""} ${this.controlsRight ? "fp3d-side-right" : ""} ${this._alerts.length ? "fp3d-has-alerts" : ""} ${this._through ? "fp3d-through-on" : ""} ${this._flash ? "fp3d-flash" : ""} ${this.replay ? "fp3d-replay" : ""}"
       style=${style}
     >
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
-      ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderThrough()} ${this.renderCameraWall()}
+      ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderGangMenu()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
       ${this.renderMic()}
       ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
@@ -4245,6 +4557,22 @@ export class Fp3dView3d extends LitElement {
       .fp3d-holo-link[style*="--bin"] line,
       .fp3d-holo-link[style*="--bin"] circle {
         stroke: var(--bin);
+      }
+      .fp3d-gang-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        z-index: 6;
+      }
+      .fp3d-gang-menu .fp3d-chip {
+        text-align: left;
+      }
+      .fp3d-gang-menu .fp3d-gang-on {
+        border-color: var(--fp3d-accent, #37e0ff);
+        box-shadow: 0 0 10px rgba(55, 224, 255, 0.35);
+      }
+      .fp3d-gang-menu small {
+        opacity: 0.7;
       }
       .fp3d-bin-info {
         display: flex;
@@ -4471,7 +4799,8 @@ export class Fp3dView3d extends LitElement {
         border: 1px solid var(--fp3d-line);
         background: var(--fp3d-chrome);
         color: var(--fp3d-muted);
-        font: 600 12px var(--fp3d-font);
+        /* the symbol size (small 0.8, normal 1, large 1.25) scales the pin from inside, not its position */
+        font: 600 calc(12px * var(--fp3d-pin-k, 1)) var(--fp3d-font);
         cursor: pointer;
         white-space: nowrap;
         backdrop-filter: blur(6px);
@@ -4483,10 +4812,14 @@ export class Fp3dView3d extends LitElement {
       .fp3d-dev-icon {
         display: grid;
         place-items: center;
-        width: 24px;
-        height: 24px;
+        width: calc(24px * var(--fp3d-pin-k, 1));
+        height: calc(24px * var(--fp3d-pin-k, 1));
         border-radius: 50%;
         background: rgba(91, 124, 255, 0.14);
+      }
+      .fp3d-dev-icon svg {
+        width: calc(18px * var(--fp3d-pin-k, 1));
+        height: calc(18px * var(--fp3d-pin-k, 1));
       }
       .fp3d-dev[data-entity^="trail:"] {
         padding: 2px 4px 2px 2px;
@@ -5243,6 +5576,23 @@ export class Fp3dView3d extends LitElement {
         object-fit: cover;
         opacity: var(--fp3d-blend);
       }
+      .fp3d-through-live {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .fp3d-through-live > * {
+        width: 100%;
+        --ha-card-background: transparent;
+        --ha-card-border-width: 0;
+        --ha-card-box-shadow: none;
+      }
+      .fp3d-through-img:fullscreen {
+        opacity: 1;
+        object-fit: contain;
+        background: #000;
+      }
       .fp3d-through-bar {
         position: absolute;
         left: 50%;
@@ -5906,6 +6256,12 @@ function formatPower(hass: HomeAssistant | undefined, w: number): string {
 }
 
 /** Marker height above furniture: in front of a screen, above wall units, else just above the top. */
+/** A running washer or dryer: a ring of light round its round door (#516); a dishwasher: its front. */
+function runGlow(type: string): ScreenState {
+  const color: [number, number, number] = [0.3, 0.85, 1];
+  return type === "washer" || type === "dryer" ? { color, level: 0.8, faces: [{ part: "drum", color, level: 0.8 }] } : { color, level: 0.8 };
+}
+
 function markerHeight(f: Furniture): number {
   if (f.type === "tv_board") return f.h + 0.9;
   // wall TV and wall cabinet: above the item (their height above the floor comes from mountBase)

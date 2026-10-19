@@ -142,7 +142,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Remove panel and card."""
     frontend.async_remove_panel(hass, PANEL_URL_PATH)
-    frontend.remove_extra_js_url(hass, await _async_main_url(hass))
+    # newer Home Assistant raises when the list was never made (no frontend loaded, as in tests) or the url is gone
+    with contextlib.suppress(KeyError, ValueError):
+        frontend.remove_extra_js_url(hass, await _async_main_url(hass))
     hass.data.pop(DOMAIN, None)
     hass.data.pop(DATA_DIAGNOSTICS, None)
     return True

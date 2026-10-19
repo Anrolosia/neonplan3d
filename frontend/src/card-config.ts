@@ -16,6 +16,8 @@ export interface CardConfig {
   controls_side?: "left" | "right";
   /** Switching floors keeps the camera (#191). */
   keep_view?: boolean;
+  /** 3D lock: the angle stays fixed, a drag moves the view (a wall tablet with children around). */
+  angle_lock?: boolean;
   /** Pull floors apart in the house view (default true). */
   explode?: boolean;
   /** A "Cameras" button that opens the camera wall, every camera's live picture (Pro: camera cockpit). */
@@ -28,7 +30,9 @@ export interface CardConfig {
   /** Show the performance display (frames per second, draw calls). */
   stats?: boolean;
   /** HTML markers: none | important (default) | all. */
-  markers?: "none" | "important" | "all";
+  markers?: "none" | "important" | "all" | "room";
+  /** How large the device symbols are (default normal). */
+  marker_size?: "small" | "normal" | "large";
   /** Every device with an own name shows it under its marker (#156). */
   marker_names?: boolean;
   /** The star with the central menu: all lights / blinds of the floor or house and the favourites (default true, #145). */

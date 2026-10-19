@@ -69,6 +69,7 @@ export class Floorplan3dPanel extends LitElement {
     _quality: { state: true },
     _stats: { state: true },
     _markers: { state: true },
+    _pinSize: { state: true },
     _heat: { state: true },
     _theme: { state: true },
     _furnish: { state: true },
@@ -78,6 +79,7 @@ export class Floorplan3dPanel extends LitElement {
     _roomNames: { state: true },
     _controlsRight: { state: true },
     _keepView: { state: true },
+    _angleLock: { state: true },
     _trail: { state: true },
     _cameraWall: { state: true },
     _clean: { state: true },
@@ -117,6 +119,8 @@ export class Floorplan3dPanel extends LitElement {
   /** Performance display (per device; also switched on by ?fp3d_stats in the URL). */
   private declare _stats: boolean;
   private declare _markers: MarkerMode;
+  /** How large the device symbols are (this device). */
+  private declare _pinSize: "small" | "normal" | "large";
   private declare _heat: HeatMode;
   private declare _theme: Theme;
   private declare _furnish: boolean;
@@ -127,6 +131,8 @@ export class Floorplan3dPanel extends LitElement {
   private declare _roomNames: boolean;
   private declare _controlsRight: boolean;
   private declare _keepView: boolean;
+  /** 3D lock on this device: the angle stays fixed. */
+  private declare _angleLock: boolean;
   /** Motion trail of the last half hour in 3D. */
   private declare _trail: boolean;
   private declare _cameraWall: boolean;
@@ -174,7 +180,9 @@ export class Floorplan3dPanel extends LitElement {
     this._quality = quality === "low" || quality === "high" ? quality : "auto";
     this._stats = prefs.get("stats") === "1" || new URLSearchParams(location.search).has("fp3d_stats");
     const markers = prefs.get("markers");
-    this._markers = markers === "none" || markers === "all" ? markers : "important";
+    this._markers = markers === "none" || markers === "all" || markers === "room" ? markers : "important";
+    const pinSize = prefs.get("pinSize");
+    this._pinSize = pinSize === "small" || pinSize === "large" ? pinSize : "normal";
     const heat = prefs.get("heat");
     this._heat = heat === "temperature" || heat === "humidity" || heat === "co2" || heat === "values" ? heat : "none";
     const theme = prefs.get("theme") as Theme | null;
@@ -189,6 +197,7 @@ export class Floorplan3dPanel extends LitElement {
     this._roomNames = prefs.get("room_names") !== "0";
     this._controlsRight = prefs.get("controls") === "right";
     this._keepView = prefs.get("keep_view") === "1";
+    this._angleLock = prefs.get("angle_lock") === "1";
     this._trail = prefs.get("trail") === "1";
     this._cameraWall = false;
     this._clean = prefs.get("clean") === "1";
@@ -597,7 +606,7 @@ export class Floorplan3dPanel extends LitElement {
                 </label>
               </div>
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("markers")}>
-                ${(["none", "important", "all"] as MarkerMode[]).map(
+                ${(["none", "room", "important", "all"] as MarkerMode[]).map(
                   (m) =>
                     html`<button
                       aria-pressed=${this._markers === m}
@@ -608,6 +617,20 @@ export class Floorplan3dPanel extends LitElement {
                       }}
                     >
                       ${this.t(`markers_${m}`)}
+                    </button>`,
+                )}
+              </div>
+              <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("pin_size")} title=${this.t("pin_size")}>
+                ${(["small", "normal", "large"] as const).map(
+                  (k) =>
+                    html`<button
+                      aria-pressed=${this._pinSize === k}
+                      @click=${() => {
+                        this._pinSize = k;
+                        prefs.set("pinSize", k);
+                      }}
+                    >
+                      ${this.t(`pin_size_${k}`)}
                     </button>`,
                 )}
               </div>
@@ -636,6 +659,17 @@ export class Floorplan3dPanel extends LitElement {
                   }}
                 >
                   ⌖
+                </button>
+                <button
+                  aria-pressed=${this._angleLock}
+                  title=${`${this.t("angle_lock")}: ${this.t("angle_lock_hint")}`}
+                  aria-label=${this.t("angle_lock")}
+                  @click=${() => {
+                    this._angleLock = !this._angleLock;
+                    prefs.set("angle_lock", this._angleLock ? "1" : "0");
+                  }}
+                >
+                  🔒
                 </button>
                 <button
                   aria-pressed=${this._stats}
@@ -873,6 +907,7 @@ export class Floorplan3dPanel extends LitElement {
           .roomLabels=${this._roomNames}
           .controlsRight=${this._controlsRight}
           .keepView=${this._keepView}
+          .angleLock=${this._angleLock}
           ?trail=${this._trail}
           .cameraWall=${this._cameraWall && !tt}
           @camera-wall-close=${() => (this._cameraWall = false)}
@@ -893,6 +928,7 @@ export class Floorplan3dPanel extends LitElement {
           .explode=${this._explode}
           .keepRoof=${this._keepRoof}
           .markerMode=${this._markers}
+          .pinSize=${this._pinSize}
           .heatMode=${this._heat}
           .theme=${this._theme}
           .accent=${this._accent}
