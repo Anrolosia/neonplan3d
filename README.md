@@ -8,7 +8,7 @@
 
 [![Open your Home Assistant instance and open the NeonPlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
-[![NeonPlan 3D: the house turns with its solar roof and energy cards, the view flies into the ground floor, the central menu switches every light off and on, then the kitchen with its room panel](docs/images/demo.webp)](https://neonplan3d.mastershort.de/)
+[![NeonPlan 3D: the house turns with its solar roof and energy cards, voice control opens the living room, the doorbell rings and the live director looks through the front door camera, then back to the whole house](docs/images/demo.webp)](https://neonplan3d.mastershort.de/)
 
 📖 **Manual:** [English](https://mastershort.de/en/neonplan3d/manual/?lang=en) · [Deutsch](https://mastershort.de/neonplan3d/anleitung/?lang=de) (also here: [manual.md](docs/manual.md), [anleitung.md](docs/anleitung.md))
 💬 **Community:** [Discord](https://discord.gg/SSdVVFsev7) – show your 3D home, ask, share ideas
@@ -31,8 +31,12 @@
 |---|---|
 | ![Editor](docs/images/editor-split-3d.jpg) | **Plan editor in Home Assistant** – floors, rooms as rectangles or free shapes, automatic walls and free-standing partitions, doors, windows, garage doors, stairs, floor openings, cellars with light wells, roofs with dormers, outdoor areas, pools, balconies and solar fields. The 3D view runs next to the plan while you draw. A **wall view** shows each wall from the front for exact placing. |
 | ![Room](docs/images/view-room-panel.jpg) | **Live 3D view** – tap a lamp to switch it, swipe to dim, long press for colours, blinds and covers; doors swing, windows tilt, curtains and awnings run with their cover. A **room panel** lists everything of the room's Home Assistant area; gardens and terraces open like rooms too. |
+| ![Voice control](docs/images/view-voice.jpg) | **Voice control** – tap the microphone and say "Show the living room", "Where is the washing machine?" or "Show the front door camera"; anything else goes to Home Assistant's Assist. New and growing – free for everyone. |
 | ![Library](docs/images/editor-library.jpg) | **Furniture and lamps** – built-in models plus furniture packs. Lamps light their room in their own colour (and the floor below through a stairwell), TVs, washers and radiators glow while they run, robot vacuums drive their lanes, pets roam the house. |
 | ![Camera](docs/images/view-camera-through.jpg) | **Cameras** – on walls or ceilings with their field of view, red while they see motion; snapshots, a camera wall and live streams. |
+| ![Live director](docs/images/view-live-director.jpg) | **Live director** (Camera Cockpit) – the doorbell rings and the wall tablet flies to the front door and looks through its camera; it also shows a camera that sees someone, a finished washer or a new warning, then goes back. |
+| ![Time travel](docs/images/view-timetravel.jpg) | **Time travel** (Pro) – replay the last day or week: lights, doors, motion and the robot's run, with a timeline of events. |
+| ![Walk](docs/images/walk.jpg) | **Walk and wall view** – walk through the house at eye level with keys or a touch stick; in the editor, each wall from the front to place furniture to the centimetre. |
 | ![Warnings](docs/images/view-alert-banner.jpg) | **Made for the wall** – warnings for smoke, gas, CO, water, alarm, a window open in the rain and power outages pulse in their room; kiosk mode with idle return, night dimming and a slow orbit; favourites and scene buttons. |
 | ![Heatmap](docs/images/view-heat.jpg) | **Values and heatmap** – temperature, humidity and CO₂ per room, sunlight through the windows from `sun.sun`, the weather around the house. |
 | ![Card](docs/images/card-og-dim.jpg) | **Dashboard card** – `custom:neonplan3d-card` with a visual editor, loaded automatically. |
