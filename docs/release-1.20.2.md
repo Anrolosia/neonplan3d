@@ -2,6 +2,7 @@
 
 ### Fixed
 
+- **Waste bins showed "in 2026 days" (Household Pro):** a sensor that shows a date, like Waste Collection Schedule's "on Mon, 26.10.2026", was read as a number – since 1.20.1 the year, before that the day of the month. A date in the text is now read as a date (also "28.10.", "29/10/2026", "2026-10-29"). Thanks km65 and the Discord beta testers!
 - **Light well switch missing (discussion #575):** the **Light well** tick in a cellar window's form did not show unless the plan had its own ground height, so light wells could not be switched off. It shows now for every window below the ground. Thanks @LortusX and @1970lexi!
 - **Light well lifted by a balcony (#602):** a balcony on the floor above raised the cellar window's light well up to itself. Only areas on the ground count now. Thanks @d14tk for the precise analysis!
 - **Floor opening over tall stairs (#375):** an opening above stairs that reach higher than the floor was not cut at all when the opening and the stairs' own hole together reached past the room. Each opening is now cut room by room. Thanks @wouter-b for narrowing it down and the plan, and @LarsTh86!
@@ -24,6 +25,7 @@ Settings → System → Updates. HACS only looks for new versions every few hour
 
 ### Behoben
 
+- **Mülltonnen zeigten „in 2026 Tagen“ (Haushalt Pro):** Ein Sensor, der ein Datum zeigt, etwa „on Mon, 26.10.2026“ von Waste Collection Schedule, wurde als Zahl gelesen – seit 1.20.1 das Jahr, davor der Tag im Monat. Jetzt wird ein Datum im Text als Datum gelesen (auch „28.10.“, „29/10/2026“, „2026-10-29“). Danke an km65 und die Beta-Tester im Discord!
 - **Lichtschacht-Haken fehlte (Diskussion #575):** Der Haken **Lichtschacht** im Formular eines Kellerfensters erschien nur, wenn der Plan eine eigene Geländehöhe hatte. Lichtschächte ließen sich so nicht abschalten. Jetzt erscheint er bei jedem Fenster unter dem Gelände. Danke an @LortusX und @1970lexi!
 - **Lichtschacht vom Balkon hochgezogen (#602):** Ein Balkon im Geschoss darüber zog den Lichtschacht des Kellerfensters bis zu sich hoch. Jetzt zählen nur Flächen auf dem Gelände. Danke an @d14tk für die genaue Analyse!
 - **Bodenöffnung über hohen Treppen (#375):** Eine Öffnung über einer Treppe, die höher reicht als die Etage, wurde gar nicht ausgeschnitten, wenn Öffnung und Treppenloch zusammen über den Raum hinausreichten. Jetzt wird jede Öffnung Raum für Raum ausgeschnitten. Danke an @wouter-b für das Eingrenzen und den Plan, und an @LarsTh86!
