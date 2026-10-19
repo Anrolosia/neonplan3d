@@ -1931,5 +1931,8 @@
  "gang_switch": "Knappen styrer",
  "gang_socket": "Kontakten styrer",
  "gang_switch_hint": "Kvar knapp får si eiga entitet (eit lys, ein brytar, ei vifte) og lyser så lenge han er på – eit lys i sin farge. Eit trykk slår han av og på; med fleire knappar opnar ein liten meny seg.",
- "gang_socket_hint": "Kvar kontakt får si eiga entitet (releet, smartpluggen) og om ønskeleg ein effektsensor; han lyser grønt så lenge han er på. Same entitet kan sitje på fleire kontaktar – to stikkontaktar på eitt rele."
+ "gang_socket_hint": "Kvar kontakt får si eiga entitet (releet, smartpluggen) og om ønskeleg ein effektsensor; han lyser grønt så lenge han er på. Same entitet kan sitje på fleire kontaktar – to stikkontaktar på eitt rele.",
+ "furn_lamp_fan": "Takvifte med lys",
+ "fan_entity": "Vifte (fan-entitet)",
+ "fan_hint": "Lyset over styrer lampa. Med ei vifte går blada rundt med trinnet, og ho får sitt eige symbol ved sida av: eit trykk slår henne av og på, eit langt trykk stiller inn trinnet."
 }

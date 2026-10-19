@@ -267,6 +267,8 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("state_split", default=None): vol.Any(None, vol.In(["left_right", "top_bottom"])),
         # lamps: a second entity with the colour and brightness (a relay switches, the bulb knows its colour)
         vol.Optional("color_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # ceiling fan with light: its fan entity (the blades turn with its speed)
+        vol.Optional("fan"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # mirrored left-right
         vol.Optional("mirror", default=False): bool,
         # awning: the fabric's fall (degrees), the valance, a position sensor, its run time and the other direction

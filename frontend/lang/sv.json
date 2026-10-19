@@ -1931,5 +1931,8 @@
  "gang_switch": "Knappen styr",
  "gang_socket": "Uttaget styr",
  "gang_switch_hint": "Varje knapp får en egen entitet (en lampa, en brytare, en fläkt) och lyser så länge den är på – en lampa i sin färg. Ett tryck växlar den; med flera knappar öppnas en liten meny.",
- "gang_socket_hint": "Varje uttag får en egen entitet (reläet, den smarta kontakten) och vid behov en effektsensor; det lyser grönt så länge det är på. Samma entitet får sitta på flera uttag – två uttag på ett relä."
+ "gang_socket_hint": "Varje uttag får en egen entitet (reläet, den smarta kontakten) och vid behov en effektsensor; det lyser grönt så länge det är på. Samma entitet får sitta på flera uttag – två uttag på ett relä.",
+ "furn_lamp_fan": "Takfläkt med belysning",
+ "fan_entity": "Fläkt (fan-entitet)",
+ "fan_hint": "Ljuset ovan styr lampan. Med en fläkt snurrar bladen med dess hastighet och den får en egen symbol bredvid: ett tryck slår på eller av, ett långt tryck ställer in hastigheten."
 }

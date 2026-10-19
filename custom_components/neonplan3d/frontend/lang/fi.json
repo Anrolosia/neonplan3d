@@ -1931,5 +1931,8 @@
  "gang_switch": "Painike ohjaa",
  "gang_socket": "Pistorasia ohjaa",
  "gang_switch_hint": "Jokainen painike saa oman entiteettinsä (valo, katkaisin, tuuletin) ja hehkuu, kun se on päällä – valo omassa värissään. Napautus kytkee sen; useammalla painikkeella aukeaa pieni valikko.",
- "gang_socket_hint": "Jokainen pistorasia saa oman entiteettinsä (rele, älypistoke) ja halutessa tehoanturin; se hehkuu vihreänä, kun se on päällä. Sama entiteetti voi olla useassa pistorasiassa – kaksi pistorasiaa yhdellä releellä."
+ "gang_socket_hint": "Jokainen pistorasia saa oman entiteettinsä (rele, älypistoke) ja halutessa tehoanturin; se hehkuu vihreänä, kun se on päällä. Sama entiteetti voi olla useassa pistorasiassa – kaksi pistorasiaa yhdellä releellä.",
+ "furn_lamp_fan": "Kattotuuletin valolla",
+ "fan_entity": "Tuuletin (fan-entiteetti)",
+ "fan_hint": "Yllä oleva valo ohjaa valaisinta. Tuulettimen kanssa siivet pyörivät sen nopeudella, ja se saa oman symbolin viereen: napautus kytkee sen, pitkä painallus säätää nopeutta."
 }

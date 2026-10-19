@@ -1931,5 +1931,8 @@
  "gang_switch": "Tasta comandă",
  "gang_socket": "Priza comandă",
  "gang_switch_hint": "Fiecare tastă primește propria entitate (o lumină, un întrerupător, un ventilator) și luminează cât timp e pornită – o lumină în culoarea ei. O atingere o comută; cu mai multe taste se deschide un mic meniu.",
- "gang_socket_hint": "Fiecare priză primește propria entitate (releul, priza inteligentă) și, dacă vrei, un senzor de putere; luminează verde cât timp e pornită. Aceeași entitate poate sta pe mai multe prize – două prize pe un releu."
+ "gang_socket_hint": "Fiecare priză primește propria entitate (releul, priza inteligentă) și, dacă vrei, un senzor de putere; luminează verde cât timp e pornită. Aceeași entitate poate sta pe mai multe prize – două prize pe un releu.",
+ "furn_lamp_fan": "Ventilator de tavan cu lumină",
+ "fan_entity": "Ventilator (entitate fan)",
+ "fan_hint": "Lumina de mai sus comandă lampa. Cu un ventilator, palele se rotesc după treapta lui și primește propriul simbol alături: o atingere îl pornește sau oprește, o apăsare lungă reglează treapta."
 }

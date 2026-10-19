@@ -1931,5 +1931,8 @@
  "gang_switch": "Klawisz steruje",
  "gang_socket": "Gniazdo steruje",
  "gang_switch_hint": "Każdy klawisz dostaje własną encję (światło, przełącznik, wentylator) i świeci, dopóki jest włączony – światło w swoim kolorze. Dotknięcie przełącza; przy kilku klawiszach otwiera się małe menu.",
- "gang_socket_hint": "Każde gniazdo dostaje własną encję (przekaźnik, inteligentną wtyczkę) i opcjonalnie czujnik mocy; świeci na zielono, dopóki jest włączone. Ta sama encja może być na kilku gniazdach – dwa gniazdka na jednym przekaźniku."
+ "gang_socket_hint": "Każde gniazdo dostaje własną encję (przekaźnik, inteligentną wtyczkę) i opcjonalnie czujnik mocy; świeci na zielono, dopóki jest włączone. Ta sama encja może być na kilku gniazdach – dwa gniazdka na jednym przekaźniku.",
+ "furn_lamp_fan": "Wentylator sufitowy z oświetleniem",
+ "fan_entity": "Wentylator (encja fan)",
+ "fan_hint": "Światło powyżej steruje lampą. Z wentylatorem łopatki obracają się z jego prędkością, a on dostaje własny symbol obok: dotknięcie go włącza lub wyłącza, długie przytrzymanie ustawia prędkość."
 }

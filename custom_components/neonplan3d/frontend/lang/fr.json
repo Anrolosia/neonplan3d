@@ -1931,5 +1931,8 @@
  "gang_switch": "La touche commande",
  "gang_socket": "La prise commande",
  "gang_switch_hint": "Chaque touche reçoit sa propre entité (une lumière, un interrupteur, un ventilateur) et brille tant qu'elle est allumée – une lumière dans sa couleur. Un appui la commute ; avec plusieurs touches un petit menu s'ouvre.",
- "gang_socket_hint": "Chaque prise reçoit sa propre entité (le relais, la prise connectée) et, au besoin, un capteur de puissance ; elle brille en vert tant qu'elle est allumée. La même entité peut être sur plusieurs prises – deux prises sur un relais."
+ "gang_socket_hint": "Chaque prise reçoit sa propre entité (le relais, la prise connectée) et, au besoin, un capteur de puissance ; elle brille en vert tant qu'elle est allumée. La même entité peut être sur plusieurs prises – deux prises sur un relais.",
+ "furn_lamp_fan": "Ventilateur de plafond avec lumière",
+ "fan_entity": "Ventilateur (entité fan)",
+ "fan_hint": "La lumière ci-dessus commande la lampe. Avec un ventilateur, les pales tournent à sa vitesse et il a son propre symbole à côté : un appui l'allume ou l'éteint, un appui long règle la vitesse."
 }

@@ -8,6 +8,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### New
 
+- **Ceiling fan with light** (Furniture → Lights): the light switches the lamp, a fan entity turns the blades with its speed; the fan gets its own symbol with its speed (tap: on/off, hold: speed). Blades only move while the fan runs, at a reduced frame rate (D606).
 - **Light switches and sockets** (Furniture → Switches & sockets): 1–4 gangs in a frame, each with its own entity. A gang glows while it is on (a light in its colour, a socket green). A socket can also have a power sensor and then counts as a consumer. A tap switches the entity; several gangs open a small menu. The same entity may sit on several sockets, e.g. two sockets on one relay, or indoor and outdoor (#593, D523, D540).
 - LED strips can **rise** along their length (Rise °), e.g. up the stairs or along a handrail; light and glow climb with them (D539).
 - Live director: **own triggers** – any entity that goes on or open (a second doorbell, the garage door, a gate), each with its camera (D615).

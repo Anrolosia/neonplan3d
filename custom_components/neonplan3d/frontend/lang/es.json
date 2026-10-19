@@ -1931,5 +1931,8 @@
  "gang_switch": "La tecla controla",
  "gang_socket": "El enchufe controla",
  "gang_switch_hint": "Cada tecla tiene su propia entidad (una luz, un interruptor, un ventilador) y brilla mientras está encendida – una luz en su color. Un toque la conmuta; con varias teclas se abre un pequeño menú.",
- "gang_socket_hint": "Cada enchufe tiene su propia entidad (el relé, el enchufe inteligente) y, si quieres, un sensor de potencia; brilla en verde mientras está encendido. La misma entidad puede estar en varios enchufes – dos enchufes en un relé."
+ "gang_socket_hint": "Cada enchufe tiene su propia entidad (el relé, el enchufe inteligente) y, si quieres, un sensor de potencia; brilla en verde mientras está encendido. La misma entidad puede estar en varios enchufes – dos enchufes en un relé.",
+ "furn_lamp_fan": "Ventilador de techo con luz",
+ "fan_entity": "Ventilador (entidad fan)",
+ "fan_hint": "La luz de arriba controla la lámpara. Con un ventilador las aspas giran a su velocidad y tiene su propio símbolo al lado: un toque lo enciende o apaga, una pulsación larga ajusta la velocidad."
 }

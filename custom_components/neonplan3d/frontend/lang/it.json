@@ -1931,5 +1931,8 @@
  "gang_switch": "Il tasto comanda",
  "gang_socket": "La presa comanda",
  "gang_switch_hint": "Ogni tasto ha la sua entità (una luce, un interruttore, un ventilatore) e si illumina finché è acceso – una luce nel suo colore. Un tocco lo commuta; con più tasti si apre un piccolo menu.",
- "gang_socket_hint": "Ogni presa ha la sua entità (il relè, la presa smart) e, se vuoi, un sensore di potenza; si illumina di verde finché è accesa. La stessa entità può stare su più prese – due prese su un relè."
+ "gang_socket_hint": "Ogni presa ha la sua entità (il relè, la presa smart) e, se vuoi, un sensore di potenza; si illumina di verde finché è accesa. La stessa entità può stare su più prese – due prese su un relè.",
+ "furn_lamp_fan": "Ventilatore da soffitto con luce",
+ "fan_entity": "Ventilatore (entità fan)",
+ "fan_hint": "La luce sopra comanda la lampada. Con un ventilatore le pale girano con la sua velocità e ha un simbolo proprio accanto: un tocco lo accende o spegne, una pressione lunga regola la velocità."
 }

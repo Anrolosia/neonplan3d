@@ -1931,5 +1931,8 @@
  "gang_switch": "Knop schakelt",
  "gang_socket": "Stopcontact schakelt",
  "gang_switch_hint": "Elke knop krijgt een eigen entiteit (een lamp, een schakelaar, een ventilator) en licht op zolang hij aan is – een lamp in zijn kleur. Tikken schakelt; bij meerdere knoppen opent een klein menu.",
- "gang_socket_hint": "Elk stopcontact krijgt een eigen entiteit (het relais, de slimme stekker) en desgewenst een vermogenssensor; het licht groen op zolang het aan is. Dezelfde entiteit mag aan meerdere stopcontacten hangen – twee stopcontacten aan één relais."
+ "gang_socket_hint": "Elk stopcontact krijgt een eigen entiteit (het relais, de slimme stekker) en desgewenst een vermogenssensor; het licht groen op zolang het aan is. Dezelfde entiteit mag aan meerdere stopcontacten hangen – twee stopcontacten aan één relais.",
+ "furn_lamp_fan": "Plafondventilator met licht",
+ "fan_entity": "Ventilator (fan-entiteit)",
+ "fan_hint": "Het licht hierboven schakelt de lamp. Met een ventilator draaien de bladen mee met zijn stand en krijgt hij een eigen symbool ernaast: tikken schakelt hem, lang drukken stelt de stand in."
 }

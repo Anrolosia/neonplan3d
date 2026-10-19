@@ -1931,5 +1931,8 @@
  "gang_switch": "A tecla comanda",
  "gang_socket": "A tomada comanda",
  "gang_switch_hint": "Cada tecla tem a sua própria entidade (uma luz, um interruptor, uma ventoinha) e brilha enquanto está ligada – uma luz na sua cor. Um toque comuta-a; com várias teclas abre-se um pequeno menu.",
- "gang_socket_hint": "Cada tomada tem a sua própria entidade (o relé, a tomada inteligente) e, se quiser, um sensor de potência; brilha a verde enquanto está ligada. A mesma entidade pode estar em várias tomadas – duas tomadas num relé."
+ "gang_socket_hint": "Cada tomada tem a sua própria entidade (o relé, a tomada inteligente) e, se quiser, um sensor de potência; brilha a verde enquanto está ligada. A mesma entidade pode estar em várias tomadas – duas tomadas num relé.",
+ "furn_lamp_fan": "Ventoinha de teto com luz",
+ "fan_entity": "Ventoinha (entidade fan)",
+ "fan_hint": "A luz acima comanda o candeeiro. Com uma ventoinha as pás giram à sua velocidade e ela tem um símbolo próprio ao lado: um toque liga ou desliga, um toque longo ajusta a velocidade."
 }
