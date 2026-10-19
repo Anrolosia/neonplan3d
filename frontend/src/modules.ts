@@ -35,6 +35,17 @@ export interface SpokenDevice {
   type: string;
 }
 
+/** A door, window, garage door or roof window of the plan, by one of its entities (contact, blind, lock …). */
+export interface SpokenOpening {
+  entity: string;
+  kind: "door" | "window" | "garage" | "roof_window";
+  /** The kind's word in the user's language ("Fenster"), or the roof window's own name. */
+  name: string;
+  room: string;
+  floorId: string;
+  roomId: string | null;
+}
+
 /** What a module may ask the host for. */
 export interface ModuleHost {
   api: typeof MODULE_API;
@@ -46,6 +57,8 @@ export interface ModuleHost {
   devices(): SpokenDevice[];
   /** The one a sentence names ("die Waschmaschine", "der Fernseher im Wohnzimmer"), by the host's own matching. */
   findDevice(sentence: string): SpokenDevice | null;
+  /** The doors and windows of the plan with their rooms, one entry per linked entity (the plan names them better than Home Assistant's contact sensors do). */
+  openings(): SpokenOpening[];
   /** Consumers drawing power right now (from the plan's sensors), highest first. */
   consumers(): { id: string; entity: string | null; name: string; watts: number }[];
 }

@@ -9,6 +9,7 @@ const host = {
   language: () => "de",
   devices: () => [],
   findDevice: () => null,
+  openings: () => [],
   consumers: () => [{ id: "switch.a", entity: "sensor.a_w", name: "Waschmaschine", watts: 430 }],
 } as ModuleHost;
 

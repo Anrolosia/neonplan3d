@@ -98,7 +98,7 @@ import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
-import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice } from "../modules.ts";
+import { moduleVoice, syncModules, type ModuleHost, type SpokenDevice, type SpokenOpening } from "../modules.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
@@ -4127,6 +4127,29 @@ export class Fp3dView3d extends LitElement {
     return { devices, items, spoken };
   }
 
+  /** The plan's doors, windows, garage doors and roof windows by their entities, each with its room's name. */
+  private spokenOpenings(hass: HomeAssistant, b: Building): SpokenOpening[] {
+    const out: SpokenOpening[] = [];
+    const t = (k: Parameters<typeof translate>[1]) => translate(hass, k);
+    for (const floor of b.floors) {
+      const rooms = new Map(zonesOf(floor).map((r) => [r.id, r.name] as const));
+      for (const o of floor.openings) {
+        const e = this.openingLinks?.get(o.id);
+        if (!e) continue;
+        const kind = o.type === "garage" ? "garage" : o.type === "door" ? "door" : "window";
+        for (const id of [e.contact, e.contact2, e.cover, e.tilt, e.tilt2]) {
+          if (id && id !== "none") out.push({ entity: id, kind, name: t(`opening_${o.type}`), room: rooms.get(o.room_id) ?? "", floorId: floor.id, roomId: o.room_id });
+        }
+      }
+    }
+    for (const w of b.settings.roof?.windows ?? []) {
+      for (const id of [w.contact, w.cover]) {
+        if (id && id !== "none") out.push({ entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null });
+      }
+    }
+    return out;
+  }
+
   /** What a module may ask: the house, its devices, the host's own matching of a spoken device, the consumers. */
   private moduleHost(hass: HomeAssistant, b: Building, synonyms: Record<string, string[]>, find: (sentence: string) => { kind: string; id?: string } | null): ModuleHost {
     const { spoken } = this.spokenDevices(hass, b, synonyms);
@@ -4140,6 +4163,7 @@ export class Fp3dView3d extends LitElement {
         const hit = find(sentence);
         return hit?.kind === "device" && hit.id ? (spoken.find((d) => d.id === hit.id) ?? null) : null;
       },
+      openings: () => this.spokenOpenings(hass, b),
       consumers: () =>
         [...this.lastConsumers]
           .map((c) => ({ id: c.id, entity: c.powerEntity, name: spoken.find((d) => d.entity === c.id || d.power === c.powerEntity)?.name ?? entityName(hass, c.id), watts: c.power }))
