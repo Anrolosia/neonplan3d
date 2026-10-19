@@ -1964,5 +1964,8 @@
  "furn_extra": "Lisäarvo symbolissa (anturi, esim. veden lämpötila)",
  "theme_auto": "Auto (Päivä/Neon auringon mukaan)",
  "voice_understands": "Tämän NeonPlan ymmärtää",
- "voice_examples": "”Näytä olohuone”|”Mene yläkertaan”|”Näytä koko talo”|”Näytä pesukone” / ”Missä kuivausrumpu on?”|”Näytä etuoven kamera”|”Näytä kamerat”|Kaikki muu (”valo eteiseen päälle”) menee Assistille"
+ "voice_examples": "”Näytä olohuone”|”Mene yläkertaan”|”Näytä koko talo”|”Näytä pesukone” / ”Missä kuivausrumpu on?”|”Näytä etuoven kamera”|”Näytä kamerat”|Kaikki muu (”valo eteiseen päälle”) menee Assistille",
+ "aliases": "Lisänimet puhetta varten",
+ "aliases_hint": "Lisänimet pilkulla eroteltuina – niin kutsut ”Smart TV Pro” -laitetta ”olohuoneen telkkariksi”. Käytössä puheohjauksessa ja haussa.",
+ "aliases_placeholder": "esim. olohuoneen telkkari"
 }

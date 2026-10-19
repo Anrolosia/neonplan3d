@@ -4131,7 +4131,7 @@ export class Fp3dView3d extends LitElement {
         const id = entity ?? `furniture:${f.id}`;
         const zone = zones.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
         const kindName = furnitureName(hass, f.type);
-        const names = [f.name, kindName, entity ? entityName(hass, entity) : null, ...(synonyms[f.type] ?? [])].filter((n): n is string => !!n);
+        const names = [f.name, ...(f.aliases ?? []), kindName, entity ? entityName(hass, entity) : null, ...(synonyms[f.type] ?? [])].filter((n): n is string => !!n);
         const name = f.name || (entity ? entityName(hass, entity) : kindName);
         devices.push({ id, entity, name, names, room: zone?.name ?? "", camera: !!entity && kindOf(entity) === "camera" });
         spoken.push({ id, entity, name, names, room: zone?.name ?? "", floorId: floor.id, roomId: zone?.id ?? null, power: link?.power ?? null, type: f.type });
@@ -4139,11 +4139,14 @@ export class Fp3dView3d extends LitElement {
         else items.set(id, { kind: "device", name, where: "", floorId: floor.id, roomId: zone?.id ?? null, entity: null, icon: null, x: f.x, z: f.z, y: Math.min(floor.height - 0.3, Math.max(0.5, f.h)) });
       }
     }
+    const placed = new Map(b.floors.flatMap((fl) => fl.placements.map((p) => [p.entity_id, p] as const)));
     for (const [entity, it] of items) {
       if (ofFurniture.has(entity) || entity.startsWith("furniture:")) continue;
       const room = (it.roomId && roomName.get(it.roomId)) || "";
-      devices.push({ id: entity, entity, name: it.name, room, camera: kindOf(entity) === "camera" });
-      spoken.push({ id: entity, entity, name: it.name, names: [it.name], room, floorId: it.floorId, roomId: it.roomId, power: null, type: "device" });
+      const pl = placed.get(entity);
+      const names = [pl?.name, ...(pl?.aliases ?? []), it.name].filter((n): n is string => !!n);
+      devices.push({ id: entity, entity, name: it.name, names, room, camera: kindOf(entity) === "camera" });
+      spoken.push({ id: entity, entity, name: it.name, names, room, floorId: it.floorId, roomId: it.roomId, power: null, type: "device" });
     }
     return { devices, items, spoken };
   }

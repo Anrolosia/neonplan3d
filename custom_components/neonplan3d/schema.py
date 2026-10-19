@@ -55,6 +55,8 @@ ROOM_SCHEMA = vol.Schema(
         ),
         vol.Required("id"): _ID,
         vol.Required("name"): _NAME,
+        # further names the voice answers to
+        vol.Optional("aliases"): vol.All([vol.All(str, vol.Length(min=1, max=60))], vol.Length(max=12)),
         vol.Required("area_id"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Required("points"): vol.All([_POINT], vol.Length(min=3, max=MAX_POINTS)),
         vol.Required("floor_material"): vol.All(str, vol.Length(max=32)),
@@ -223,6 +225,7 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Required("variant"): vol.Any(None, vol.All(str, vol.Length(max=32))),
         # its own name (e.g. "Wechselrichter Nord"); None = the type's name; show_name puts it under the marker
         vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=60))),
+        vol.Optional("aliases"): vol.All([vol.All(str, vol.Length(min=1, max=60))], vol.Length(max=12)),
         vol.Optional("show_name", default=False): bool,
         # lamps / lights: how strongly they glow in 3D (None = as reported)
         vol.Optional("glow_scale", default=None): vol.Any(
@@ -362,6 +365,7 @@ PLACEMENT_SCHEMA = vol.Schema(
         vol.Optional("icon", default=None): vol.Any(None, vol.All(str, vol.Length(max=64))),
         # an own name in the plan, without renaming the entity; show_name puts it under the marker
         vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=60))),
+        vol.Optional("aliases"): vol.All([vol.All(str, vol.Length(min=1, max=60))], vol.Length(max=12)),
         vol.Optional("show_name", default=False): bool,
         # lamps / lights: how strongly they glow in 3D (None = as reported)
         vol.Optional("glow_scale", default=None): vol.Any(

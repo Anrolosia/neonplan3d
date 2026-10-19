@@ -1964,5 +1964,8 @@
  "furn_extra": "Valeur supplémentaire au symbole (capteur, p. ex. température de l'eau)",
  "theme_auto": "Auto (Jour/Néon selon le soleil)",
  "voice_understands": "Ce que NeonPlan comprend",
- "voice_examples": "« Montre le salon »|« Va à l'étage »|« Montre toute la maison »|« Montre le lave-linge » / « Où est le sèche-linge ? »|« Montre la caméra de la porte d'entrée »|« Montre les caméras »|Tout le reste (« allume la lumière du couloir ») va à Assist"
+ "voice_examples": "« Montre le salon »|« Va à l'étage »|« Montre toute la maison »|« Montre le lave-linge » / « Où est le sèche-linge ? »|« Montre la caméra de la porte d'entrée »|« Montre les caméras »|Tout le reste (« allume la lumière du couloir ») va à Assist",
+ "aliases": "Autres noms pour la voix",
+ "aliases_hint": "Autres noms, séparés par des virgules – pour appeler la « Smart TV Pro » « télé du salon ». Utilisés par la commande vocale et la recherche.",
+ "aliases_placeholder": "p. ex. télé du salon"
 }

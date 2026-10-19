@@ -1964,5 +1964,8 @@
  "furn_extra": "Valoare suplimentară la simbol (senzor, de ex. temperatura apei)",
  "theme_auto": "Auto (Zi/Neon după soare)",
  "voice_understands": "Ce înțelege NeonPlan",
- "voice_examples": "„Arată sufrageria”|„Mergi la etaj”|„Arată toată casa”|„Arată mașina de spălat” / „Unde e uscătorul?”|„Arată camera de la intrare”|„Arată camerele”|Orice altceva („aprinde lumina pe hol”) merge la Assist"
+ "voice_examples": "„Arată sufrageria”|„Mergi la etaj”|„Arată toată casa”|„Arată mașina de spălat” / „Unde e uscătorul?”|„Arată camera de la intrare”|„Arată camerele”|Orice altceva („aprinde lumina pe hol”) merge la Assist",
+ "aliases": "Alte nume pentru voce",
+ "aliases_hint": "Alte nume, separate prin virgulă – așa numești „Smart TV Pro” „televizorul din sufragerie”. Pentru comanda vocală și căutare.",
+ "aliases_placeholder": "de ex. televizorul din sufragerie"
 }

@@ -37,6 +37,14 @@ test("cameras: by name, by 'camera' and their room, or all of them", () => {
   assert.equal(t("Zeig mir die Kameras")?.kind, "cameras");
 });
 
+test("own aliases: a device by its further names, a room by its own", () => {
+  const items: Shown[] = [{ id: "media_player.tv", entity: "media_player.tv", name: "Smart TV Pro", names: ["Smart TV Pro", "Wohnzimmerfernseher", "Glotze"], room: "Wohnzimmer", camera: false }];
+  assert.equal(id(t("Zeig den Wohnzimmerfernseher", items)), "media_player.tv");
+  assert.equal(id(t("wo ist die Glotze", items)), "media_player.tv");
+  const b = { ...building, floors: [{ ...building.floors[0], rooms: [{ ...room("wz", "Wohnzimmer"), aliases: ["Stube"] }] }] };
+  assert.equal(showTarget("Zeig die Stube", b, [])?.kind, "room");
+});
+
 test("rooms stay rooms when a device only shares their name", () => {
   assert.deepEqual(t("Zeig das Wohnzimmer"), { kind: "room", floorId: "eg", roomId: "wz", name: "Wohnzimmer" });
   assert.equal(id(t("Zeig die Wohnzimmer Decke")), "light.wz");

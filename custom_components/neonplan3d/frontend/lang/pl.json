@@ -1964,5 +1964,8 @@
  "furn_extra": "Dodatkowa wartość przy symbolu (czujnik, np. temperatura wody)",
  "theme_auto": "Auto (Dzień/Neon wg słońca)",
  "voice_understands": "To rozumie NeonPlan",
- "voice_examples": "„Pokaż salon”|„Idź na piętro”|„Pokaż cały dom”|„Pokaż pralkę” / „Gdzie jest suszarka?”|„Pokaż kamerę przy drzwiach”|„Pokaż kamery”|Wszystko inne („włącz światło w korytarzu”) trafia do Assist"
+ "voice_examples": "„Pokaż salon”|„Idź na piętro”|„Pokaż cały dom”|„Pokaż pralkę” / „Gdzie jest suszarka?”|„Pokaż kamerę przy drzwiach”|„Pokaż kamery”|Wszystko inne („włącz światło w korytarzu”) trafia do Assist",
+ "aliases": "Inne nazwy dla głosu",
+ "aliases_hint": "Inne nazwy, oddzielone przecinkami – tak nazwiesz „Smart TV Pro” „telewizorem w salonie”. Dla sterowania głosem i wyszukiwania.",
+ "aliases_placeholder": "np. telewizor w salonie"
 }

@@ -1964,5 +1964,8 @@
  "furn_extra": "Ekstra verdi ved symbolet (sensor, f.eks. vanntemperatur)",
  "theme_auto": "Auto (Dag/Neon etter sola)",
  "voice_understands": "Dette forstår NeonPlan",
- "voice_examples": "«Vis stua»|«Gå til andre etasje»|«Vis hele huset»|«Vis vaskemaskinen» / «Hvor er tørketrommelen?»|«Vis kameraet ved inngangsdøra»|«Vis kameraene»|Alt annet («slå på lyset i gangen») går til Assist"
+ "voice_examples": "«Vis stua»|«Gå til andre etasje»|«Vis hele huset»|«Vis vaskemaskinen» / «Hvor er tørketrommelen?»|«Vis kameraet ved inngangsdøra»|«Vis kameraene»|Alt annet («slå på lyset i gangen») går til Assist",
+ "aliases": "Flere navn for stemmen",
+ "aliases_hint": "Flere navn, kommaseparert – så kaller du «Smart TV Pro» «stue-tv». Brukes av stemmestyring og søk.",
+ "aliases_placeholder": "f.eks. stue-tv"
 }

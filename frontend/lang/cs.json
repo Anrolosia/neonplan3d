@@ -1964,5 +1964,8 @@
  "furn_extra": "Doplňková hodnota u symbolu (senzor, např. teplota vody)",
  "theme_auto": "Auto (Den/Neon podle slunce)",
  "voice_understands": "Tomu NeonPlan rozumí",
- "voice_examples": "„Ukaž obývák“|„Jdi do patra“|„Ukaž celý dům“|„Ukaž pračku“ / „Kde je sušička?“|„Ukaž kameru u dveří“|„Ukaž kamery“|Vše ostatní („rozsviť světlo na chodbě“) jde do Assistu"
+ "voice_examples": "„Ukaž obývák“|„Jdi do patra“|„Ukaž celý dům“|„Ukaž pračku“ / „Kde je sušička?“|„Ukaž kameru u dveří“|„Ukaž kamery“|Vše ostatní („rozsviť světlo na chodbě“) jde do Assistu",
+ "aliases": "Další jména pro hlas",
+ "aliases_hint": "Další jména oddělená čárkou – tak říkáš „Smart TV Pro“ „televize v obýváku“. Pro hlasové ovládání a hledání.",
+ "aliases_placeholder": "např. televize v obýváku"
 }

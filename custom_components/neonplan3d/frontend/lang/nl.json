@@ -1964,5 +1964,8 @@
  "furn_extra": "Extra waarde bij het symbool (sensor, bijv. watertemperatuur)",
  "theme_auto": "Auto (Dag/Neon naar de zon)",
  "voice_understands": "Dit verstaat NeonPlan",
- "voice_examples": "„Toon de woonkamer”|„Ga naar de bovenverdieping”|„Toon het hele huis”|„Toon de wasmachine” / „Waar is de droger?”|„Toon de camera van de voordeur”|„Toon de camera's”|Al het andere („licht in de gang aan”) gaat naar Assist"
+ "voice_examples": "„Toon de woonkamer”|„Ga naar de bovenverdieping”|„Toon het hele huis”|„Toon de wasmachine” / „Waar is de droger?”|„Toon de camera van de voordeur”|„Toon de camera's”|Al het andere („licht in de gang aan”) gaat naar Assist",
+ "aliases": "Andere namen voor de spraak",
+ "aliases_hint": "Andere namen, gescheiden door komma's – zo noem je de „Smart TV Pro” „woonkamer-tv”. Voor spraakbediening en zoeken.",
+ "aliases_placeholder": "bijv. woonkamer-tv"
 }

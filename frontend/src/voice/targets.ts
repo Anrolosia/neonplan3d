@@ -4,8 +4,8 @@
 // answers to its own name, its kind ("Waschmaschine") and a few everyday words for it ("TV", "Glotze"), with or
 // without an entity.
 
-import type { Building, Room } from "../model.ts";
-import { findPlace, normalize, showCommand, type Place } from "./commands.ts";
+import type { Building } from "../model.ts";
+import { findPlace, normalize, showCommand, type Place, type RoomAlias } from "./commands.ts";
 
 /** A device or piece of furniture that can be shown. */
 export interface Shown {
@@ -99,7 +99,7 @@ function telling(name: string): string[] {
  * The thing a sentence asks to see, or null (then it is for Assist). A device needs a word that asks to see it
  * ("zeig", "wo ist") – "Licht im Flur an" names the hall light but switches it.
  */
-export function showTarget(sentence: string, building: Building, devices: readonly Shown[], alias?: (room: Room) => string | null | undefined): Target | null {
+export function showTarget(sentence: string, building: Building, devices: readonly Shown[], alias?: RoomAlias): Target | null {
   const text = normalize(sentence);
   if (!text) return null;
   const asks = SHOW.test(text);

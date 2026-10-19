@@ -1964,5 +1964,8 @@
  "furn_extra": "Kiegészítő érték a szimbólumnál (érzékelő, pl. vízhőmérséklet)",
  "theme_auto": "Auto (Nappal/Neon a nap szerint)",
  "voice_understands": "Ezt érti a NeonPlan",
- "voice_examples": "„Mutasd a nappalit”|„Menj az emeletre”|„Mutasd az egész házat”|„Mutasd a mosógépet” / „Hol a szárító?”|„Mutasd a bejárati kamerát”|„Mutasd a kamerákat”|Minden más („kapcsold fel a folyosó lámpáját”) az Assisthez megy"
+ "voice_examples": "„Mutasd a nappalit”|„Menj az emeletre”|„Mutasd az egész házat”|„Mutasd a mosógépet” / „Hol a szárító?”|„Mutasd a bejárati kamerát”|„Mutasd a kamerákat”|Minden más („kapcsold fel a folyosó lámpáját”) az Assisthez megy",
+ "aliases": "További nevek a hanghoz",
+ "aliases_hint": "További nevek vesszővel elválasztva – így hívod a „Smart TV Pro”-t „nappali tévének”. A hangvezérléshez és a kereséshez.",
+ "aliases_placeholder": "pl. nappali tévé"
 }

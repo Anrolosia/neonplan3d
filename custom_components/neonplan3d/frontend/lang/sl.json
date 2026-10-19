@@ -1964,5 +1964,8 @@
  "furn_extra": "Dodatna vrednost pri simbolu (senzor, npr. temperatura vode)",
  "theme_auto": "Samodejno (Dan/Neon po soncu)",
  "voice_understands": "To NeonPlan razume",
- "voice_examples": "„Pokaži dnevno sobo“|„Pojdi v nadstropje“|„Pokaži celo hišo“|„Pokaži pralni stroj“ / „Kje je sušilni stroj?“|„Pokaži kamero pri vratih“|„Pokaži kamere“|Vse ostalo („prižgi luč na hodniku“) gre k Assistu"
+ "voice_examples": "„Pokaži dnevno sobo“|„Pojdi v nadstropje“|„Pokaži celo hišo“|„Pokaži pralni stroj“ / „Kje je sušilni stroj?“|„Pokaži kamero pri vratih“|„Pokaži kamere“|Vse ostalo („prižgi luč na hodniku“) gre k Assistu",
+ "aliases": "Dodatna imena za glas",
+ "aliases_hint": "Dodatna imena, ločena z vejico – tako „Smart TV Pro“ kličeš „televizor v dnevni“. Za glasovno upravljanje in iskanje.",
+ "aliases_placeholder": "npr. televizor v dnevni"
 }

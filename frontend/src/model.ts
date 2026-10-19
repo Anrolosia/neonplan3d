@@ -23,6 +23,8 @@ export interface Room {
   climate?: RoomClimate | null;
   id: string;
   name: string;
+  /** Further names the voice answers to ("Stube", "Lounge"). */
+  aliases?: string[];
   area_id: string | null;
   /** The camera the room opens with when it is tapped in 3D (null: framed from above). */
   start_view?: StartView | null;
@@ -166,6 +168,8 @@ export interface Furniture {
   variant: string | null;
   /** Own name (e.g. "Wechselrichter Nord"); null = the type's name. */
   name?: string | null;
+  /** Further names the voice answers to ("Wohnzimmerfernseher", "Glotze"). */
+  aliases?: string[];
   /** The own name shows as a small label under its marker in 3D. */
   show_name?: boolean;
   /** Lamps: how strongly the lamp glows in 3D, 0.1–1.5 (1 = as bright as the light reports) – #181. */
@@ -292,6 +296,8 @@ export interface Placement {
   /** Fixed against moving by accident. */
   locked?: boolean | null;
   entity_id: string;
+  /** Further names the voice answers to. */
+  aliases?: string[];
   x: number;
   z: number;
   /** Height above the floor; null = default for the device kind (and lamp mount). */
@@ -1429,6 +1435,12 @@ export function surfaceHeight(floor: Floor, x: number, z: number, itemH = 0): nu
     top = Math.max(top, f.h);
   }
   return top;
+}
+
+/** "Glotze, Wohnzimmerfernseher" → the names, trimmed, empty ones dropped (at most 12). */
+export function splitAliases(text: string): string[] | undefined {
+  const out = text.split(/[,;\n]/).map((s) => s.trim()).filter(Boolean).slice(0, 12);
+  return out.length ? out : undefined;
 }
 
 /** Wall switches and sockets: up to four gangs in one frame, each with its own entity (D523, #593). */

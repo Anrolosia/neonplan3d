@@ -1964,5 +1964,8 @@
  "furn_extra": "Extra värde vid symbolen (sensor, t.ex. vattentemperatur)",
  "theme_auto": "Auto (Dag/Neon efter solen)",
  "voice_understands": "Det förstår NeonPlan",
- "voice_examples": "”Visa vardagsrummet”|”Gå till övervåningen”|”Visa hela huset”|”Visa tvättmaskinen” / ”Var är torktumlaren?”|”Visa kameran vid ytterdörren”|”Visa kamerorna”|Allt annat (”tänd lampan i hallen”) går till Assist"
+ "voice_examples": "”Visa vardagsrummet”|”Gå till övervåningen”|”Visa hela huset”|”Visa tvättmaskinen” / ”Var är torktumlaren?”|”Visa kameran vid ytterdörren”|”Visa kamerorna”|Allt annat (”tänd lampan i hallen”) går till Assist",
+ "aliases": "Fler namn för rösten",
+ "aliases_hint": "Fler namn, kommaseparerade – så kallar du ”Smart TV Pro” för ”vardagsrums-tv”. Används av röststyrning och sökning.",
+ "aliases_placeholder": "t.ex. vardagsrums-tv"
 }
