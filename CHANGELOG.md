@@ -19,6 +19,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - Ceiling lamps and LED panels can be lowered like spots (Height above floor), e.g. under a staircase.
 - Own background behind the 3D house: the look's sky (default), one colour, a gradient or a picture with a darkening veil (editor → Background; idea from damonxxu's fork).
 
+### Fixed
+
+- Waste bins in the Blueprint and Day looks: the lower half fell back to the look's grey; coloured bins now keep their colour down to the ground (#609, thanks TheBhim).
+
 ## 1.20.2
 
 ### Fixed
