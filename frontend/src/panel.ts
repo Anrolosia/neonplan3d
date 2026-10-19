@@ -21,7 +21,7 @@ import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
 import { directorOnHere } from "./director.ts";
-import { loadVoice, micProbeDone, voiceOnHere } from "./load-voice.ts";
+import { loadVoice, micProbeDone, screenName, voiceOnHere } from "./load-voice.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -90,6 +90,7 @@ export class Floorplan3dPanel extends LitElement {
     _director: { state: true },
     _micProbe: { state: true },
     _voiceHere: { state: true },
+    _screen: { state: true },
   };
 
   declare hass: HomeAssistant;
@@ -152,6 +153,7 @@ export class Floorplan3dPanel extends LitElement {
   private declare _micProbe: boolean;
   /** Voice control (the microphone button) on this device. */
   private declare _voiceHere: boolean;
+  private declare _screen: string;
 
   private readonly data = new BuildingController(this);
   /** Time travel (Pro): the last 24 hours replayed, read-only. */
@@ -207,6 +209,7 @@ export class Floorplan3dPanel extends LitElement {
     this._director = directorOnHere();
     this._micProbe = false;
     this._voiceHere = voiceOnHere();
+    this._screen = screenName();
   }
 
   private t(key: I18nKey, vars?: Record<string, string | number>): string {
@@ -831,7 +834,10 @@ export class Floorplan3dPanel extends LitElement {
       .packs=${this.data.packs}
       @packs-changed=${() => void this.data.reloadPacks()}
       @director-here=${() => (this._director = directorOnHere())}
-      @voice-here=${() => (this._voiceHere = voiceOnHere())}
+      @voice-here=${() => {
+        this._voiceHere = voiceOnHere();
+        this._screen = screenName();
+      }}
       @mic-probe=${() => loadVoice().then(() => (this._micProbe = true)).catch(() => undefined)}
       @open-extensions=${() => this.setMode("extensions")}
       @building-changed=${(e: CustomEvent<{ building: Building }>) => this.data.edit(e.detail.building)}
@@ -942,6 +948,7 @@ export class Floorplan3dPanel extends LitElement {
           .weather=${this._weather}
           .director=${this._director}
           .voice=${this._voiceHere}
+          .screen=${this._screen || null}
           .panelOpen=${!!this._roomId}
           .floorId=${b.floors.length > 1 ? this._floorId : (b.floors[0]?.id ?? null)}
           .roomId=${this._roomId}

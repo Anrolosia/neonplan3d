@@ -25,7 +25,7 @@ import { poolEntities, type PoolEntities } from "../pool.ts";
 import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
 import { backdropImage } from "../backdrop.ts";
-import { setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
+import { screenName, setScreenName, setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
@@ -11065,7 +11065,20 @@ export class Fp3dEditor extends LitElement {
           />
           ${this.t("voice_here")}</label
         >
+        <label class="fp3d-wide"
+          >${this.t("screen_name")}
+          <input
+            type="text"
+            .value=${screenName()}
+            placeholder=${this.t("screen_name_placeholder")}
+            @change=${(e: Event) => {
+              setScreenName((e.target as HTMLInputElement).value);
+              this.dispatchEvent(new CustomEvent("voice-here", { bubbles: true, composed: true }));
+            }}
+          />
+        </label>
       </div>
+      <p class="fp3d-sub">${this.t("screen_name_hint")}</p>
       ${this.renderVoicePipeline()}
       <p class="fp3d-sub">${this.t("voice_needs")}</p>
       <div class="fp3d-actions">

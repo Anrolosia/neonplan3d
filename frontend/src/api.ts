@@ -19,6 +19,26 @@ export function subscribeBuilding(hass: HomeAssistant, callback: (revision: numb
   });
 }
 
+/** A sentence Assist or the service `neonplan3d.ask` hands to the open views. */
+export interface Ask {
+  ask_id: string;
+  text: string;
+  /** Only the view with this screen name reacts (null: every open view). */
+  screen: string | null;
+  /** The view speaks its answer (a satellite that asked speaks itself). */
+  speak: boolean;
+}
+
+export function subscribeAsk(hass: HomeAssistant, callback: (ask: Ask) => void): Promise<() => Promise<void>> {
+  return hass.connection.subscribeMessage<Ask>(callback, { type: "neonplan3d/voice/subscribe" });
+}
+
+/** The view's answer; `taken` is false when another view was first. */
+export async function answerAsk(hass: HomeAssistant, askId: string, text: string, answered: boolean): Promise<boolean> {
+  const res = await hass.callWS<{ taken: boolean }>({ type: "neonplan3d/voice/answer", ask_id: askId, text, answered });
+  return res.taken;
+}
+
 export async function fetchImage(hass: HomeAssistant, imageId: string): Promise<string> {
   const res = await hass.callWS<{ data: string }>({ type: "neonplan3d/image/get", image_id: imageId });
   return res.data;

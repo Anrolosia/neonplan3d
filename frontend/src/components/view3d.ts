@@ -123,6 +123,7 @@ import { wallLayout } from "../camera-wall.ts";
 import { watchedEntities } from "../watched.ts";
 import { backdropCss } from "../backdrop.ts";
 import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
+import { answerAsk, subscribeAsk, type Ask } from "../api.ts";
 import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, triggerFired, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
@@ -239,6 +240,7 @@ export class Fp3dView3d extends LitElement {
     director: { attribute: false },
     hideRoof: { attribute: false },
     voice: { attribute: false },
+    screen: { attribute: false },
     _voice: { state: true },
     scenes: { attribute: false },
     dimmed: { attribute: false },
@@ -421,7 +423,11 @@ export class Fp3dView3d extends LitElement {
   declare hideRoof: boolean;
   /** Voice control: a microphone button – "Zeig das Wohnzimmer" shows it, other sentences go to Assist (default off). */
   declare voice: boolean;
+  /** This view's screen name: a sentence from Assist that names a screen is only for the view with that name. */
+  declare screen: string | null;
   private declare _voice: { phase: "wait" | "listen" | "done" | "error"; text: string } | null;
+  /** The subscription to the sentences Assist hands over (every open view listens, with or without a microphone). */
+  private unsubAsk: Promise<() => Promise<void>> | null = null;
   private voiceTimer: ReturnType<typeof setTimeout> | undefined;
   private declare _alerts: Alert[];
   /** Haushalt Pro: what is due in the household now (the glass card "Today in the household"). */
@@ -621,6 +627,7 @@ export class Fp3dView3d extends LitElement {
     this.director = false;
     this.hideRoof = false;
     this.voice = false;
+    this.screen = null;
     this._voice = null;
     this._micProbe = micProbeAsked();
     this._alerts = [];
@@ -657,6 +664,24 @@ export class Fp3dView3d extends LitElement {
       this.watchTrail();
     }
     document.addEventListener("visibilitychange", this.onVisible);
+    this.watchAsk();
+  }
+
+  /** Listens to the sentences Assist and the service `neonplan3d.ask` hand to the views (once the connection is there). */
+  private watchAsk(): void {
+    const hass = this.hass;
+    if (this.unsubAsk || !hass?.connection || !this.isConnected) return;
+    this.unsubAsk = subscribeAsk(hass, (ask) => void this.onAsk(ask)).catch(() => {
+      // a replay or an older backend: nothing to listen to
+      this.unsubAsk = null;
+      return async () => {};
+    });
+  }
+
+  private unwatchAsk(): void {
+    const sub = this.unsubAsk;
+    this.unsubAsk = null;
+    void sub?.then((unsub) => unsub()).catch(() => undefined);
   }
 
   /** A wall tablet's screen on again: stale day curves are fetched at once. */
@@ -677,6 +702,7 @@ export class Fp3dView3d extends LitElement {
     this.unlistenReplay = null;
     this.unwatchDiag?.();
     this.unwatchDiag = null;
+    this.unwatchAsk();
     this.resizeObs?.disconnect();
     this.resizeObs = null;
     clearInterval(this.alertTimer);
@@ -822,6 +848,7 @@ export class Fp3dView3d extends LitElement {
 
   protected updated(changed: PropertyValues): void {
     if (changed.has("hass") && this.live?.el) this.live.el.hass = this.hass;
+    if (changed.has("hass")) this.watchAsk();
     // the star menu closes when a room or another floor is chosen (#220)
     if (this._central && ((changed.has("roomId") && changed.get("roomId") !== undefined) || (changed.has("floorId") && changed.get("floorId") !== undefined))) this._central = false;
     const v = this.viewer;
@@ -4015,17 +4042,47 @@ export class Fp3dView3d extends LitElement {
       ${v ? html`<div class="fp3d-mic-say ${v.phase === "error" ? "fp3d-mic-err" : ""}" style="left:${left}px">${v.text}</div>` : nothing}`;
   }
 
+  /** What the microphone heard or the view answered, shown next to the button for a moment. */
+  private sayVoice(phase: "wait" | "listen" | "done" | "error", text: string): void {
+    this._voice = { phase, text };
+    clearTimeout(this.voiceTimer);
+    if (phase === "done" || phase === "error") this.voiceTimer = setTimeout(() => (this._voice = null), phase === "error" ? 9000 : 6000);
+  }
+
+  /**
+   * A sentence from Assist (a satellite, the Assist dialog, an automation): handled like one from the microphone,
+   * but without Assist as the fallback (it asked). The answer goes back to Assist, which speaks it where it was asked;
+   * the view speaks only when the service asked for it.
+   */
+  private async onAsk(ask: Ask): Promise<void> {
+    const hass = this.hass;
+    const b = this.building;
+    if (!hass || !b) return;
+    // a sentence for one screen: only the view with that name (a view without a name stays out of it)
+    const mine = (this.screen ?? "").trim().toLowerCase();
+    if (ask.screen && ask.screen.trim().toLowerCase() !== mine) return;
+    let answer: string | null = null;
+    try {
+      const v = await loadVoice();
+      answer = await this.handleSentence(hass, b, v, ask.text, ask.speak);
+      if (answer === null) this.sayVoice("error", translate(hass, "voice_none"));
+    } catch (err) {
+      this.sayVoice("error", translate(hass, "voice_error", { msg: String((err as Error)?.message ?? err) }));
+    }
+    try {
+      await answerAsk(hass, ask.ask_id, answer ?? "", answer !== null);
+    } catch {
+      // the question is gone (answered by another view, or its asker waited no longer)
+    }
+  }
+
   /** One spoken sentence: a place to show ("Zeig das Wohnzimmer") is shown, anything else goes to Assist. */
   private async onMic(): Promise<void> {
     const hass = this.hass;
     const b = this.building;
     if (!hass || !b || this._voice?.phase === "wait" || this._voice?.phase === "listen") return;
     clearTimeout(this.voiceTimer);
-    const say = (phase: "wait" | "listen" | "done" | "error", text: string) => {
-      this._voice = { phase, text };
-      clearTimeout(this.voiceTimer);
-      if (phase === "done" || phase === "error") this.voiceTimer = setTimeout(() => (this._voice = null), phase === "error" ? 9000 : 6000);
-    };
+    const say = (phase: "wait" | "listen" | "done" | "error", text: string) => this.sayVoice(phase, text);
     say("wait", "…");
     this.tourToken++;
     // the audio context starts here, on the tap itself: made later (after loading) Android WebViews keep it mute (#579)
@@ -4044,54 +4101,7 @@ export class Fp3dView3d extends LitElement {
         say("error", translate(hass, "voice_none"));
         return;
       }
-      const { devices, items } = this.spokenDevices(hass, b, v.SYNONYMS);
-      const place = v.showTarget(text, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
-      if (place) {
-        say("done", `“${text}” → ${place.kind === "house" ? translate(hass, "all_floors") : place.kind === "cameras" ? translate(hass, "camera_wall_title") : place.name}`);
-        this.directing.touch(Date.now());
-        if (place.kind === "cameras") {
-          if (hasFeature("camera_cockpit")) this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
-          else this._proHint = "camera_cockpit";
-        } else if (place.kind === "device") {
-          const item = items.get(place.id);
-          // a camera is looked through (Kamera-Cockpit), any other device shown where it stands
-          if (place.camera && place.entity && hasFeature("camera_cockpit")) this.lookThrough(place.entity);
-          else if (item) this.goTo(item);
-        } else if (place.kind === "house") this.fire("floor-tap", { floorId: null });
-        else if (place.kind === "floor") this.fire("floor-tap", { floorId: place.floorId });
-        else {
-          if (this.floorId !== place.floorId) this.fire("floor-tap", { floorId: place.floorId });
-          setTimeout(() => this.fire("room-tap", { floorId: place.floorId, roomId: place.roomId }), 60);
-        }
-        return;
-      }
-      // a module of the house answers (installed from the shop): what to say and what to show
-      const host = this.moduleHost(hass, b, v.SYNONYMS, (s) => v.showTarget(s, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null)));
-      const own = await moduleVoice(text, host);
-      if (own) {
-        say("done", own.text ? `“${text}” – ${own.text}` : `“${text}”`);
-        this.directing.touch(Date.now());
-        if (own.highlight?.length) this.viewer?.flashDevices(own.highlight);
-        const f = own.focus;
-        if (own.tour?.length) {
-          // the intro is spoken first, then the tour speaks at its stops
-          const talk = own.speak !== false ? (t: string) => v.speak(hass, t, voicePipeline()) : null;
-          const intro = own.spoken ?? own.text;
-          if (intro && talk) await talk(intro);
-          void this.runTour(own.tour, b, items, talk);
-          return;
-        }
-        if (f?.roomId && f.floorId) {
-          if (this.floorId !== f.floorId) this.fire("floor-tap", { floorId: f.floorId });
-          setTimeout(() => this.fire("room-tap", { floorId: f.floorId, roomId: f.roomId }), 60);
-        } else if (f?.floorId && !f.entity && !f.furnitureId) this.fire("floor-tap", { floorId: f.floorId });
-        else if (f?.entity || f?.furnitureId) {
-          const item = items.get(f.entity ?? `furniture:${f.furnitureId}`);
-          if (item) this.goTo(item);
-        }
-        if (own.text && own.speak !== false) void v.speak(hass, own.text, voicePipeline());
-        return;
-      }
+      if ((await this.handleSentence(hass, b, v, text, true)) !== null) return;
       say("wait", `“${text}” …`);
       const answer = await v.converse(hass, text);
       say("done", answer ? `“${text}” – ${answer}` : `“${text}”`);
@@ -4107,6 +4117,68 @@ export class Fp3dView3d extends LitElement {
               : null;
       say("error", key ? translate(hass, key) : translate(hass, "voice_error", { msg: String(e?.message ?? e?.name ?? err) }));
     }
+  }
+
+  /**
+   * One sentence, from the microphone or from Assist: a place or device to show is shown, a question is answered by
+   * the modules. Returns what was answered (for Assist to speak) or null when the sentence is not NeonPlan's.
+   * `speak`: the view speaks the answer itself (false when a satellite asked: it speaks).
+   */
+  private async handleSentence(hass: HomeAssistant, b: Building, v: Awaited<ReturnType<typeof loadVoice>>, text: string, speak: boolean): Promise<string | null> {
+    const say = (phase: "wait" | "listen" | "done" | "error", t: string) => this.sayVoice(phase, t);
+    const { devices, items } = this.spokenDevices(hass, b, v.SYNONYMS);
+    {
+      const place = v.showTarget(text, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
+      if (place) {
+        const name = place.kind === "house" ? translate(hass, "all_floors") : place.kind === "cameras" ? translate(hass, "camera_wall_title") : place.name;
+        say("done", `“${text}” → ${name}`);
+        this.directing.touch(Date.now());
+        if (place.kind === "cameras") {
+          if (hasFeature("camera_cockpit")) this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
+          else this._proHint = "camera_cockpit";
+        } else if (place.kind === "device") {
+          const item = items.get(place.id);
+          // a camera is looked through (Kamera-Cockpit), any other device shown where it stands
+          if (place.camera && place.entity && hasFeature("camera_cockpit")) this.lookThrough(place.entity);
+          else if (item) this.goTo(item);
+        } else if (place.kind === "house") this.fire("floor-tap", { floorId: null });
+        else if (place.kind === "floor") this.fire("floor-tap", { floorId: place.floorId });
+        else {
+          if (this.floorId !== place.floorId) this.fire("floor-tap", { floorId: place.floorId });
+          setTimeout(() => this.fire("room-tap", { floorId: place.floorId, roomId: place.roomId }), 60);
+        }
+        return translate(hass, "voice_showing", { name });
+      }
+      // a module of the house answers (installed from the shop): what to say and what to show
+      const host = this.moduleHost(hass, b, v.SYNONYMS, (s) => v.showTarget(s, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null)));
+      const own = await moduleVoice(text, host);
+      if (own) {
+        say("done", own.text ? `“${text}” – ${own.text}` : `“${text}”`);
+        this.directing.touch(Date.now());
+        if (own.highlight?.length) this.viewer?.flashDevices(own.highlight);
+        const f = own.focus;
+        const spoken = own.spoken ?? own.text ?? "";
+        if (own.tour?.length) {
+          // the intro is spoken first, then the tour speaks at its stops
+          const talk = speak && own.speak !== false ? (t: string) => v.speak(hass, t, voicePipeline()) : null;
+          const intro = own.spoken ?? own.text;
+          if (intro && talk) await talk(intro);
+          void this.runTour(own.tour, b, items, talk);
+          return spoken;
+        }
+        if (f?.roomId && f.floorId) {
+          if (this.floorId !== f.floorId) this.fire("floor-tap", { floorId: f.floorId });
+          setTimeout(() => this.fire("room-tap", { floorId: f.floorId, roomId: f.roomId }), 60);
+        } else if (f?.floorId && !f.entity && !f.furnitureId) this.fire("floor-tap", { floorId: f.floorId });
+        else if (f?.entity || f?.furnitureId) {
+          const item = items.get(f.entity ?? `furniture:${f.furnitureId}`);
+          if (item) this.goTo(item);
+        }
+        if (own.text && own.speak !== false && speak) void v.speak(hass, own.text, voicePipeline());
+        return spoken;
+      }
+    }
+    return null;
   }
 
   /**

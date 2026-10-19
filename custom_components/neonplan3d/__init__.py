@@ -37,6 +37,7 @@ from .const import (
 from .diagnostics_report import DiagnosticsReporter
 from .license import FIRST_CHECK_DELAY, REFRESH_INTERVAL, async_refresh_quietly
 from .storage import FloorplanData
+from .voice import async_setup_voice, async_unload_voice
 from .websocket import async_register_commands
 
 _LOGGER = logging.getLogger(__name__)
@@ -111,6 +112,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DATA_DIAGNOSTICS] = reporter
     entry.async_on_unload(reporter.start())
 
+    # Assist asks the house: service, intent and the sentences Assist understands
+    await async_setup_voice(hass)
+
     await _async_register_static(hass)
 
     url = await _async_main_url(hass)
@@ -145,6 +149,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # newer Home Assistant raises when the list was never made (no frontend loaded, as in tests) or the url is gone
     with contextlib.suppress(KeyError, ValueError):
         frontend.remove_extra_js_url(hass, await _async_main_url(hass))
+    async_unload_voice(hass)
     hass.data.pop(DOMAIN, None)
     hass.data.pop(DATA_DIAGNOSTICS, None)
     return True

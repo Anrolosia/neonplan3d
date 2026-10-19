@@ -358,6 +358,7 @@ clearTimeout(this.cleanTimer);
               .alertJump=${!!c?.alert_jump}
               .director=${!!c?.director}
               .voice=${!!c?.voice}
+              .screen=${c?.screen?.trim() || null}
               .scenes=${c?.scenes !== false}
               ?trail=${!!c?.motion_trail}
               .cameraWall=${this._cameraWall && !tt}

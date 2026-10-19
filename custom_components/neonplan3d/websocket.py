@@ -14,12 +14,13 @@ from homeassistant.loader import async_get_integration
 import voluptuous as vol
 
 from . import license as lic
-from .const import DATA_DIAGNOSTICS, DOMAIN, SIGNAL_BUILDING_UPDATED
+from .const import DATA_ASK, DATA_DIAGNOSTICS, DOMAIN, SIGNAL_ASK, SIGNAL_BUILDING_UPDATED
 from .diagnostics_report import DiagnosticsError, DiagnosticsReporter
 from .packs import MAX_PACK_SIZE, PackError, parts_of, verify_pack
 from .schema import BUILDING_SCHEMA, IMAGE_DATA
 from .storage import FloorplanData, complete
 from .timetravel import ws_timetravel_history
+from .voice import AskBroker
 
 _IMAGE_ID = vol.All(str, vol.Length(min=1, max=64), vol.Match(r"^[A-Za-z0-9_\-.]+$"))
 
@@ -53,6 +54,8 @@ def async_register_commands(hass: HomeAssistant) -> None:
         ws_diagnostics_set,
         ws_diagnostics_delete,
         ws_diagnostics_client,
+        ws_voice_subscribe,
+        ws_voice_answer,
     ):
         websocket_api.async_register_command(hass, command)
 
@@ -516,3 +519,32 @@ def ws_diagnostics_client(hass: HomeAssistant, connection: websocket_api.ActiveC
         return
     reporter.add_client(msg.get("client"), msg.get("errors"))
     connection.send_result(msg["id"], {"enabled": True})
+
+
+@websocket_api.websocket_command({vol.Required("type"): "neonplan3d/voice/subscribe"})
+@callback
+def ws_voice_subscribe(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """Every sentence Assist (or the service `neonplan3d.ask`) hands to the views; each open view listens."""
+
+    @callback
+    def forward(ask: dict[str, Any]) -> None:
+        connection.send_message(websocket_api.event_message(msg["id"], ask))
+
+    connection.subscriptions[msg["id"]] = async_dispatcher_connect(hass, SIGNAL_ASK, forward)
+    connection.send_result(msg["id"])
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "neonplan3d/voice/answer",
+        vol.Required("ask_id"): vol.All(str, vol.Length(max=64)),
+        vol.Required("text"): vol.All(str, vol.Length(max=2000)),
+        vol.Optional("answered", default=True): bool,
+    }
+)
+@callback
+def ws_voice_answer(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """A view's answer to a sentence: the first one is taken, later ones are told so (`taken: false`)."""
+    broker: AskBroker | None = hass.data.get(DATA_ASK)
+    taken = broker.answer(msg["ask_id"], msg["text"], msg["answered"]) if broker else False
+    connection.send_result(msg["id"], {"taken": taken})

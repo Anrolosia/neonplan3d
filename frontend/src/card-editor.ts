@@ -257,6 +257,13 @@ export class Floorplan3dCardEditor extends LitElement {
       ${this.toggle("alerts", "card_alerts", "card_alerts_hint")} ${this.toggle("alert_jump", "card_alert_jump", "card_alert_jump_hint")}
       ${this.toggle("director", "card_director", "card_director_hint")}
       ${this.toggle("voice", "card_voice", "card_voice_hint")}
+      <div class="grid">
+        <label class="field wide"
+          >${this.t("screen_name")}
+          <input type="text" placeholder=${this.t("screen_name_placeholder")} .value=${v.screen ?? ""} @change=${(e: Event) => this.set("screen", (e.target as HTMLInputElement).value.trim() || undefined)} />
+        </label>
+      </div>
+      <p class="hint">${this.t("screen_name_hint")}</p>
       ${this.toggle("scenes", "card_scenes", "card_scenes_hint")}
       ${this.toggle("motion_trail", "card_motion_trail", "card_motion_trail_hint")} ${this.toggle("camera_wall", "card_camera_wall", "card_camera_wall_hint")}
       ${this.toggle("time_travel", "card_time_travel", "card_time_travel_hint")}
