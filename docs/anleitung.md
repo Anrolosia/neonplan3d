@@ -681,7 +681,7 @@ NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, 
 
 **Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
 
-- **NeonPlan-Seite (Panel):** Editor → **🎙️ Sprachsteuerung** → **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet, aber nicht das Handy.
+- **NeonPlan-Seite (Panel):** Editor → **⚙ Einstellungen → 🎙 Sprachsteuerung** → **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet, aber nicht das Handy.
 - **Dashboard-Karte:** Dashboard bearbeiten → NeonPlan-Karte → **Funktionen** → **Sprachsteuerung (Mikrofon-Knopf)**, oder im YAML `voice: true`. Die Karten-Einstellung gilt auf allen Geräten, die dieses Dashboard zeigen. Du kannst sie bequem am PC setzen, auch wenn sie für das Tablet gedacht ist.
 
 **Was du dafür brauchst:**
@@ -724,7 +724,7 @@ Pro-Erweiterungen sind kostenpflichtige Zusatzfunktionen, einzeln im Shop erhäl
 
 **Live-Regie:** Ein Bildschirm, meist das Wandtablet, zeigt von selbst, was im Haus passiert. Klingelt es, fliegt die Ansicht zur Haustür und schaut durch die Kamera dort. Sieht eine Kamera jemanden, ist die Waschmaschine fertig oder kommt eine Warnung, fliegt sie ebenfalls dorthin. Danach kehrt sie zurück, wo sie war. Alles ist **aus**, bis du es einschaltest, und zwar an zwei Stellen:
 
-1. **Welche Ereignisse:** Editor → **🎬 Live-Regie**. Jedes Ereignis hat einen eigenen Schalter:
+1. **Welche Ereignisse:** Editor → **⚙ Einstellungen → 🎬 Live-Regie**. Jedes Ereignis hat einen eigenen Schalter:
    - **Es klingelt:** Die Klingel findet NeonPlan selbst, nämlich eine Ereignis-Entität der Klasse „Türklingel“ (Ring, UniFi Protect …) oder einen Sensor wie Reolinks „Besucher“. Du kannst sie auch selbst wählen, ebenso die Kamera an der Tür. Ohne Wahl nimmt NeonPlan die Kamera desselben Geräts oder eine im selben Bereich. Die Kamera muss im Plan platziert sein, sonst fliegt die Ansicht nur zur Klingel.
    - **Eine Kamera sieht jemanden:** „Nur Personen“ oder „Jede Bewegung“, für alle platzierten Kameras.
    - **Waschmaschine, Trockner oder Spülmaschine fertig:** Das Gerät muss als Möbel mit Strommessung oder Status verknüpft sein. Als fertig gilt es, wenn es nach dem Lauf 3 Minuten ruht. Eine Pause im Programm zählt also nicht.

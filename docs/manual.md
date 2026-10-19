@@ -681,7 +681,7 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors and de
 
 **Switching it on.** Voice control is off by default. You switch it on where you want to speak:
 
-- **NeonPlan page (panel):** editor → **🎙️ Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
+- **NeonPlan page (panel):** editor → **⚙ Settings → 🎙 Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
 - **Dashboard card:** edit the dashboard → NeonPlan card → **Features** → **Voice control (microphone button)**, or `voice: true` in YAML. The card setting applies on every device that shows this dashboard, so you can set it on the PC even when it is meant for the tablet.
 
 **What you need:**
@@ -724,7 +724,7 @@ Pro add-ons are paid extra features, sold singly in the shop. Without an add-on,
 
 **Live director:** a screen, usually the wall tablet, shows by itself what happens in the house. When the doorbell rings, the view flies to the front door and looks through the camera there. When a camera sees someone, the washer is done or a warning comes up, it flies there too. Afterwards it goes back to where it was. Everything is **off** until you switch it on, in two places:
 
-1. **Which events:** editor → **🎬 Live director**. Every event has its own switch:
+1. **Which events:** editor → **⚙ Settings → 🎬 Live director**. Every event has its own switch:
    - **Doorbell rings:** NeonPlan finds the doorbell itself, as an event entity of the class "doorbell" (Ring, UniFi Protect …) or a sensor like Reolink's "Visitor". You can also choose it yourself, and the camera at the door too. Without a choice NeonPlan takes the camera of the same device, or one in the same area. The camera has to be placed in the plan; otherwise the view only flies to the doorbell.
    - **A camera sees someone:** "People only" or "Any motion", for all placed cameras.
    - **Washer, dryer or dishwasher finished:** the appliance has to be furniture linked to a power sensor or a status. It counts as finished once it rests for 3 minutes after its run, so a pause in the programme does not count.
