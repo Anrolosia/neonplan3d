@@ -1362,7 +1362,13 @@ var Zn=globalThis,qn=Zn.ShadowRoot&&(Zn.ShadyCSS===void 0||Zn.ShadyCSS.nativeSha
         </button>
         ${n?_`<div class="fp3d-menu-veil" @click=${()=>this._settingsMenu=!1}></div>
               <div class="fp3d-menu fp3d-menu-right" role="menu">
-                ${s.map(a=>_`<button role="menuitem" class="fp3d-menu-item" @click=${()=>(this._settingsDialog=a.key,this._settingsMenu=!1)}>${a.icon} ${a.label}</button>`)}
+                ${s.map(a=>_`<button
+                    role="menuitem"
+                    class="fp3d-menu-item"
+                    @click=${()=>{this._settingsDialog=a.key,this._settingsMenu=!1,a.key==="voice"&&this.hass&&kd(this.hass,this.packs??[]).then(()=>this.requestUpdate())}}
+                  >
+                    ${a.icon} ${a.label}
+                  </button>`)}
               </div>`:w}
       </div>
     </div>`}renderSettingsDialog(){let e=this._settingsDialog;if(!e)return w;let t=()=>this._settingsDialog=null,n={house:this.t("settings_house"),weather:this.t("settings_weather"),director:this.t("card_director"),voice:this.t("voice"),favorites:this.t("favorites"),backdrop:this.t("backdrop"),terrain:this.t("terrain"),backup:this.t("backup"),modules:this.t("settings_modules")},i=e==="house"?this.renderHouseSettings():e==="weather"?this.renderWeatherSettings():e==="director"?this.renderDirector():e==="voice"?this.renderVoice():e==="favorites"?this.renderFavorites():e==="backdrop"?this.renderBackdrop():e==="terrain"?this.renderTerrain():e==="backup"?this.renderBackup():this.renderModuleSettings();return _`<div class="fp3d-dialog-veil" @click=${o=>o.target===o.currentTarget&&t()}>
@@ -2616,7 +2622,7 @@ var Zn=globalThis,qn=Zn.ShadowRoot&&(Zn.ShadyCSS===void 0||Zn.ShadyCSS.nativeSha
           ${(this.voicePipes??[]).map(n=>_`<option value=${n.id} ?selected=${t===n.id} ?disabled=${!n.stt}>${n.name}${n.stt?"":` (${this.t("voice_pipeline_no_stt")})`}</option>`)}
         </select></label
       >
-    </div>`}renderVoice(){let e=Ml();this.hass&&kd(this.hass,this.packs??[]).then(()=>this.requestUpdate());let t=[...this.t("voice_examples").split("|"),...$d(this.hass?.language??"en")];return _`<details class="fp3d-section">
+    </div>`}renderVoice(){let e=Ml(),t=[...this.t("voice_examples").split("|"),...$d(this.hass?.language??"en")];return _`<details class="fp3d-section">
       <summary>🎙️ ${this.t("voice")}</summary>
       <p class="fp3d-sub">${this.t("voice_hint")}</p>
       <p class="fp3d-sub"><b>${this.t("voice_understands")}</b></p>

@@ -5413,7 +5413,18 @@ export class Fp3dEditor extends LitElement {
           ? html`<div class="fp3d-menu-veil" @click=${() => (this._settingsMenu = false)}></div>
               <div class="fp3d-menu fp3d-menu-right" role="menu">
                 ${topics.map(
-                  (t) => html`<button role="menuitem" class="fp3d-menu-item" @click=${() => ((this._settingsDialog = t.key), (this._settingsMenu = false))}>${t.icon} ${t.label}</button>`,
+                  (t) => html`<button
+                    role="menuitem"
+                    class="fp3d-menu-item"
+                    @click=${() => {
+                      this._settingsDialog = t.key;
+                      this._settingsMenu = false;
+                      // the modules' sentences for the voice list: loaded here as well (the editor is its own bundle), once per opening
+                      if (t.key === "voice" && this.hass) void syncModules(this.hass, this.packs ?? []).then(() => this.requestUpdate());
+                    }}
+                  >
+                    ${t.icon} ${t.label}
+                  </button>`,
                 )}
               </div>`
           : nothing}
@@ -11024,8 +11035,6 @@ export class Fp3dEditor extends LitElement {
   /** Voice control: the microphone button on this device (a card has its own option), and the microphone test. */
   private renderVoice() {
     const here = voiceOnHere();
-    // the modules' sentences: loaded here as well (the editor is its own bundle), listed once they are there
-    if (this.hass) void syncModules(this.hass, this.packs ?? []).then(() => this.requestUpdate());
     const examples = [...this.t("voice_examples").split("|"), ...moduleHelp(this.hass?.language ?? "en")];
     return html`<details class="fp3d-section">
       <summary>🎙️ ${this.t("voice")}</summary>
