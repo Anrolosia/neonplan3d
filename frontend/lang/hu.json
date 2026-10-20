@@ -1934,6 +1934,8 @@
  "roof_basics": "Tetőforma",
  "module_no_settings": "Ennek a modulnak nincsenek saját beállításai.",
  "modules_none": "Még nincs modul telepítve.",
+ "pack_pro_module": "{publisher} Pro-bővítménye · modullá válik",
+ "modules_pro_note": "A Pro-bővítmények már itt állnak: egymás után modulokká válnak, amelyek a kódjukat a boltból hozzák – a használat nem változik.",
  "module_import": "Modul importálása …",
  "module_imported": "„{name}” ({publisher}) importálva",
  "module_import_hint": "A modulok .fp3dpack fájlként érkeznek a boltból (ügyfélfiókkal): aláírt csomag kóddal, amelyet a NeonPlan betölt – ellenőrizve és a telepítésedhez kötve. A hangmodul mondatai ezután a 🎙 Hangvezérlés alatt jelennek meg.",

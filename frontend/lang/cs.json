@@ -1934,6 +1934,8 @@
  "roof_basics": "Tvar střechy",
  "module_no_settings": "Tento modul nemá vlastní nastavení.",
  "modules_none": "Zatím žádný modul.",
+ "pack_pro_module": "Pro rozšíření od {publisher} · stane se modulem",
+ "modules_pro_note": "Pro rozšíření už stojí zde: postupně se stanou moduly, které si svůj kód přinesou z obchodu – na ovládání se nic nemění.",
  "module_import": "Nahrát modul …",
  "module_imported": "„{name}“ od {publisher} nahráno",
  "module_import_hint": "Moduly přicházejí jako soubory .fp3dpack z obchodu (se zákaznickým účtem): podepsaný balíček s kódem, který NeonPlan načte – ověřený a vázaný na tvou instalaci. Věty hlasového modulu se pak zobrazí pod 🎙 Hlasové ovládání.",

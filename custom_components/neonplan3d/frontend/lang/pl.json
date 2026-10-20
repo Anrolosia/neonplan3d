@@ -1934,6 +1934,8 @@
  "roof_basics": "Kształt dachu",
  "module_no_settings": "Ten moduł nie ma własnych ustawień.",
  "modules_none": "Nie zainstalowano jeszcze modułu.",
+ "pack_pro_module": "Rozszerzenie Pro od {publisher} · stanie się modułem",
+ "modules_pro_note": "Rozszerzenia Pro już tu są: jedno po drugim staną się modułami, które przynoszą swój kod ze sklepu – obsługa się nie zmienia.",
  "module_import": "Importuj moduł …",
  "module_imported": "„{name}” od {publisher} zaimportowano",
  "module_import_hint": "Moduły przychodzą jako pliki .fp3dpack ze sklepu (z kontem klienta): podpisany pakiet z kodem, który NeonPlan wczytuje – sprawdzony i powiązany z twoją instalacją. Zdania modułu głosowego pojawiają się potem w 🎙 Sterowanie głosem.",

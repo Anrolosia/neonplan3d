@@ -1934,6 +1934,8 @@
  "roof_basics": "Forme du toit",
  "module_no_settings": "Ce module n'a pas de réglages propres.",
  "modules_none": "Aucun module installé pour l'instant.",
+ "pack_pro_module": "Extension Pro de {publisher} · devient un module",
+ "modules_pro_note": "Les extensions Pro sont déjà ici : une à une, elles deviennent des modules qui apportent leur code depuis la boutique – rien ne change à l'usage.",
  "module_import": "Importer un module …",
  "module_imported": "« {name} » de {publisher} importé",
  "module_import_hint": "Les modules arrivent sous forme de fichiers .fp3dpack depuis la boutique (avec un compte client) : un pack signé contenant du code que NeonPlan charge, vérifié et lié à ton installation. Les phrases d'un module vocal apparaissent ensuite sous 🎙 Commande vocale.",

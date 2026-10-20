@@ -1934,6 +1934,8 @@
  "roof_basics": "屋顶形状",
  "module_no_settings": "此模块没有自己的设置。",
  "modules_none": "尚未安装模块。",
+ "pack_pro_module": "{publisher} 的 Pro 扩展 · 将成为模块",
+ "modules_pro_note": "Pro 扩展已经列在这里：它们会逐一变成从商店带来代码的模块——使用方式不变。",
  "module_import": "导入模块…",
  "module_imported": "已导入 {publisher} 的“{name}”",
  "module_import_hint": "模块以 .fp3dpack 文件的形式来自商店（需客户账户）：一个带代码的签名包，NeonPlan 会加载它——经过校验并绑定到你的安装。语音模块的句子随后显示在 🎙 语音控制下。",

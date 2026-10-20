@@ -1934,6 +1934,8 @@
  "roof_basics": "Forma del tejado",
  "module_no_settings": "Este módulo no tiene ajustes propios.",
  "modules_none": "Aún no hay ningún módulo.",
+ "pack_pro_module": "Extensión Pro de {publisher} · se convierte en módulo",
+ "modules_pro_note": "Las extensiones Pro ya están aquí: una a una se convertirán en módulos que traen su código de la tienda – el manejo no cambia.",
  "module_import": "Importar un módulo …",
  "module_imported": "«{name}» de {publisher} importado",
  "module_import_hint": "Los módulos llegan como archivos .fp3dpack desde la tienda (con cuenta de cliente): un pack firmado con código que NeonPlan carga, comprobado y vinculado a tu instalación. Las frases de un módulo de voz aparecen después en 🎙 Control por voz.",

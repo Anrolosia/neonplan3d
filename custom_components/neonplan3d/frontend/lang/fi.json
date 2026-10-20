@@ -1934,6 +1934,8 @@
  "roof_basics": "Katon muoto",
  "module_no_settings": "Tällä moduulilla ei ole omia asetuksia.",
  "modules_none": "Ei vielä moduuleja.",
+ "pack_pro_module": "Pro-laajennus ({publisher}) · muuttuu moduuliksi",
+ "modules_pro_note": "Pro-laajennukset ovat jo täällä: yksi kerrallaan niistä tulee moduuleja, jotka tuovat koodinsa kaupasta – käyttö ei muutu.",
  "module_import": "Tuo moduuli …",
  "module_imported": "”{name}” ({publisher}) tuotu",
  "module_import_hint": "Moduulit tulevat .fp3dpack-tiedostoina kaupasta (asiakastilillä): allekirjoitettu paketti, jonka koodin NeonPlan lataa – tarkistettu ja sidottu asennukseesi. Puhemoduulin lauseet näkyvät sen jälkeen kohdassa 🎙 Puheohjaus.",

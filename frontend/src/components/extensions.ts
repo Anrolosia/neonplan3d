@@ -562,16 +562,12 @@ export class Extensions extends LitElement {
   }
 
   private renderPacks() {
-    // modules have their own section below
-    const packs = (this.packs ?? []).filter((p) => !p.module);
+    // modules and Pro add-ons (modules soon) have their own section below: here only packs with furniture
+    const packs = (this.packs ?? []).filter((p) => !p.module && !p.features?.length);
     const items = packs.reduce((s, p) => s + p.items.length, 0);
-    const pro = packs.filter((p) => p.features?.length).length;
     return html`<section class="fp3d-ext-card">
       <h3>${this.t("packs")}</h3>
-      ${this.summaryBar("packs", [
-        { n: packs.length - pro, label: this.t("ext_sum_packs", { items }), tone: "ok" },
-        { n: pro, label: this.t("ext_sum_feature_packs"), tone: "missing" },
-      ])}
+      ${this.summaryBar("packs", [{ n: packs.length, label: this.t("ext_sum_packs", { items }), tone: "ok" }])}
       ${(this._open.has("packs") ? packs : []).map(
         (p) => html`<div class="fp3d-pack">
           <div>
@@ -593,9 +589,9 @@ export class Extensions extends LitElement {
     </section>`;
   }
 
-  /** Modules: signed packs that carry code (the editor's ⚙ Module dialog shows the same list). */
+  /** Modules: signed packs that carry code – and the Pro add-ons, which become modules (the editor's ⚙ Module dialog shows the same list). */
   private renderModules() {
-    const modules = (this.packs ?? []).filter((p) => p.module);
+    const modules = (this.packs ?? []).filter((p) => p.module || p.features?.length);
     return html`<section class="fp3d-ext-card">
       <h3>${this.t("settings_modules")}</h3>
       ${modules.length
@@ -603,7 +599,8 @@ export class Extensions extends LitElement {
             (p) => html`<div class="fp3d-pack">
               <div>
                 <b>${packName(p, this.hass?.language ?? "de")}</b>
-                <span class="fp3d-sub">${this.t("pack_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
+                <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t("pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
+                ${(p.features ?? []).some((f) => !knownFeature(f)) ? html`<span class="fp3d-sub fp3d-pack-error">${this.t("pack_needs_update")}</span>` : nothing}
                 ${p.licensee ? html`<span class="fp3d-sub">${this.t("pack_licensed", { name: p.licensee })}</span>` : nothing}
               </div>
               <button class="fp3d-btn fp3d-danger" @click=${() => this.deletePack(p)}>${this.t("pack_remove")}</button>
@@ -615,7 +612,7 @@ export class Extensions extends LitElement {
         <input type="file" accept=".fp3dpack,.json,application/json" multiple hidden @change=${(e: Event) => this.importPackFile(e, true)} />
       </label>
       ${this._moduleMsg ? html`<p class="fp3d-sub ${this._moduleMsg.ok ? "fp3d-notice" : "fp3d-pack-error"}">${this._moduleMsg.text}</p>` : nothing}
-      <p class="fp3d-sub">${this.t("module_import_hint")}</p>
+      <p class="fp3d-sub">${this.t("module_import_hint")} ${this.t("modules_pro_note")}</p>
     </section>`;
   }
 

@@ -1934,6 +1934,8 @@
  "roof_basics": "Takform",
  "module_no_settings": "Denne modulen har ingen eigne innstillingar.",
  "modules_none": "Ingen modul installert enno.",
+ "pack_pro_module": "Pro-utviding frå {publisher} · vert ein modul",
+ "modules_pro_note": "Pro-utvidingane står alt her: ein etter ein vert dei modular som hentar koden sin frå butikken – bruken endrar seg ikkje.",
  "module_import": "Importer ein modul …",
  "module_imported": "«{name}» frå {publisher} importert",
  "module_import_hint": "Modular kjem som .fp3dpack-filer frå butikken (med kundekonto): ein signert pakke med kode som NeonPlan lastar – kontrollert og bunden til installasjonen din. Setningane til ein stemmemodul viser etterpå under 🎙 Stemmestyring.",

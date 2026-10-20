@@ -1934,6 +1934,8 @@
  "roof_basics": "Forma acoperișului",
  "module_no_settings": "Acest modul nu are setări proprii.",
  "modules_none": "Niciun modul instalat încă.",
+ "pack_pro_module": "Extensie Pro de la {publisher} · devine modul",
+ "modules_pro_note": "Extensiile Pro stau deja aici: una câte una devin module care își aduc codul din magazin – nimic nu se schimbă în folosire.",
  "module_import": "Importă un modul …",
  "module_imported": "„{name}” de {publisher} importat",
  "module_import_hint": "Modulele vin ca fișiere .fp3dpack din magazin (cu cont de client): un pachet semnat cu cod pe care NeonPlan îl încarcă – verificat și legat de instalația ta. Propozițiile unui modul vocal apar apoi sub 🎙 Control vocal.",

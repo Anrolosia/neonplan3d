@@ -5539,14 +5539,14 @@ export class Fp3dEditor extends LitElement {
   /** Modules installed from the shop; a module's own settings will show here once modules bring some. */
   /** The modules installed (code from the shop) and the button that imports one – a module file need not go through the extensions page. */
   private renderModuleSettings() {
-    const modules = (this.packs ?? []).filter((p) => p.module);
+    const modules = (this.packs ?? []).filter((p) => p.module || p.features?.length);
     return html`<div class="fp3d-form">
       ${modules.length
         ? modules.map(
             (p) => html`<div class="fp3d-wide">
               <b>${packName(p, this.hass?.language ?? "de")}</b>
-              <p class="fp3d-sub">${this.t("pack_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</p>
-              <p class="fp3d-sub">${this.t("module_no_settings")}</p>
+              <p class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t("pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</p>
+              ${p.module ? html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>` : nothing}
             </div>`,
           )
         : html`<p class="fp3d-sub fp3d-wide">${this.t("modules_none")}</p>`}

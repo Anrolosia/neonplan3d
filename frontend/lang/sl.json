@@ -1934,6 +1934,8 @@
  "roof_basics": "Oblika strehe",
  "module_no_settings": "Ta modul nima lastnih nastavitev.",
  "modules_none": "Noben modul še ni nameščen.",
+ "pack_pro_module": "Razširitev Pro ({publisher}) · postane modul",
+ "modules_pro_note": "Razširitve Pro so že tukaj: ena za drugo postanejo moduli, ki svojo kodo prinesejo iz trgovine – uporaba se ne spremeni.",
  "module_import": "Uvozi modul …",
  "module_imported": "„{name}“ ({publisher}) uvožen",
  "module_import_hint": "Moduli pridejo kot datoteke .fp3dpack iz trgovine (z računom stranke): podpisan paket s kodo, ki jo NeonPlan naloži – preverjen in vezan na tvojo namestitev. Stavki glasovnega modula se nato prikažejo pod 🎙 Glasovno upravljanje.",

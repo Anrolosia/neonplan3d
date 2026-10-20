@@ -1934,6 +1934,8 @@
  "roof_basics": "Tagform",
  "module_no_settings": "Dette modul har ingen egne indstillinger.",
  "modules_none": "Intet modul installeret endnu.",
+ "pack_pro_module": "Pro-udvidelse fra {publisher} · bliver et modul",
+ "modules_pro_note": "Pro-udvidelserne står allerede her: en efter en bliver de til moduler, der bringer deres kode fra shoppen – betjeningen ændrer sig ikke.",
  "module_import": "Importér et modul …",
  "module_imported": "„{name}“ fra {publisher} importeret",
  "module_import_hint": "Moduler kommer som .fp3dpack-filer fra shoppen (med kundekonto): en signeret pakke med kode, som NeonPlan indlæser – kontrolleret og bundet til din installation. Et stemmemoduls sætninger vises derefter under 🎙 Stemmestyring.",

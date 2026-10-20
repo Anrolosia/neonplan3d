@@ -1934,6 +1934,8 @@
  "roof_basics": "Dakvorm",
  "module_no_settings": "Deze module heeft geen eigen instellingen.",
  "modules_none": "Nog geen module geïnstalleerd.",
+ "pack_pro_module": "Pro-uitbreiding van {publisher} · wordt een module",
+ "modules_pro_note": "De Pro-uitbreidingen staan hier al: een voor een worden het modules die hun code uit de shop meebrengen – aan de bediening verandert niets.",
  "module_import": "Module importeren …",
  "module_imported": "„{name}” van {publisher} geïmporteerd",
  "module_import_hint": "Modules komen als .fp3dpack-bestanden uit de shop (met klantaccount): een ondertekend pack met code dat NeonPlan laadt – gecontroleerd en gebonden aan je installatie. De zinnen van een spraakmodule staan daarna onder 🎙 Spraakbediening.",
