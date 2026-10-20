@@ -3,6 +3,9 @@
 import type { StartView } from "./model.ts";
 import type { Quality, WallMode } from "./viewer/viewer3d.ts";
 
+/** Where the clock sits: a corner, or none. */
+export type ClockPos = "off" | "tl" | "tr" | "bl" | "br";
+
 export interface CardConfig {
   type: string;
   floor?: string;
@@ -50,6 +53,8 @@ export interface CardConfig {
   /** Look: neon | blueprint | day. */
   /** The look; "auto" shows Day while the sun is up and Neon at night. */
   theme?: "neon" | "blueprint" | "day" | "auto";
+  /** Date and time in a corner of the view (default off). */
+  clock?: ClockPos;
   /** Accent colour for the neon look and the card's chips ("#rrggbb"); leave out for the stock cyan. */
   accent?: string;
   /** Energy values at the top (default true). */

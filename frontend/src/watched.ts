@@ -46,7 +46,7 @@ export function watchedEntities(hass: HomeAssistant, b: Building, w: WatchLinks)
   const parking = [...parkingEntities(b.floors), ...(hasFeature("auto_pro") ? carWatched(hass, b.floors) : [])];
   const motion = trailSources(hass, b).map((s) => s.entity);
   // Haushalt Pro: the bins' calendars and sensors, the mailboxes' flaps and doors
-  const household = hasFeature("household") ? b.floors.flatMap((f) => f.furniture.flatMap(householdEntities)).filter((id) => id !== "none") : [];
+  const household = hasFeature("household") ? [...b.floors.flatMap((f) => f.furniture.flatMap(householdEntities)), b.settings.household?.notes ?? null].filter((id): id is string => !!id && id !== "none") : [];
   const weather = weatherEntity(hass, w.weatherEntityId ?? b.settings.weather_entity);
   const all = [...placed, ...cameraSensors, ...links, ...power, ...furniture, ...states, ...doors, ...robotRooms, ...roofWindowIds, ...solarIds, ...pictureRules, e.grid, e.solar, e.battery, e.battery_soc, e.consumption, e.tariff, ...presence, ...lights, ...heat, ...w.warnings, ...parking, ...motion, ...household, weather, "sun.sun"];
   return [...new Set(all.filter((id): id is string => !!id))];

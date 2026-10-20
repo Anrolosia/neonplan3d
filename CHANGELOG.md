@@ -22,6 +22,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Improved
 
+- **Smart locks on doors** (D636): a door gets its lock entity; a pin at the door shows locked or open (red while unlocked), a tap locks or unlocks.
+- **Radiators with a heat sensor** (D637): Tuya valves and others that report heating as a separate "work state" sensor glow with it.
+- **Clock in the view** (D631): date and time in a corner of your choice, per device in the view settings and as card option `clock`.
+- **Editor start floor** (D418): ⚙ House → "Start-Etage im Editor".
+- **Pinboard in "Heute im Haushalt"** (D628): a text helper's lines stand at the top of the household card – automations write into it.
+- **iPad / iPhone** (#635, #633): a finger on the house no longer swipes the dashboard to another view or back; the full-screen button spreads the card over the page where the browser has no full-screen mode (the Home Assistant app on iOS).
 - Look **Auto**: Day while the sun is up, Neon after sunset – in the view settings and as card option `theme: auto` (D623).
 - Editor: the side bar can be dragged wider or narrower at its left edge; the width is remembered (#620).
 - Electric furniture: an **extra value at the symbol** – a sensor (a gas boiler's water temperature) shown at the item's pin (D619).

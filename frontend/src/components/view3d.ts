@@ -1,7 +1,7 @@
 // Lit wrapper around the lazily loaded 3D viewer.
 
 import { css, html, LitElement, nothing, svg, type PropertyValues } from "lit";
-import { carState, type CarState, roomClimateValue,
+import { carState, type CarState, heatSensorOn, roomClimateValue,
   appColor,
   areaEntities,
   entityName,
@@ -124,6 +124,7 @@ import { backdropCss } from "../backdrop.ts";
 import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
 import { answerAsk, subscribeAsk, type Ask } from "../api.ts";
 import { pipePlanner } from "../pipe-planner.ts";
+import type { ClockPos } from "../card-config.ts";
 import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, triggerFired, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
@@ -178,6 +179,8 @@ export class Fp3dView3d extends LitElement {
     markerNames: { attribute: false },
     heatMode: { attribute: false },
     theme: { attribute: false },
+    clock: { attribute: false },
+    _clockTick: { state: true },
     accent: { attribute: false },
     packs: { attribute: false },
     showEnergy: { attribute: false },
@@ -296,6 +299,10 @@ export class Fp3dView3d extends LitElement {
   declare packs: unknown;
   /** The look; "auto" is Day while the sun is up and Neon at night (D623). */
   declare theme: Theme | "auto";
+  /** Date and time in a corner of the view (D631); null or "off": none. */
+  declare clock: ClockPos | null;
+  private declare _clockTick: number;
+  private clockTimer: ReturnType<typeof setInterval> | undefined;
   /** Accent colour for the neon look ("#rrggbb"), null for the stock cyan. */
   declare accent: string | null;
   /** Show the energy values at the top (cards can switch them off). */
@@ -567,6 +574,8 @@ export class Fp3dView3d extends LitElement {
     this.pinSize = "normal";
     this.heatMode = "none";
     this.theme = "neon";
+    this.clock = null;
+    this._clockTick = 0;
     this.accent = null;
     this.furnish = false;
     this.trail = false;
@@ -684,6 +693,14 @@ export class Fp3dView3d extends LitElement {
     void sub?.then((unsub) => unsub()).catch(() => undefined);
   }
 
+  /**
+   * A finger on the house turns, moves and zooms it – nothing else: Home Assistant's dashboard would otherwise take
+   * a swipe for a change of view and the iPad's browser for a step back (#635, #633).
+   */
+  private keepTouch = (e: TouchEvent): void => {
+    e.stopPropagation();
+  };
+
   /** A wall tablet's screen on again: stale day curves are fetched at once. */
   private onVisible = (): void => {
     if (!document.hidden) this.holoRefetch?.();
@@ -703,6 +720,8 @@ export class Fp3dView3d extends LitElement {
     this.unwatchDiag?.();
     this.unwatchDiag = null;
     this.unwatchAsk();
+    clearInterval(this.clockTimer);
+    this.clockTimer = undefined;
     this.resizeObs?.disconnect();
     this.resizeObs = null;
     clearInterval(this.alertTimer);
@@ -986,7 +1005,7 @@ export class Fp3dView3d extends LitElement {
       hasFeature("auto_pro") ? b.floors.flatMap((fl) => fl.furniture.filter((f) => f.type === "parking" && f.car && parkedVehicle(hass, f)).map((f) => f.id)) : [],
     );
     v.setDevices([
-      ...[...deviceMarkers, ...furniture.markers].map((m) => {
+      ...[...deviceMarkers, ...furniture.markers, ...this.lockMarkers(hass, b)].map((m) => {
         // "without watts" drops the power badge (a plug shows only on / off)
         const power = m.show === "no_power" || ("energyDevice" in m && m.energyDevice) ? null : (byDevice.get(m.id) ?? null);
         // at night (kiosk) colour effects rest
@@ -2595,11 +2614,13 @@ export class Fp3dView3d extends LitElement {
           }
           if (faces.length) screens.set(`${f.id}:vehicle`, { color: faces[0].color, level: faces[0].level, faces });
         }
-        if (f.type === "radiator" && st && kindOf(st.entity_id) === "climate") {
-          // glows while it heats; brighter the further the room is below its target
-          const a = st.attributes;
-          if (a.hvac_action === "heating") {
-            const gap = typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
+        if (f.type === "radiator" && ((st && kindOf(st.entity_id) === "climate") || f.heat_sensor)) {
+          // glows while it heats; brighter the further the room is below its target. A thermostat that does not tell
+          // (Tuya's valves report a "work state" sensor instead) is asked through the radiator's own sensor (D637)
+          const a = st && kindOf(st.entity_id) === "climate" ? st.attributes : null;
+          const heating = heatSensorOn(hass, f.heat_sensor) ?? a?.hvac_action === "heating";
+          if (heating) {
+            const gap = a && typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
             screens.set(f.id, { color: [1, 0.42, 0.1], level: Math.min(1, 0.45 + 0.25 * Math.max(0, gap)) });
           }
         } else if (f.type === "ac_unit" && st && kindOf(st.entity_id) === "climate") {
@@ -2674,6 +2695,17 @@ export class Fp3dView3d extends LitElement {
       }
     }
     // two bins of the same kind out on the same day are one line
+    // the pinboard (D628): a text helper's lines, one above the other, first in the list
+    const notes = b.settings.household?.notes;
+    const noteSt = notes && notes !== "none" ? hass.states[notes] : undefined;
+    if (household && noteSt && !isUnavailable(noteSt) && noteSt.state.trim()) {
+      const lines = noteSt.state
+        .split(/\s*(?:\||\n|;)\s*/)
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .slice(0, 8);
+      today.unshift(...lines.map((text) => ({ icon: "pin-outline", text, entity: notes as string })));
+    }
     this._household = today.filter((it, i) => today.findIndex((x) => x.text === it.text) === i);
     // picture rules: the first rule whose entity is in its state puts its picture on the screen (a Pro feature)
     this.cameraScreens = 0;
@@ -3516,6 +3548,30 @@ export class Fp3dView3d extends LitElement {
     </div>`;
   }
 
+  /** Date and time in a corner (D631), kept current every half minute while shown. */
+  private renderClock() {
+    const pos = this.clock;
+    if (!pos || pos === "off" || !this.hass) {
+      if (this.clockTimer) {
+        clearInterval(this.clockTimer);
+        this.clockTimer = undefined;
+      }
+      return nothing;
+    }
+    this.clockTimer ??= setInterval(() => (this._clockTick = Date.now()), 30000);
+    const now = new Date(this.now());
+    const lang = (this.hass.language || "en").replace("_", "-");
+    const tz = this.hass.config?.time_zone;
+    const fmt = (o: Intl.DateTimeFormatOptions) => {
+      try {
+        return now.toLocaleString(lang, tz ? { ...o, timeZone: tz } : o);
+      } catch {
+        return now.toLocaleString(lang, o);
+      }
+    };
+    return html`<div class="fp3d-clock fp3d-clock-${pos}" aria-hidden="true"><b>${fmt({ hour: "2-digit", minute: "2-digit" })}</b><span>${fmt({ weekday: "short", day: "numeric", month: "short" })}</span></div>`;
+  }
+
   private renderAlerts() {
     const b = this.building;
     if (!this._alerts.length || !b) return nothing;
@@ -4099,6 +4155,37 @@ export class Fp3dView3d extends LitElement {
       spoken.push({ id: entity, entity, name: it.name, names, room, floorId: it.floorId, roomId: it.roomId, power: null, type: "device" });
     }
     return { devices, items, spoken };
+  }
+
+  /** The smart locks of the doors (D636): a pin at each door that has one, red while it is unlocked; a tap locks or unlocks. */
+  private lockMarkers(hass: HomeAssistant, b: Building): (DeviceMarker & { fromFurniture: boolean })[] {
+    const out: (DeviceMarker & { fromFurniture: boolean })[] = [];
+    for (const floor of b.floors) {
+      for (const o of floor.openings) {
+        const lock = this.openingLinks?.get(o.id)?.lock;
+        if (!lock) continue;
+        const spot = this.openingSpot(b, o.id);
+        if (!spot) continue;
+        const st = hass.states[lock];
+        out.push({
+          id: lock,
+          floorId: floor.id,
+          roomId: o.room_id,
+          x: spot.x,
+          z: spot.z,
+          y: Math.min(spot.y + 0.35, 1.5),
+          icon: iconSvg("lock"),
+          name: entityName(hass, lock),
+          text: st ? stateText(hass, st) : "",
+          active: !!st && (st.state === "unlocked" || st.state === "open" || st.state === "unlocking"),
+          unavailable: !st || isUnavailable(st),
+          glow: null,
+          full: true,
+          fromFurniture: false,
+        });
+      }
+    }
+    return out;
   }
 
   /**
@@ -4708,11 +4795,14 @@ export class Fp3dView3d extends LitElement {
     const pinK = this.pinSize === "small" ? 0.8 : this.pinSize === "large" ? 1.25 : 1;
     const style = `--fp3d-pin-k:${pinK};--fp3d-sky:${mix(stage.night[0], stage.day[0])};--fp3d-ground:${mix(stage.night[1], stage.day[1])}${own ? `;background:${own}` : ""}`;
     return html`<div
+      @touchstart=${this.keepTouch}
+      @touchmove=${this.keepTouch}
+      @touchend=${this.keepTouch}
       class="fp3d-stage ${this.roomLabels ? "" : "fp3d-no-room-names"} ${this._low ? "fp3d-low" : ""} ${this.panelOpen ? "fp3d-panel-open" : ""} ${this.controlsRight ? "fp3d-side-right" : ""} ${this._alerts.length ? "fp3d-has-alerts" : ""} ${this._through ? "fp3d-through-on" : ""} ${this._flash ? "fp3d-flash" : ""} ${this.replay ? "fp3d-replay" : ""}"
       style=${style}
     >
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
-      ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderGangMenu()} ${this.renderThrough()} ${this.renderCameraWall()}
+      ${this.renderClock()} ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderGangMenu()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
       ${this.renderMic()}
       ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}

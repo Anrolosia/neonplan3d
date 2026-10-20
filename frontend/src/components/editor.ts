@@ -846,6 +846,9 @@ export class Fp3dEditor extends LitElement {
     if (changed.has("building") && this.building !== this._doc) {
       this._doc = this.building;
       this._doc3d = this.building;
+      // the first plan: the floor chosen in the house settings (D418), else the first of the list
+      const start = this._doc.settings.editor_floor;
+      if (this._floorId === null && start && this._doc.floors.some((f) => f.id === start)) this._floorId = start;
       if (!this._doc.floors.some((f) => f.id === this._floorId)) this._floorId = this._doc.floors[0]?.id ?? null;
       if (!this.floor?.rooms.some((r) => r.id === this._roomId)) this._roomId = null;
     }
@@ -10745,7 +10748,9 @@ export class Fp3dEditor extends LitElement {
                 ? html`<label class="fp3d-check fp3d-wide" title=${this.t("door_shut_hint")}
                     ><input type="checkbox" .checked=${!!o.shut} ?disabled=${!admin} @change=${(ev: Event) => this.updateOpening({ shut: (ev.target as HTMLInputElement).checked })} />
                     ${this.t("door_shut")}</label
-                  >`
+                  >
+                  ${this.entitySelect(this.t("door_lock"), o.lock ?? null, undefined, this.entityOptions((id) => id.startsWith("lock.")), (v) => this.updateOpening({ lock: v === "none" ? null : v }))}
+                  <p class="fp3d-sub fp3d-wide">${this.t("door_lock_hint")}</p>`
                 : nothing}`}
         ${o.contact !== "none" && (o.contact || o.contact2 || autoPick("contact"))
           ? html`<label class="fp3d-check fp3d-wide" title=${this.t("contact_invert_hint")}
@@ -11724,6 +11729,10 @@ export class Fp3dEditor extends LitElement {
         ${f.type === "lamp_fan"
           ? html`${this.entitySelect(this.t("fan_entity"), f.fan ?? null, undefined, this.entityOptions((id) => id.startsWith("fan.")), (v) => this.updateFurniture({ fan: v && v !== "none" ? v : null }))}
               <p class="fp3d-sub fp3d-wide">${this.t("fan_hint")}</p>`
+          : nothing}
+        ${f.type === "radiator"
+          ? html`${this.entitySelect(this.t("heat_sensor"), f.heat_sensor ?? null, undefined, this.entityOptions((id) => /^(binary_sensor|sensor|switch|input_boolean|number)\./.test(id)), (v) => this.updateFurniture({ heat_sensor: v && v !== "none" ? v : null }))}
+              <p class="fp3d-sub fp3d-wide">${this.t("heat_sensor_hint")}</p>`
           : nothing}
         ${f.type === "awning" ? this.renderAwningFields(f) : packMotion(f.type) ? this.renderMotionFields(f) : nothing}
         ${!lamp && !(ENERGY_DEVICES as readonly string[]).includes(f.type) && !hasScreen(f.type) ? this.renderStateLinks(f) : nothing}
@@ -12949,6 +12958,15 @@ export class Fp3dEditor extends LitElement {
           </select></label
         >
         ${this.num(this.t("north"), s.north, (v) => set({ north: ((Math.round(v) % 360) + 360) % 360 }), 1)}
+        <label class="fp3d-field fp3d-wide" title=${this.t("editor_floor_hint")}
+          >${this.t("editor_floor")}
+          <select @change=${(e: Event) => set({ editor_floor: (e.target as HTMLSelectElement).value || null })}>
+            <option value="" ?selected=${!s.editor_floor}>${this.t("editor_floor_auto")}</option>
+            ${this._doc.floors.map((f) => html`<option value=${f.id} ?selected=${s.editor_floor === f.id}>${f.name}</option>`)}
+          </select></label
+        >
+        ${this.entitySelect(this.t("hh_notes"), s.household?.notes ?? null, undefined, this.entityOptions((id) => /^(input_text|text|sensor)\./.test(id)), (v) => this.setHousehold({ notes: v === "none" ? null : v }))}
+        <p class="fp3d-sub fp3d-wide">${this.t("hh_notes_hint")}</p>
       </div>
       <p class="fp3d-sub">${this.t("north_hint")}</p>
     </details>`;

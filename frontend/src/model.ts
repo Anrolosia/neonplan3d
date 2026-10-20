@@ -97,6 +97,8 @@ export interface Opening {
   sidelight_width2?: number | null;
   /** Contact of the second leaf (null = none). */
   contact2: string | null;
+  /** Door: its smart lock (lock.*) – shown as a pin at the door, locked or not (D636). */
+  lock?: EntityRef;
   /** Windows: which sensors report the sash (null: a contact, plus a tilt sensor when one is set). */
   sensor?: "contact" | "handle" | "contact_tilt" | null;
   /** The same for the second leaf of a double window, with its own tilt sensor. */
@@ -209,6 +211,8 @@ export interface Furniture {
   moisture_min?: number | null;
   /** Haushalt Pro, washer, dryer, dishwasher: the time left (minutes, an end time or "H:MM"). */
   remaining?: EntityRef;
+  /** Radiator: a sensor that says whether it heats (a valve's work state, an opening percentage) when the thermostat does not (D637). */
+  heat_sensor?: EntityRef;
   /** Haushalt Pro: a consumable or service of the item (a filter, salt, rinse aid): due when on, at or below `service_min`, or its date. */
   service?: EntityRef;
   /** Haushalt Pro: the number (percent or days left) at or below which the service is due (null = 10). */
@@ -679,7 +683,9 @@ export interface BuildingSettings {
   /** The ground around the house: its height and the earth around cellars. */
   terrain?: Terrain | null;
   /** Haushalt Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12). */
-  household?: { bin_from?: number | null; bin_until?: number | null } | null;
+  household?: { bin_from?: number | null; bin_until?: number | null; notes?: EntityRef } | null;
+  /** The floor the editor opens with (null: the first of the list) (D418). */
+  editor_floor?: string | null;
   /** Fun pack "Halloween": the ghost that floats through the house now and then (on unless switched off). */
   halloween?: { ghost?: boolean } | null;
   /** Plan lock: rooms, walls, doors, windows and outdoor areas cannot be moved by accident. */

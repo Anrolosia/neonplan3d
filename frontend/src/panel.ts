@@ -22,6 +22,7 @@ import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
 import { directorOnHere } from "./director.ts";
 import { loadVoice, micProbeDone, screenName, voiceOnHere } from "./load-voice.ts";
+import type { ClockPos } from "./card-config.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -72,6 +73,7 @@ export class Floorplan3dPanel extends LitElement {
     _pinSize: { state: true },
     _heat: { state: true },
     _theme: { state: true },
+    _clock: { state: true },
     _furnish: { state: true },
     _selFurniture: { state: true },
     _selDevice: { state: true },
@@ -124,6 +126,7 @@ export class Floorplan3dPanel extends LitElement {
   private declare _pinSize: "small" | "normal" | "large";
   private declare _heat: HeatMode;
   private declare _theme: Theme | "auto";
+  private declare _clock: ClockPos;
   private declare _furnish: boolean;
   private declare _selFurniture: string | null;
   private declare _selDevice: string | null;
@@ -189,6 +192,8 @@ export class Floorplan3dPanel extends LitElement {
     this._heat = heat === "temperature" || heat === "humidity" || heat === "co2" || heat === "values" ? heat : "none";
     const theme = prefs.get("theme") as Theme | "auto" | null;
     this._theme = theme === "auto" || (theme && THEMES.includes(theme)) ? theme : "neon";
+    const clock = prefs.get("clock");
+    this._clock = clock === "tl" || clock === "tr" || clock === "bl" || clock === "br" ? clock : "off";
     const accent = prefs.get("accent");
     this._accent = accent && /^#[0-9a-f]{6}$/i.test(accent) ? accent : null;
     this._furnish = false;
@@ -617,6 +622,16 @@ export class Floorplan3dPanel extends LitElement {
                     : nothing}
                 </label>
               </div>
+              <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("clock")}>
+                ${(["off", "tl", "tr", "bl", "br"] as ClockPos[]).map(
+                  (p) =>
+                    html`<button aria-pressed=${this._clock === p} title=${this.t("clock")} @click=${() => {
+                      this._clock = p;
+                      prefs.set("clock", p);
+                    }}>
+                      ${this.t(`clock_${p}`)}
+                    </button>`,
+                )}
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("markers")}>
                 ${(["none", "room", "important", "all"] as MarkerMode[]).map(
                   (m) =>
@@ -959,6 +974,7 @@ export class Floorplan3dPanel extends LitElement {
           .pinSize=${this._pinSize}
           .heatMode=${this._heat}
           .theme=${this._theme}
+          .clock=${this._clock}
           .accent=${this._accent}
           ?furnish=${this._furnish && !tt}
           .selectedFurniture=${this._selFurniture}
