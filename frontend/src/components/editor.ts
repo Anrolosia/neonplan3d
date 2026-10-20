@@ -52,6 +52,7 @@ import { generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall }
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
 import { moduleAreaFields, moduleHelp, modulePipeRules, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
+import { pipePlanner } from "../pipe-planner.ts";
 import {
   bounds,
   centroid,
@@ -9347,6 +9348,7 @@ export class Fp3dEditor extends LitElement {
       callService: (domain, service, data) => hass.callService(domain, service, data),
       newId: (prefix) => uid(prefix),
       refresh: () => this.requestUpdate(),
+      plan: pipePlanner,
     };
   }
 

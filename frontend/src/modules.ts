@@ -3,7 +3,10 @@
 // checked its signature and binding like a furniture pack's, so what runs here is what we signed.
 
 import type { Building, OutdoorArea, PoolPipe, PoolPort, Vec2 } from "./model.ts";
+import type { PipePlanner } from "./pipe-planner.ts";
 import type { HomeAssistant } from "./types.ts";
+
+export type { PipePlanner, WallSpec } from "./pipe-planner.ts";
 
 /** The loader interface this NeonPlan speaks; a module written for a newer one is left alone. */
 export const MODULE_API = 1;
@@ -151,6 +154,8 @@ export interface ModuleHost {
   waterLevel?(floorId: string, areaId: string): { y: number; floorY: number | null } | null;
   /** Something the view should show again (a module keeps state of its own, e.g. a target just set). */
   refresh?(): void;
+  /** Lays pipes the way the editor's wall view does: walls, node positions, connections through holes (host geometry). */
+  plan?: PipePlanner;
 }
 
 /** A piece a module adds to the 3D stage; the host draws it with its own means (a module never touches three.js). */

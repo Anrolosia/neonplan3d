@@ -123,6 +123,7 @@ import { watchedEntities } from "../watched.ts";
 import { backdropCss } from "../backdrop.ts";
 import { loadVoice, micProbeAsked, micProbeDone, voicePipeline } from "../load-voice.ts";
 import { answerAsk, subscribeAsk, type Ask } from "../api.ts";
+import { pipePlanner } from "../pipe-planner.ts";
 import { Director, HOLD_DEFAULT, directorAny, doorbellCamera, doorbellEntities, doorbellRang, triggerFired, type DirectorSettings, type Shot } from "../director.ts";
 import type { HistorySpec, ReplayInfo } from "../timetravel/types.ts";
 
@@ -4240,6 +4241,7 @@ export class Fp3dView3d extends LitElement {
         return { y: poolWaterY(floor, area), floorY: poolFloorY(floor, area) };
       },
       refresh: () => this.requestUpdate(),
+      plan: pipePlanner,
       openings: () => this.spokenOpenings(hass, b),
       energy: () => (this._energy ? { consumption: this._energy.consumption, solar: this._energy.solar, grid: this._energy.grid, battery: this._energy.battery, soc: this._energy.soc } : null),
       consumers: () =>
