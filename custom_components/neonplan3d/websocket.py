@@ -14,13 +14,13 @@ from homeassistant.loader import async_get_integration
 import voluptuous as vol
 
 from . import license as lic
-from .const import DATA_ASK, DATA_DIAGNOSTICS, DOMAIN, SIGNAL_ASK, SIGNAL_BUILDING_UPDATED
+from .const import DATA_ASK, DATA_DIAGNOSTICS, DATA_VOICE, DOMAIN, SIGNAL_ASK, SIGNAL_BUILDING_UPDATED
 from .diagnostics_report import DiagnosticsError, DiagnosticsReporter
 from .packs import MAX_PACK_SIZE, PackError, parts_of, verify_pack
 from .schema import BUILDING_SCHEMA, IMAGE_DATA
 from .storage import FloorplanData, complete
 from .timetravel import ws_timetravel_history
-from .voice import AskBroker
+from .voice import SENTENCE_MODES, AskBroker, VoiceSettings
 
 _IMAGE_ID = vol.All(str, vol.Length(min=1, max=64), vol.Match(r"^[A-Za-z0-9_\-.]+$"))
 
@@ -56,6 +56,8 @@ def async_register_commands(hass: HomeAssistant) -> None:
         ws_diagnostics_client,
         ws_voice_subscribe,
         ws_voice_answer,
+        ws_voice_settings,
+        ws_voice_settings_set,
     ):
         websocket_api.async_register_command(hass, command)
 
@@ -548,3 +550,28 @@ def ws_voice_answer(hass: HomeAssistant, connection: websocket_api.ActiveConnect
     broker: AskBroker | None = hass.data.get(DATA_ASK)
     taken = broker.answer(msg["ask_id"], msg["text"], msg["answered"]) if broker else False
     connection.send_result(msg["id"], {"taken": taken})
+
+
+@websocket_api.websocket_command({vol.Required("type"): "neonplan3d/voice/settings"})
+@callback
+def ws_voice_settings(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
+    """The voice settings: which sentences Assist hands to NeonPlan."""
+    settings: VoiceSettings | None = hass.data.get(DATA_VOICE)
+    connection.send_result(msg["id"], {"sentences": settings.sentences if settings else "distinct"})
+
+
+@websocket_api.websocket_command(
+    {vol.Required("type"): "neonplan3d/voice/settings/set", vol.Required("sentences"): vol.In(SENTENCE_MODES)}
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+async def ws_voice_settings_set(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Sets which sentences Assist hands to NeonPlan; the sentence files are rewritten and Assist reloads them."""
+    settings: VoiceSettings | None = hass.data.get(DATA_VOICE)
+    if settings is None:
+        connection.send_error(msg["id"], "not_ready", "voice settings not loaded")
+        return
+    await settings.async_set_sentences(msg["sentences"])
+    connection.send_result(msg["id"], {"sentences": settings.sentences})

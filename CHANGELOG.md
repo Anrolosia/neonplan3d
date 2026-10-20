@@ -4,6 +4,16 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.22.1
+
+### Fixed
+
+- **Clock** (#642): the clock stood at the top left whatever corner was chosen – the corner styles were missing.
+- **Assist sentences** (#641): by default NeonPlan now registers only distinct sentences ("Zeig …", "Geh …", "Frag das Haus …", "NeonPlan, …", "Guten Morgen", "Gute Nacht"), so questions Home Assistant answers itself ("welche Fenster sind offen", "wo ist …") stay with Home Assistant. **⚙ Settings → Voice control → Sentences for Assist** switches to all questions or to none (the sentence file is removed). "Frag das Haus, welche Fenster offen sind" always reaches NeonPlan.
+- **Smart locks** (#645): the lock's pin at the door shows its text (locked / open) again – the symbol mode took it away; a terrace door (a window down to the floor) takes a lock too.
+- **Look Auto / Day** (#645): the day look keeps more of the shading and the hue, so furniture and devices stand out instead of washing out.
+- **Roof windows** (#645): their glass is as see-through as the windows in the walls, no more.
+
 ## 1.22.0
 
 ### New

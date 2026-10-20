@@ -1967,5 +1967,10 @@
  "voice_showing": "Prikazujem {name}.",
  "screen_name": "Ime zaslona (za Assist)",
  "screen_name_placeholder": "npr. Kuhinja",
- "screen_name_hint": "Če vprašaš Assist („Pokaži dnevno sobo“) ali avtomatizacija pokliče storitev neonplan3d.ask, se odzove vsak odprt pogled NeonPlan. Če storitev navede zaslon, se odzove le pogled s tem imenom."
+ "screen_name_hint": "Če vprašaš Assist („Pokaži dnevno sobo“) ali avtomatizacija pokliče storitev neonplan3d.ask, se odzove vsak odprt pogled NeonPlan. Če storitev navede zaslon, se odzove le pogled s tem imenom.",
+ "voice_sentences": "Stavki za Assist",
+ "voice_sentences_distinct": "Samo nedvoumni (»Pokaži …«, »Vprašaj hišo …«)",
+ "voice_sentences_all": "Vsa vprašanja (prevzame tudi stavke, na katere Home Assistant odgovori sam)",
+ "voice_sentences_off": "Nobeni (datoteka s stavki se odstrani)",
+ "voice_sentences_hint": "Kaj Assist posreduje NeonPlanu. Na vprašanja, kot je »Katera okna so odprta?«, sicer odgovori Home Assistant sam – »Vprašaj hišo, katera okna so odprta« vedno doseže NeonPlan."
 }

@@ -1967,5 +1967,10 @@
  "voice_showing": "Viser {name}.",
  "screen_name": "Skjermnamn (for Assist)",
  "screen_name_placeholder": "t.d. Kjøken",
- "screen_name_hint": "Spør du Assist («Vis stova») eller kallar ein automasjon tenesta neonplan3d.ask, reagerer alle opne NeonPlan-visingar. Nemner tenesta ein skjerm, reagerer berre visinga med det namnet."
+ "screen_name_hint": "Spør du Assist («Vis stova») eller kallar ein automasjon tenesta neonplan3d.ask, reagerer alle opne NeonPlan-visingar. Nemner tenesta ein skjerm, reagerer berre visinga med det namnet.",
+ "voice_sentences": "Setningar for Assist",
+ "voice_sentences_distinct": "Berre eintydige («Vis …», «Spør huset …»)",
+ "voice_sentences_all": "Alle spørsmål (tek òg setningar Home Assistant svarar på sjølv)",
+ "voice_sentences_off": "Ingen (setningsfila vert fjerna)",
+ "voice_sentences_hint": "Kva Assist gjev vidare til NeonPlan. Spørsmål som «Kva vindauge er opne?» svarar Home Assistant elles på sjølv – «Spør huset kva vindauge som er opne» når alltid NeonPlan."
 }

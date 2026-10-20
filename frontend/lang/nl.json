@@ -1967,5 +1967,10 @@
  "voice_showing": "Ik toon {name}.",
  "screen_name": "Schermnaam (voor Assist)",
  "screen_name_placeholder": "bv. Keuken",
- "screen_name_hint": "Vraag je het aan Assist („Toon de woonkamer”) of roept een automatisering de dienst neonplan3d.ask aan, dan reageert elke open NeonPlan-weergave. Noemt de dienst een scherm, dan reageert alleen de weergave met die naam."
+ "screen_name_hint": "Vraag je het aan Assist („Toon de woonkamer”) of roept een automatisering de dienst neonplan3d.ask aan, dan reageert elke open NeonPlan-weergave. Noemt de dienst een scherm, dan reageert alleen de weergave met die naam.",
+ "voice_sentences": "Zinnen voor Assist",
+ "voice_sentences_distinct": "Alleen eenduidige („Toon …”, „Vraag het huis …”)",
+ "voice_sentences_all": "Alle vragen (neemt ook zinnen over die Home Assistant zelf beantwoordt)",
+ "voice_sentences_off": "Geen (het zinnenbestand wordt verwijderd)",
+ "voice_sentences_hint": "Wat Assist aan NeonPlan doorgeeft. Vragen als „Welke ramen staan open?” beantwoordt Home Assistant anders zelf – „Vraag het huis welke ramen open staan” bereikt altijd NeonPlan."
 }

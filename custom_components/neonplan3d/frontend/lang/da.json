@@ -1967,5 +1967,10 @@
  "voice_showing": "Viser {name}.",
  "screen_name": "Skærmnavn (til Assist)",
  "screen_name_placeholder": "f.eks. Køkken",
- "screen_name_hint": "Spørger du Assist („Vis stuen“) eller kalder en automatisering tjenesten neonplan3d.ask, reagerer alle åbne NeonPlan-visninger. Nævner tjenesten en skærm, reagerer kun visningen med det navn."
+ "screen_name_hint": "Spørger du Assist („Vis stuen“) eller kalder en automatisering tjenesten neonplan3d.ask, reagerer alle åbne NeonPlan-visninger. Nævner tjenesten en skærm, reagerer kun visningen med det navn.",
+ "voice_sentences": "Sætninger til Assist",
+ "voice_sentences_distinct": "Kun entydige (\"Vis …\", \"Spørg huset …\")",
+ "voice_sentences_all": "Alle spørgsmål (tager også sætninger, Home Assistant selv besvarer)",
+ "voice_sentences_off": "Ingen (sætningsfilen fjernes)",
+ "voice_sentences_hint": "Hvad Assist giver videre til NeonPlan. Spørgsmål som \"Hvilke vinduer er åbne?\" besvarer Home Assistant ellers selv – \"Spørg huset, hvilke vinduer er åbne\" når altid NeonPlan."
 }

@@ -1967,5 +1967,10 @@
  "voice_showing": "Je montre {name}.",
  "screen_name": "Nom d'écran (pour Assist)",
  "screen_name_placeholder": "p. ex. Cuisine",
- "screen_name_hint": "Si tu demandes à Assist (« Montre le salon ») ou qu'une automatisation appelle le service neonplan3d.ask, chaque vue NeonPlan ouverte réagit. Si le service nomme un écran, seule la vue portant ce nom réagit."
+ "screen_name_hint": "Si tu demandes à Assist (« Montre le salon ») ou qu'une automatisation appelle le service neonplan3d.ask, chaque vue NeonPlan ouverte réagit. Si le service nomme un écran, seule la vue portant ce nom réagit.",
+ "voice_sentences": "Phrases pour Assist",
+ "voice_sentences_distinct": "Seulement les phrases univoques (« Montre … », « Demande à la maison … »)",
+ "voice_sentences_all": "Toutes les questions (prend aussi des phrases auxquelles Home Assistant répond lui-même)",
+ "voice_sentences_off": "Aucune (le fichier de phrases est supprimé)",
+ "voice_sentences_hint": "Ce qu'Assist transmet à NeonPlan. Aux questions comme « Quelles fenêtres sont ouvertes ? » Home Assistant répond sinon lui-même – « Demande à la maison quelles fenêtres sont ouvertes » atteint toujours NeonPlan."
 }

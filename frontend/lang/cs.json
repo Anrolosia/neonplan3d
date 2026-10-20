@@ -1967,5 +1967,10 @@
  "voice_showing": "Ukazuji {name}.",
  "screen_name": "Název obrazovky (pro Assist)",
  "screen_name_placeholder": "např. Kuchyň",
- "screen_name_hint": "Dotaz na Assist („Ukaž obývák“) nebo služba neonplan3d.ask z automatizace dorazí ke každému otevřenému pohledu NeonPlan. Když služba uvede obrazovku, reaguje jen pohled s tímto názvem."
+ "screen_name_hint": "Dotaz na Assist („Ukaž obývák“) nebo služba neonplan3d.ask z automatizace dorazí ke každému otevřenému pohledu NeonPlan. Když služba uvede obrazovku, reaguje jen pohled s tímto názvem.",
+ "voice_sentences": "Věty pro Assist",
+ "voice_sentences_distinct": "Jen jednoznačné („Ukaž …“, „Zeptej se domu …“)",
+ "voice_sentences_all": "Všechny otázky (přebírá i věty, které zodpoví Home Assistant sám)",
+ "voice_sentences_off": "Žádné (soubor s větami se odstraní)",
+ "voice_sentences_hint": "Co Assist předává NeonPlanu. Otázky jako „Která okna jsou otevřená?“ jinak zodpoví Home Assistant sám – „Zeptej se domu, která okna jsou otevřená“ vždy dojde k NeonPlanu."
 }

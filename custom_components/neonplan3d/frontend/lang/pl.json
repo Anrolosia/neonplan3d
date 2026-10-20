@@ -1967,5 +1967,10 @@
  "voice_showing": "Pokazuję {name}.",
  "screen_name": "Nazwa ekranu (dla Assist)",
  "screen_name_placeholder": "np. Kuchnia",
- "screen_name_hint": "Gdy pytasz Assist („Pokaż salon”) lub automatyzacja wywołuje usługę neonplan3d.ask, reaguje każdy otwarty widok NeonPlan. Jeśli usługa wskaże ekran, reaguje tylko widok o tej nazwie."
+ "screen_name_hint": "Gdy pytasz Assist („Pokaż salon”) lub automatyzacja wywołuje usługę neonplan3d.ask, reaguje każdy otwarty widok NeonPlan. Jeśli usługa wskaże ekran, reaguje tylko widok o tej nazwie.",
+ "voice_sentences": "Zdania dla Assist",
+ "voice_sentences_distinct": "Tylko jednoznaczne („Pokaż …”, „Zapytaj dom …”)",
+ "voice_sentences_all": "Wszystkie pytania (przejmuje też zdania, na które Home Assistant odpowiada sam)",
+ "voice_sentences_off": "Żadne (plik zdań zostaje usunięty)",
+ "voice_sentences_hint": "Co Assist przekazuje do NeonPlan. Na pytania jak „Które okna są otwarte?” Home Assistant odpowiada inaczej sam – „Zapytaj dom, które okna są otwarte” zawsze trafia do NeonPlan."
 }
