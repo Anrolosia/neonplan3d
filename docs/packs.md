@@ -50,7 +50,13 @@ dessen öffentlicher Schlüssel zusätzlich in `PACK_PUBLIC_KEYS` eingetragen un
 ```
 
 - `size`: Standardgröße in Metern (Breite, Tiefe, Höhe). Im Plan lässt sich jedes Möbel danach frei
-  skalieren; alle Teile wachsen mit.
+  skalieren; alle Teile wachsen mit – außer denen mit `fix`.
+- `fix` an einem Teil (ab NeonPlan 1.23, Mindestversion setzen): welche Maße das Teil beim Skalieren
+  **behält** – `"w"`, `"d"`, `"h"` oder mehrere (`"wdh"`). Beine, Armlehnen, Platten und Griffe
+  behalten so ihre Größe und ihren Abstand zur Kante des Möbels, die Teile dazwischen (Sitzfläche,
+  Korpus) strecken sich. Je Achse gibt es damit eine feste Zone an jedem Ende und eine Mitte, die
+  wächst; ein festes Teil in der Mitte bleibt mittig. Reicht der Platz für die festen Teile nicht
+  (ein sehr schmales Möbel), skaliert alles wie früher.
 - `parts` (max. 60): `box`, `cyl` oder `loft`. Alle Maße sind **Anteile der Möbelgröße**: `x`/`z`
   Mitte (−0,5 … 0,5, vorne ist +z), `w`/`d` Breite/Tiefe (0 … 1), `y` Unterkante und `h` Höhe (0 … 1
   der Höhe). Ein Zylinder hat den kleineren Wert von `w` und `d` als Durchmesser; mit `axis: "x"` oder

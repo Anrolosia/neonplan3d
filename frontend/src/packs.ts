@@ -37,6 +37,8 @@ export interface PackPart {
   glow?: boolean;
   /** A screen: shows the linked media player's app colour and picture on its front (+z). */
   screen?: boolean;
+  /** The measures that stay when the item is resized: "w", "d", "h" or several ("wdh"). */
+  fix?: string;
   /** Loft: centre and extent of the top rectangle (defaults: the same as the bottom). */
   tx?: number;
   tz?: number;
@@ -71,6 +73,7 @@ export interface PackItem {
   hole?: boolean;
   /** A lamp: how its light spreads. */
   light?: LampModel;
+  /** Parts (fractions of the size); a part's `fix` ("w", "d", "h" or several) keeps that measure when the item is resized. */
   parts: PackPart[];
   symbol?: PackSymbol[];
   /** Library (pack format since 1.23): what it is, the rooms it is made for, words that find it. */

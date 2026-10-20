@@ -77,6 +77,9 @@ PART_SCHEMA = vol.Schema(
         vol.Optional("axis"): vol.In(["x", "y", "z"]),
         # turn of the part around its own centre (degrees around the vertical axis): spiral steps, diagonals
         vol.Optional("rot"): vol.All(vol.Coerce(float), vol.Range(min=-360, max=360)),
+        # free sizes (1.23): the measures that stay when the item is resized ("w", "d", "h" or several): legs,
+        # arms and plates keep their size and their distance from the edge, the parts between them stretch
+        vol.Optional("fix"): vol.All(str, vol.Match(r"^[wdh]{1,3}$")),
     }
 )
 
