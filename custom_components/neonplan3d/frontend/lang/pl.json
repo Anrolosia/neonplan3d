@@ -90,6 +90,8 @@
  "tech_mode": "Technika basenowa",
  "tech_mode_hint": "Narysuj pomieszczenie techniczne na tej ścianie: wprowadź przewody z basenu, ustaw urządzenia, poprowadź rury",
  "tech_draw": "Rysuj",
+ "tech_ask": "Dokąd prowadzi rura?",
+ "tech_ask_loose": "Zostaw otwartą",
  "tech_pick": "Wybierz",
  "pool_delete_confirm": "Usunąć basen ze wszystkimi rurami ({n})?",
  "tech_erase": "Gumka",

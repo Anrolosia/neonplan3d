@@ -90,6 +90,8 @@
  "tech_mode": "Pooltechniek",
  "tech_mode_hint": "Teken de technische ruimte op deze muur: leidingen van het zwembad binnenbrengen, apparaten plaatsen, buizen trekken",
  "tech_draw": "Tekenen",
+ "tech_ask": "Waar gaat de leiding heen?",
+ "tech_ask_loose": "Open laten",
  "tech_pick": "Selecteren",
  "pool_delete_confirm": "Het zwembad met alle {n} leidingen verwijderen?",
  "tech_erase": "Gum",

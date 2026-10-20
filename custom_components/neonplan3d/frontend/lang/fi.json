@@ -90,6 +90,8 @@
  "tech_mode": "Allastekniikka",
  "tech_mode_hint": "Piirrä tekninen tila tälle seinälle: tuo altaan linjat sisään, aseta laitteet, vedä putket",
  "tech_draw": "Piirrä",
+ "tech_ask": "Minne putki johtaa?",
+ "tech_ask_loose": "Jätä avoimeksi",
  "tech_pick": "Valitse",
  "pool_delete_confirm": "Poistetaanko allas ja kaikki sen {n} putkea?",
  "tech_erase": "Pyyhi",

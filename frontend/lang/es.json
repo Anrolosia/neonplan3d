@@ -90,6 +90,8 @@
  "tech_mode": "Sala técnica",
  "tech_mode_hint": "Dibuja la sala técnica en esta pared: entra las tuberías de la piscina, coloca los equipos, traza los tubos",
  "tech_draw": "Dibujar",
+ "tech_ask": "¿Adónde va la tubería?",
+ "tech_ask_loose": "Dejar abierta",
  "tech_pick": "Seleccionar",
  "pool_delete_confirm": "¿Eliminar la piscina con sus {n} tubos?",
  "tech_erase": "Borrar",

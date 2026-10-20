@@ -90,6 +90,8 @@
  "tech_mode": "Local technique",
  "tech_mode_hint": "Dessiner le local technique sur ce mur : faire entrer les conduites de la piscine, placer les appareils, tracer les tuyaux",
  "tech_draw": "Dessiner",
+ "tech_ask": "Où va la conduite ?",
+ "tech_ask_loose": "Laisser ouverte",
  "tech_pick": "Sélectionner",
  "pool_delete_confirm": "Supprimer la piscine avec ses {n} tuyaux ?",
  "tech_erase": "Effacer",

@@ -246,6 +246,54 @@ interface RunCtx {
   pt: (e: PointerEvent) => { s: number; y: number };
 }
 
+/** Douglas–Peucker: the stroke's corners, wiggles below `tol` dropped. */
+function simplifyStroke(pts: { s: number; y: number }[], tol: number): { s: number; y: number }[] {
+  if (pts.length < 3) return pts.slice(1);
+  const a = pts[0];
+  const b = pts[pts.length - 1];
+  let far = 0;
+  let at = -1;
+  const len = Math.hypot(b.s - a.s, b.y - a.y) || 1;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const p = pts[i];
+    const dist = Math.abs((b.s - a.s) * (a.y - p.y) - (a.s - p.s) * (b.y - a.y)) / len;
+    if (dist > far) [far, at] = [dist, i];
+  }
+  if (far <= tol || at < 0) return [];
+  return [...simplifyStroke(pts.slice(0, at + 1), tol), pts[at], ...simplifyStroke(pts.slice(at), tol)];
+}
+
+/**
+ * Right angles: each piece of the stroke runs level or upright (whichever it is nearer to), pieces in a line merge,
+ * stubs shorter than 8 cm go; the points sit on a 5 cm grid. The first and the last point stay where they are.
+ */
+function snapStroke(pts: { s: number; y: number }[]): { s: number; y: number }[] {
+  if (pts.length < 2) return pts;
+  const g = (v: number) => Math.round(v * 20) / 20;
+  const out: { s: number; y: number }[] = [{ s: pts[0].s, y: pts[0].y }];
+  for (let i = 1; i < pts.length; i++) {
+    const prev = out[out.length - 1];
+    const p = pts[i];
+    const level = Math.abs(p.s - prev.s) >= Math.abs(p.y - prev.y);
+    const q = level ? { s: g(p.s), y: prev.y } : { s: prev.s, y: g(p.y) };
+    const back = out.length > 1 ? out[out.length - 2] : null;
+    // the same direction as the piece before: the corner between them goes
+    if (back && ((back.y === prev.y && q.y === prev.y) || (back.s === prev.s && q.s === prev.s))) out.pop();
+    if (Math.hypot(q.s - out[out.length - 1].s, q.y - out[out.length - 1].y) < 0.08 && i < pts.length - 1) continue;
+    out.push(q);
+  }
+  // the true end: the last corner turns towards it, level then upright
+  const end = pts[pts.length - 1];
+  const prev = out[out.length - 1];
+  out.pop();
+  const last = out[out.length - 1];
+  if (last) {
+    if (Math.abs(end.s - last.s) >= 0.08 && Math.abs(end.y - last.y) >= 0.08) out.push(last.y === prev.y || out.length < 2 ? { s: g(end.s), y: last.y } : { s: last.s, y: g(end.y) });
+  }
+  out.push({ s: end.s, y: end.y });
+  return out;
+}
+
 /** A plan point in front of a wall (rounded to the millimetre). */
 function onWallXZ(frame: WallFrame, s: number, d: number): Vec2 {
   const [x, , z] = onWall(frame, s, 0, d);
@@ -332,6 +380,7 @@ export class Fp3dEditor extends LitElement {
     _runMode: { state: true },
     _techMode: { state: true },
     _feedKind: { state: true },
+    _techAsk: { state: true },
     _runDraft: { state: true },
     _runSel: { state: true },
     _conn: { state: true },
@@ -478,6 +527,10 @@ export class Fp3dEditor extends LitElement {
   private declare _feedKind: string | null;
   /** Where a press in the drawing went down (a drag from there draws a pipe to where it is let go). */
   private techPress: { s: number; y: number } | null = null;
+  /** The pen: the stroke under the pointer (wall coordinates), made into a pipe with right angles when let go. */
+  private techStroke: { s: number; y: number }[] | null = null;
+  /** A stroke ended on nothing: where does the line go? (the floor: down and out to the pool; higher: through the wall) */
+  private declare _techAsk: { s: number; y: number; pts: P3[] } | null;
   /** The zoomed part of the 2D wall view (svg units), per wall; null: the whole wall. */
   private wvZoom: { key: string; k: number; x0: number; y0: number } | null = null;
   /** Touch points on the 2D wall view, and a two-finger zoom under way. */
@@ -644,6 +697,7 @@ export class Fp3dEditor extends LitElement {
     this._wallView = null;
     this._techMode = false;
     this._feedKind = null;
+    this._techAsk = null;
     this._wallSel = null;
     this._wallMulti = [];
     this._wallSingle = false;
@@ -7040,7 +7094,22 @@ export class Fp3dEditor extends LitElement {
             if (rc && this.jointDrag) this.jointMove(e, rc);
             else if (rc && this.fitDrag) this.fittingMove(e, rc);
             else if (rc && this.runDrag) this.runPointMove(e, rc);
-            else if (rc && this._runMode === "draw" && this._runDraft) {
+            else if (rc && this._runMode === "draw" && this.techPress && this.isAdmin && (e.buttons & 1 || e.pointerType === "touch")) {
+              // the pen on the wall: the stroke grows under the pointer (a touch starts its line here, not on the tap)
+              const q = rc.pt(e);
+              const tap = this.wvTap;
+              if (tap && !this._runDraft && Math.hypot(q.s - tap.s, q.y - tap.y) > 0.02) {
+                this.wvTap = null;
+                this.runAt(rc, tap.s, tap.y, false, 1, null);
+              }
+              if (this._runDraft && !this.wvTap) {
+                const st = (this.techStroke ??= [this.techPress]);
+                const last = st[st.length - 1];
+                if (Math.hypot(q.s - last.s, q.y - last.y) > 0.02) st.push(q);
+                this.runHover = [q.s, q.y];
+                this.requestUpdate();
+              }
+            } else if (rc && this._runMode === "draw" && this._runDraft) {
               const q = rc.pt(e);
               this.runHover = [q.s, q.y];
               this.requestUpdate();
@@ -7054,12 +7123,21 @@ export class Fp3dEditor extends LitElement {
             }
             const tap = this.wvTap;
             this.wvTap = null;
-            if (tap && rc && this._runMode) this.runAt(rc, tap.s, tap.y, false, 1, null);
-            const press = this.techPress;
-            this.techPress = null;
-            if (rc && this._techMode && this._runMode === "draw" && this._runDraft && press) {
-              const q = rc.pt(e);
-              if (Math.hypot(q.s - press.s, q.y - press.y) > 0.12) this.runAt(rc, q.s, q.y, e.altKey, 1, null);
+            const stroke = this.techStroke;
+            this.techStroke = null;
+            const travel = stroke ? stroke.reduce((sum, p, i) => (i ? sum + Math.hypot(p.s - stroke[i - 1].s, p.y - stroke[i - 1].y) : 0), 0) : 0;
+            if (stroke && travel > 0.12 && rc && this._runMode === "draw" && this._runDraft) {
+              this.techPress = null;
+              this.runHover = null;
+              this.endStroke(rc, stroke, rc.pt(e));
+            } else {
+              if (tap && rc && this._runMode) this.runAt(rc, tap.s, tap.y, false, 1, null);
+              const press = this.techPress;
+              this.techPress = null;
+              if (rc && this._techMode && this._runMode === "draw" && this._runDraft && press) {
+                const q = rc.pt(e);
+                if (Math.hypot(q.s - press.s, q.y - press.y) > 0.12) this.runAt(rc, q.s, q.y, e.altKey, 1, null);
+              }
             }
             up();
             this.runPointUp();
@@ -7074,6 +7152,7 @@ export class Fp3dEditor extends LitElement {
             if (!this.wvTouch.size) this.wvPinch = null;
             this.wvTap = null;
             this.techPress = null;
+            this.techStroke = null;
             up();
             this.runPointUp();
             this.fitDrag = null;
@@ -7831,10 +7910,15 @@ export class Fp3dEditor extends LitElement {
    */
   private placeFeed(c: RunCtx, s: number, y: number): void {
     const kind = this._feedKind;
-    const floor = this.floor;
     this._feedKind = null;
     this._runMode = "draw";
-    if (!kind || !floor) return;
+    if (kind) this.feedAt(c, kind, s, y);
+  }
+
+  /** The hole of a pool line at a point of the wall and its way outside to the pool; returns the hole (null: no floor). */
+  private feedAt(c: RunCtx, kind: string, s: number, y: number): PoolJoint | null {
+    const floor = this.floor;
+    if (!floor) return null;
     const ss = Math.round(s * 20) / 20;
     const low = y < 0.25;
     const face = c.gap - RUN_GAP;
@@ -7875,6 +7959,46 @@ export class Fp3dEditor extends LitElement {
       l.joints = [...(l.joints ?? []), ...plan.joints];
       l.pipes = [...(l.pipes ?? []), ...plan.pipes];
     });
+    return hole;
+  }
+
+  /**
+   * The pen: a stroke let go becomes a pipe with right angles – the wiggles go, each piece runs level or upright,
+   * corners stay where the hand turned. Its end joins what lies there (a device's connection, a pipe as a T-piece);
+   * on nothing it asks where the line goes (the floor: down and out to the pool; higher: through the wall).
+   */
+  private endStroke(c: RunCtx, stroke: { s: number; y: number }[], q: { s: number; y: number }): void {
+    const d = this._runDraft;
+    if (!d) return;
+    const start = this.runLast(d, c);
+    const w0 = start ? toWall(c.frame, [start[0], start[2]]) : null;
+    const first = w0 && w0.d > -0.35 && w0.d < 0.6 ? { s: w0.s, y: start![1] } : stroke[0];
+    const corners = snapStroke([first, ...simplifyStroke(stroke, 0.08), q]);
+    // the corners between start and end (the end itself is set by what it joins)
+    const inner = corners.slice(1, -1).map((p): P3 => {
+      const r = onWall(c.frame, p.s, p.y, c.gap);
+      return [round(r[0]), round(r[1]), round(r[2])];
+    });
+    const hit = this.runPick(c, q.s, q.y);
+    if (hit.node && hit.node !== d.from) return this.finishRun(hit.node, null, inner);
+    if (hit.pipe) return this.finishRun("", hit.pipe.p, inner);
+    const end = corners[corners.length - 1];
+    this._techAsk = { s: end.s, y: end.y, pts: inner };
+  }
+
+  /** The answer to "where does the line go": a pool line through a hole there, or a loose end. */
+  private answerAsk(c: RunCtx, kind: string | null): void {
+    const ask = this._techAsk;
+    this._techAsk = null;
+    if (!ask || !this._runDraft) return;
+    if (kind === "cancel") {
+      this._runDraft = null;
+      return;
+    }
+    const hole = kind ? this.feedAt(c, kind, ask.s, ask.y) : null;
+    const endPt = onWall(c.frame, Math.round(ask.s * 20) / 20, Math.round(ask.y * 20) / 20, c.gap);
+    if (hole) this.finishRun(`joint:${hole.id}:inside`, null, ask.pts);
+    else this.finishRun("", null, [...ask.pts, [round(endPt[0]), round(endPt[1]), round(endPt[2])]]);
   }
 
   /** The side bar of "Technik zeichnen": devices, the pool's lines to bring in, ball valve and sight glass, what is missing. */
@@ -7893,8 +8017,16 @@ export class Fp3dEditor extends LitElement {
         this._runDraft = null;
         this._runMode = this._runMode === mode ? "draw" : mode;
       }}>+ ${this.t(label)}</button>`;
+    const ask = this._techAsk;
     return html`<aside class="fp3d-wv-kit fp3d-tech-kit">
-      ${this.renderTechStep(c)}
+      ${ask
+        ? html`<div class="fp3d-tech-ask">
+            <b>${this.t("tech_ask")}</b>
+            ${(["skimmer", "drain", "inlet", "waste"] as const).map((k) => html`<button class="fp3d-btn fp3d-tech-feed" @click=${() => this.answerAsk(c, k)}><i>${k === "waste" ? "🟤" : "〰"}</i>${this.t(`feed_${k}` as I18nKey)}</button>`)}
+            <button class="fp3d-btn" @click=${() => this.answerAsk(c, null)}>${this.t("tech_ask_loose")}</button>
+            <button class="fp3d-btn" @click=${() => this.answerAsk(c, "cancel")}>${this.t("cancel")}</button>
+          </div>`
+        : this.renderTechStep(c)}
       <div class="fp3d-seg fp3d-tech-pen" role="group">
         <button aria-pressed=${this._runMode === "draw"} @click=${() => {
           this._runMode = "draw";
@@ -8311,6 +8443,7 @@ export class Fp3dEditor extends LitElement {
         </g>`,
       )}
       ${draft.length ? svg`<polyline class="fp3d-wv-draft" points=${draft.map(toView).join(" ")} />` : nothing}
+      ${this.techStroke && this.techStroke.length > 1 ? svg`<polyline class="fp3d-wv-draft fp3d-wv-stroke" points=${this.techStroke.map((p) => `${X(p.s)},${Y(p.y)}`).join(" ")} />` : nothing}
       ${last && hover ? svg`<line class="fp3d-wv-draft fp3d-wv-rubber" x1=${toView(last).split(",")[0]} y1=${toView(last).split(",")[1]} x2=${X(hover[0])} y2=${Y(hover[1])} />` : nothing}
     </g>`;
   }
@@ -14030,6 +14163,22 @@ export class Fp3dEditor extends LitElement {
         stroke: #4a4f56;
         stroke-width: 0.012;
         cursor: pointer;
+      }
+      .fp3d-wv-stroke {
+        stroke-dasharray: 0.08 0.05;
+        opacity: 0.55;
+      }
+      .fp3d-tech-ask {
+        display: grid;
+        gap: 4px;
+        padding: 8px;
+        margin-bottom: 6px;
+        border: 1px solid var(--fp3d-accent);
+        border-radius: 8px;
+        background: rgba(91, 124, 255, 0.08);
+      }
+      .fp3d-tech-ask b {
+        font-size: 12.5px;
       }
       .fp3d-wv-draft {
         fill: none;

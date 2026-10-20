@@ -90,6 +90,8 @@
  "tech_mode": "Locale tecnico",
  "tech_mode_hint": "Disegna il locale tecnico su questa parete: porta dentro le linee della piscina, metti gli apparecchi, traccia i tubi",
  "tech_draw": "Disegna",
+ "tech_ask": "Dove va la linea?",
+ "tech_ask_loose": "Lascia aperta",
  "tech_pick": "Seleziona",
  "pool_delete_confirm": "Eliminare la piscina con tutti i {n} tubi?",
  "tech_erase": "Cancella",

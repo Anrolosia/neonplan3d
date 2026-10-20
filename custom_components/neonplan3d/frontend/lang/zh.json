@@ -90,6 +90,8 @@
  "tech_mode": "泳池设备",
  "tech_mode_hint": "在这面墙上绘制设备间：引入泳池管线，安装设备，绘制管道",
  "tech_draw": "绘制",
+ "tech_ask": "管线通向哪里？",
+ "tech_ask_loose": "保持开放",
  "tech_pick": "选择",
  "pool_delete_confirm": "删除泳池及其全部 {n} 根管道？",
  "tech_erase": "擦除",

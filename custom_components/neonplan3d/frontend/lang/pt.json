@@ -90,6 +90,8 @@
  "tech_mode": "Equipamento da piscina",
  "tech_mode_hint": "Desenhar a casa das máquinas nesta parede: trazer as linhas da piscina, montar os dispositivos, desenhar os tubos",
  "tech_draw": "Desenhar",
+ "tech_ask": "Para onde vai a tubagem?",
+ "tech_ask_loose": "Deixar aberta",
  "tech_pick": "Selecionar",
  "pool_delete_confirm": "Eliminar a piscina com todos os {n} tubos?",
  "tech_erase": "Apagar",

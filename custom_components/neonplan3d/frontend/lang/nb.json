@@ -90,6 +90,8 @@
  "tech_mode": "Poolteknikk",
  "tech_mode_hint": "Tegn teknikkrommet på denne veggen: før bassengets ledninger inn, sett opp apparatene, trekk rørene",
  "tech_draw": "Tegn",
+ "tech_ask": "Hvor går ledningen?",
+ "tech_ask_loose": "La den stå åpen",
  "tech_pick": "Velg",
  "pool_delete_confirm": "Slette bassenget med alle {n} rør?",
  "tech_erase": "Viskelær",

@@ -90,6 +90,8 @@
  "tech_mode": "Tehnica piscinei",
  "tech_mode_hint": "Desenează camera tehnică pe acest perete: adu conductele piscinei, pune aparatele, trage țevile",
  "tech_draw": "Desenează",
+ "tech_ask": "Unde duce conducta?",
+ "tech_ask_loose": "Las-o deschisă",
  "tech_pick": "Selectează",
  "pool_delete_confirm": "Ștergi piscina cu toate cele {n} țevi?",
  "tech_erase": "Radieră",

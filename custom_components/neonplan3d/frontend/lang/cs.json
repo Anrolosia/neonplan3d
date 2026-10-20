@@ -90,6 +90,8 @@
  "tech_mode": "Bazénová technika",
  "tech_mode_hint": "Nakreslete technickou místnost na této stěně: přiveďte potrubí z bazénu, postavte zařízení, natáhněte trubky",
  "tech_draw": "Kreslit",
+ "tech_ask": "Kam vede potrubí?",
+ "tech_ask_loose": "Nechat otevřené",
  "tech_pick": "Vybrat",
  "pool_delete_confirm": "Smazat bazén se všemi trubkami ({n})?",
  "tech_erase": "Gumovat",

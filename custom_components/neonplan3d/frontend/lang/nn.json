@@ -90,6 +90,8 @@
  "tech_mode": "Bassengteknikk",
  "tech_mode_hint": "Teikn teknikkrommet på denne veggen: før ledningane frå bassenget inn, set opp apparata, trekk røyra",
  "tech_draw": "Teikn",
+ "tech_ask": "Kvar går leidningen?",
+ "tech_ask_loose": "La han stå open",
  "tech_pick": "Vel",
  "pool_delete_confirm": "Slette bassenget med alle {n} røyra?",
  "tech_erase": "Visk ut",

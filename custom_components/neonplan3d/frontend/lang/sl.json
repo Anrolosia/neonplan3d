@@ -90,6 +90,8 @@
  "tech_mode": "Bazenska tehnika",
  "tech_mode_hint": "Narišite strojnico na tej steni: pripeljite cevi iz bazena, postavite naprave, potegnite cevi",
  "tech_draw": "Riši",
+ "tech_ask": "Kam vodi cev?",
+ "tech_ask_loose": "Pusti odprto",
  "tech_pick": "Izberi",
  "pool_delete_confirm": "Izbrišem bazen z vsemi {n} cevmi?",
  "tech_erase": "Radirka",
