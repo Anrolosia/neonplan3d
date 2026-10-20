@@ -6,7 +6,11 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 
 **Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## ✅ Recently done (1.13 – 1.21)
+## ✅ Recently done (1.13 – 1.22)
+
+- **The house talks back** (1.22): the voice module answers around forty kinds of questions (beta for supporters), further names for rooms and devices, Assist asks the house (service `neonplan3d.ask`, custom sentences, screen names).
+- **Modules** (1.22): packs that carry code, signed and bound like every pack; Pro add-ons become modules one by one; ⚙ Settings → Modules; the free Fenster-Wächter module.
+- **⚙ Settings menu** in the editor, look Auto, clock, smart locks on doors, radiator heat sensors, the household pinboard, editor start floor, iPad fixes (1.22).
 
 - **Home technology** (1.21): light switches and sockets with 1–4 gangs (the same relay on several sockets), ceiling fans with light whose blades turn with the speed, a Wi-Fi access point that glows red when it is gone, a water heater with its temperature.
 - **Sloping walls**, a **3D lock** for wall tablets, your **own background**, symbols **only in the room** and in three sizes, **rising LED strips** (1.21).
@@ -26,11 +30,12 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 - **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
 - A tidied-up editor, furniture blocks and multi-select, 18 languages.
 
-## 🔨 Next up (1.22)
+## 🔨 Next up (1.23)
 
 | Topic | What it is about | Wish |
 |---|---|---|
-| Voice control, round 2 | More sentences ("lights off upstairs", "what is open?"), answers spoken by the tablet, a voice view for the live director | your sentences on Discord |
+| Modules, round 2 | Pro add-ons move into modules; the voice module leaves its beta; the Pool module when its drawing is right | your feedback on Discord |
+| Roofs | Rotated roof sections, two roofs meeting at 90°, the floor edge under the roof | discussions #634, #605, #632 |
 | Even faster on old tablets | Fewer redraws, calmer warning pulses, a lower resolution on weak devices by itself | – |
 | Desk with height | A standing desk whose top moves with its height from Home Assistant (IKEA Idasen and others) | discussion #610 |
 | Underfloor heating | Heating zones on the floor that glow while they heat | discussion #607 |
@@ -109,7 +114,11 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 
 **Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
-## ✅ Zuletzt erledigt (1.13 – 1.21)
+## ✅ Zuletzt erledigt (1.13 – 1.22)
+
+- **Das Haus spricht zurück** (1.22): das Sprach-Modul beantwortet rund vierzig Frage-Arten (Beta für Supporter), weitere Namen für Räume und Geräte, Assist fragt das Haus (Dienst `neonplan3d.ask`, eigene Sätze, Bildschirmnamen).
+- **Module** (1.22): Packs, die Code mitbringen, signiert und gebunden wie jedes Pack; die Pro-Erweiterungen werden nach und nach Module; ⚙ Einstellungen → Module; das kostenlose Modul Fenster-Wächter.
+- **⚙ Einstellungen-Menü** im Editor, Look Auto, Uhr, Smart Locks an Türen, Heiz-Sensor am Heizkörper, die Pinnwand im Haushalt, Start-Etage im Editor, iPad-Fixes (1.22).
 
 - **Haustechnik** (1.21): Lichtschalter und Steckdosen mit 1–4 Tasten bzw. Dosen (dasselbe Relais an mehreren Dosen), Deckenventilatoren mit Licht, deren Flügel sich mit der Stufe drehen, ein WLAN-Access-Point, der rot leuchtet, wenn er fehlt, ein Warmwasserspeicher mit Temperatur.
 - **Schräge Wände**, eine **3D-Sperre** fürs Wandtablet, ein **eigener Hintergrund**, Symbole **nur im Raum** und in drei Größen, **ansteigende LED-Streifen** (1.21).
@@ -129,11 +138,12 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 - **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
 - Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## 🔨 Als Nächstes (1.22)
+## 🔨 Als Nächstes (1.23)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
-| Sprachsteuerung, Runde 2 | Mehr Sätze („oben alles aus“, „was ist offen?“), Antworten vom Tablet vorgelesen, Sprache auch in der Live-Regie | eure Sätze im Discord |
+| Module, Runde 2 | Die Pro-Erweiterungen ziehen in Module um; das Sprach-Modul verlässt die Beta; das Pool-Modul, sobald das Zeichnen stimmt | euer Feedback im Discord |
+| Dächer | Gedrehte Dachabschnitte, zwei Dächer im 90°-Winkel, die Etagenkante unterm Dach | Diskussionen #634, #605, #632 |
 | Noch schneller auf alten Tablets | Weniger Neuberechnungen, ruhigeres Pulsieren der Warnungen, auf schwachen Geräten von selbst eine niedrigere Auflösung | – |
 | Schreibtisch mit Höhe | Ein Steh-Schreibtisch, dessen Platte mit der Höhe aus Home Assistant hoch- und runterfährt (IKEA Idasen u. a.) | Diskussion #610 |
 | Fußbodenheizung | Heizzonen im Boden, die leuchten, solange sie heizen | Diskussion #607 |

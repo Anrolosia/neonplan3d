@@ -592,21 +592,28 @@ export class Extensions extends LitElement {
   /** Modules: signed packs that carry code – and the Pro add-ons, which become modules (the editor's ⚙ Module dialog shows the same list). */
   private renderModules() {
     const modules = (this.packs ?? []).filter((p) => p.module || p.features?.length);
+    const pro = modules.filter((p) => !p.module).length;
     return html`<section class="fp3d-ext-card">
       <h3>${this.t("settings_modules")}</h3>
-      ${modules.length
-        ? modules.map(
+      ${this.summaryBar("modules", [
+        { n: modules.length - pro, label: this.t("ext_sum_modules"), tone: "ok" },
+        { n: pro, label: this.t("ext_sum_feature_packs"), tone: "missing" },
+      ])}
+      ${!modules.length
+        ? html`<p class="fp3d-sub">${this.t("modules_none")}</p>`
+        : !this._open.has("modules")
+          ? nothing
+          : modules.map(
             (p) => html`<div class="fp3d-pack">
               <div>
                 <b>${packName(p, this.hass?.language ?? "de")}</b>
-                <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t("pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
+                <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t((p.features ?? []).every((f) => f.startsWith("fun_")) ? "pack_fun_module" : "pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
                 ${(p.features ?? []).some((f) => !knownFeature(f)) ? html`<span class="fp3d-sub fp3d-pack-error">${this.t("pack_needs_update")}</span>` : nothing}
                 ${p.licensee ? html`<span class="fp3d-sub">${this.t("pack_licensed", { name: p.licensee })}</span>` : nothing}
               </div>
               <button class="fp3d-btn fp3d-danger" @click=${() => this.deletePack(p)}>${this.t("pack_remove")}</button>
             </div>`,
-          )
-        : html`<p class="fp3d-sub">${this.t("modules_none")}</p>`}
+          )}
       <label class="fp3d-btn fp3d-primary fp3d-pack-import">
         ${this.t("module_import")}
         <input type="file" accept=".fp3dpack,.json,application/json" multiple hidden @change=${(e: Event) => this.importPackFile(e, true)} />
