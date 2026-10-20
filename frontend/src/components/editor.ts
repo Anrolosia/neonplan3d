@@ -12,17 +12,14 @@ import { areaText, formatImperial, lengthText, lengthUnit, parseLength, unitLabe
 import { closeGaps, straightenEdges, suggestedThickness } from "../geometry/gaps.ts";
 import { clampIntoRoom, keepInRoom, sharedEdge, snapToWall } from "../geometry/snap.ts";
 import { cornerPoint, nearestOnPath, onWall, pipePath, type P3 } from "../geometry/runs.ts";
-import { connectionsAt, laidPipe, planConnection, poolNodeAt, runLead, runsOnWall, splitPipe, type Connection, type ConnectVia, type WallRun } from "../pool-runs.ts";
+import { connectionsAt, laidPipe, nearestOnOutline, planConnection, poolNodeAt, runLead, runsOnWall, splitPipe, type Connection, type ConnectVia, type WallRun } from "../pool-runs.ts";
 import { devicePorts, FILTER_VALVES, jointPortAt, jointPorts, nodePart, poolPortFlow, portFlow, splitNode, type PortName } from "../pool-ports.ts";
-import { autoPort, feedDone, nodeFlow, orientPipe, sketchIssues } from "../pool-sketch.ts";
 import { holeInRoom } from "../geometry/holes.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, labOn, manualUrl, released, shopUrl, UNRELEASED } from "../features.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
 import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlant, MAILBOX_SHAPES, MAILBOX_SIZE, mailboxShape, WASTE_KINDS, wasteColors } from "../household.ts";
-import { poolEntities, type PoolEntities } from "../pool.ts";
-import { nearestOnOutline, poolFlow, waterColor, type PoolDeviceType } from "../pool-flow.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
 import { backdropImage } from "../backdrop.ts";
 import { screenName, setScreenName, setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
@@ -54,7 +51,7 @@ import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
-import { moduleHelp, syncModules } from "../modules.ts";
+import { moduleAreaFields, moduleHelp, modulePipeRules, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
 import {
   bounds,
   centroid,
@@ -2713,8 +2710,8 @@ export class Fp3dEditor extends LitElement {
       area.points = poolShapePoints(shape, b.x0, b.z0, b.x1, b.z1);
       area.pool_shape = shape;
     }
-    // a new pool comes with Pool Pro switched on when the add-on is there (its entities are found by name)
-    if (type === "pool" && hasFeature("pool")) area.pool = {};
+    // a new pool comes with its links when a module draws pools (Pool Pro: its entities are found by name)
+    if (type === "pool" && this.pipeRules) area.pool = {};
     this.change((_, floor) => floor.outdoor.push(area));
     this.selectItem("outdoor", area.id);
     // the tool stays: the next area (or the pool's ports and pipes) right away; Esc or "Select" ends it
@@ -5300,7 +5297,7 @@ export class Fp3dEditor extends LitElement {
             this._outdoorFree = k === "free";
           },
         })),
-        ...(released("pool") ? [{ label: this.t("pool_pipe_draw"), on: this._tool === "pool" && !!this._pipeMode, pick: () => (this.setTool("pool"), (this._pipeMode = true)) }] : []),
+        ...(this.pipeRules ? [{ label: this.t("pool_pipe_draw"), on: this._tool === "pool" && !!this._pipeMode, pick: () => (this.setTool("pool"), (this._pipeMode = true)) }] : []),
       ],
     };
     const groups: { id: string; label: string; entries: Entry[] }[] = [
@@ -5582,7 +5579,7 @@ export class Fp3dEditor extends LitElement {
               ${floor ? this.renderOutdoorHandles(floor) : nothing}
               ${this.room && this._tool === "select" ? this.renderSplitMarks(this.room) : nothing}
               ${floor ? this.renderHeadroom(floor) : nothing}
-              ${this._tool === "roof" ? svg`${this.renderRoofSections()}${this.renderRoofWindows()}` : this._tool === "energy" ? svg`${this.renderRoofSections()}${this.renderSolarFields()}${this.renderCables()}${this.renderEnergyMarkers()}` : this._tool === "pool" && floor && released("pool") ? this.renderPoolPlan(floor) : nothing} ${this.renderDraft()} ${this.renderGuides()}
+              ${this._tool === "roof" ? svg`${this.renderRoofSections()}${this.renderRoofWindows()}` : this._tool === "energy" ? svg`${this.renderRoofSections()}${this.renderSolarFields()}${this.renderCables()}${this.renderEnergyMarkers()}` : this._tool === "pool" && floor && this.pipeRules ? this.renderPoolPlan(floor) : nothing} ${this.renderDraft()} ${this.renderGuides()}
             </svg>
             ${this.renderContext()}
             <p class="fp3d-hint ${this._fixedHint ? "fp3d-hint-fixed" : ""}">${!floor ? this.t("hint_empty") : this._wallPick ? this.t("hint_wall_pick") : this._fixedHint ? this.t("fixed_drag_hint") : this._tool === "outdoor" && this._outdoorFree ? this.t("hint_outdoor_free") : this._tool === "pool" && this._jointPlace ? this.t("hint_joint_place") : this._tool === "pool" && this._pipeMode ? this.t(!this.poolArea ? "hint_pipe_pool" : this._pipeDraft ? "hint_pipe_next" : "hint_pipe_start") : this._tool === "pool" && released("pool") ? this.t("hint_pool_tech") : this.t(`hint_${this._tool}` as I18nKey)}</p>
@@ -6167,7 +6164,7 @@ export class Fp3dEditor extends LitElement {
       </div>
       ${a.slope ? html`<p class="fp3d-sub">${this.t("outdoor_slope_hint")}</p>` : nothing}
       <p class="fp3d-sub">${this.t("outdoor_hint")}</p>
-      ${a.type === "pool" ? this.renderPoolPro(a) : nothing}
+      ${this.renderModuleFields(a)}
       ${admin
         ? html`<div class="fp3d-actions">
             <button class="fp3d-btn" @click=${() => this.duplicateOutdoor()}>${this.t("duplicate")}</button>
@@ -6901,7 +6898,7 @@ export class Fp3dEditor extends LitElement {
           <b>${this.t("wall_view")} · ${room.name} · ${this.t("wall_n", { a: v.edge + 1, b: ((v.edge + 1) % n) + 1 })} · ${this.m(L, 2)}</b>
           <button class="fp3d-btn" title=${`${this.t("wall_next")}: ${wallName(rightEdge)}`} @click=${() => go(rightEdge)}>›</button>
           <span class="fp3d-wv-grow"></span>
-          ${admin && hasFeature("pool") && released("pool") && this.runPool
+          ${admin && this.pipeRules && this.runPool
             ? html`<button class="fp3d-btn ${this._techMode ? "fp3d-primary" : ""}" title=${this.t("tech_mode_hint")} @click=${() => {
                 if (this._techMode) {
                   this._techMode = false;
@@ -7720,8 +7717,9 @@ export class Fp3dEditor extends LitElement {
   private finishRun(to: string, toT: P3 | null, extra: P3[] = [], height?: number): void {
     const d = this._runDraft;
     const floor = this.floor;
+    const rules = this.pipeRules;
     this._runDraft = null;
-    if (!d || !floor) return;
+    if (!d || !floor || !rules) return;
     const pts = [...d.pts, ...extra];
     // drawing the technical room: into its end the line turns once – level first, then straight up or down into it –
     // instead of a slanted last piece
@@ -7786,7 +7784,7 @@ export class Fp3dEditor extends LitElement {
         const { kind, id, port } = splitNode(n);
         if (kind !== "dev" || port) return n;
         const type = floor.furniture.find((f) => f.id === id)?.type ?? "";
-        const q = autoPort(type, other ? nodeFlow(other, area, devs) : null, toWasteNode(other), taken(`dev:${id}`));
+        const q = rules.autoPort(type, other ? rules.nodeFlow(other, area, devs) : null, toWasteNode(other), taken(`dev:${id}`));
         return q ? `dev:${id}:${q}` : n;
       };
       from = resolve(from, end);
@@ -7813,7 +7811,7 @@ export class Fp3dEditor extends LitElement {
       }
       let pipe: PoolPipe = { id: uid("pipe"), from, to: end, floor_id: floor.id, points: xz, heights: hs, height: height ?? hs[hs.length - 1] ?? null };
       // the water runs from where it comes out to where it goes in, whichever way the line was drawn
-      pipe = orientPipe(pipe, from ? nodeFlow(from, area, devs) : null, end ? nodeFlow(end, area, devs) : null);
+      pipe = rules.orientPipe(pipe, from ? rules.nodeFlow(from, area, devs) : null, end ? rules.nodeFlow(end, area, devs) : null);
       pipes.push(pipe);
       chosen = pipe.id;
     });
@@ -7878,6 +7876,8 @@ export class Fp3dEditor extends LitElement {
   /** The side bar of "Technik zeichnen": devices, the pool's lines to bring in, ball valve and sight glass, what is missing. */
   private renderTechKit(frame: WallFrame, room: Room, c: RunCtx) {
     const area = c.pool;
+    const rules = this.pipeRules;
+    if (!rules) return nothing;
     const add = (t: string) => html`<button class="fp3d-wv-tile" @click=${() => this.addOnWall(t, frame, room)}>
       <span class="fp3d-wv-tile-pic">${this.kitPics.get(t) ? html`<img src=${this.kitPics.get(t)} alt="" />` : html`<i></i>`}</span>
       <span class="fp3d-wv-tile-name">${this.t(`furn_${t}` as I18nKey)}</span>
@@ -7913,7 +7913,7 @@ export class Fp3dEditor extends LitElement {
       }}>↶ ${this.t("undo")}</button>
       <h4>${this.t("tech_feeds")}</h4>
       ${kinds.map((k) => {
-        const done = feedDone(area, k);
+        const done = rules.feedDone(area, k);
         return html`<button class="fp3d-btn fp3d-tech-feed ${this._feedKind === k ? "fp3d-primary" : ""} ${done ? "fp3d-on" : ""}" ?disabled=${done} @click=${() => {
           this._runDraft = null;
           this._feedKind = this._feedKind === k ? null : k;
@@ -7935,6 +7935,8 @@ export class Fp3dEditor extends LitElement {
    */
   private renderTechStep(c: RunCtx) {
     const area = c.pool;
+    const rules = this.pipeRules;
+    if (!rules) return nothing;
     const ports = area.pool?.ports ?? [];
     const devs = c.floor.furniture.filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type));
     const box = (n: number | null, text: string) => html`<div class="fp3d-tech-step ${n === null ? "fp3d-done" : ""}"><b>${n === null ? "✓" : this.t("tech_step", { n })}</b>${text}</div>`;
@@ -7943,12 +7945,12 @@ export class Fp3dEditor extends LitElement {
     if (this._runMode === "valve" || this._runMode === "sight") return box(4, this.t("tech_step_fit"));
     if (this._runDraft) return box(3, this.t("tech_step_drawing"));
     if (!ports.some((q) => q.kind !== "waste")) return box(1, this.t("tech_no_ports"));
-    const missing = ["skimmer", "drain", "inlet"].find((k) => ports.some((q) => q.kind === k) && !feedDone(area, k));
+    const missing = ["skimmer", "drain", "inlet"].find((k) => ports.some((q) => q.kind === k) && !rules.feedDone(area, k));
     if (missing) return box(1, this.t("tech_step_feed", { name: this.t(`feed_${missing}` as I18nKey) }));
     const pump = devs.find((f) => f.type === "pool_pump");
     const filter = devs.find((f) => f.type === "pool_filter");
     if (!pump || !filter) return box(2, this.t("tech_step_devices"));
-    const issues = sketchIssues(area, devs.map((f) => ({ id: f.id, type: f.type })));
+    const issues = rules.issues(area, devs.map((f) => ({ id: f.id, type: f.type })));
     const name = (n: string) => this.poolNodeLabel(area, n);
     const port = issues.find((i) => i.kind === "port");
     if (port) {
@@ -7972,7 +7974,9 @@ export class Fp3dEditor extends LitElement {
   /** "Technik zeichnen": what is still missing, or that the water flows. */
   private renderTechIssues(c: RunCtx) {
     const devs = c.floor.furniture.filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type)).map((f) => ({ id: f.id, type: f.type }));
-    const issues = sketchIssues(c.pool, devs);
+    const rules = this.pipeRules;
+    if (!rules) return nothing;
+    const issues = rules.issues(c.pool, devs);
     if (!issues.length) return html`<span class="fp3d-tech-ok">✓ ${this.t("tech_ok")}</span>`;
     const loose = issues.filter((i) => i.kind === "loose").length;
     const text = [
@@ -8268,20 +8272,22 @@ export class Fp3dEditor extends LitElement {
     ];
     // drawing the technical room: the water flows in the drawing as if the pump ran (blue, warm after a heating heat
     // pump, brown to the waste drain); a pipe it does not reach stays grey
-    const wet = this._techMode
-      ? poolFlow({
-          pipes: c.pool.pool?.pipes ?? [],
-          ports: c.pool.pool?.ports ?? [],
-          devices: this._doc.floors.flatMap((f) => f.furniture).filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type)).map((f) => ({ id: f.id, type: f.type as PoolDeviceType, open: f.valve_open !== false, valve: f.valve_position ?? null })),
-          pumpOn: true,
-          heaterOn: false,
-          heating: false,
-        })
-      : null;
+    const rules = this.pipeRules;
+    const wet =
+      this._techMode && rules
+        ? rules.flow({
+            pipes: c.pool.pool?.pipes ?? [],
+            ports: c.pool.pool?.ports ?? [],
+            devices: this._doc.floors.flatMap((f) => f.furniture).filter((f) => (POOL_DEVICES as readonly string[]).includes(f.type)).map((f) => ({ id: f.id, type: f.type, open: f.valve_open !== false, valve: f.valve_position ?? null })),
+            pumpOn: true,
+            heaterOn: false,
+            heating: false,
+          })
+        : null;
     const wetStyle = (id: string) => {
       const f = wet?.get(id);
-      if (!f?.active) return "";
-      const [r, g, b] = waterColor(f).map((v) => Math.round(v * 255));
+      if (!f?.active || !rules) return "";
+      const [r, g, b] = rules.waterColor(f).map((v) => Math.round(v * 255));
       return `stroke: rgb(${r}, ${g}, ${b}); stroke-opacity: 0.95`;
     };
     return svg`<g class="fp3d-wv-runs">
@@ -9176,8 +9182,8 @@ export class Fp3dEditor extends LitElement {
   }
 
   private renderPoolTech(a: OutdoorArea) {
-    // pool equipment, ports and pipes belong to Pool Pro: hidden until it is released (the tester with the pack sees them)
-    if (!released("pool")) return nothing;
+    // pool equipment, ports and pipes: only with a module that knows pipes (Pool Pro)
+    if (!this.pipeRules) return nothing;
     const admin = this.isAdmin;
     const ports = a.pool?.ports ?? [];
     const pipes = a.pool?.pipes ?? [];
@@ -9284,7 +9290,6 @@ export class Fp3dEditor extends LitElement {
               ${this.len(this.t("pool_pipe_height"), pipe.height ?? 0.3, (v) => this.changePool(a.id, (l) => { const q = l.pipes?.find((x) => x.id === pipe.id); if (q) q.height = Math.min(10, Math.max(-5, round(v))); }), 0.05)}
             </div>`
           : nothing}
-        ${hasFeature("pool") || !released("pool") ? nothing : html`<p class="fp3d-sub">${this.t("pool_pipes_pro")}</p>`}
       </section>`;
   }
 
@@ -9316,41 +9321,61 @@ export class Fp3dEditor extends LitElement {
       ${!a.above && this.floor && !poolSunken(this.floor, a) ? html`<p class="fp3d-sub fp3d-wide fp3d-warn">${this.t("pool_depth_ground")}</p>` : nothing}`;
   }
 
-  /** Pool Pro: the pool's entities (each role found by name when left empty), or the teaser without the add-on. */
-  private renderPoolPro(a: OutdoorArea) {
-    const lang = this.hass?.language;
-    // not released yet: no teaser at all (the tester with the pack sees the section)
-    if (!released("pool")) return nothing;
-    if (!hasFeature("pool")) {
-      const beta = isBeta("pool");
-      return html`<section class="fp3d-teaser">
-        <div class="fp3d-teaser-head">
-          <b>🏊 ${this.t("pro_name_pool")}</b>
-          <a class="fp3d-btn fp3d-primary" href=${beta ? supporterUrl(lang) : shopUrl(lang)} target="_blank" rel="noopener">${this.t(beta ? "beta_become" : "pro_unlock")}</a>
-        </div>
-        <p class="fp3d-sub">${this.t("pool_teaser")}</p>
-      </section>`;
-    }
+  /** The pipe rules of a loaded module (Pool Pro); without them the pipe tools stay hidden. */
+  private get pipeRules(): PipeRules | null {
+    return modulePipeRules();
+  }
+
+  /** The host a module gets from the editor: the plan as edited here, and the means to change it. */
+  private editorHost(): ModuleHost {
+    const hass = this.hass!;
+    return {
+      api: 1,
+      hass: () => hass,
+      building: () => this._doc,
+      language: () => hass.language || "en",
+      devices: () => [],
+      findDevice: () => null,
+      openings: () => [],
+      energy: () => null,
+      consumers: () => [],
+      canEdit: () => this.isAdmin,
+      updateBuilding: (mutate) => this.change((doc) => mutate(doc)),
+      callService: (domain, service, data) => hass.callService(domain, service, data),
+      newId: (prefix) => uid(prefix),
+      refresh: () => this.requestUpdate(),
+    };
+  }
+
+  /** Fields a module adds to an outdoor area's form (Pool Pro: the pool's entities, the assistant), rendered here. */
+  private renderModuleFields(a: OutdoorArea) {
     if (!this.hass) return nothing;
-    const links = a.pool ?? {};
-    const auto = poolEntities(this.hass, {});
-    const set = (patch: Partial<PoolLinks>) => this.updateOutdoor({ pool: { ...links, ...patch } });
-    const role = (key: keyof PoolLinks & keyof PoolEntities, label: I18nKey, test: (id: string) => boolean) =>
-      this.entitySelect(this.t(label), links[key] ?? null, auto[key] ?? undefined, this.entityOptions(test), (v) => set({ [key]: v === "none" ? "none" : v }));
-    const sensor = (id: string) => id.startsWith("sensor.");
+    const fields = moduleAreaFields(this.editorHost(), a);
+    if (!fields.length) return nothing;
+    const admin = this.isAdmin;
+    const field = (f: ModuleField) => {
+      switch (f.kind) {
+        case "heading":
+          return html`<h3>${f.text}</h3>`;
+        case "text":
+          return html`<p class="fp3d-sub fp3d-wide">${f.text}</p>`;
+        case "entity":
+          return this.entitySelect(f.label, f.value, f.auto, this.entityOptions(f.filter), (v) => f.set(v));
+        case "select":
+          return html`<label class="fp3d-field fp3d-wide"
+            >${f.label}
+            <select ?disabled=${!admin} @change=${(e: Event) => f.set((e.target as HTMLSelectElement).value)}>
+              ${f.options.map((o) => html`<option value=${o.id} ?selected=${o.id === f.value}>${o.label}</option>`)}
+            </select></label
+          >`;
+        case "check":
+          return html`<label class="fp3d-check fp3d-wide"><input type="checkbox" .checked=${f.value} ?disabled=${!admin} @change=${(e: Event) => f.set((e.target as HTMLInputElement).checked)} /> ${f.label}</label>`;
+        case "button":
+          return html`<button class="fp3d-btn ${f.primary ? "fp3d-primary" : ""} fp3d-wide" ?disabled=${!admin} title=${f.title ?? ""} @click=${() => f.onTap()}>${f.label}</button>`;
+      }
+    };
     return html`<section>
-      <h3>🏊 ${this.t("pro_name_pool")}</h3>
-      <p class="fp3d-sub">${this.t("pool_pro_hint")}</p>
-      <div class="fp3d-form fp3d-links">
-        ${role("temperature", "pool_temperature", (id) => /^(sensor|climate|water_heater)\./.test(id))}
-        ${role("heater", "pool_heater", (id) => /^(climate|water_heater|switch|input_boolean)\./.test(id))}
-        ${role("pump", "pool_pump", (id) => /^(switch|fan|input_boolean|binary_sensor|sensor)\./.test(id))}
-        ${role("light", "pool_light", (id) => /^(light|switch)\./.test(id))}
-        ${role("ph", "pool_ph", sensor)}
-        ${role("chlorine", "pool_chlorine_role", sensor)}
-        ${role("cover", "pool_cover", (id) => id.startsWith("cover."))}
-      </div>
-      ${a.pool ? nothing : html`<button class="fp3d-btn fp3d-primary" ?disabled=${!this.isAdmin} @click=${() => this.updateOutdoor({ pool: {} })}>${this.t("pool_activate")}</button>`}
+      <div class="fp3d-form fp3d-links">${fields.map(field)}</div>
     </section>`;
   }
 

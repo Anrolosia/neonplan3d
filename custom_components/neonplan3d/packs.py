@@ -154,7 +154,8 @@ KNOWN_FEATURES = [
 
 # A module: code the shop delivers (not part of the public repository), run by NeonPlan's module loader.
 # `api` is the loader interface it was written for, `kind` where it plugs in. Signed and bound like any pack.
-MODULE_KINDS = ["voice"]
+# voice: answers spoken questions; stage: draws in the house (water, cards, warnings, editor fields)
+MODULE_KINDS = ["voice", "stage"]
 MODULE_SCHEMA = vol.Schema(
     {
         vol.Required("api"): 1,

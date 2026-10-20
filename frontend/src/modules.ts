@@ -2,7 +2,7 @@
 // a small, versioned interface. A module is an ES module whose default export is a `NeonModule`; the backend
 // checked its signature and binding like a furniture pack's, so what runs here is what we signed.
 
-import type { Building } from "./model.ts";
+import type { Building, OutdoorArea, PoolPipe, PoolPort, Vec2 } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
 
 /** The loader interface this NeonPlan speaks; a module written for a newer one is left alone. */
@@ -136,6 +136,147 @@ export interface ModuleHost {
   pools?(): SpokenPool[];
   /** The weather entity the plan uses (null without one). */
   weather?(): string | null;
+
+  // --- the house as a stage: what a module that draws may ask for and do (the 3D view's host has them) ---
+  /** The view is dimmed (night, replay): water and cards rest. */
+  dimmed?(): boolean;
+  /** The user may change the plan (an administrator, not a replay). */
+  canEdit?(): boolean;
+  /** Changes the plan and saves it (administrators only; a module's card may set a valve the way it really stands). */
+  updateBuilding?(mutate: (next: Building) => void): void;
+  callService?(domain: string, service: string, data?: Record<string, unknown>): Promise<unknown>;
+  /** A fresh id for something new in the plan ("pipe", "port" …). */
+  newId?(prefix: string): string;
+  /** Where a pool's water stands and where its floor lies (floor coordinates), null for an area that is no pool. */
+  waterLevel?(floorId: string, areaId: string): { y: number; floorY: number | null } | null;
+  /** Something the view should show again (a module keeps state of its own, e.g. a target just set). */
+  refresh?(): void;
+}
+
+/** A piece a module adds to the 3D stage; the host draws it with its own means (a module never touches three.js). */
+export type ScenePiece =
+  | {
+      kind: "water";
+      id: string;
+      floorId: string;
+      points: Vec2[];
+      /** Water surface height (floor coordinates); `floorY` where the caustics lie (null: only the surface glows). */
+      y: number;
+      floorY?: number | null;
+      color: [number, number, number];
+      /** How strongly the water glows (0..1). */
+      level: number;
+      /** The water moves (a pump runs); a warm shimmer (heating); how far a cover is closed (0 open … 1 closed). */
+      flow: boolean;
+      heat: boolean;
+      cover: number;
+    }
+  | {
+      /** A piece of furniture lit by the module (the pump while it runs, the heat pump while it heats). */
+      kind: "glow";
+      furnitureId: string;
+      color: [number, number, number];
+      level: number;
+    }
+  | {
+      /** The water in an area's pipes: which pipe carries water now and in what colour (the host draws the pipes). */
+      kind: "pipeflow";
+      floorId: string;
+      areaId: string;
+      flows: Record<string, { active: boolean; color: [number, number, number] }>;
+    };
+
+/** A row of a module's glass card: a label with its value, coloured, with a position on a scale (0..100) when it has one. */
+export interface CardRow {
+  label: string;
+  value: string;
+  color?: string;
+  /** Where the value sits on its scale (a marker on a bar), 0..100. */
+  at?: number;
+}
+
+export interface CardButton {
+  label: string;
+  title?: string;
+  /** Pressed look (a valve open, a light on). */
+  on?: boolean;
+  onTap(): void;
+}
+
+/** A glass card a module shows over a place in the house, drawn by the host like its own cards. */
+export interface ModuleCard {
+  /** Stable id (the fold state is remembered by it). */
+  id: string;
+  /** Where it floats: over an outdoor area or over a piece of furniture. */
+  anchor: { floorId: string; areaId?: string; furnitureId?: string };
+  icon: string;
+  title: string;
+  /** What is live now ("heizt", "Pumpe läuft"); shown in the head. */
+  live?: string;
+  /** The big number and its colour, and a smaller line beside it. */
+  main?: { text: string; color?: string; sub?: string };
+  rows?: CardRow[];
+  /** Plain lines under the rows. */
+  lines?: string[];
+  /** Groups of chips (ball valves, the six-way valve's positions). */
+  chips?: { title: string; items: CardButton[] }[];
+  /** The buttons at the bottom (−/+, on/off, open/close …). */
+  buttons?: CardButton[];
+}
+
+/** A warning a module raises; the host shows it like its own (banner, pulsing rooms). */
+export interface ModuleAlert {
+  /** A kind of the module's own ("pool_ph"); used to tell warnings apart. */
+  kind: string;
+  entity: string;
+  /** The banner's text, already in the user's language. */
+  text: string;
+  color: [number, number, number];
+  floorId: string | null;
+  roomId: string | null;
+}
+
+/** A field a module adds to a form of the editor; the host renders it and writes the value where the module says. */
+export type ModuleField =
+  | { kind: "heading"; text: string }
+  | { kind: "text"; text: string }
+  | { kind: "entity"; label: string; value: string | null; auto?: string | null; filter(id: string): boolean; set(v: string | null): void }
+  | { kind: "select"; label: string; value: string; options: { id: string; label: string }[]; set(v: string): void }
+  | { kind: "check"; label: string; value: boolean; set(v: boolean): void }
+  | { kind: "button"; label: string; primary?: boolean; title?: string; onTap(): void };
+
+/** A pool's pipe as the module's flow logic sees it. */
+export interface PipeFlowDevice {
+  id: string;
+  type: string;
+  open?: boolean;
+  valve?: string | null;
+}
+export interface PipeFlowState {
+  active: boolean;
+  warm: boolean;
+  waste: boolean;
+}
+
+/**
+ * What a module knows about drawing pipes: which way water goes at a part, which connection a line belongs to,
+ * what still hangs loose. The host's drawing tools ask these; without a module that answers, the tools stay hidden.
+ */
+export interface PipeRules {
+  /** Which way water goes at a node for a new line ("source" out of it, "sink" into it; null unknown). */
+  nodeFlow(node: string, area: Pick<OutdoorArea, "pool">, devices: readonly { id: string; type: string }[]): "source" | "sink" | null;
+  /** The connection of a device a line drawn to the device as a whole belongs to. */
+  autoPort(type: string, other: "source" | "sink" | null, toWaste: boolean, taken: readonly string[]): string | null;
+  /** A pipe turned so the water runs from its source end to its sink end. */
+  orientPipe(p: PoolPipe, fromFlow: "source" | "sink" | null, toFlow: "source" | "sink" | null): PoolPipe;
+  /** What the drawing still lacks: loose ends, connections without a pipe, pool lines not brought in. */
+  issues(area: Pick<OutdoorArea, "pool">, devices: readonly { id: string; type: string }[]): { kind: "loose" | "port" | "feed"; node: string }[];
+  /** Whether a pool line ("skimmer", "drain", "inlet", "waste") is already brought into the room. */
+  feedDone(area: Pick<OutdoorArea, "pool">, kind: string): boolean;
+  /** Where the water flows with the pump running (for the drawing's colours). */
+  flow(input: { pipes: readonly PoolPipe[]; ports: readonly PoolPort[]; devices: readonly PipeFlowDevice[]; pumpOn: boolean; heaterOn: boolean; heating: boolean }): Map<string, PipeFlowState>;
+  /** The colour of the water in a pipe. */
+  waterColor(f: PipeFlowState | undefined): [number, number, number];
 }
 
 export interface NeonModule {
@@ -145,6 +286,20 @@ export interface NeonModule {
   voice?(sentence: string, host: ModuleHost): Promise<VoiceAnswer | null> | VoiceAnswer | null;
   /** Example sentences the module understands, in the user's language (shown in the voice settings). */
   help?(language: string): string[];
+  /** Entities whose changes the module cares about (the host redraws when one of them changes). */
+  watched?(host: ModuleHost): string[];
+  /** What the module adds to the 3D stage right now (cheap: called on every change of a watched entity). */
+  scene?(host: ModuleHost): ScenePiece[];
+  /** The module's glass cards. */
+  cards?(host: ModuleHost): ModuleCard[];
+  /** The module's warnings. */
+  alerts?(host: ModuleHost): ModuleAlert[];
+  /** Fields the module adds to an outdoor area's form in the editor (a pool's entities, an assistant). */
+  areaFields?(host: ModuleHost, area: OutdoorArea): ModuleField[];
+  /** The module's knowledge about drawing pipes (the host's pipe tools show only with it). */
+  pipes?: PipeRules;
+  /** Pool Pro: the pools as the voice modules ask for them. */
+  pools?(host: ModuleHost): SpokenPool[];
 }
 
 interface Loaded {
@@ -245,6 +400,54 @@ export async function moduleVoice(sentence: string, host: ModuleHost): Promise<V
     }
   }
   return null;
+}
+
+/** Everything the loaded modules add to the stage. */
+export function moduleScene(host: ModuleHost): ScenePiece[] {
+  return collect((m) => m.scene?.(host));
+}
+
+export function moduleCards(host: ModuleHost): ModuleCard[] {
+  return collect((m) => m.cards?.(host));
+}
+
+export function moduleAlerts(host: ModuleHost): ModuleAlert[] {
+  return collect((m) => m.alerts?.(host));
+}
+
+export function moduleWatched(host: ModuleHost): string[] {
+  return collect((m) => m.watched?.(host));
+}
+
+export function moduleAreaFields(host: ModuleHost, area: OutdoorArea): ModuleField[] {
+  return collect((m) => m.areaFields?.(host, area));
+}
+
+export function modulePools(host: ModuleHost): SpokenPool[] {
+  return collect((m) => m.pools?.(host));
+}
+
+/** The pipe rules of the first module that has them (null: no module draws pipes). */
+export function modulePipeRules(): PipeRules | null {
+  for (const m of loaded.values()) if (m.module.pipes) return m.module.pipes;
+  return null;
+}
+
+/** Whether any module is loaded (the view then asks it on every change). */
+export function anyModule(): boolean {
+  return loaded.size > 0;
+}
+
+function collect<T>(pick: (m: NeonModule) => T[] | undefined | null): T[] {
+  const out: T[] = [];
+  for (const m of loaded.values()) {
+    try {
+      out.push(...(pick(m.module) ?? []));
+    } catch (err) {
+      console.warn(`NeonPlan 3D: module ${m.id} failed`, err);
+    }
+  }
+  return out;
 }
 
 /** For tests: register a module without loading code. */

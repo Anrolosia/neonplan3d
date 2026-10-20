@@ -31,10 +31,12 @@ test("manual and shop links follow the language and point Pro add-ons at their s
 test("an unreleased add-on shows only to whoever has its pack", async () => {
   const { released, UNRELEASED } = await import("./features.ts");
   const { setPacks } = await import("./packs.ts");
-  assert.ok(UNRELEASED.includes("pool"));
+  assert.ok(UNRELEASED.includes("diagnostics"));
   setPacks([]);
-  assert.equal(released("pool"), false);
+  assert.equal(released("diagnostics"), false);
   assert.equal(released("auto_pro"), true);
+  assert.equal(released("pool"), true);
+  // Pool Pro is a module now: released, the pack brings it
   setPacks([{ id: "mastershort.pro_pool", name: "Pro: Pool Pro", items: [], features: ["pool"] } as never]);
   assert.equal(released("pool"), true);
   setPacks([]);

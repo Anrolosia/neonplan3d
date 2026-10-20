@@ -457,7 +457,7 @@ POOL_SCHEMA = vol.Schema(
     {
         **{
             vol.Optional(role): _POOL_ENTITY
-            for role in ("temperature", "heater", "pump", "light", "ph", "chlorine", "cover")
+            for role in ("temperature", "heater", "pump", "light", "ph", "chlorine", "salt", "cover")
         },
         vol.Optional("ports"): vol.All([POOL_PORT_SCHEMA], vol.Length(max=40)),
         vol.Optional("pipes"): vol.All([POOL_PIPE_SCHEMA], vol.Length(max=80)),

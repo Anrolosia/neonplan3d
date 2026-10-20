@@ -899,6 +899,8 @@ export interface PoolLinks {
   ph?: EntityRef;
   /** Chlorine: redox/ORP in mV or free chlorine in mg/l (ppm). */
   chlorine?: EntityRef;
+  /** Salt (a salt-water pool): mg/l or ppm. */
+  salt?: EntityRef;
   /** Pool cover (a cover entity): it slides over the water as far as it is closed. */
   cover?: EntityRef;
   /** Pool Pro: the pool's ports (skimmer, bottom drain, inlets) and the waste drain the backwash goes to. */

@@ -992,6 +992,37 @@ Haushalt Pro zeigt im Haus, was im Haushalt ansteht – dort, wo es passiert. Di
 
 ---
 
+### 6.9 Pool Pro (Modul)
+
+Pool Pro lässt den Pool leben – mit dem, was deine Pool-Technik in Home Assistant meldet. Es kommt als **Modul** aus dem Shop (siehe 5.10 und 7): ein signiertes Pack, das du unter **⚙ Einstellungen → 🧩 Module → Modul einspielen …** einspielst. Voraussetzung ist eine Außenfläche der Art **Pool** (4.17).
+
+**Einrichten:** Pool im Grundriss antippen. Im Formular steht der Abschnitt **🏊 Pool Pro** mit den Rollen deiner Technik – leere Felder sucht NeonPlan selbst über den Namen (eine Entität mit „Pool“ im Namen und der passenden Art), „Keine“ schaltet eine Rolle ab:
+
+| Rolle | Entität |
+|---|---|
+| Wassertemperatur | ein Temperatur-Sensor (ohne ihn nimmt NeonPlan die Wassertemperatur der Wärmepumpe) |
+| Wärmepumpe / Heizung | eine Klima-Entität (`climate`) oder ein Warmwasserbereiter (`water_heater`) – dann lässt sich die Solltemperatur einstellen – oder ein Schalter |
+| Filterpumpe | ein Schalter, ein Binärsensor oder ein Leistungssensor (läuft ab 20 W) |
+| Poolbeleuchtung | ein Licht (die Farbe färbt das Wasser) oder ein Schalter |
+| pH-Wert | ein Sensor |
+| Chlor / Redox | Redox in mV oder freies Chlor in mg/l |
+| Salz | ein Salz-Sensor (ppm oder mg/l) bei einem Salzwasserpool |
+| Abdeckung | eine Abdeckung (`cover`) mit Position |
+
+**Im Garten:** Das Wasser leuchtet in der Farbe der Poolbeleuchtung; ist sie aus, färbt die Wassertemperatur es von tiefem Blau (kalt) bis Türkis (warm). Läuft die Filterpumpe, bewegt sich das Wasser mit einem Lichtspiel wie unter echten Wellen; heizt die Wärmepumpe, schimmert es warm. Die Abdeckung fährt so weit über das Wasser, wie sie geschlossen ist. In der Garage leuchten die Geräte mit: die Pumpe, solange sie läuft, die Wärmepumpe warm, solange sie heizt, der Kopf des Sandfilters in der Farbe seiner Ventilstellung.
+
+**Glaskarte:** Über dem Pool schwebt eine Karte im Look der anderen Pro-Karten: die Wassertemperatur groß in ihrer Farbe, daneben die Solltemperatur der Wärmepumpe (− / + zum Einstellen); pH, Redox/Chlor und Salz mit einer Ampel (grün im idealen Bereich, gelb leicht daneben, rot weit daneben) und ihrem Platz auf der Skala; die Abdeckung; Knöpfe für Wärmepumpe 🔥, Filterpumpe 〰, Licht 💡 und Abdeckung ▲▼. Administratoren stellen auf der Karte auch die **Kugelhähne** und das **6-Wege-Ventil** so, wie sie wirklich stehen – das Wasser in den Rohren folgt.
+
+**Warnungen:** in der Warnleiste, wenn pH, Chlor/Redox oder Salz weit außerhalb liegen (rot), und bei **Frostgefahr** – Wasser bei 3 °C oder kälter, während die Pumpe steht. Der Pool ist draußen: Seine Warnungen stehen oben, kein Raum pulst.
+
+**Die Anlage aufbauen – auf Knopfdruck:** Unter dem Pool-Formular steht **🛠 Anlage aufbauen**. Wähle den **Technikraum** (NeonPlan schlägt Garage oder Technikraum vor; „Draußen neben dem Pool“ geht auch), hake **Mit Wärmepumpe** an oder ab und tippe **Anlage automatisch aufbauen**. NeonPlan stellt Filterpumpe, Sandfilter und Wärmepumpe in einer Reihe an die längste Wand des Raums, setzt am Pool Skimmer, Bodenablauf, zwei Einlaufdüsen und den Abwasser-Anschluss und zieht die übliche Verrohrung: Skimmer und Bodenablauf mit je einem Kugelhahn unter der Erde zur Pumpe, Pumpe → Sandfilter → T-Stück → Wärmepumpe oder Bypass (mit Kugelhahn) → T-Stück → zurück unter der Erde zu den Einlaufdüsen, Rückspülung zum Abwasser. Danach darfst du alles verschieben – die Rohre folgen den Geräten. **Anlage neu aufbauen** ersetzt Anschlüsse und Rohre, vorhandene Geräte bleiben stehen.
+
+**Rohre von Hand (Wandansicht):** Wer es genau so haben will, wie es in der Garage läuft, öffnet die **Wandansicht** des Technikraums und dort **🛠 Pooltechnik**: Leitungen vom Pool hereinholen, Geräte an die Wand stellen, Linien von Gerät zu Gerät ziehen (die richtige Anschlussseite findet NeonPlan selbst), Kugelhähne und Schaugläser einsetzen. Ein Schritt-für-Schritt-Hinweis sagt, was als Nächstes fehlt, bis das Wasser fließt. Läuft die Filterpumpe, wandern helle Punkte durch die Rohre – blau, nach einer heizenden Wärmepumpe orange, beim Rückspülen braun zum Abwasser; an einer Verteilung geht das Wasser durch die Wärmepumpe, solange sie an ist, sonst durch den Bypass; ein geschlossener Hahn sperrt.
+
+**Sprache:** Mit dem Modul „Das Haus antwortet“ fragst du „Wie warm ist der Pool?“, „Läuft die Poolpumpe?“, „Wie ist der pH-Wert?“ oder „Ist der Pool in Ordnung?“ (5.10).
+
+**Wandtablet:** Das Wasser bewegt sich nur, solange die Filterpumpe läuft; steht sie, kostet der Pool nichts.
+
 ## 7. Erweiterungen, Shop und Möbel-Packs
 
 ![Erweiterungen](images/extensions.jpg)

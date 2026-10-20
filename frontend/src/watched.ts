@@ -2,7 +2,6 @@
 // Shared by the view (it compares them on every update) and the time travel (it fetches their history).
 
 import { carWatched, kindOf, areaEntities, robotRoomSensor, type FurnitureLinks, type OpeningEntities } from "./devices.ts";
-import { poolWatched } from "./pool.ts";
 import { powerSensorFor } from "./energy.ts";
 import { hasFeature } from "./features.ts";
 import { cameraMotionSensors, placedEntities } from "./markers.ts";
@@ -44,7 +43,7 @@ export function watchedEntities(hass: HomeAssistant, b: Building, w: WatchLinks)
   const robotRooms = b.floors.flatMap((f) => f.furniture.filter((m) => m.type === "robot_vacuum").map((m) => robotRoomSensor(hass, w.furniture.get(m.id)?.entity ?? null, m.room_sensor)));
   const pictureRules = b.floors.flatMap((f) => f.furniture.flatMap((m) => (m.pictures ?? []).flatMap((r) => [r.entity, ...(r.image.startsWith("camera:") ? [r.image.slice(7)] : [])])));
   const heat = w.heat ? b.floors.flatMap((f) => f.rooms.flatMap((r) => areaEntities(hass, r.area_id).filter((id) => id.startsWith("sensor.")))) : [];
-  const parking = [...parkingEntities(b.floors), ...(hasFeature("auto_pro") ? carWatched(hass, b.floors) : []), ...(hasFeature("pool") ? poolWatched(hass, b.floors) : [])];
+  const parking = [...parkingEntities(b.floors), ...(hasFeature("auto_pro") ? carWatched(hass, b.floors) : [])];
   const motion = trailSources(hass, b).map((s) => s.entity);
   // Haushalt Pro: the bins' calendars and sensors, the mailboxes' flaps and doors
   const household = hasFeature("household") ? b.floors.flatMap((f) => f.furniture.flatMap(householdEntities)).filter((id) => id !== "none") : [];
