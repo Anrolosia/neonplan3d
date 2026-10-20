@@ -262,7 +262,7 @@ Das Werkzeug **Möbel** öffnet rechts die Bibliothek: die 80 eingebauten Modell
 - Das **Suchfeld** findet deutsche und englische Namen, den Pack-Namen und Alltagswörter („lampe“ findet alle Leuchten, „schrank“ alle Schränke), mehrere Wörter in beliebiger Reihenfolge („sofa ecke“); Escape leert es. Beim Suchen sind alle Abschnitte offen.
 - Lange Abschnitte zeigen zuerst 24 Karten und darunter **„… weitere zeigen“**.
 
-Die **Arbeitsplatte** (Küche) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm. Unter Sofas stehen neben dem Sofa ein **Ecksofa (L-Form)** und eine **Wohnlandschaft (U-Form)**; mit **Spiegeln** sitzt der Schenkel des Ecksofas auf der anderen Seite. Fährst du mit der Maus über eine Karte oder einen Größen-Chip, zeigt eine größere 3D-Vorschau das Möbel.
+Die **Arbeitsplatte** (Küche) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm. Unter Sofas stehen neben dem Sofa ein **Ecksofa (L-Form)** und eine **Wohnlandschaft (U-Form)**; mit **Spiegeln** sitzt der Schenkel des Ecksofas auf der anderen Seite. Auf Geräten, die die Karten ohne Bild zeigen, erscheint beim Darüberfahren die größere 3D-Vorschau wie bisher.
 
 **Symbole an den Einträgen:**
 

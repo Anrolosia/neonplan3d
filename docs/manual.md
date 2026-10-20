@@ -262,7 +262,7 @@ The **Furniture** tool opens the library: the 80 built-in models and everything 
 - The **search field** finds English and German names, the pack name and everyday words ("lamp" finds all lights, "cabinet" all cabinets), several words in any order ("corner sofa"); Escape clears it. While searching, every section is open.
 - Long sections show 24 cards first and **"Show … more"** below.
 
-The **Worktop** (Kitchen) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. Under Sofas, next to the sofa, there are a **Corner sofa (L-shaped)** and a **U-shaped sofa**; **Mirror** puts the corner sofa's side section on the other side. Hover over a card or a size chip for a bigger 3D preview.
+The **Worktop** (Kitchen) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. Under Sofas, next to the sofa, there are a **Corner sofa (L-shaped)** and a **U-shaped sofa**; **Mirror** puts the corner sofa's side section on the other side. On devices that show the cards without pictures, hovering shows the bigger 3D preview as before.
 
 **Symbols on the entries:**
 

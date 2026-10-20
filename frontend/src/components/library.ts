@@ -5,6 +5,7 @@
 // browser (thumbs.ts). Fires "library-add" {type} and "library-preview" {type, element} (type null = gone).
 
 import { css, html, LitElement, nothing } from "lit";
+import { repeat } from "lit/directives/repeat.js";
 import { KINDS, cardsOf, filterEntries, sizeText, type LibraryCard, type LibraryEntry, type Room, ROOMS } from "../library-index.ts";
 import { tokens } from "../styles.ts";
 import { thumbFor } from "../thumbs.ts";
@@ -135,10 +136,20 @@ export class FurnitureLibrary extends LitElement {
       },
       { root: null, rootMargin: "200px" },
     );
+    const byType = this.byType;
+    const bottom = window.innerHeight + 200;
     for (const el of this.renderRoot.querySelectorAll<HTMLElement>(".fp3d-lc-pic[data-type]")) {
-      if (this.observed.has(el)) continue;
-      this.observed.add(el);
-      this.observer.observe(el);
+      if (!this.observed.has(el)) {
+        this.observed.add(el);
+        this.observer.observe(el);
+      }
+      const type = el.dataset.type;
+      if (!type || this._thumbs.has(type)) continue;
+      const r = el.getBoundingClientRect();
+      if (r.bottom >= -200 && r.top <= bottom) {
+        const entry = byType.get(type);
+        if (entry) this.want(entry);
+      }
     }
   }
 
@@ -183,6 +194,8 @@ export class FurnitureLibrary extends LitElement {
   }
 
   private preview(type: string | null, element: HTMLElement | null): void {
+    // the cards show their pictures: the big preview stays only on devices without them
+    if (!this.lite && !(type && !this._thumbs.has(type) && this.thumb === null)) return;
     this.dispatchEvent(new CustomEvent("library-preview", { detail: { type, element }, bubbles: true, composed: true }));
   }
 
@@ -254,7 +267,7 @@ export class FurnitureLibrary extends LitElement {
         <span class="fp3d-lib-caret">${special ? "" : open ? "▾" : "▸"}</span>${title} <span class="fp3d-lib-count">${count}</span>
       </button>
       ${open
-        ? html`<div class="fp3d-lib-grid">${shown.map((c) => this.card(c))}</div>
+        ? html`<div class="fp3d-lib-grid">${repeat(shown, (c) => c.key, (c) => this.card(c))}</div>
             ${cards.length > limit
               ? html`<button class="fp3d-lib-more" @click=${() => {
                   const next = new Map(this._limits);
