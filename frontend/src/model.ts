@@ -23,6 +23,8 @@ export interface Room {
   climate?: RoomClimate | null;
   id: string;
   name: string;
+  /** Further names the voice answers to ("Stube", "Lounge"). */
+  aliases?: string[];
   area_id: string | null;
   /** The camera the room opens with when it is tapped in 3D (null: framed from above). */
   start_view?: StartView | null;
@@ -95,6 +97,8 @@ export interface Opening {
   sidelight_width2?: number | null;
   /** Contact of the second leaf (null = none). */
   contact2: string | null;
+  /** Door: its smart lock (lock.*) – shown as a pin at the door, locked or not (D636). */
+  lock?: EntityRef;
   /** Windows: which sensors report the sash (null: a contact, plus a tilt sensor when one is set). */
   sensor?: "contact" | "handle" | "contact_tilt" | null;
   /** The same for the second leaf of a double window, with its own tilt sensor. */
@@ -166,6 +170,8 @@ export interface Furniture {
   variant: string | null;
   /** Own name (e.g. "Wechselrichter Nord"); null = the type's name. */
   name?: string | null;
+  /** Further names the voice answers to ("Wohnzimmerfernseher", "Glotze"). */
+  aliases?: string[];
   /** The own name shows as a small label under its marker in 3D. */
   show_name?: boolean;
   /** Lamps: how strongly the lamp glows in 3D, 0.1–1.5 (1 = as bright as the light reports) – #181. */
@@ -205,6 +211,8 @@ export interface Furniture {
   moisture_min?: number | null;
   /** Haushalt Pro, washer, dryer, dishwasher: the time left (minutes, an end time or "H:MM"). */
   remaining?: EntityRef;
+  /** Radiator: a sensor that says whether it heats (a valve's work state, an opening percentage) when the thermostat does not (D637). */
+  heat_sensor?: EntityRef;
   /** Haushalt Pro: a consumable or service of the item (a filter, salt, rinse aid): due when on, at or below `service_min`, or its date. */
   service?: EntityRef;
   /** Haushalt Pro: the number (percent or days left) at or below which the service is due (null = 10). */
@@ -249,6 +257,8 @@ export interface Furniture {
   state_split?: "left_right" | "top_bottom" | null;
   /** Lamps: a second entity whose colour and brightness the lamp shows while the linked switch is on (a relay switches the light, the bulb itself knows its colour). */
   color_entity?: EntityRef;
+  /** Any electric item: a sensor whose value stands at its symbol – a boiler's water temperature, a humidity (D619). */
+  extra?: EntityRef;
   /** Mirrored (left-right) – an L-sofa the other way round, a cabinet with its door on the other side. */
   mirror?: boolean;
   /** LED strip: tilt about its length (°; 0 = lying flat, 90 = its face points sideways, e.g. along a roof slope). */
@@ -290,6 +300,8 @@ export interface Placement {
   /** Fixed against moving by accident. */
   locked?: boolean | null;
   entity_id: string;
+  /** Further names the voice answers to. */
+  aliases?: string[];
   x: number;
   z: number;
   /** Height above the floor; null = default for the device kind (and lamp mount). */
@@ -671,7 +683,9 @@ export interface BuildingSettings {
   /** The ground around the house: its height and the earth around cellars. */
   terrain?: Terrain | null;
   /** Haushalt Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12). */
-  household?: { bin_from?: number | null; bin_until?: number | null } | null;
+  household?: { bin_from?: number | null; bin_until?: number | null; notes?: EntityRef } | null;
+  /** The floor the editor opens with (null: the first of the list) (D418). */
+  editor_floor?: string | null;
   /** Fun pack "Halloween": the ghost that floats through the house now and then (on unless switched off). */
   halloween?: { ghost?: boolean } | null;
   /** Plan lock: rooms, walls, doors, windows and outdoor areas cannot be moved by accident. */
@@ -891,6 +905,8 @@ export interface PoolLinks {
   ph?: EntityRef;
   /** Chlorine: redox/ORP in mV or free chlorine in mg/l (ppm). */
   chlorine?: EntityRef;
+  /** Salt (a salt-water pool): mg/l or ppm. */
+  salt?: EntityRef;
   /** Pool cover (a cover entity): it slides over the water as far as it is closed. */
   cover?: EntityRef;
   /** Pool Pro: the pool's ports (skimmer, bottom drain, inlets) and the waste drain the backwash goes to. */
@@ -1427,6 +1443,12 @@ export function surfaceHeight(floor: Floor, x: number, z: number, itemH = 0): nu
     top = Math.max(top, f.h);
   }
   return top;
+}
+
+/** "Glotze, Wohnzimmerfernseher" → the names, trimmed, empty ones dropped (at most 12). */
+export function splitAliases(text: string): string[] | undefined {
+  const out = text.split(/[,;\n]/).map((s) => s.trim()).filter(Boolean).slice(0, 12);
+  return out.length ? out : undefined;
 }
 
 /** Wall switches and sockets: up to four gangs in one frame, each with its own entity (D523, #593). */

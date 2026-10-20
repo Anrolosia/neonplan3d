@@ -115,6 +115,8 @@ The toolbar at the top is grouped. On its far left is always the floor you are w
 
 A group's button names the tool in use, e.g. "Room: Free shape" or "Outdoor: Lawn". **A tool stays in use** after you placed something, so you can set several doors, windows, rooms or areas in a row. **Esc** or **Select** ends it. A short hint for the active tool is always shown at the bottom of the plan.
 
+**Dragging the sidebar wider:** at its left edge the sidebar can be dragged wider or narrower with the mouse or a finger (280 to 640 pixels); the browser remembers the width.
+
 **Collapsing the sidebar:** **Collapse ›** at the top of the sidebar folds it to a narrow strip – the plan gets all the room, e.g. for moving furniture. **‹** unfolds it, a glowing **⚙** in the strip opens the settings of the selection. Choosing another tool unfolds it again by itself. The browser remembers the choice.
 
 **Mouse and touch:** Two fingers pan and zoom. With a mouse, the wheel zooms; drag an empty spot or anywhere with the **right or middle mouse button** to pan (a right click without dragging still opens the menu). **Ctrl+Z** undoes, **Ctrl+Y** or **Ctrl+Shift+Z** redoes, **Del** deletes the selection, **Esc** cancels. The **arrow keys** nudge the selection (room, corner, furniture, device, wall, outdoor area) by one grid step, with **Shift** by 10 cm, with **Alt** by 1 cm; doors and windows slide along their wall.
@@ -177,9 +179,23 @@ Walls are created automatically: every shared edge of two rooms becomes an inter
 
 **Split walls:** When a neighbouring room splits a wall into several parts (say two small rooms along one long wall), every part gets a row of its own, "Wall 2–3 · part 1", "… part 2", with its length, and every part can have its own height or be left out.
 
-### 4.5 Settings
+### 4.5 The ⚙ settings menu
 
-**Settings** unfolds at the bottom of the sidebar:
+Everything that belongs to the whole plan rather than to a floor, a room or an item sits in one menu: **⚙ Settings ▾** on the right of the toolbar (only the gear on narrow screens). Each entry opens a dialog over the plan, also while something is selected; **✕** or **Esc** closes it. The side bar without a selection only keeps the floor's rooms, the floor-plan picture and the help.
+
+| Entry | Content |
+|---|---|
+| **🏠 House** | wall thicknesses, grid, lengths, north (the rows below) |
+| **🌦 Weather & warnings** | weather entity and effects, rain warning, warning names, outage sensor, sun patches |
+| **🎬 Live director** | see [6.1](#61-camera-cockpit) |
+| **🎙 Voice control** | see [5.10](#510-voice-control-new) |
+| **⭐ Favourites** | the central menu of the 3D view (below) |
+| **🖼 Background** | what lies behind the 3D house (below) |
+| **⛰ Ground** | see [4.21](#421-cellar-and-ground) |
+| **💾 Backup** | export, import, restore, see chapter 9 |
+| **🧩 Modules** | the modules installed (code from the shop, e.g. "The house answers") and **Import a module …** for the .fp3dpack file |
+
+The **roof shape** (none, flat, gable, ridge, pitch, overhang) sits with the roof tool, see [4.19](#419-roof). The **start view** is remembered in the 3D view: turn and zoom the house, then tap **📌** in the view settings (gear at the top right); **📌✕** resets it. The 3D view, the card and the kiosk then open the house like that, and an opened floor is shown from the same side.
 
 | Setting | Meaning |
 |---|---|
@@ -187,10 +203,8 @@ Walls are created automatically: every shared edge of two rooms becomes an inter
 | **Grid (m)** | Drawing step |
 | **Lengths** | **Automatic** follows Home Assistant's unit system, otherwise **Metres** or **Feet and inches**. With feet and inches the editor shows every length, dimension and area (ft²) that way and understands input like `8' 2"`, `98in`, `8.2ft` or even `2.5m`. The plan always stores metres, so you can switch at any time |
 | **North** | Degrees clockwise from up. Needed for sunlight |
-| **Roof** | No roof, flat roof or gable roof, with pitch and overhang. For a gable roof, **Ridge** sets whether the ridge runs along the long or the short side (e.g. terraced house). **Roof sections (custom)** builds the roof from several parts, see [4.19](#419-roof) |
 | **Weather entity** | Which weather entity drives the weather outside, see [6.2](#62-weather-outside) |
 | **Weather effects in 3D** | Which effects are shown |
-| **Start view** | Turn, zoom and move the house in the 3D pane on the right the way it should open (e.g. from the garden side) and press **Remember the current 3D view as the start**. The 3D view, the card and the kiosk then open the house like that – angle, zoom and framing – and an opened floor is shown from the same side as well; **Default** resets it |
 | **Favourites** | Scenes, scripts, automations, buttons and switches for the central menu (star) of the 3D view: party, presence simulation, shading, watering. Pick them with the search, order them with ↑ ↓, ✕ removes one. Below them **Own buttons** with a label, an icon and an action: **Open a path** (e.g. `/lovelace/blinds`), **Entity details**, **Call a service** (`domain.service` with data as JSON) or **fire-dom-event** – with it a button opens a browser_mod popup with your own card, e.g. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Blinds", "content": {"type": "custom:my-blind-card"}}}}` |
 | **🖼 Background** | What lies behind the 3D house: the look's sky (default), **one colour**, a **gradient** or a **picture**. Put the picture into `config/www` in Home Assistant and enter `/local/filename.jpg`; **Darken** lays a dark veil over it so the neon lines stay readable. Applies to the panel and cards and costs no performance |
 
@@ -213,6 +227,7 @@ Every opening has:
 - **Leaves:** single or double, with an own contact for the second leaf.
 - **Highlight in 3D:** *When open* (default) makes open windows and doors glow warm. *When closed* turns this round, e.g. for the WC or a child's room door: it glows while it is shut. This needs a contact; without a sensor nothing is highlighted.
 - **Show closed without a sensor:** a door without a contact stands half open in 3D, so it is seen as a door. The checkbox draws it closed, e.g. for a front door or a carport without a sensor.
+- **Smart lock:** the door's lock (Nuki, Aqara, `lock.*`). A pin stands at the door in 3D: 🔒 locked, glowing red while it is unlocked; a tap locks or unlocks. The voice asks it ("Is the front door locked?").
 - **Invert contact:** for sensors that report open and closed the other way round. NeonPlan then shows open when the sensor reports closed, and vice versa (default: off).
 
 Doors and windows can also be tapped in a wide band around the opening in the plan; a selected room lists its doors and windows in its form.
@@ -328,8 +343,10 @@ Lamps are furniture with a linked light: ceiling light, downlight, surface spot,
 
 TVs, media walls, the wall unit with a TV (the wall unit without a TV is a lamp: vitrines and LED strips glow with the linked light), desks with monitors, washing machines, dryers, dishwashers, radiators, robot vacuums and many pack items link to entities:
 
+- **Radiator – Heating (sensor):** when the thermostat does not say whether it heats (Tuya valves report a "work state" sensor instead), pick that sensor under **Heating (sensor)**: "opened", "heating", "on" or an opening above 0 % makes the radiator glow.
 - **Device** or **TV (media player or smart plug)**: A **status sensor** works as a device too, e.g. the print status of a 3D printer (Bambu Lab and others); the item then counts as active while the status reports "running", "printing", "prepare" or similar. A TV glows while it is on. An older TV on a smart plug simply takes the plug's switch; the screen glows while the plug is on, and a tap switches it. Washing machine, dryer and dishwasher glow while they run – washer and dryer with a ring of light round their round door. A radiator with a thermostat glows while it heats. The **air conditioner (wall)** hangs high on the wall and glows at its air outlet in the colour of its mode: red heating, blue cooling, green automatic, yellow drying, white fan only – bright while it works, dimmed on standby. A **stove** glows on its cooking zones while it cooks; an operating-state sensor (e.g. Home Connect: "run", "ready", "inactive") makes it glow faintly at "ready" and stay dark at "inactive".
 - **Power sensor (W)**: The item shows its watts. **Running from (watts)** sets from how many watts it counts as running and glows (empty: 10 W) – handy for appliances behind a smart plug that draw a few watts on standby, e.g. 100 W.
+- **Extra value at the symbol:** a sensor whose value stands at the item's symbol – a gas boiler's water temperature, a ventilation unit's humidity. With an extra value the symbol shows by itself.
 - **Ask before switching** and **Marker in 3D** as with devices.
 - **Pictures by state** on screens: a Pro add-on, see [6.3](#63-live-screens).
 
@@ -399,7 +416,7 @@ With **Outside → Outdoor** you draw lawn, terrace, path, driveway, flower bed,
 
 ![A farmhouse with house, barn and extension, each with a roof of its own](images/view-roof-sections.jpg)
 
-A simple house gets a flat or gable roof over the whole top floor under **Settings → Roof**. For everything else – an L- or T-shaped house, a house with a barn, an extension with a pent roof, a roof that reaches far down on one side – you build the roof from **roof sections**.
+A simple house gets a flat or gable roof over the whole top floor under **Build → Roof** at **Roof shape**, with the ridge (along the long or the short side, e.g. a terraced house), pitch and overhang. For everything else – an L- or T-shaped house, a house with a barn, an extension with a pent roof, a roof that reaches far down on one side – you build the roof from **roof sections**.
 
 - Choose **Roof sections (custom)** under **Roof**, or the **Roof** tool. The first time, NeonPlan 3D proposes the sections from your rooms: per floor the parts no higher floor covers, each with a gable roof. Then you adjust them.
 - In the **Roof** tool you drag a new section in the plan. Tap selects one, dragging moves it, the corners resize it. At the top you choose the floor whose rooms the plan shows. The 3D view opens beside it with the whole house, so you see every change at once.
@@ -461,7 +478,7 @@ At the bottom, a card announces the coming Pro add-on **Energy Pro**. Everything
 
 ### 4.21 Cellar and ground
 
-A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Without a selection, the sidebar shows the section **Ground** at the bottom:
+A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Under **⚙ Settings → Ground** you set:
 
 - **Ground height** (in metres, ground floor = 0) says where the ground lies around the house. Lawns, paths and terraces lie on it. For a **semi-basement** or raised ground floor you lower it as far as the cellar should show, e.g. to −1.2 m. If the house then stands higher than the ground, it gets a **plinth** down to the ground in 3D – nothing floats.
 - **Show cellars in the earth:** floors below the ground sit in the earth in 3D. Open the cellar and you see it as in a building pit, with the earth walls around it. Unticked, they stand free as before.
@@ -550,7 +567,8 @@ At the top right:
 | Switch | Effect |
 |---|---|
 | **Auto** / **Tablet** / **High** | Quality level. Tablet leaves out patterns, shadows and halos and is chosen automatically on Fire tablets. High adds light cones under spots |
-| **Neon** / **Blueprint** / **Day** | The look. The colour well beside it sets an **accent colour of your own**: in the neon look lines and glowing edges take it, the buttons and pins in every look; ↺ brings the cyan back |
+| **Clock** | Date and time in a corner of the view (↖ ↗ ↙ ↘) or off – per device; in the card `clock: tr` |
+| **Neon** / **Blueprint** / **Day** / **Auto** | The look; **Auto** shows Day while the sun is above the horizon (`sun.sun`) and Neon after sunset – for the wall tablet. In the card `theme: auto`. The colour well beside it sets an **accent colour of your own**: in the neon look lines and glowing edges take it, the buttons and pins in every look; ↺ brings the cyan back |
 | **None** / **In the room** / **Important** / **All** | Which device markers appear. Important shows only devices without their own 3D model and values such as watts or the running app. **In the room** shows no markers in the house and floor views and, in an open room, only that room's own – handy with many sockets and sensors |
 | **Small** / **Normal** / **Large** | How large the device markers are; the device remembers the choice (card: `marker_size`) |
 | **◧ / ◨** | Floor pictures, star, search and eye on the left or on the right – handy when the view sits at the left edge of a dashboard |
@@ -657,16 +675,47 @@ Talk to your house. A **microphone button** 🎙️ appears at the bottom left o
 | "Show the upper floor", "Cellar" | The floor opens. |
 | "Show the whole house" | Back to the house view. |
 | "Show the garden", "Terrace" | An outdoor area with a name and an area opens like a room. |
-| "Show the washing machine", "Where is the floor lamp?" | The view flies to the device and it flashes. |
+| "Show the washing machine", "Where is the floor lamp?", "Show the TV", "Where is the dryer?" | The view flies to the device or piece of furniture and it flashes. Furniture answers to its kind ("dryer", "pool pump"), its own name and everyday words ("TV", "telly", "heating", "car") – with or without a linked entity. If the sensor is called "Washing machine power" in the plan, "washing machine" is enough. With several of a kind, name the room too ("the heating in the living room"). |
 | "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
 | "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
-| "Turn on the hall light", "How warm is it outside?" | Anything else goes to Home Assistant's **Assist**. The answer shows as a speech bubble. |
+| "What is open?", "Where is it cold?", "Is the washing machine running?", "What is drawing power?", "Who is home?", "What is the weather like?", "Is everything OK?", "What is on today?", "Good morning", "Good night" … | With the module **The house answers** (free in the shop, see below): the answer shows as a speech bubble, is spoken through Assist's text-to-speech, and the house shows it – open windows flash, the coldest room opens, the view flies to the washing machine. The full list is below. |
+| "Turn on the hall light", "Lower the blinds" | Commands go to Home Assistant's **Assist**. The answer shows as a speech bubble. |
 
-NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors and devices. A room also answers to the name of its Home Assistant area. Devices need a "show" or "where is", so "turn on the living room light" stays a command for Assist and switches the light instead of flying there.
+Compounds work too: "driveway camera" said as one word finds the camera "Driveway". Under **⚙ Settings → Voice control** the list **What NeonPlan understands** shows the sentences, with those of the installed modules.
+
+NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devices and furniture. A room also answers to the name of its Home Assistant area. Devices need a "show" or "where is", so "turn on the living room light" stays a command for Assist and switches the light instead of flying there.
+
+**Further names.** Your TV is called "Smart TV Pro" in Home Assistant, but you say "living room TV" or "telly": every room, piece of furniture and placed device has the field **Further names for the voice** below its name in the editor (comma separated, up to twelve). They count for voice control and the search.
+
+**The house answers – the questions.** The module (see below) answers from your plan and your sensors, without AI, all local:
+
+| Topic | You ask, for example |
+|---|---|
+| Open | "What is open?", "Which windows are open?", "Is a window open in the bathroom?", "Is the garage closed?", "How long has the window been open?" – the view flies to each open window, from inside, and says there what it is |
+| Temperature | "Where is it cold?", "Where is it warmest?", "How warm is it in the living room?", "How warm is it outside?" |
+| Air | "How humid is the bathroom?", "How is the air in the bedroom?" (CO₂), "Should I air the house?" |
+| Heating | "What is the heating set to in the living room?", "Is the heating on?" (the room's thermostats) |
+| Appliances | "Is the washing machine still running?", "Is the TV on?", "What is running right now?", with Haushalt Pro: "How long does the washing machine need?", "When is the laundry done?" |
+| Media | "What is playing on the TV?", "What music is playing?" |
+| Energy | "What is drawing power?", "What is the solar doing?", "How full is the battery?" |
+| Lights, blinds, locks | "Which lights are on?", "Is a light still on in the hall?", "Are the blinds down?", "Is the front door locked?" |
+| People | "Who is home?", "Where is Anna?", "Is anyone in the living room?", "Where is motion?" |
+| Warnings | "Is everything OK?", "Any warnings?" (smoke, water, a window in the rain, a power outage …) |
+| Household (Haushalt Pro) | "What is on today?", "When is the bin collected?", "Is there mail?", "Do the plants need water?" |
+| Car (Auto Pro) | "How full is the car?", "Is the car charging?", "How far can I still go?", "Is the car locked?", "Where is the car?" |
+| Pool (Pool Pro) | "How warm is the pool?", "Is the pool pump running?", "What is the pH?", "Is the pool OK?" |
+| Weather, time | "What is the weather like?", "Is it raining?", "What time is it?", "What day is it?", "When does the sun set?" |
+| The house | "How many rooms does the house have?", "How big is the living room?", "How many windows does the house have?" |
+| The day | "Good morning" – the morning report: weather, warnings, what is open, what is on today, who is home, the car. "Good night" – the night check: open windows and doors, unlocked locks, lights, running appliances, with a tour |
+| And more | "Who are you?", "How are you?", "Tell me a joke", "Thank you", "Hello", "What can you do?" |
+
+Commands ("turn on the light", "set the heating to 22 degrees") still go to Assist. The answers come in your user's language (German or English).
+
+**Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). You import the .fp3dpack file under **⚙ Settings → 🧩 Modules → Import a module …** (or on the Extensions page in the **Modules** section); it is then listed there as "Module by Mastershort", and its sentences show under 🎙 Voice control. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
 
 **Switching it on.** Voice control is off by default. You switch it on where you want to speak:
 
-- **NeonPlan page (panel):** editor → **🎙️ Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
+- **NeonPlan page (panel):** editor → **⚙ Settings → 🎙 Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
 - **Dashboard card:** edit the dashboard → NeonPlan card → **Features** → **Voice control (microphone button)**, or `voice: true` in YAML. The card setting applies on every device that shows this dashboard, so you can set it on the PC even when it is meant for the tablet.
 
 **What you need:**
@@ -676,6 +725,20 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors and de
 3. **The microphone allowed:**
    - in the browser, "Allow" on the first tap;
    - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access (Plus licence), plus Fully's microphone permission in Android.
+
+**Asking through Assist – without a microphone on the tablet.** Everything NeonPlan understands you can also say to Assist: a voice satellite (Home Assistant Voice, ESPHome), the Assist dialog or the app. On start NeonPlan writes the sentences `custom_sentences/en/neonplan3d.yaml` and `…/de/…` into your configuration folder (only when they are missing or changed). Say "Show the living room" or "What is open?" to Assist and the sentence goes to **every open NeonPlan view** – the wall tablet shows the room or the open windows, and Assist speaks the answer where you asked. The tablet itself stays quiet. The sentences start unmistakably ("show …", "where is …", "what is open", "ask the house …", "NeonPlan, …") so Assist keeps switching your lights itself. Your own sentences go into a further file under `custom_sentences` for the intent `NeonPlanAsk`.
+
+**The service `neonplan3d.ask`.** For automations and scripts: fields **Sentence** (`text`), **Screen** (`screen`, optional) and **Speak** (`speak`, off by default). The service returns the answer (`answer`, `answered`, `screen_open`), e.g. for a notification. With `speak: true` the view speaks the answer itself through its Assist pipeline's text-to-speech. Example – the night check on the wall tablet every evening at 10 pm:
+
+```yaml
+action: neonplan3d.ask
+data:
+  text: "Good night"
+  screen: "Hall"
+  speak: true
+```
+
+**Screen names.** With several tablets, give each view a name: in the editor under **⚙ Settings → 🎙 Voice control → Screen name** (for this device) or on the card with the option `screen: Kitchen`. When the service names a screen, only the view with that name reacts; without one, all of them do. With no view open, Assist answers "No NeonPlan screen is open right now".
 
 **Testing:** in the **🎙️ Voice control** section, **🎙️ Test the microphone** starts a probe. It checks https, the microphone, the level and Assist one after the other. It also shows which room a spoken sentence would open, and switches nothing while doing so. Wherever there is a ✖, the fix stands next to it.
 
@@ -709,7 +772,7 @@ Pro add-ons are paid extra features, sold singly in the shop. Without an add-on,
 
 **Live director:** a screen, usually the wall tablet, shows by itself what happens in the house. When the doorbell rings, the view flies to the front door and looks through the camera there. When a camera sees someone, the washer is done or a warning comes up, it flies there too. Afterwards it goes back to where it was. Everything is **off** until you switch it on, in two places:
 
-1. **Which events:** editor → **🎬 Live director**. Every event has its own switch:
+1. **Which events:** editor → **⚙ Settings → 🎬 Live director**. Every event has its own switch:
    - **Doorbell rings:** NeonPlan finds the doorbell itself, as an event entity of the class "doorbell" (Ring, UniFi Protect …) or a sensor like Reolink's "Visitor". You can also choose it yourself, and the camera at the door too. Without a choice NeonPlan takes the camera of the same device, or one in the same area. The camera has to be placed in the plan; otherwise the view only flies to the doorbell.
    - **A camera sees someone:** "People only" or "Any motion", for all placed cameras.
    - **Washer, dryer or dishwasher finished:** the appliance has to be furniture linked to a power sensor or a status. It counts as finished once it rests for 3 minutes after its run, so a pause in the programme does not count.
@@ -925,12 +988,44 @@ Household Pro shows what is due in the household, right where it happens. The wa
 - **Waste bins:** under **Waste calendar or sensor** pick a calendar (e.g. from *Waste Collection Schedule*) or a sensor. In a calendar NeonPlan finds the entries by the words of the bin's waste (paper, food, packaging, PMD, recycling … in many languages); if that does not fit, enter a **word** of your own. A sensor may report the days to the pickup, a date or "tomorrow"/"in 3 days". Every bin with a pickup wears a small **tag** on its lid – "Today", "Tomorrow", "in 3 days" – in its colour; today and tomorrow stand out. A tap on the bin shows its next pickups. **Glow from / until** sets from when the day before until when on pickup day a bin counts as due (for all bins).
 - **Mailbox:** a **post sensor** – a flag (e.g. an input_boolean "post" set by an automation) or the letter flap – and optionally the **sensor of the emptying door**. While post is in it, the mailbox glows and shows "Post" until it is emptied.
 - **Plants:** a plant (plant.*) or a moisture sensor; below the set value (default 20 %) it shows "Thirsty".
+- **Pinboard:** under **⚙ Settings → House → Pinboard (text helper)** pick a text helper (`input_text`) or sensor. Its text stands at the top of "Today in the household", several lines separated by `|` – automations write into it ("parcel for Alla is in the garage", "plumber tomorrow at 10"), the card shows it.
 - **Washer, dryer, dishwasher:** with a **time-left sensor** the pin shows "23 min left"; afterwards "Done!" until the door opens (**door sensor**) or it runs again. NeonPlan tells "done" from the appliance's state (finished, done …) or from it having stopped running.
 - **Service and consumables:** any electric item can have a sensor for a filter, salt or rinse aid – a binary sensor (on = due), a number (percent or days left, due at the set value) or a date. When due the item glows yellow.
 - **Fridge:** when a door stands open longer than set (default 2 minutes), NeonPlan warns at the top of the view. The **smart fridge** (side-by-side with moving doors) in the furniture library comes with it.
 - **Today in the household:** a glass card at the top right lists what is due – bins today and tomorrow, post, finished appliances, thirsty plants, services due, open fridge doors. A tap opens the device, its header folds it. In the dashboard card `household_card: false` switches it off.
 
 ---
+
+### 6.9 Pool Pro (module)
+
+Pool Pro brings the pool to life – with what your pool equipment reports in Home Assistant. It comes as a **module** from the shop (see 5.10 and 7): a signed pack you import under **⚙ Settings → 🧩 Modules → Import a module …**. It needs an outdoor area of the kind **Pool** (4.17).
+
+**Setting up:** tap the pool in the plan. Its form has the section **🏊 Pool Pro** with the roles of your equipment – empty fields NeonPlan fills by name (an entity with "pool" in its name and the right kind), "None" switches a role off:
+
+| Role | Entity |
+|---|---|
+| Water temperature | a temperature sensor (without one NeonPlan takes the heat pump's water temperature) |
+| Heat pump / heater | a climate entity (`climate`) or a water heater (`water_heater`) – then the target can be set – or a switch |
+| Filter pump | a switch, a binary sensor or a power sensor (running from 20 W) |
+| Pool light | a light (its colour tints the water) or a switch |
+| pH value | a sensor |
+| Chlorine / redox | redox in mV or free chlorine in mg/l |
+| Salt | a salt sensor (ppm or mg/l) of a salt-water pool |
+| Cover | a cover entity with a position |
+
+**In the garden:** the water glows in the colour of the pool light; with the light off, the water temperature tints it from deep blue (cold) to turquoise (warm). While the filter pump runs the water moves with a play of light like under real waves; while the heat pump heats it shimmers warm. The cover slides over the water as far as it is closed. In the garage the devices glow along: the pump while it runs, the heat pump warm while it heats, the sand filter's head in the colour of its valve position.
+
+**Glass card:** a card floats over the pool in the look of the other Pro cards: the water temperature large in its colour, the heat pump's target beside it (− / + to set it); pH, redox/chlorine and salt with a traffic light (green in the ideal range, yellow a little off, red far off) and their place on the scale; the cover; buttons for heat pump 🔥, filter pump 〰, light 💡 and cover ▲▼. Administrators also set the **ball valves** and the **six-way valve** on the card the way they really stand – the water in the pipes follows.
+
+**Warnings:** in the warning bar when pH, chlorine/redox or salt are far off (red), and on **risk of frost** – water at 3 °C or colder while the pump rests. The pool is outside: its warnings show at the top, no room pulses.
+
+**Setting up the plant – at a tap:** below the pool's form stands **🛠 Set up the plant**. Choose the **technical room** (NeonPlan suggests the garage or utility room; "Outside next to the pool" works too), tick **With a heat pump** or not, and tap **Set up the plant automatically**. NeonPlan puts the filter pump, the sand filter and the heat pump in a row along the room's longest wall, puts the skimmer, bottom drain, two inlet nozzles and the waste drain at the pool and lays the usual piping: skimmer and bottom drain, each with a ball valve, underground to the pump, pump → sand filter → T-piece → heat pump or bypass (with a ball valve) → T-piece → back underground to the inlets, backwash to the waste drain. Afterwards you may move everything – the pipes follow the devices. **Set up the plant again** replaces ports and pipes; devices already there stay.
+
+**Pipes by hand (wall view):** to have it exactly the way it runs in your garage, open the **wall view** of the technical room and there **🛠 Pool equipment** – and draw like with a pen: devices from the palette onto the wall, then press on a device and drag the line with a finger or the mouse. Wiggles go, the pipes run level and upright, corners stay where you turned. A stroke ending on a device joins there (NeonPlan finds the right side), on a pipe it makes a T-piece; one ending on nothing is asked **"Where does the line go?"** – skimmer, bottom drain, inlets or waste – and NeonPlan lays the hole (low: through the floor, higher: through the wall) and the way outside to the pool itself. A tap on a pipe adds ball valves and sight glasses, the eraser takes away, undo helps. A step-by-step hint says what is still missing until the water flows. While the filter pump runs, bright dots travel through the pipes – blue, orange after a heating heat pump, brown to the waste drain while backwashing; at a split the water goes through the heat pump while it is on, else through the bypass; a closed valve stops it.
+
+**Voice:** with the module "The house answers" ask "How warm is the pool?", "Is the pool pump running?", "What is the pH?" or "Is the pool OK?" (5.10).
+
+**Wall tablet:** the water only moves while the filter pump runs; with it off, the pool costs nothing.
 
 ## 7. Extensions, shop and furniture packs
 
@@ -980,7 +1075,7 @@ The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked o
 
 Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 
-At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once.
+At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once. The **Modules** section below lists the installed modules (code from the shop, see 5.10) with **Import a module …** and **Remove**.
 
 **Good to know:**
 
@@ -1010,6 +1105,32 @@ Switch them on and off under **🎈 Fun packs** afterwards.
 
 ---
 
+### 7.5 Modules
+
+A **module** is a pack that carries code: NeonPlan loads it and runs it in the house – checked, signed and bound to your installation like a furniture pack. Modules come only from the shop (with a customer account, many of them free); their code is not in the public repository.
+
+**How a module works – step by step:**
+
+1. **Get it:** put the module into the shop's basket (free ones too), order, done. It then lies in your customer account like every pack.
+2. **Install it:** with NeonPlan connected to the shop (7.1) it stands under Extensions → **Install/update all** – one tap. Without the connection download the `.fp3dpack` file from the account and import it: **⚙ Settings → 🧩 Modules → Import a module …** or here in the **Modules** section. Nothing more to do – no restart, no reload.
+3. **See it:** the module stands in both lists as "Module by Mastershort · v2". What it does is in its shop description; the sentences of a voice module show at once under **🎙 Voice control → What NeonPlan understands**, a module's warnings in the warning bar, its cards over the house.
+4. **Updates:** a new release is fetched by the daily shop check by itself; without the connection import the new file – the same id replaces the old one.
+5. **Remove:** **Remove** in the list, like a pack. Your plan stays untouched.
+
+Security: a module runs only with a valid signature and on the installation it was bought for. You can read the code in the file (it is not obfuscated) but not pass it on – the Elastic License 2.0 applies.
+
+**Why modules?** The Pro add-ons move over to this form one by one (on the extensions page they already stand under Modules, "becomes a module"). Nothing changes in how you use them. A lot changes in how they are built: each extension gets its updates through the shop without waiting for the next NeonPlan release; several extensions can be built and tested at once, each with its own supporter beta; and the core stays small and fast – a wall tablet only loads what it uses.
+
+> **Beta: The house answers.** Supporters test the voice module first: with the [Supporter Pass](https://mastershort.de/en/neonplan3d/supporters/) it lies in your account – **Install all** or import the file (step 2). Then open **⚙ Settings → 🎙 Voice control**: under "What NeonPlan understands" every question is listed. Try "What is open?", "Good morning", "Good night", "What is the weather like?" – at the microphone or in the Assist dialog. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech). Whatever is not understood or answered wrongly: post the exact sentence on Discord in **#beta-feedback** – that is what the next release is made of. After the beta the module is free for everyone.
+
+Modules today:
+
+| Module | What it does | Price |
+|---|---|---|
+| **The house answers** | answers spoken questions – "What is open?", "What is the weather like?", "Good morning" … (5.10) | free |
+| **Window watch** | warns when a window has been open in the cold (below 12 °C outside) for more than 20 minutes or the heating runs with a window open (10 minutes): the room pulses, the warning bar names the window and the time; "Which windows have been open too long?" visits them | free |
+| **Pool Pro** | the living pool with its card, warnings and pool equipment (6.9) | Pro |
+
 ## 8. The dashboard card
 
 ![The card in a dashboard](images/card-og-dim.jpg)
@@ -1021,7 +1142,7 @@ The card `custom:neonplan3d-card` brings the 3D view into any dashboard. It load
 | Section | Options |
 |---|---|
 | **View** | One floor or the whole house, fixed size or full screen, height, look, walls, quality, floors below |
-| **Show** | Markers, heatmap, switches in the card, floor pictures, room names, room panel, full-screen button, floors apart, performance display |
+| **Show** | Markers, heatmap, switches in the card, floor pictures, room names, room panel, full-screen button, clock (corner of your choice, `clock: tl/tr/bl/br`), floors apart, performance display |
 | **Features** | Warnings, jump to a warning, scene buttons, motion trail, camera wall, time travel, weather with weather entity |
 | **Wall tablet (kiosk)** | Back to the start view, night dimming, camera turn as screensaver |
 

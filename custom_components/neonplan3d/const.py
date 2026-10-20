@@ -31,3 +31,6 @@ PANEL_ICON = "mdi:floor-plan"
 PANEL_TITLE = "NeonPlan 3D"
 
 SIGNAL_BUILDING_UPDATED = f"{DOMAIN}_building_updated"
+# a sentence for the open views (see voice.py) and the hass.data key of its broker
+SIGNAL_ASK = f"{DOMAIN}_ask"
+DATA_ASK = f"{DOMAIN}_ask"

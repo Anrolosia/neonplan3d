@@ -237,3 +237,27 @@ def test_probatio_marks_an_unknown_value_by_its_code() -> None:
     probatio = SimpleNamespace(errors=[SimpleNamespace(code="not_in_list")])
     assert packs._unknown_value(probatio)  # type: ignore[arg-type]
     assert not packs._unknown_value(vol.MultipleInvalid([vol.Invalid("expected float")]))
+
+
+def test_a_module_pack_needs_no_furniture_and_its_code_is_served_apart() -> None:
+    """A module pack (code the shop delivers) passes without items; the studio key may not sign one."""
+    module = {
+        **PAYLOAD,
+        "id": "mastershort.voice_answers",
+        "items": [],
+        "module": {"api": 1, "kind": "voice", "code": "export default { api: 1 };"},
+    }
+    clean = packs.validate_payload(module)
+    assert clean["module"]["kind"] == "voice"
+    with pytest.raises(packs.PackError) as err:
+        packs.validate_payload({**module, "module": {"api": 2, "kind": "voice", "code": "x"}})
+    assert err.value.code == "needs_update"
+    with pytest.raises(packs.PackError) as err:
+        packs.validate_payload({**module, "module": {"api": 1, "kind": "editor", "code": "x"}})
+    assert err.value.code == "needs_update"
+    # the pack list leaves the code out, the code command returns it
+    from custom_components.neonplan3d.websocket import _without_code
+
+    slim = _without_code({**clean, "source": clean})
+    assert "code" not in slim["module"] and "code" not in slim["source"]["module"]
+    assert slim["module"]["api"] == 1

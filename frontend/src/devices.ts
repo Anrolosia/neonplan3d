@@ -329,6 +329,21 @@ export function entityName(hass: HomeAssistant, entityId: string, areaName?: str
   return name;
 }
 
+/**
+ * Whether a radiator heats by its own sensor (D637): a valve's work state ("opened", "heating", "on"), a binary
+ * sensor, or an opening in percent (above 0); null when the sensor says nothing usable.
+ */
+export function heatSensorOn(hass: HomeAssistant, ref: EntityRef | undefined): boolean | null {
+  if (!ref || ref === "none") return null;
+  const st = hass.states[ref];
+  if (!st || isUnavailable(st)) return null;
+  const s = st.state.toLowerCase();
+  if (["on", "open", "opened", "heating", "heat", "true", "active", "running"].includes(s)) return true;
+  if (["off", "closed", "idle", "false", "inactive", "standby"].includes(s)) return false;
+  const v = Number(s);
+  return Number.isFinite(v) ? v > 0 : null;
+}
+
 export function isUnavailable(st: HassEntity | undefined): boolean {
   return !st || st.state === "unavailable" || st.state === "unknown";
 }
@@ -575,6 +590,8 @@ export interface OpeningEntities {
   tiltInvert?: boolean;
   /** A door without a sensor is drawn closed. */
   shut?: boolean;
+  /** A door's smart lock. */
+  lock?: string | null;
   /** The contacts report the other way round (on = closed). */
   contactInvert?: boolean;
 }
@@ -603,6 +620,7 @@ export function openingEntities(hass: HomeAssistant, floors: readonly Floor[]): 
     contact: o.sensor === "handle" && o.contact == null ? null : pick(o.contact, autoK),
     tilt: o.tilt === "none" ? null : o.tilt,
     contact2: o.leaves === 2 && o.contact2 && o.contact2 !== "none" ? o.contact2 : null,
+    lock: o.type === "door" && o.lock && o.lock !== "none" ? o.lock : null,
     tilt2: o.leaves === 2 && o.tilt2 && o.tilt2 !== "none" ? o.tilt2 : null,
     position: o.position && o.position !== "none" ? o.position : null,
     positionInverted: !!o.position_inverted,

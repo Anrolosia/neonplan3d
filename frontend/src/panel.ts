@@ -8,7 +8,7 @@ import { loadEditor } from "./load-editor.ts";
 import "./components/room-panel.ts";
 import "./components/view3d.ts";
 import { languageReady, loadLanguage, translate, type I18nKey } from "./i18n.ts";
-import type { Building } from "./model.ts";
+import type { Building, StartView } from "./model.ts";
 import { controls, tokens } from "./styles.ts";
 import type { HomeAssistant } from "./types.ts";
 import type { MarkerMode } from "./components/view3d.ts";
@@ -21,7 +21,8 @@ import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, registerUrl, UNRELEASED } from "./features.ts";
 import { directorOnHere } from "./director.ts";
-import { loadVoice, micProbeDone, voiceOnHere } from "./load-voice.ts";
+import { loadVoice, micProbeDone, screenName, voiceOnHere } from "./load-voice.ts";
+import type { ClockPos } from "./card-config.ts";
 import { getLicense, unseenOffers, unseenUpdates } from "./api.ts";
 import { TimeTravel } from "./load-timetravel.ts";
 import type { HistorySpec } from "./timetravel/types.ts";
@@ -72,6 +73,7 @@ export class Floorplan3dPanel extends LitElement {
     _pinSize: { state: true },
     _heat: { state: true },
     _theme: { state: true },
+    _clock: { state: true },
     _furnish: { state: true },
     _selFurniture: { state: true },
     _selDevice: { state: true },
@@ -90,6 +92,7 @@ export class Floorplan3dPanel extends LitElement {
     _director: { state: true },
     _micProbe: { state: true },
     _voiceHere: { state: true },
+    _screen: { state: true },
   };
 
   declare hass: HomeAssistant;
@@ -122,7 +125,8 @@ export class Floorplan3dPanel extends LitElement {
   /** How large the device symbols are (this device). */
   private declare _pinSize: "small" | "normal" | "large";
   private declare _heat: HeatMode;
-  private declare _theme: Theme;
+  private declare _theme: Theme | "auto";
+  private declare _clock: ClockPos;
   private declare _furnish: boolean;
   private declare _selFurniture: string | null;
   private declare _selDevice: string | null;
@@ -152,6 +156,7 @@ export class Floorplan3dPanel extends LitElement {
   private declare _micProbe: boolean;
   /** Voice control (the microphone button) on this device. */
   private declare _voiceHere: boolean;
+  private declare _screen: string;
 
   private readonly data = new BuildingController(this);
   /** Time travel (Pro): the last 24 hours replayed, read-only. */
@@ -185,8 +190,10 @@ export class Floorplan3dPanel extends LitElement {
     this._pinSize = pinSize === "small" || pinSize === "large" ? pinSize : "normal";
     const heat = prefs.get("heat");
     this._heat = heat === "temperature" || heat === "humidity" || heat === "co2" || heat === "values" ? heat : "none";
-    const theme = prefs.get("theme") as Theme | null;
-    this._theme = theme && THEMES.includes(theme) ? theme : "neon";
+    const theme = prefs.get("theme") as Theme | "auto" | null;
+    this._theme = theme === "auto" || (theme && THEMES.includes(theme)) ? theme : "neon";
+    const clock = prefs.get("clock");
+    this._clock = clock === "tl" || clock === "tr" || clock === "bl" || clock === "br" ? clock : "off";
     const accent = prefs.get("accent");
     this._accent = accent && /^#[0-9a-f]{6}$/i.test(accent) ? accent : null;
     this._furnish = false;
@@ -207,6 +214,7 @@ export class Floorplan3dPanel extends LitElement {
     this._director = directorOnHere();
     this._micProbe = false;
     this._voiceHere = voiceOnHere();
+    this._screen = screenName();
   }
 
   private t(key: I18nKey, vars?: Record<string, string | number>): string {
@@ -456,8 +464,17 @@ export class Floorplan3dPanel extends LitElement {
     this._selFurniture = null;
   }
 
+  /** The view as it stands now becomes the start view of the house (null: back to the default); saved in the plan. */
+  private rememberStartView(reset = false): void {
+    const b = this.data.building;
+    if (!b) return;
+    const view = reset ? null : this.view3d()?.currentView();
+    if (!reset && !view) return;
+    this.data.edit({ ...b, settings: { ...b.settings, start_view: view ?? null } });
+  }
+
   private view3d() {
-    return this.renderRoot.querySelector("fp3d-view3d") as (HTMLElement & { resetView(): void; lookThrough(entityId: string): void; historyEntities(): HistorySpec; proHint(f: Feature): void }) | null;
+    return this.renderRoot.querySelector("fp3d-view3d") as (HTMLElement & { resetView(): void; lookThrough(entityId: string): void; historyEntities(): HistorySpec; proHint(f: Feature): void; currentView(): StartView | null }) | null;
   }
 
   /** Time travel on or off; without the Pro add-on its hint shows. `at`: a start moment from a link. */
@@ -568,7 +585,7 @@ export class Floorplan3dPanel extends LitElement {
                 )}
               </div>
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("theme")}>
-                ${THEMES.map(
+                ${[...THEMES, "auto" as const].map(
                   (t) =>
                     html`<button
                       aria-pressed=${this._theme === t}
@@ -605,6 +622,16 @@ export class Floorplan3dPanel extends LitElement {
                     : nothing}
                 </label>
               </div>
+              <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("clock")}>
+                ${(["off", "tl", "tr", "bl", "br"] as ClockPos[]).map(
+                  (p) =>
+                    html`<button aria-pressed=${this._clock === p} title=${this.t("clock")} @click=${() => {
+                      this._clock = p;
+                      prefs.set("clock", p);
+                    }}>
+                      ${this.t(`clock_${p}`)}
+                    </button>`,
+                )}
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("markers")}>
                 ${(["none", "room", "important", "all"] as MarkerMode[]).map(
                   (m) =>
@@ -649,6 +676,18 @@ export class Floorplan3dPanel extends LitElement {
                       ${right ? "◨" : "◧"}
                     </button>`,
                 )}
+                ${this.isAdmin
+                  ? html`<button
+                        title=${`${this.t("start_view")}: ${this.t("start_view_set")}`}
+                        aria-label=${this.t("start_view_set")}
+                        @click=${() => this.rememberStartView()}
+                      >
+                        📌
+                      </button>
+                      ${this.data.building?.settings.start_view
+                        ? html`<button title=${`${this.t("start_view")}: ${this.t("start_view_reset")}`} aria-label=${this.t("start_view_reset")} @click=${() => this.rememberStartView(true)}>📌✕</button>`
+                        : nothing}`
+                  : nothing}
                 <button
                   aria-pressed=${this._keepView}
                   title=${`${this.t("keep_view")}: ${this.t("keep_view_hint")}`}
@@ -810,7 +849,10 @@ export class Floorplan3dPanel extends LitElement {
       .packs=${this.data.packs}
       @packs-changed=${() => void this.data.reloadPacks()}
       @director-here=${() => (this._director = directorOnHere())}
-      @voice-here=${() => (this._voiceHere = voiceOnHere())}
+      @voice-here=${() => {
+        this._voiceHere = voiceOnHere();
+        this._screen = screenName();
+      }}
       @mic-probe=${() => loadVoice().then(() => (this._micProbe = true)).catch(() => undefined)}
       @open-extensions=${() => this.setMode("extensions")}
       @building-changed=${(e: CustomEvent<{ building: Building }>) => this.data.edit(e.detail.building)}
@@ -921,6 +963,7 @@ export class Floorplan3dPanel extends LitElement {
           .weather=${this._weather}
           .director=${this._director}
           .voice=${this._voiceHere}
+          .screen=${this._screen || null}
           .panelOpen=${!!this._roomId}
           .floorId=${b.floors.length > 1 ? this._floorId : (b.floors[0]?.id ?? null)}
           .roomId=${this._roomId}
@@ -931,6 +974,7 @@ export class Floorplan3dPanel extends LitElement {
           .pinSize=${this._pinSize}
           .heatMode=${this._heat}
           .theme=${this._theme}
+          .clock=${this._clock}
           .accent=${this._accent}
           ?furnish=${this._furnish && !tt}
           .selectedFurniture=${this._selFurniture}

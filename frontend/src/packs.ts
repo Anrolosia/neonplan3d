@@ -88,6 +88,8 @@ export interface FurniturePack {
   /** Pro features the pack unlocks (see features.ts). */
   features?: string[];
   items: PackItem[];
+  /** A module (code the shop delivers; see modules.ts) – the code itself is fetched apart. */
+  module?: { api: number; kind: string };
   imported_at?: number;
 }
 

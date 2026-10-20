@@ -55,6 +55,8 @@ ROOM_SCHEMA = vol.Schema(
         ),
         vol.Required("id"): _ID,
         vol.Required("name"): _NAME,
+        # further names the voice answers to
+        vol.Optional("aliases"): vol.All([vol.All(str, vol.Length(min=1, max=60))], vol.Length(max=12)),
         vol.Required("area_id"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Required("points"): vol.All([_POINT], vol.Length(min=3, max=MAX_POINTS)),
         vol.Required("floor_material"): vol.All(str, vol.Length(max=32)),
@@ -223,6 +225,7 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Required("variant"): vol.Any(None, vol.All(str, vol.Length(max=32))),
         # its own name (e.g. "Wechselrichter Nord"); None = the type's name; show_name puts it under the marker
         vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=60))),
+        vol.Optional("aliases"): vol.All([vol.All(str, vol.Length(min=1, max=60))], vol.Length(max=12)),
         vol.Optional("show_name", default=False): bool,
         # lamps / lights: how strongly they glow in 3D (None = as reported)
         vol.Optional("glow_scale", default=None): vol.Any(
@@ -267,6 +270,8 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("state_split", default=None): vol.Any(None, vol.In(["left_right", "top_bottom"])),
         # lamps: a second entity with the colour and brightness (a relay switches, the bulb knows its colour)
         vol.Optional("color_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # any electric item: a sensor whose value stands at its symbol (a boiler's water temperature)
+        vol.Optional("extra", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # ceiling fan with light: its fan entity (the blades turn with its speed)
         vol.Optional("fan"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # mirrored left-right
@@ -360,6 +365,7 @@ PLACEMENT_SCHEMA = vol.Schema(
         vol.Optional("icon", default=None): vol.Any(None, vol.All(str, vol.Length(max=64))),
         # an own name in the plan, without renaming the entity; show_name puts it under the marker
         vol.Optional("name", default=None): vol.Any(None, vol.All(str, vol.Length(max=60))),
+        vol.Optional("aliases"): vol.All([vol.All(str, vol.Length(min=1, max=60))], vol.Length(max=12)),
         vol.Optional("show_name", default=False): bool,
         # lamps / lights: how strongly they glow in 3D (None = as reported)
         vol.Optional("glow_scale", default=None): vol.Any(
@@ -451,7 +457,7 @@ POOL_SCHEMA = vol.Schema(
     {
         **{
             vol.Optional(role): _POOL_ENTITY
-            for role in ("temperature", "heater", "pump", "light", "ph", "chlorine", "cover")
+            for role in ("temperature", "heater", "pump", "light", "ph", "chlorine", "salt", "cover")
         },
         vol.Optional("ports"): vol.All([POOL_PORT_SCHEMA], vol.Length(max=40)),
         vol.Optional("pipes"): vol.All([POOL_PIPE_SCHEMA], vol.Length(max=80)),
