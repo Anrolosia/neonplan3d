@@ -139,7 +139,7 @@ ITEM_SCHEMA = vol.Schema(
         # variants of one thing (a table in three lengths) as a family with the variant's name by language
         vol.Optional("group"): _ID,
         vol.Optional("room"): vol.All([_ID], vol.Length(max=12)),
-        vol.Optional("tags"): vol.All([_ID], vol.Length(max=12)),
+        vol.Optional("tags"): vol.All([vol.All(str, vol.Length(min=1, max=30))], vol.Length(max=12)),
         vol.Optional("family"): _ID,
         vol.Optional("variant"): vol.All({vol.All(str, vol.Length(min=2, max=5)): _TEXT}, vol.Length(min=1, max=10)),
     }
