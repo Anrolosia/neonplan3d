@@ -1101,6 +1101,16 @@ Unter **🎈 Fun-Packs** schaltest du sie danach ein und aus.
 
 ---
 
+### 7.5 Module
+
+Ein **Modul** ist ein Pack, das Code mitbringt: NeonPlan lädt ihn nach und lässt ihn im Haus laufen – geprüft, signiert und an deine Installation gebunden wie ein Möbel-Pack. Module kommen nur aus dem Shop (mit Kundenkonto, viele kostenlos); ihr Code liegt nicht im öffentlichen Repository. Einspielen: **⚙ Einstellungen → 🧩 Module → Modul einspielen …** oder hier auf der Seite im Abschnitt **Module**. Was ein Modul kann, steht in seiner Beschreibung; die Sätze eines Sprach-Moduls erscheinen unter 🎙 Sprachsteuerung. Module heute:
+
+| Modul | Was es tut | Preis |
+|---|---|---|
+| **Das Haus antwortet** | beantwortet gesprochene Fragen – „Was ist offen?“, „Wie ist das Wetter?“, „Guten Morgen“ … (5.10) | kostenlos |
+| **Fenster-Wächter** | warnt, wenn ein Fenster bei Kälte (unter 12 °C draußen) länger als 20 Minuten offen steht oder die Heizung bei offenem Fenster läuft (10 Minuten): Der Raum pulst, die Warnleiste nennt Fenster und Zeit; „Welche Fenster sind zu lange offen?“ fliegt sie ab | kostenlos |
+| **Pool Pro** | der lebende Pool mit Karte, Warnungen und Pooltechnik (6.9) | Pro |
+
 ## 8. Die Dashboard-Karte
 
 ![Karte im Dashboard](images/card-og-dim.jpg)

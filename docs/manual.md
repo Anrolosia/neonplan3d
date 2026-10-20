@@ -1101,6 +1101,16 @@ Switch them on and off under **🎈 Fun packs** afterwards.
 
 ---
 
+### 7.5 Modules
+
+A **module** is a pack that carries code: NeonPlan loads it and runs it in the house – checked, signed and bound to your installation like a furniture pack. Modules come only from the shop (with a customer account, many of them free); their code is not in the public repository. Importing: **⚙ Settings → 🧩 Modules → Import a module …** or on this page in the **Modules** section. What a module does is in its description; the sentences of a voice module show under 🎙 Voice control. Modules today:
+
+| Module | What it does | Price |
+|---|---|---|
+| **The house answers** | answers spoken questions – "What is open?", "What is the weather like?", "Good morning" … (5.10) | free |
+| **Window watch** | warns when a window has been open in the cold (below 12 °C outside) for more than 20 minutes or the heating runs with a window open (10 minutes): the room pulses, the warning bar names the window and the time; "Which windows have been open too long?" visits them | free |
+| **Pool Pro** | the living pool with its card, warnings and pool equipment (6.9) | Pro |
+
 ## 8. The dashboard card
 
 ![The card in a dashboard](images/card-og-dim.jpg)

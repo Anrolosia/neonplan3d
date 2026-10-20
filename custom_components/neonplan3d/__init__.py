@@ -8,8 +8,9 @@ import logging
 from pathlib import Path
 import random
 
+from aiohttp import web
 from homeassistant.components import frontend, panel_custom
-from homeassistant.components.http import StaticPathConfig
+from homeassistant.components.http import HomeAssistantView
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -60,13 +61,31 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     return True
 
 
+FRONTEND_DIR = Path(__file__).parent / "frontend"
+
+
+class FrontendView(HomeAssistantView):
+    """The bundles, languages and pictures of the frontend, served without caching: a browser checks every file on
+    each load (and gets a short 304 when it is unchanged), so an update of the files shows after a reload, with no
+    restart of Home Assistant for the frontend alone."""
+
+    url = f"{URL_BASE}/{{path:.+}}"
+    name = f"{DOMAIN}:frontend"
+    requires_auth = False
+
+    async def get(self, request: web.Request, path: str) -> web.StreamResponse:
+        root = FRONTEND_DIR.resolve()
+        file = (root / path).resolve()
+        if root not in file.parents or not file.is_file():
+            raise web.HTTPNotFound
+        return web.FileResponse(file, headers={"Cache-Control": "no-cache"})
+
+
 async def _async_register_static(hass: HomeAssistant) -> None:
-    # static paths cannot be unregistered, so they are registered once per run
+    # views cannot be unregistered, so it is registered once per run
     if hass.data.get(_STATIC_REGISTERED):
         return
-    await hass.http.async_register_static_paths(
-        [StaticPathConfig(URL_BASE, str(Path(__file__).parent / "frontend"), cache_headers=False)]
-    )
+    hass.http.register_view(FrontendView())
     hass.data[_STATIC_REGISTERED] = True
 
 
