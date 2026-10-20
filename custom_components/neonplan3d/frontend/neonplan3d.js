@@ -4199,4 +4199,4 @@ Array.prototype.at||Object.defineProperty(Array.prototype,"at",{configurable:!0,
           --fp3d-tt-h: 100px;
         }
       }
-    `]};if(!customElements.get("neonplan3d-card")){customElements.get("neonplan3d-card")||customElements.define("neonplan3d-card",Si);let o=window;o.customCards=o.customCards??[],o.customCards.push({type:"neonplan3d-card",name:z(void 0,"card_name"),description:z(void 0,"card_description"),preview:!1})}Wi();Ao();
+    `]};if(!customElements.get("neonplan3d-card")){customElements.define("neonplan3d-card",Si);let o=window;o.customCards=o.customCards??[],o.customCards.push({type:"neonplan3d-card",name:z(void 0,"card_name"),description:z(void 0,"card_description"),preview:!1})}Wi();Ao();
