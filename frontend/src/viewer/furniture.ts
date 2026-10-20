@@ -7,6 +7,7 @@ import { Color } from "three";
 import type { Furniture, Vec2 } from "../model.ts";
 import { builtinBase, gangsOf, stairsULayout, POOL_VALVE_Y } from "../model.ts";
 import { mountBase, packItem, packMotion, packMovingPart, packScreen, type PackItem, type PackMotion } from "../packs.ts";
+import { fitParts } from "../pack-scale.ts";
 import { binColors, binShape, householdCountry, mailboxShape, type BinShape, type MailboxShape } from "../household.ts";
 import type { Floor } from "../model.ts";
 import { ALWAYS, DEG, EDGE_TOP, GeoBuffer, LineBuffer, pushLoft, pushLyingCyl, pushPrism, shade } from "./geo.ts";
@@ -1821,7 +1822,7 @@ function packModel(
   skip: ((p: PackItem["parts"][number]) => boolean) | null = null,
 ): void {
   const onlyGlow = !!only;
-  for (const q of item.parts) {
+  for (const q of fitParts(item, w, d, h)) {
     if (skip?.(q)) continue;
     // only some parts (the glowing ones of a speaker, a car's windows), a hair larger so they cover the item's own
     if (only && !only(q)) continue;

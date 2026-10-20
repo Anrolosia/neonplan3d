@@ -6,8 +6,9 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 
 **Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## ✅ Recently done (1.13 – 1.22)
+## ✅ Recently done (1.13 – 1.23)
 
+- **Furniture library 2.0** (1.23): everything sorted by what it is, room chips, pictures and sizes on the cards, one card per family of sizes, favourites, everyday search words; **free sizes with fixed parts**; **furniture wave 1** in the shop: five packs with 213 more models.
 - **The house talks back** (1.22): the voice module answers around forty kinds of questions (beta for supporters), further names for rooms and devices, Assist asks the house (service `neonplan3d.ask`, custom sentences, screen names).
 - **Modules** (1.22): packs that carry code, signed and bound like every pack; Pro add-ons become modules one by one; ⚙ Settings → Modules; the free Fenster-Wächter module.
 - **⚙ Settings menu** in the editor, look Auto, clock, smart locks on doors, radiator heat sensors, the household pinboard, editor start floor, iPad fixes (1.22).
@@ -30,10 +31,11 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 - **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
 - A tidied-up editor, furniture blocks and multi-select, 18 languages.
 
-## 🔨 Next up (1.23)
+## 🔨 Next up (1.24)
 
 | Topic | What it is about | Wish |
 |---|---|---|
+| Furniture wave 2 | Kids, garden & terrace (with an outdoor staircase under a roof), garage, home cinema, utility, fitness, smart home and architecture grow; then new packs: dining & hall, balcony, decoration & plants | – |
 | Modules, round 2 | Pro add-ons move into modules; the voice module leaves its beta; the Pool module when its drawing is right | your feedback on Discord |
 | Roofs | Rotated roof sections, two roofs meeting at 90°, the floor edge under the roof | discussions #634, #605, #632 |
 | Even faster on old tablets | Fewer redraws, calmer warning pulses, a lower resolution on weak devices by itself | – |
@@ -114,8 +116,9 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 
 **Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
-## ✅ Zuletzt erledigt (1.13 – 1.22)
+## ✅ Zuletzt erledigt (1.13 – 1.23)
 
+- **Möbel-Bibliothek 2.0** (1.23): alles sortiert nach dem, was es ist, Raum-Chips, Bilder und Maße auf den Karten, eine Karte je Größen-Familie, Favoriten, Alltagswörter in der Suche; **freie Maße mit festen Teilen**; **Möbel-Welle 1** im Shop: fünf Packs mit 213 Modellen mehr.
 - **Das Haus spricht zurück** (1.22): das Sprach-Modul beantwortet rund vierzig Frage-Arten (Beta für Supporter), weitere Namen für Räume und Geräte, Assist fragt das Haus (Dienst `neonplan3d.ask`, eigene Sätze, Bildschirmnamen).
 - **Module** (1.22): Packs, die Code mitbringen, signiert und gebunden wie jedes Pack; die Pro-Erweiterungen werden nach und nach Module; ⚙ Einstellungen → Module; das kostenlose Modul Fenster-Wächter.
 - **⚙ Einstellungen-Menü** im Editor, Look Auto, Uhr, Smart Locks an Türen, Heiz-Sensor am Heizkörper, die Pinnwand im Haushalt, Start-Etage im Editor, iPad-Fixes (1.22).
@@ -138,10 +141,11 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 - **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
 - Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## 🔨 Als Nächstes (1.23)
+## 🔨 Als Nächstes (1.24)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
+| Möbel-Welle 2 | Kinder, Garten & Terrasse (mit Außentreppe unter einem Dach), Garage, Heimkino, Hauswirtschaft, Fitness, Smart Home und Architektur wachsen; danach neue Packs: Esszimmer & Flur, Balkon, Deko & Pflanzen | – |
 | Module, Runde 2 | Die Pro-Erweiterungen ziehen in Module um; das Sprach-Modul verlässt die Beta; das Pool-Modul, sobald das Zeichnen stimmt | euer Feedback im Discord |
 | Dächer | Gedrehte Dachabschnitte, zwei Dächer im 90°-Winkel, die Etagenkante unterm Dach | Diskussionen #634, #605, #632 |
 | Noch schneller auf alten Tablets | Weniger Neuberechnungen, ruhigeres Pulsieren der Warnungen, auf schwachen Geräten von selbst eine niedrigere Auflösung | – |

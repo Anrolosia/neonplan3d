@@ -4347,7 +4347,7 @@ export class Fp3dView3d extends LitElement {
 
   private spokenAlerts(hass: HomeAssistant, b: Building): SpokenAlert[] {
     const rooms = new Map(b.floors.flatMap((f) => zonesOf(f).map((r) => [r.id, r.name] as const)));
-    return this._alerts.map((a) => ({ kind: a.kind, entity: a.entity, name: entityName(hass, a.entity), room: a.roomId ? (rooms.get(a.roomId) ?? null) : null, floorId: a.floorId, roomId: a.roomId }));
+    return this._alerts.map((a) => ({ kind: a.kind, entity: a.entity, name: entityName(hass, a.entity), ...(a.text ? { text: a.text } : {}), room: a.roomId ? (rooms.get(a.roomId) ?? null) : null, floorId: a.floorId, roomId: a.roomId }));
   }
 
   /** Auto Pro: every parking spot with a car, as its card shows it. */

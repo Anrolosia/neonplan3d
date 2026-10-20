@@ -137,6 +137,9 @@ import type { HassArea, HassFloor, HomeAssistant } from "../types.ts";
 import { fetchBackup, restoreBackup, type BackupFile } from "../api.ts";
 import { deleteDiagnostics, getDiagnostics, setDiagnostics, type DiagnosticsStatus } from "../api.ts";
 import { load3d } from "../load3d.ts";
+import "./library.ts";
+import { basicTypes, buildIndex, roomKindOf, type LibraryEntry } from "../library-index.ts";
+import { packsVersion as libPacksVersion } from "../packs.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
 import { furnitureSize, isElectric, isPackType, isRobotVacuum, mountBase, packDisplay, packItem, packItemName, packMotion, packName, packType, setPacks, type FurniturePack } from "../packs.ts";
@@ -354,8 +357,6 @@ export class Fp3dEditor extends LitElement {
     _roofWinId: { state: true },
     _energyNote: { state: true },
     _cableId: { state: true },
-    _furnQuery: { state: true },
-    _libOpen: { state: true },
     _expanded: { state: true },
     _notice: { state: true },
     _history: { state: true },
@@ -482,8 +483,6 @@ export class Fp3dEditor extends LitElement {
   /** The cables' ways for the plan, computed once per document. */
   private cableCache: { doc: Building; segs: FlowSegment[] } | null = null;
   /** Furniture library: the search text, and which sections are open (built-in groups and packs). */
-  private declare _furnQuery: string;
-  private declare _libOpen: Set<string>;
   /** Devices whose further entities are unfolded in the device list. */
   private declare _expanded: Set<string>;
   /** Short confirmation shown after an action (e.g. closed gaps). */
@@ -675,14 +674,6 @@ export class Fp3dEditor extends LitElement {
     this._roofWinId = null;
     this._energyNote = null;
     this._cableId = null;
-    this._furnQuery = "";
-    this._libOpen = new Set(["group:lights", "group:living"]);
-    try {
-      const saved = localStorage.getItem("neonplan3d.library");
-      if (saved) this._libOpen = new Set(JSON.parse(saved) as string[]);
-    } catch {
-      // no storage: the defaults stand
-    }
     this._expanded = new Set();
     this._notice = null;
     this._history = null;
@@ -4701,7 +4692,7 @@ export class Fp3dEditor extends LitElement {
     >`;
   }
 
-  private addFurniture(type: string): void {
+  private addFurniture(type: string, mirror = false): void {
     const floor = this.floor;
     if (!floor || !this.isAdmin) return;
     const [w, d, h0] = furnitureSize(type);
@@ -4719,7 +4710,7 @@ export class Fp3dEditor extends LitElement {
       const b = bounds(room.points);
       rotation = (a && c ? Math.abs(c[1] - a[1]) > Math.abs(c[0] - a[0]) : b.x1 - b.x0 > b.z1 - b.z0) ? 90 : 0;
     }
-    const item: Furniture = { id: uid("furniture"), type, x: round(x), z: round(z), rotation, w, d, h, variant: null };
+    const item: Furniture = { id: uid("furniture"), type, x: round(x), z: round(z), rotation, w, d, h, variant: null, ...(mirror ? { mirror: true } : {}) };
     this.change((_, f) => f.furniture.push(item));
     this.selectItem("furniture", item.id);
     // small items are easy to lose in a large plan: bring the new one into view
@@ -11984,48 +11975,6 @@ export class Fp3dEditor extends LitElement {
     </section>`;
   }
 
-  private toggleLibrary(key: string): void {
-    const next = new Set(this._libOpen);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    this._libOpen = next;
-    try {
-      localStorage.setItem("neonplan3d.library", JSON.stringify([...next]));
-    } catch {
-      // no storage
-    }
-  }
-
-  /** A section of the library: folded away unless open (or while a search shows its hits). */
-  private librarySection(key: string, title: string, items: { type: string; label: string; search?: string }[], q: string) {
-    // every word of the query somewhere in the item's names, its id or its section's title (D155)
-    const words = fold(q).split(/\s+/).filter(Boolean);
-    const hits = words.length ? items.filter((it) => {
-      const hay = fold(`${it.label} ${it.search ?? ""} ${it.type.replace(/[_:.]/g, " ")} ${title}`);
-      return words.every((w) => hay.includes(w));
-    }) : items;
-    if (q && !hits.length) return nothing;
-    const open = q ? true : this._libOpen.has(key);
-    return html`<button class="fp3d-lib-head fp3d-lib-toggle" aria-expanded=${open} @click=${() => this.toggleLibrary(key)}>
-        <span class="fp3d-lib-caret">${open ? "▾" : "▸"}</span>${title} <span class="fp3d-lib-count">${hits.length}</span>
-      </button>
-      ${open ? html`<div class="fp3d-library">${hits.map((it) => this.libraryButton(it.type, it.label))}</div>` : nothing}`;
-  }
-
-  /** Whether the furniture library has any item for the query (else a "nothing found" line shows). */
-  private libraryHasHits(q: string): boolean {
-    const words = fold(q).split(/\s+/).filter(Boolean);
-    const lang = this.hass?.language ?? "en";
-    const all: string[] = [
-      ...Object.entries(FURNITURE_GROUPS).flatMap(([g, types]) => types.map((t) => `${this.t(`furn_${t}` as I18nKey)} ${translate(EN_HASS, `furn_${t}` as I18nKey)} ${t.replace(/_/g, " ")} ${this.t(`furn_group_${g}` as I18nKey)}`)),
-      ...(this.packs ?? []).flatMap((p) => p.items.map((it) => `${packItemName(it, lang)} ${Object.values(it.name).join(" ")} ${it.id.replace(/_/g, " ")} ${p.name} ${packName(p, "en")}`)),
-    ];
-    return all.some((s) => {
-      const hay = fold(s);
-      return words.every((w) => hay.includes(w));
-    });
-  }
-
   /** Ids of the stored pictures any screen of the plan uses (in order of first use). */
   private storedPictures(): string[] {
     const ids: string[] = [];
@@ -12208,72 +12157,59 @@ export class Fp3dEditor extends LitElement {
     this.updateFurniture({ pictures: rules.map((x, j) => (j === index ? { ...x, image: imageId } : x)) });
   }
 
+  private libIndex: { key: string; entries: LibraryEntry[] } | null = null;
+
+  /** The library's index, built once per language and pack state. */
+  private libraryEntries(lang: string): LibraryEntry[] {
+    // the smart fridge is exclusive: an installed pack with the feature "fridge_smart", or Haushalt Pro, offers it
+    const extra = hasFeature("fridge_smart") || hasFeature("household") ? ["fridge_smart"] : [];
+    const key = `${lang}|${libPacksVersion()}|${this.packs?.length ?? 0}|${extra.length}`;
+    if (this.libIndex?.key === key) return this.libIndex.entries;
+    const entries = buildIndex({
+      packs: this.packs ?? [],
+      basics: basicTypes(extra),
+      language: lang,
+      basicName: (t) => this.t(`furn_${t}` as I18nKey),
+      basicNameEn: (t) => translate(EN_HASS, `furn_${t}` as I18nKey),
+      kindName: (k) => this.t(`lib_kind_${k}` as I18nKey),
+      size: furnitureSize,
+    });
+    this.libIndex = { key, entries };
+    return entries;
+  }
+
+  /** A card's picture: drawn by the 3D bundle like the hover preview, smaller. */
+  private libraryThumb = async (entry: LibraryEntry): Promise<string | null> => {
+    const mod = await load3d();
+    const [w, d, h] = entry.size;
+    return mod.furniturePreview({ type: entry.type, w, d, h, variant: null, lamp: LAMP_MODEL[entry.type] ?? null }, 96, this.packs ?? []);
+  };
+
   private renderFurnitureLibrary() {
     const room = this.room;
-    const q = this._furnQuery.trim().toLowerCase();
     const lang = this.hass?.language ?? "en";
     return html`<section>
       <h3>${this.t("furniture_add")}</h3>
       <p class="fp3d-sub">${room ? this.t("furniture_into", { room: room.name }) : this.t("furniture_pick_room")}</p>
-      <input
-        class="fp3d-search"
-        type="search"
-        placeholder=${this.t("furniture_search")}
-        .value=${this._furnQuery}
-        @input=${(e: Event) => (this._furnQuery = (e.target as HTMLInputElement).value)}
-        @keydown=${(e: KeyboardEvent) => {
-          if (e.key === "Escape") this._furnQuery = "";
+      <fp3d-library
+        .entries=${this.libraryEntries(lang)}
+        .language=${lang}
+        .roomHint=${room ? roomKindOf(room.name) : null}
+        .admin=${this.isAdmin}
+        .t=${(k: string, v?: Record<string, string | number>) => this.t(k as I18nKey, v)}
+        .thumb=${this.libraryThumb}
+        @library-add=${(e: CustomEvent<{ type: string; mirror?: boolean }>) => this.addFurniture(e.detail.type, !!e.detail.mirror)}
+        @library-preview=${(e: CustomEvent<{ type: string | null; element: HTMLElement | null }>) => {
+          if (e.detail.type && e.detail.element) void this.showPreview(e.detail.type, e.detail.element);
+          else this._preview = null;
         }}
-      />
-      ${q && !this.libraryHasHits(q) ? html`<p class="fp3d-sub">${this.t("furniture_search_none")}</p>` : nothing}
-      ${Object.entries(FURNITURE_GROUPS).map(([group, types]) =>
-        this.librarySection(
-          `group:${group}`,
-          this.t(`furn_group_${group}` as I18nKey),
-          // the smart fridge is exclusive: an installed pack with the feature "fridge_smart", or Haushalt Pro, offers it
-          [...types, ...(group === "kitchen" && (hasFeature("fridge_smart") || hasFeature("household")) ? ["fridge_smart"] : [])].map((t) => ({ type: t, label: this.t(`furn_${t}` as I18nKey), search: translate(EN_HASS, `furn_${t}` as I18nKey) })),
-          q,
-        ),
-      )}
-      ${(this.packs ?? [])
-        // feature-only packs (Pro add-ons) bring no furniture: no empty section
-        .filter((pack) => pack.items.length)
-        .map((pack) =>
-        this.librarySection(
-          `pack:${pack.id}`,
-          packName(pack, lang),
-          pack.items.map((it) => ({ type: packType(pack.id, it.id), label: packItemName(it, lang), search: Object.values(it.name).join(" ") })),
-          q,
-        ),
-      )}
+      ></fp3d-library>
     </section>
     <div class="fp3d-ext-teaser">
       <b>${this.t("ext_teaser_title")}</b>
       <span class="fp3d-sub">${this.t("ext_teaser_text")}</span>
       <button class="fp3d-btn fp3d-primary" @click=${() => this.dispatchEvent(new CustomEvent("open-extensions", { bubbles: true, composed: true }))}>${this.t("ext_open")}</button>
     </div>`;
-  }
-
-  private libraryButton(type: string, label: string) {
-    const show = (e: Event) => void this.showPreview(type, e.currentTarget as HTMLElement);
-    // a lamp can be switched from 3D, another electric item takes an entity and a power sensor
-    const badge = isLamp(type) ? "light" : isElectric(type) || GANG_TYPES.has(type) || TECH_TYPES.has(type) ? "switch" : null;
-    return html`<button
-      class="fp3d-btn ${badge ? "fp3d-lib-electric" : ""}"
-      title=${badge ? this.t(badge === "light" ? "lib_badge_light" : "lib_badge_electric") : label}
-      @click=${() => this.addFurniture(type)}
-      @mouseenter=${show}
-      @focus=${show}
-      @mouseleave=${() => (this._preview = null)}
-      @blur=${() => (this._preview = null)}
-    >
-      ${label}
-      ${badge
-        ? html`<svg class="fp3d-lib-badge" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d=${iconPath(badge)} />
-          </svg>`
-        : nothing}
-    </button>`;
   }
 
   /** Picture of an item, drawn by the 3D bundle and shown left of its button. */
