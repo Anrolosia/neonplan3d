@@ -527,4 +527,4 @@ export class FurnitureLibrary extends LitElement {
   ];
 }
 
-customElements.define("fp3d-library", FurnitureLibrary);
+if (!customElements.get("fp3d-library")) customElements.define("fp3d-library", FurnitureLibrary);
