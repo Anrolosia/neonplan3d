@@ -16,23 +16,41 @@
 
 ---
 
+## Your house in three steps – no CAD, no Blender
+
+Everything happens in the editor inside Home Assistant, with the 3D house growing next to the plan while you draw.
+
+| 1. Draw | 2. Furnish | 3. Link |
+|---|---|---|
+| [![Draw rooms with the 3D view beside the plan](docs/images/editor-draw.jpg)](docs/images/editor-draw.jpg) | [![The furniture library with pictures, room chips and sizes](docs/images/editor-library-en.jpg)](docs/images/editor-library-en.jpg) | [![The devices of a room's Home Assistant area](docs/images/editor-devices-en.jpg)](docs/images/editor-devices-en.jpg) |
+| Rooms as rectangles or free shapes – walls, corners and measures follow by themselves. Doors, windows, stairs, roofs and the garden come from the same toolbar. | Pick furniture by room and kind, each with a picture and its size; one card per item with its sizes, left and right versions. Resize freely – legs and arms stay as they are. | Each room takes its Home Assistant area: lights, blinds, sensors and media are found and placed with one tap. From then on the house is live. |
+
+Not drawing at all? The [import page](https://neonplan3d.mastershort.de/import/) turns Sweet Home 3D, iPhone LiDAR scans and more into a plan (see below).
+
 ## Highlights
 
-- 🎙️ **Talk to your house** *(new, free)* – tap the microphone: "Show the living room", "Where is the washing machine?", "Show the front door camera". Anything else ("turn on the hall light") goes to Home Assistant's Assist, and the answer shows as a bubble. Speech to text runs through your own Assist pipeline.
+- ✏️ **Drawn in minutes, right in Home Assistant** – the plan editor with the 3D view beside it, a furniture library with pictures, free sizes, a wall view for exact placing. No external tool.
+- 🎙️ **Talk to your house** – tap the microphone or ask Assist: "Show the living room", "What's open?", "Good night". Assist satellites and automations ask the house too (service `neonplan3d.ask`); the answer module "Das Haus antwortet" is in beta for supporters.
 - 🎬 **Live director** – the wall tablet shows by itself what happens: the doorbell rings and the view flies to the front door and looks through its camera; someone at a camera, the washer done, a warning. Every event is opt-in.
 - ⏪ **Time travel** – replay the last day or week in the house: lights, doors, motion, the robot's run.
 - 🚶 **Walk through the house** at eye level, with keys or a touch stick.
 - 🔋 **Energy in the walls** – solar, battery, grid and wallbox as glowing cables, holograms with day curves.
 - 📱 **Runs on old wall tablets** – a *Tablet* quality level, nothing is drawn while nothing changes, and the build refuses browser features old Fire WebViews lack.
 
+| Neon | Blueprint | Day |
+|---|---|---|
+| ![The neon look](docs/images/look-neon.jpg) | ![The blueprint look](docs/images/look-blueprint.jpg) | ![The day look](docs/images/look-day.jpg) |
+
+Three looks, an accent colour of your choice, and **Auto** – day while the sun is up, neon after sunset.
+
 ## What it does
 
 | | |
 |---|---|
-| ![Editor](docs/images/editor-split-3d.jpg) | **Plan editor in Home Assistant** – floors, rooms as rectangles or free shapes, automatic walls and free-standing partitions, doors, windows, garage doors, stairs, floor openings, cellars with light wells, roofs with dormers, outdoor areas, pools, balconies and solar fields. The 3D view runs next to the plan while you draw. A **wall view** shows each wall from the front for exact placing. |
+| ![Editor](docs/images/editor-draw.jpg) | **Plan editor in Home Assistant** – floors, rooms as rectangles or free shapes, automatic walls and free-standing partitions, doors, windows, garage doors, stairs, floor openings, cellars with light wells, roofs with dormers, outdoor areas, pools, balconies and solar fields. The 3D view runs next to the plan while you draw. A **wall view** shows each wall from the front for exact placing. |
 | ![Room](docs/images/view-room-panel.jpg) | **Live 3D view** – tap a lamp to switch it, swipe to dim, long press for colours, blinds and covers; doors swing, windows tilt, curtains and awnings run with their cover. A **room panel** lists everything of the room's Home Assistant area; gardens and terraces open like rooms too. |
-| ![Voice control](docs/images/view-voice.jpg) | **Voice control** – tap the microphone and say "Show the living room", "Where is the washing machine?" or "Show the front door camera"; anything else goes to Home Assistant's Assist. New and growing – free for everyone. |
-| ![Library](docs/images/editor-library.jpg) | **Furniture and lamps** – built-in models plus furniture packs. Lamps light their room in their own colour (and the floor below through a stairwell), TVs, washers and radiators glow while they run, robot vacuums drive their lanes, pets roam the house. |
+| ![Voice control](docs/images/view-voice.jpg) | **Voice control** – tap the microphone or ask Assist: "Show the living room", "Where is the washing machine?", "Show the front door camera"; anything else goes to Home Assistant's Assist. Free for everyone; the answer module ("What's open?", "Good morning") is in beta for supporters. |
+| ![Library](docs/images/editor-library-en.jpg) | **Furniture and lamps** – 80 built-in models plus furniture packs, in one library sorted by room and kind, with a picture and the size on every card. Lamps light their room in their own colour (and the floor below through a stairwell), TVs, washers and radiators glow while they run, robot vacuums drive their lanes, pets roam the house. |
 | ![Camera](docs/images/view-camera-through.jpg) | **Cameras** – on walls or ceilings with their field of view, red while they see motion; snapshots, a camera wall and live streams. |
 | ![Live director](docs/images/view-live-director.jpg) | **Live director** (Camera Cockpit) – the doorbell rings and the wall tablet flies to the front door and looks through its camera; it also shows a camera that sees someone, a finished washer or a new warning, then goes back. |
 | ![Time travel](docs/images/view-timetravel.jpg) | **Time travel** (Pro) – replay the last day or week: lights, doors, motion and the robot's run, with a timeline of events. |
@@ -43,7 +61,7 @@
 
 **Coming from another program?** The [import page](https://neonplan3d.mastershort.de/import/) turns Sweet Home 3D, iPhone LiDAR scans (RoomPlan), CAD (DXF), Blender/SketchUp models (glTF, OBJ, STL), Floorplanner and Valetudo robot maps into a NeonPlan plan – in your browser. Or let an AI write it with [this template](docs/ai-import.md) ([format](docs/plan-format.md)).
 
-Also included: parking spots with vehicles that appear while a car is home, waste bins and mailboxes, three looks (*Neon*, *Blueprint*, *Day*) with an accent colour, search, restore points, a full backup of plan, pictures and packs, and 18 languages.
+Also included: parking spots with vehicles that appear while a car is home, waste bins and mailboxes, smart locks on doors, a clock in the view, search, restore points, a full backup of plan, pictures and packs, and 18 languages.
 
 ## Free, packs and Pro add-ons
 
@@ -63,7 +81,9 @@ The integration and everything above are **free and open source (MIT)**. Safety 
   | **Time travel** | Replay the last 24 hours or 7 days |
   | **Household Pro** *(beta)* | Bins with pickup tags, post in the mailbox, thirsty plants, appliance time left |
 
-Bought packs are signed for your installation and update by themselves once a day. Everything installed keeps working without the shop.
+- **Modules** – extensions that bring their own code from the shop, signed and bound to your installation like every pack; they update through the shop without waiting for a NeonPlan release. The Pro add-ons move over one by one; free modules: *Fenster-Wächter* (warns when a window stays open in the cold).
+
+Bought packs and modules are signed for your installation and update by themselves once a day. Everything installed keeps working without the shop.
 
 ## Installation
 
