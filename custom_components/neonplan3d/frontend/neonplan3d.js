@@ -4084,9 +4084,14 @@ Array.prototype.at||Object.defineProperty(Array.prototype,"at",{configurable:!0,
         position: fixed;
         inset: 0;
         z-index: 9999;
-        height: 100dvh !important;
+        height: 100vh !important;
         max-height: none !important;
         border-radius: 0;
+      }
+      @supports (height: 100dvh) {
+        ha-card.fp3d-pseudo-full {
+          height: 100dvh !important;
+        }
       }
       ha-card {
         overflow: hidden;
