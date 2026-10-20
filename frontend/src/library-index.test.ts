@@ -113,6 +113,29 @@ test("the index lists built-in kinds and pack items, folds families into cards a
   assert.ok(filterEntries(entries, { ...none, electric: true }).some((e) => e.type === "pack:mastershort.living:tv_stand"));
 });
 
+test("an item for one side gets a mirrored twin for the other, explicit pairs become a family", () => {
+  const pack: FurniturePack = {
+    id: "mastershort.living",
+    name: "Wohnzimmer",
+    publisher: "Mastershort",
+    licensee: null,
+    items: [item("sofa_chaise", "Sofa with chaise (left)", "Sofa mit Récamiere links"), item("corner_left", "Corner sofa (left)", "Ecksofa links"), item("corner_right", "Corner sofa (right)", "Ecksofa rechts")],
+  };
+  const entries = buildIndex({ packs: [pack], basics: [], language: "de", basicName: (t) => t, basicNameEn: (t) => t, kindName: (k) => k, size: () => [1, 1, 1] });
+  const twin = entries.find((e) => e.key === "pack:mastershort.living:sofa_chaise#m")!;
+  assert.ok(twin, "a twin exists");
+  assert.equal(twin.mirror, true);
+  assert.equal(twin.type, "pack:mastershort.living:sofa_chaise");
+  assert.equal(twin.label, "Sofa mit Récamiere rechts");
+  assert.ok(!entries.some((e) => e.key.endsWith("corner_left#m")), "an explicit pair needs no twin");
+  const cards = cardsOf(entries, "sofa");
+  const chaise = cards.find((c) => c.key === "mastershort.living:pack:mastershort.living:sofa_chaise")!;
+  assert.equal(chaise.entries.length, 2);
+  assert.deepEqual(chaise.entries.map((e) => e.variant), ["links", "rechts"]);
+  const corner = cards.find((c) => c.key === "mastershort.living:corner")!;
+  assert.equal(corner.entries.length, 2, "corner_left and corner_right fold into one card");
+});
+
 test("sizes read as centimetres, big things as metres", () => {
   assert.equal(sizeText([2.1, 0.92, 0.85], "de"), "210 × 92 cm");
   assert.equal(sizeText([12, 3.5, 2], "de"), "12 × 3,5 m");

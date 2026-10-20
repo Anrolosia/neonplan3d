@@ -1,8 +1,8 @@
 // The furniture library of the editor: everything that can be placed, sorted by what it is and filtered by the
-// room it is for, with a picture, the size and a star on every card; variants of one thing (a bed in five widths)
-// fold into one card with chips. The logic (index, classification, families, search) lives in library-index.ts;
+// room it is for, with a picture, the size and a star on every card; variants of one thing (a bed in five widths,
+// a corner sofa for the left and the right) fold into one card with chips. The logic (index, classification, families, search) lives in library-index.ts;
 // this element only shows it. Pictures are drawn by the 3D bundle through the `thumb` callback and kept in the
-// browser (thumbs.ts). Fires "library-add" {type} and "library-preview" {type, element} (type null = gone).
+// browser (thumbs.ts). Fires "library-add" {type, mirror} and "library-preview" {type, element} (type null = gone; only without card pictures).
 
 import { css, html, LitElement, nothing } from "lit";
 import { repeat } from "lit/directives/repeat.js";
@@ -110,9 +110,9 @@ export class FurnitureLibrary extends LitElement {
     if (changed.has("roomHint") && !this.roomTouched) this._room = this.roomHint;
     if (changed.has("entries")) {
       // packs changed: forget pictures of items that are gone and start over with the queue
-      const known = new Set(this.entries.map((e) => e.type));
-      this._fav = this._fav.filter((t) => known.has(t));
-      this._recent = this._recent.filter((t) => known.has(t));
+      const known = new Set(this.entries.map((e) => e.key));
+      this._fav = this._fav.filter((k) => known.has(k));
+      this._recent = this._recent.filter((k) => known.has(k));
       this.queue = [];
     }
   }
@@ -129,32 +129,28 @@ export class FurnitureLibrary extends LitElement {
       (hits) => {
         for (const h of hits) {
           if (!h.isIntersecting) continue;
-          const type = (h.target as HTMLElement).dataset.type;
-          const entry = type ? this.byType.get(type) : undefined;
+          const entry = this.byKey.get((h.target as HTMLElement).dataset.key ?? "");
           if (entry) this.want(entry);
         }
       },
       { root: null, rootMargin: "200px" },
     );
-    const byType = this.byType;
+    const byKey = this.byKey;
     const bottom = window.innerHeight + 200;
-    for (const el of this.renderRoot.querySelectorAll<HTMLElement>(".fp3d-lc-pic[data-type]")) {
+    for (const el of this.renderRoot.querySelectorAll<HTMLElement>(".fp3d-lc-pic[data-key]")) {
       if (!this.observed.has(el)) {
         this.observed.add(el);
         this.observer.observe(el);
       }
-      const type = el.dataset.type;
-      if (!type || this._thumbs.has(type)) continue;
+      const entry = byKey.get(el.dataset.key ?? "");
+      if (!entry || this._thumbs.has(entry.type)) continue;
       const r = el.getBoundingClientRect();
-      if (r.bottom >= -200 && r.top <= bottom) {
-        const entry = byType.get(type);
-        if (entry) this.want(entry);
-      }
+      if (r.bottom >= -200 && r.top <= bottom) this.want(entry);
     }
   }
 
-  private get byType(): Map<string, LibraryEntry> {
-    return new Map(this.entries.map((e) => [e.type, e]));
+  private get byKey(): Map<string, LibraryEntry> {
+    return new Map(this.entries.map((e) => [e.key, e]));
   }
 
   /** Asks for an item's picture once; at most two are drawn at a time so the editor stays smooth. */
@@ -176,9 +172,9 @@ export class FurnitureLibrary extends LitElement {
             const next = new Map(this._thumbs);
             next.set(entry.type, url);
             this._thumbs = next;
-          }
+          } else this.wanted.delete(entry.type);
         })
-        .catch(() => undefined)
+        .catch(() => this.wanted.delete(entry.type))
         .finally(() => {
           this.drawing--;
           this.drain();
@@ -186,21 +182,21 @@ export class FurnitureLibrary extends LitElement {
     }
   }
 
-  private pick(type: string): void {
+  private pick(entry: LibraryEntry): void {
     if (!this.admin) return;
-    this._recent = [type, ...this._recent.filter((t) => t !== type)].slice(0, RECENT_MAX);
+    this._recent = [entry.key, ...this._recent.filter((k) => k !== entry.key)].slice(0, RECENT_MAX);
     save(STORE_RECENT, this._recent);
-    this.dispatchEvent(new CustomEvent("library-add", { detail: { type }, bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent("library-add", { detail: { type: entry.type, mirror: !!entry.mirror }, bubbles: true, composed: true }));
   }
 
   private preview(type: string | null, element: HTMLElement | null): void {
     // the cards show their pictures: the big preview stays only on devices without them
-    if (!this.lite && !(type && !this._thumbs.has(type) && this.thumb === null)) return;
+    if (!this.lite) return;
     this.dispatchEvent(new CustomEvent("library-preview", { detail: { type, element }, bubbles: true, composed: true }));
   }
 
-  private toggleFav(type: string): void {
-    this._fav = this._fav.includes(type) ? this._fav.filter((t) => t !== type) : [...this._fav, type];
+  private toggleFav(key: string): void {
+    this._fav = this._fav.includes(key) ? this._fav.filter((k) => k !== key) : [...this._fav, key];
     save(STORE_FAV, this._fav);
   }
 
@@ -225,10 +221,11 @@ export class FurnitureLibrary extends LitElement {
     const t = this.t;
     const hits = this.hits;
     const searching = this._query.trim().length > 0;
-    const byType = this.byType;
-    const hitTypes = new Set(hits.map((e) => e.type));
-    const recent = this._recent.map((x) => byType.get(x)).filter((e): e is LibraryEntry => !!e && hitTypes.has(e.type));
-    const favs = this._fav.map((x) => byType.get(x)).filter((e): e is LibraryEntry => !!e && hitTypes.has(e.type));
+    const byKey = this.byKey;
+    const hitKeys = new Set(hits.map((e) => e.key));
+    const single = (e: LibraryEntry): LibraryCard => ({ key: e.key, label: e.label, kind: e.kind, rooms: e.rooms, entries: [e] });
+    const recent = this._recent.map((k) => byKey.get(k)).filter((e): e is LibraryEntry => !!e && hitKeys.has(e.key));
+    const favs = this._fav.map((k) => byKey.get(k)).filter((e): e is LibraryEntry => !!e && hitKeys.has(e.key));
     const sections = KINDS.map((kind) => ({ kind, cards: cardsOf(hits, kind) })).filter((s) => s.cards.length);
     // with nothing open among the sections that have hits, the first one opens by itself
     const firstOpen = sections.length && !sections.some((s) => this._open.has(s.kind)) ? sections[0].kind : null;
@@ -253,8 +250,8 @@ export class FurnitureLibrary extends LitElement {
       </div>
       ${this.roomHint && this._room === this.roomHint && !this.roomTouched ? html`<p class="fp3d-lib-hint">${t("lib_hint_room")}</p>` : nothing}
       ${!hits.length ? html`<p class="fp3d-lib-hint">${t("furniture_search_none")}</p>` : nothing}
-      ${recent.length ? this.section("recent", `🕘 ${t("lib_recent")}`, recent.map((e) => ({ key: e.type, label: e.label, kind: e.kind, rooms: e.rooms, entries: [e] })), searching, true) : nothing}
-      ${favs.length ? this.section("fav", `★ ${t("lib_favorites")}`, favs.map((e) => ({ key: e.type, label: e.label, kind: e.kind, rooms: e.rooms, entries: [e] })), searching, true) : nothing}
+      ${recent.length ? this.section("recent", `🕘 ${t("lib_recent")}`, recent.map(single), searching, true) : nothing}
+      ${favs.length ? this.section("fav", `★ ${t("lib_favorites")}`, favs.map(single), searching, true) : nothing}
       ${sections.map((s) => this.section(s.kind, t(`lib_kind_${s.kind}`), s.cards, searching || s.kind === firstOpen, false))}`;
   }
 
@@ -282,20 +279,20 @@ export class FurnitureLibrary extends LitElement {
     const t = this.t;
     const first = c.entries[0];
     const family = c.entries.length > 1;
-    const fav = this._fav.includes(first.type);
+    const fav = this._fav.includes(first.key);
     const pic = this._thumbs.get(first.type);
     const badge = first.light ? "💡" : first.electric ? "⚡" : "";
     return html`<div class="fp3d-lc ${family ? "fp3d-lc-family" : ""}" title=${first.label}>
       <button
         class="fp3d-lc-main"
         ?disabled=${!this.admin}
-        @click=${() => this.pick(first.type)}
+        @click=${() => this.pick(first)}
         @mouseenter=${(e: Event) => this.preview(first.type, e.currentTarget as HTMLElement)}
         @focus=${(e: Event) => this.preview(first.type, e.currentTarget as HTMLElement)}
         @mouseleave=${() => this.preview(null, null)}
         @blur=${() => this.preview(null, null)}
       >
-        ${this.lite ? nothing : html`<span class="fp3d-lc-pic" data-type=${first.type}>${pic ? html`<img src=${pic} alt="" loading="lazy" />` : html`<span class="fp3d-lc-wait"></span>`}</span>`}
+        ${this.lite ? nothing : html`<span class="fp3d-lc-pic" data-key=${first.key}>${pic ? html`<img src=${pic} alt="" loading="lazy" class=${first.mirror ? "fp3d-lc-mirrored" : ""} />` : html`<span class="fp3d-lc-wait"></span>`}</span>`}
         <span class="fp3d-lc-label">${c.label}${badge ? html` <span class="fp3d-lc-badge">${badge}</span>` : nothing}</span>
         <span class="fp3d-lc-sub">${family ? t("lib_sizes", { n: c.entries.length }) : sizeText(first.size, this.language)}${first.packLabel ? html` · ${first.packLabel}` : html` · ${t("lib_basic")}`}</span>
       </button>
@@ -306,7 +303,7 @@ export class FurnitureLibrary extends LitElement {
                 class="fp3d-lc-chip"
                 title="${e.label} · ${sizeText(e.size, this.language)}"
                 ?disabled=${!this.admin}
-                @click=${() => this.pick(e.type)}
+                @click=${() => this.pick(e)}
                 @mouseenter=${(ev: Event) => this.preview(e.type, ev.currentTarget as HTMLElement)}
                 @focus=${(ev: Event) => this.preview(e.type, ev.currentTarget as HTMLElement)}
                 @mouseleave=${() => this.preview(null, null)}
@@ -315,7 +312,7 @@ export class FurnitureLibrary extends LitElement {
             )}
           </div>`
         : nothing}
-      <button class="fp3d-lc-fav ${fav ? "on" : ""}" title=${fav ? t("lib_fav_remove") : t("lib_fav_add")} aria-label=${fav ? t("lib_fav_remove") : t("lib_fav_add")} @click=${() => this.toggleFav(first.type)}>${fav ? "★" : "☆"}</button>
+      <button class="fp3d-lc-fav ${fav ? "on" : ""}" title=${fav ? t("lib_fav_remove") : t("lib_fav_add")} aria-label=${fav ? t("lib_fav_remove") : t("lib_fav_add")} @click=${() => this.toggleFav(first.key)}>${fav ? "★" : "☆"}</button>
     </div>`;
   }
 
@@ -445,6 +442,9 @@ export class FurnitureLibrary extends LitElement {
         width: 100%;
         height: 100%;
         object-fit: contain;
+      }
+      .fp3d-lc-pic img.fp3d-lc-mirrored {
+        transform: scaleX(-1);
       }
       .fp3d-lc-wait {
         display: block;

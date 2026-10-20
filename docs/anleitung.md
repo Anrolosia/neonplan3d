@@ -257,7 +257,7 @@ Das Werkzeug **Möbel** öffnet rechts die Bibliothek: die 80 eingebauten Modell
 
 - **Raum-Chips** oben: Beim Öffnen eines Raums ist sein Raumtyp vorgewählt (ein „Wohnzimmer“ zeigt Wohnen, eine „Küche“ Küche) – die Bibliothek zeigt dann nur, was in diesen Raum passt, plus alles, was überall passt (Leuchten, Technik). **Alle Räume** hebt den Filter auf, jeder andere Chip wechselt ihn.
 - **Filter-Chips:** ⚡ **Verknüpfbar** (nimmt eine Entität), 💡 **Leuchtet** (verknüpft ein Licht), 🌳 **Außen**.
-- **Familien:** Gibt es ein Möbel in mehreren Größen (Esstisch 120 / 160 / 200, Bett 90 bis 200, Unterschrank 30 bis 120), steht es als **eine Karte** mit Chips für die Größen; der Chip legt genau diese Größe ab. So bleibt die Liste auch mit vielen Packs überschaubar.
+- **Familien:** Gibt es ein Möbel in mehreren Größen (Esstisch 120 / 160 / 200, Bett 90 bis 200, Unterschrank 30 bis 120), steht es als **eine Karte** mit Chips für die Größen; der Chip legt genau diese Größe ab. So bleibt die Liste auch mit vielen Packs überschaubar. Gibt es ein Möbel nur für eine Seite („Ecksofa links“, „Sofa mit Récamiere links“), bekommt es von selbst einen Chip für die andere Seite – der legt es gespiegelt ab.
 - **★ Favoriten** und **🕘 Zuletzt benutzt** stehen ganz oben, sobald es welche gibt – der Stern an jeder Karte merkt sie, beides bleibt im Browser.
 - Das **Suchfeld** findet deutsche und englische Namen, den Pack-Namen und Alltagswörter („lampe“ findet alle Leuchten, „schrank“ alle Schränke), mehrere Wörter in beliebiger Reihenfolge („sofa ecke“); Escape leert es. Beim Suchen sind alle Abschnitte offen.
 - Lange Abschnitte zeigen zuerst 24 Karten und darunter **„… weitere zeigen“**.

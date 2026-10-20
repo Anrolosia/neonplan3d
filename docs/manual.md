@@ -257,7 +257,7 @@ The **Furniture** tool opens the library: the 80 built-in models and everything 
 
 - **Room chips** at the top: when you open a room, its room kind is preselected (a "Living room" shows Living, a "Kitchen" Kitchen) – the library then shows only what fits that room, plus everything that fits anywhere (lights, tech). **All rooms** lifts the filter, any other chip switches it.
 - **Filter chips:** ⚡ **Linkable** (takes an entity), 💡 **Lights up** (links a light), 🌳 **Outdoors**.
-- **Families:** an item that comes in several sizes (dining table 120 / 160 / 200, bed 90 to 200, base unit 30 to 120) stands as **one card** with chips for the sizes; the chip places exactly that size. That keeps the list short even with many packs.
+- **Families:** an item that comes in several sizes (dining table 120 / 160 / 200, bed 90 to 200, base unit 30 to 120) stands as **one card** with chips for the sizes; the chip places exactly that size. That keeps the list short even with many packs. An item that comes for one side only ("Corner sofa (left)", "Sofa with chaise (left)") gets a chip for the other side by itself – it places the item mirrored.
 - **★ Favourites** and **🕘 Recently used** stand at the top as soon as there are any – the star on every card marks them, both stay in the browser.
 - The **search field** finds English and German names, the pack name and everyday words ("lamp" finds all lights, "cabinet" all cabinets), several words in any order ("corner sofa"); Escape clears it. While searching, every section is open.
 - Long sections show 24 cards first and **"Show … more"** below.

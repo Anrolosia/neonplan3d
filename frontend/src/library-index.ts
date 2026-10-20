@@ -43,6 +43,10 @@ export type Room = (typeof ROOMS)[number];
 export interface LibraryEntry {
   /** The furniture type to place (a built-in kind or "pack:<pack>:<item>"). */
   type: string;
+  /** Identifies the entry in the library (the type, or the type + "#m" for a mirrored twin). */
+  key: string;
+  /** Placed mirrored (the twin of an item that comes left-handed only: the corner sofa for the other side). */
+  mirror?: boolean;
   label: string;
   /** Every word that finds it (names in all languages, the id, the pack's name, the kind). */
   search: string;
@@ -286,13 +290,31 @@ export function familyLabel(name: string): string {
 /** The numbers of a name as the variant's chip: "Bed 160 × 200" → "160 × 200", "2-seater sofa" → "2". */
 export function variantLabel(name: string): string | null {
   const hits = [...name.matchAll(/\d+(?:[.,]\d+)?(?:\s*[×x]\s*\d+(?:[.,]\d+)?)*/g)].map((m) => m[0].replace(/\s*[×x]\s*/g, " × "));
-  return hits.length ? hits.join(" · ") : null;
+  if (hits.length) return hits.join(" · ");
+  const side = name.match(/\b(links|rechts|left|right)\b/i);
+  return side ? side[1].toLowerCase() : null;
+}
+
+/** The side an item is made for, by its name: "left" / "right", null for the rest. */
+export function sideOf(name: string): "left" | "right" | null {
+  if (/\b(links|left)\b/i.test(name)) return "left";
+  if (/\b(rechts|right)\b/i.test(name)) return "right";
+  return null;
+}
+
+/** The name for the other side: "Ecksofa links" → "Ecksofa rechts", "Corner sofa (left)" → "Corner sofa (right)". */
+export function otherSideName(name: string): string {
+  return name.replace(/\b(links|rechts|left|right)\b/i, (w) => {
+    const map: Record<string, string> = { links: "rechts", rechts: "links", left: "right", right: "left" };
+    const out = map[w.toLowerCase()] ?? w;
+    return w[0] === w[0].toUpperCase() ? out[0].toUpperCase() + out.slice(1) : out;
+  });
 }
 
 /** An item's family key: its own field, else its id without the size suffix (sofa_3 → sofa, base_60 → base, cube_4x2 → cube). */
 export function familyOf(item: PackItem): string | null {
   if (item.family) return item.family;
-  const m = item.id.match(/^(.*?)_(\d+(?:x\d+)?)$/);
+  const m = item.id.match(/^(.*?)_(\d+(?:x\d+)?|left|right|links|rechts)$/);
   return m ? m[1] : null;
 }
 
@@ -349,6 +371,7 @@ export function buildIndex(src: IndexSource): LibraryEntry[] {
     const label = src.basicName(type);
     out.push({
       type,
+      key: type,
       label,
       search: `${label} ${src.basicNameEn(type)} ${type.replace(/_/g, " ")} ${src.kindName(kind)} ${KIND_WORDS[kind]}`,
       kind,
@@ -373,6 +396,7 @@ export function buildIndex(src: IndexSource): LibraryEntry[] {
       const label = packItemName(it, src.language);
       out.push({
         type,
+        key: type,
         label,
         search: `${Object.values(it.name).join(" ")} ${it.id.replace(/_/g, " ")} ${packLabel} ${packName(pack, "en")} ${src.kindName(kind)} ${KIND_WORDS[kind]} ${(it.tags ?? []).join(" ")}`,
         kind,
@@ -388,6 +412,18 @@ export function buildIndex(src: IndexSource): LibraryEntry[] {
         variant: it.variant ? (it.variant[src.language.split("-")[0]] ?? it.variant.en ?? Object.values(it.variant)[0] ?? null) : variantLabel(label),
       });
     }
+  }
+  // an item that comes for one side only gets a twin for the other side, placed mirrored (#645: a left corner
+  // sofa or cabinet must also exist as a right one)
+  const byType = new Map(out.map((e) => [e.type, e]));
+  for (const e of [...out]) {
+    const side = sideOf(e.label);
+    if (!side || e.mirror) continue;
+    const twinType = e.type.replace(/(_|\b)(left|right|links|rechts)(?=$|[_\s)])/i, (_m: string, sep: string, w: string) => sep + (({ left: "right", right: "left", links: "rechts", rechts: "links" } as Record<string, string>)[w.toLowerCase()] ?? w));
+    if (twinType !== e.type && byType.has(twinType)) continue;
+    const label = otherSideName(e.label);
+    out.push({ ...e, key: `${e.type}#m`, mirror: true, label, search: `${e.search} ${label}`, family: e.family ?? e.type, variant: variantLabel(label) });
+    if (!e.family) e.family = e.type;
   }
   return out;
 }
@@ -428,23 +464,23 @@ export function cardsOf(entries: readonly LibraryEntry[], kind: Kind): LibraryCa
   const mine = entries.filter((e) => e.kind === kind);
   const families = new Map<string, LibraryEntry[]>();
   for (const e of mine) {
-    if (!e.family || !e.pack) continue;
-    const key = `${e.pack}:${e.family}`;
+    if (!e.family) continue;
+    const key = `${e.pack ?? "basic"}:${e.family}`;
     families.set(key, [...(families.get(key) ?? []), e]);
   }
   const cards: LibraryCard[] = [];
   const done = new Set<string>();
   for (const e of mine) {
-    if (done.has(e.type)) continue;
-    const key = e.family && e.pack ? `${e.pack}:${e.family}` : null;
+    if (done.has(e.key)) continue;
+    const key = e.family ? `${e.pack ?? "basic"}:${e.family}` : null;
     const group = key ? families.get(key) : undefined;
     if (key && group && group.length > 1) {
-      for (const g of group) done.add(g.type);
+      for (const g of group) done.add(g.key);
       const rooms = [...new Set(group.flatMap((g) => g.rooms))];
       cards.push({ key, label: familyLabel(e.label), kind, rooms, entries: group });
     } else {
-      done.add(e.type);
-      cards.push({ key: e.type, label: e.label, kind, rooms: e.rooms, entries: [e] });
+      done.add(e.key);
+      cards.push({ key: e.key, label: e.label, kind, rooms: e.rooms, entries: [e] });
     }
   }
   return cards;

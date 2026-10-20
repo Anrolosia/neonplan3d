@@ -4692,7 +4692,7 @@ export class Fp3dEditor extends LitElement {
     >`;
   }
 
-  private addFurniture(type: string): void {
+  private addFurniture(type: string, mirror = false): void {
     const floor = this.floor;
     if (!floor || !this.isAdmin) return;
     const [w, d, h0] = furnitureSize(type);
@@ -4710,7 +4710,7 @@ export class Fp3dEditor extends LitElement {
       const b = bounds(room.points);
       rotation = (a && c ? Math.abs(c[1] - a[1]) > Math.abs(c[0] - a[0]) : b.x1 - b.x0 > b.z1 - b.z0) ? 90 : 0;
     }
-    const item: Furniture = { id: uid("furniture"), type, x: round(x), z: round(z), rotation, w, d, h, variant: null };
+    const item: Furniture = { id: uid("furniture"), type, x: round(x), z: round(z), rotation, w, d, h, variant: null, ...(mirror ? { mirror: true } : {}) };
     this.change((_, f) => f.furniture.push(item));
     this.selectItem("furniture", item.id);
     // small items are easy to lose in a large plan: bring the new one into view
@@ -12198,7 +12198,7 @@ export class Fp3dEditor extends LitElement {
         .admin=${this.isAdmin}
         .t=${(k: string, v?: Record<string, string | number>) => this.t(k as I18nKey, v)}
         .thumb=${this.libraryThumb}
-        @library-add=${(e: CustomEvent<{ type: string }>) => this.addFurniture(e.detail.type)}
+        @library-add=${(e: CustomEvent<{ type: string; mirror?: boolean }>) => this.addFurniture(e.detail.type, !!e.detail.mirror)}
         @library-preview=${(e: CustomEvent<{ type: string | null; element: HTMLElement | null }>) => {
           if (e.detail.type && e.detail.element) void this.showPreview(e.detail.type, e.detail.element);
           else this._preview = null;
