@@ -712,7 +712,6 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devic
 | Warnings | "Is everything OK?", "Any warnings?" (smoke, water, a window in the rain, a power outage …) |
 | Household (Haushalt Pro) | "What is on today?", "When is the bin collected?", "Is there mail?", "Do the plants need water?" |
 | Car (Auto Pro) | "How full is the car?", "Is the car charging?", "How far can I still go?", "Is the car locked?", "Where is the car?" |
-| Pool (Pool Pro) | "How warm is the pool?", "Is the pool pump running?", "What is the pH?", "Is the pool OK?" |
 | Weather, time | "What is the weather like?", "Is it raining?", "What time is it?", "What day is it?", "When does the sun set?" |
 | The house | "How many rooms does the house have?", "How big is the living room?", "How many windows does the house have?" |
 | The day | "Good morning" – the morning report: weather, warnings, what is open, what is on today, who is home, the car. "Good night" – the night check: open windows and doors, unlocked locks, lights, running appliances, with a tour |
@@ -1003,39 +1002,6 @@ Household Pro shows what is due in the household, right where it happens. The wa
 - **Fridge:** when a door stands open longer than set (default 2 minutes), NeonPlan warns at the top of the view. The **smart fridge** (side-by-side with moving doors) in the furniture library comes with it.
 - **Today in the household:** a glass card at the top right lists what is due – bins today and tomorrow, post, finished appliances, thirsty plants, services due, open fridge doors. A tap opens the device, its header folds it. In the dashboard card `household_card: false` switches it off.
 
----
-
-### 6.9 Pool Pro (module)
-
-Pool Pro brings the pool to life – with what your pool equipment reports in Home Assistant. It comes as a **module** from the shop (see 5.10 and 7): a signed pack you import under **⚙ Settings → 🧩 Modules → Import a module …**. It needs an outdoor area of the kind **Pool** (4.17).
-
-**Setting up:** tap the pool in the plan. Its form has the section **🏊 Pool Pro** with the roles of your equipment – empty fields NeonPlan fills by name (an entity with "pool" in its name and the right kind), "None" switches a role off:
-
-| Role | Entity |
-|---|---|
-| Water temperature | a temperature sensor (without one NeonPlan takes the heat pump's water temperature) |
-| Heat pump / heater | a climate entity (`climate`) or a water heater (`water_heater`) – then the target can be set – or a switch |
-| Filter pump | a switch, a binary sensor or a power sensor (running from 20 W) |
-| Pool light | a light (its colour tints the water) or a switch |
-| pH value | a sensor |
-| Chlorine / redox | redox in mV or free chlorine in mg/l |
-| Salt | a salt sensor (ppm or mg/l) of a salt-water pool |
-| Cover | a cover entity with a position |
-
-**In the garden:** the water glows in the colour of the pool light; with the light off, the water temperature tints it from deep blue (cold) to turquoise (warm). While the filter pump runs the water moves with a play of light like under real waves; while the heat pump heats it shimmers warm. The cover slides over the water as far as it is closed. In the garage the devices glow along: the pump while it runs, the heat pump warm while it heats, the sand filter's head in the colour of its valve position.
-
-**Glass card:** a card floats over the pool in the look of the other Pro cards: the water temperature large in its colour, the heat pump's target beside it (− / + to set it); pH, redox/chlorine and salt with a traffic light (green in the ideal range, yellow a little off, red far off) and their place on the scale; the cover; buttons for heat pump 🔥, filter pump 〰, light 💡 and cover ▲▼. Administrators also set the **ball valves** and the **six-way valve** on the card the way they really stand – the water in the pipes follows.
-
-**Warnings:** in the warning bar when pH, chlorine/redox or salt are far off (red), and on **risk of frost** – water at 3 °C or colder while the pump rests. The pool is outside: its warnings show at the top, no room pulses.
-
-**Setting up the plant – at a tap:** below the pool's form stands **🛠 Set up the plant**. Choose the **technical room** (NeonPlan suggests the garage or utility room; "Outside next to the pool" works too), tick **With a heat pump** or not, and tap **Set up the plant automatically**. NeonPlan puts the filter pump, the sand filter and the heat pump in a row along the room's longest wall, puts the skimmer, bottom drain, two inlet nozzles and the waste drain at the pool and lays the usual piping: skimmer and bottom drain, each with a ball valve, underground to the pump, pump → sand filter → T-piece → heat pump or bypass (with a ball valve) → T-piece → back underground to the inlets, backwash to the waste drain. Afterwards you may move everything – the pipes follow the devices. **Set up the plant again** replaces ports and pipes; devices already there stay.
-
-**Pipes by hand (wall view):** to have it exactly the way it runs in your garage, open the **wall view** of the technical room and there **🛠 Pool equipment** – and draw like with a pen: devices from the palette onto the wall, then press on a device and drag the line with a finger or the mouse. Wiggles go, the pipes run level and upright, corners stay where you turned. A stroke ending on a device joins there (NeonPlan finds the right side), on a pipe it makes a T-piece; one ending on nothing is asked **"Where does the line go?"** – skimmer, bottom drain, inlets or waste – and NeonPlan lays the hole (low: through the floor, higher: through the wall) and the way outside to the pool itself. A tap on a pipe adds ball valves and sight glasses, the eraser takes away, undo helps. A step-by-step hint says what is still missing until the water flows. While the filter pump runs, bright dots travel through the pipes – blue, orange after a heating heat pump, brown to the waste drain while backwashing; at a split the water goes through the heat pump while it is on, else through the bypass; a closed valve stops it.
-
-**Voice:** with the module "The house answers" ask "How warm is the pool?", "Is the pool pump running?", "What is the pH?" or "Is the pool OK?" (5.10).
-
-**Wall tablet:** the water only moves while the filter pump runs; with it off, the pool costs nothing.
-
 ## 7. Extensions, shop and furniture packs
 
 ![Extensions](images/extensions.jpg)
@@ -1138,7 +1104,6 @@ Modules today:
 |---|---|---|
 | **The house answers** | answers spoken questions – "What is open?", "What is the weather like?", "Good morning" … (5.10) | free |
 | **Window watch** | warns when a window has been open in the cold (below 12 °C outside) for more than 20 minutes or the heating runs with a window open (10 minutes): the room pulses, the warning bar names the window and the time; "Which windows have been open too long?" visits them | free |
-| **Pool Pro** | the living pool with its card, warnings and pool equipment (6.9) | Pro |
 
 ## 8. The dashboard card
 
