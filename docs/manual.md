@@ -708,7 +708,7 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devic
 
 Commands ("turn on the light", "set the heating to 22 degrees") still go to Assist. The answers come in your user's language (German or English).
 
-**Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). You import the .fp3dpack file under **⚙ Settings → 🧩 Modules → Import a module …** (or under Extensions, together with the furniture packs); it is then listed there as "Module by Mastershort", and its sentences show under 🎙 Voice control. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
+**Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). You import the .fp3dpack file under **⚙ Settings → 🧩 Modules → Import a module …** (or on the Extensions page in the **Modules** section); it is then listed there as "Module by Mastershort", and its sentences show under 🎙 Voice control. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
 
 **Switching it on.** Voice control is off by default. You switch it on where you want to speak:
 
@@ -1040,7 +1040,7 @@ The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked o
 
 Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 
-At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, add-ons and modules); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import packs and modules …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once.
+At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once. The **Modules** section below lists the installed modules (code from the shop, see 5.10) with **Import a module …** and **Remove**.
 
 **Good to know:**
 

@@ -708,7 +708,7 @@ NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, 
 
 Befehle („Mach das Licht an“, „Stell die Heizung auf 22 Grad“) gehen weiter an Assist. Die Antworten kommen in der Sprache deines Nutzers (Deutsch oder Englisch).
 
-**Module.** Manche Fähigkeiten kommen als **Modul** aus dem Shop: ein signiertes Pack, das Code mitbringt, den NeonPlan nachlädt – geprüft und an deine Installation gebunden wie ein Möbel-Pack. Das erste Modul ist **Das Haus antwortet** (kostenlos mit Kundenkonto). Du spielst die .fp3dpack-Datei unter **⚙ Einstellungen → 🧩 Module → Modul einspielen …** ein (oder unter Erweiterungen, zusammen mit den Möbel-Packs); danach steht es dort als „Modul von Mastershort“, und seine Sätze erscheinen unter 🎙 Sprachsteuerung. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache); ohne sie bleibt es bei der Sprechblase.
+**Module.** Manche Fähigkeiten kommen als **Modul** aus dem Shop: ein signiertes Pack, das Code mitbringt, den NeonPlan nachlädt – geprüft und an deine Installation gebunden wie ein Möbel-Pack. Das erste Modul ist **Das Haus antwortet** (kostenlos mit Kundenkonto). Du spielst die .fp3dpack-Datei unter **⚙ Einstellungen → 🧩 Module → Modul einspielen …** ein (oder auf der Seite Erweiterungen im Abschnitt **Module**); danach steht es dort als „Modul von Mastershort“, und seine Sätze erscheinen unter 🎙 Sprachsteuerung. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache); ohne sie bleibt es bei der Sprechblase.
 
 **Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
 
@@ -1040,7 +1040,7 @@ Die mittlere Kachelreihe zeigt die Pro-Erweiterungen. Aktive tragen ein ✓, ges
 
 Geräte in Packs haben eine kleine Leuchtfläche (Display, Status-LED): Verknüpft mit einem Media-Player, Schalter oder Licht leuchtet sie, solange das Gerät läuft; ein Aquarium leuchtet in der Farbe seines Lichts.
 
-Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Möbel-Packs mit der Zahl ihrer Möbel, Erweiterungen und Module); **Liste zeigen** klappt die Liste mit **Entfernen** auf. Genauso fasst die Shop-Verbindung deine Käufe in einem Balken zusammen – installiert, Updates, noch nicht installiert – mit **Alle installieren/aktualisieren**. Darunter liegt **Packs und Module importieren …** für Pack-Dateien: Schnupper-Packs aus dem Newsletter, Downloads von der Website oder Installationen ohne Internet. Mehrere Dateien lassen sich auf einmal wählen.
+Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Möbel-Packs mit der Zahl ihrer Möbel und Erweiterungen); **Liste zeigen** klappt die Liste mit **Entfernen** auf. Genauso fasst die Shop-Verbindung deine Käufe in einem Balken zusammen – installiert, Updates, noch nicht installiert – mit **Alle installieren/aktualisieren**. Darunter liegt **Möbel-Packs importieren …** für Pack-Dateien: Schnupper-Packs aus dem Newsletter, Downloads von der Website oder Installationen ohne Internet. Mehrere Dateien lassen sich auf einmal wählen. Der Abschnitt **Module** darunter listet die eingespielten Module (Code aus dem Shop, siehe 5.10) mit **Modul einspielen …** und **Entfernen**.
 
 **Gut zu wissen:**
 

@@ -31,6 +31,7 @@ export class Extensions extends LitElement {
     packs: { attribute: false },
     building: { attribute: false },
     _packMsg: { state: true },
+    _moduleMsg: { state: true },
     _license: { state: true },
     _licenseKey: { state: true },
     _licenseBusy: { state: true },
@@ -44,6 +45,7 @@ export class Extensions extends LitElement {
   /** The plan (the fun packs keep their settings in it, e.g. the pets). */
   declare building: Building | null | undefined;
   private declare _packMsg: { ok: boolean; text: string } | null;
+  private declare _moduleMsg: { ok: boolean; text: string } | null;
   /** The shop connection (loaded when the page opens); null until then. */
   private declare _license: LicenseStatus | null;
   private declare _licenseKey: string;
@@ -61,6 +63,7 @@ export class Extensions extends LitElement {
   constructor() {
     super();
     this._packMsg = null;
+    this._moduleMsg = null;
     this._license = null;
     this._licenseKey = "";
     this._licenseBusy = null;
@@ -186,7 +189,7 @@ export class Extensions extends LitElement {
           )}
         </div>
       </section>
-      ${this.renderFun(unlocked)} ${this.renderPacks()}
+      ${this.renderFun(unlocked)} ${this.renderPacks()} ${this.renderModules()}
     </div>`;
   }
 
@@ -559,16 +562,15 @@ export class Extensions extends LitElement {
   }
 
   private renderPacks() {
-    const packs = this.packs ?? [];
+    // modules have their own section below
+    const packs = (this.packs ?? []).filter((p) => !p.module);
     const items = packs.reduce((s, p) => s + p.items.length, 0);
-    const pro = packs.filter((p) => p.features?.length && !p.module).length;
-    const modules = packs.filter((p) => p.module).length;
+    const pro = packs.filter((p) => p.features?.length).length;
     return html`<section class="fp3d-ext-card">
       <h3>${this.t("packs")}</h3>
       ${this.summaryBar("packs", [
-        { n: packs.length - pro - modules, label: this.t("ext_sum_packs", { items }), tone: "ok" },
+        { n: packs.length - pro, label: this.t("ext_sum_packs", { items }), tone: "ok" },
         { n: pro, label: this.t("ext_sum_feature_packs"), tone: "missing" },
-        ...(modules ? [{ n: modules, label: this.t("ext_sum_modules"), tone: "ok" as const }] : []),
       ])}
       ${(this._open.has("packs") ? packs : []).map(
         (p) => html`<div class="fp3d-pack">
@@ -591,8 +593,34 @@ export class Extensions extends LitElement {
     </section>`;
   }
 
-  /** Imports one or several pack files at once (a buyer of a bundle picks them all in one go). */
-  private async importPackFile(e: Event): Promise<void> {
+  /** Modules: signed packs that carry code (the editor's ⚙ Module dialog shows the same list). */
+  private renderModules() {
+    const modules = (this.packs ?? []).filter((p) => p.module);
+    return html`<section class="fp3d-ext-card">
+      <h3>${this.t("settings_modules")}</h3>
+      ${modules.length
+        ? modules.map(
+            (p) => html`<div class="fp3d-pack">
+              <div>
+                <b>${packName(p, this.hass?.language ?? "de")}</b>
+                <span class="fp3d-sub">${this.t("pack_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
+                ${p.licensee ? html`<span class="fp3d-sub">${this.t("pack_licensed", { name: p.licensee })}</span>` : nothing}
+              </div>
+              <button class="fp3d-btn fp3d-danger" @click=${() => this.deletePack(p)}>${this.t("pack_remove")}</button>
+            </div>`,
+          )
+        : html`<p class="fp3d-sub">${this.t("modules_none")}</p>`}
+      <label class="fp3d-btn fp3d-primary fp3d-pack-import">
+        ${this.t("module_import")}
+        <input type="file" accept=".fp3dpack,.json,application/json" multiple hidden @change=${(e: Event) => this.importPackFile(e, true)} />
+      </label>
+      ${this._moduleMsg ? html`<p class="fp3d-sub ${this._moduleMsg.ok ? "fp3d-notice" : "fp3d-pack-error"}">${this._moduleMsg.text}</p>` : nothing}
+      <p class="fp3d-sub">${this.t("module_import_hint")}</p>
+    </section>`;
+  }
+
+  /** Imports one or several pack files at once (a buyer of a bundle picks them all in one go); `modules` tells which section's message to set. */
+  private async importPackFile(e: Event, modules = false): Promise<void> {
     const input = e.target as HTMLInputElement;
     const files = [...(input.files ?? [])];
     input.value = "";
@@ -612,7 +640,9 @@ export class Extensions extends LitElement {
     }
     if (done.length) this.dispatchEvent(new CustomEvent("packs-changed", { bubbles: true, composed: true }));
     const summary = files.length > 1 ? [this.t("packs_imported_n", { n: done.length, total: files.length })] : [];
-    this._packMsg = { ok: failed.length === 0, text: [...summary, ...done, ...failed].join(" · ") };
+    const msg = { ok: failed.length === 0, text: [...summary, ...done, ...failed].join(" · ") };
+    if (modules) this._moduleMsg = msg;
+    else this._packMsg = msg;
   }
 
   private async deletePack(pack: FurniturePack): Promise<void> {
