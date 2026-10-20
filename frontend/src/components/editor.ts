@@ -7095,12 +7095,12 @@ export class Fp3dEditor extends LitElement {
             else if (rc && this.fitDrag) this.fittingMove(e, rc);
             else if (rc && this.runDrag) this.runPointMove(e, rc);
             else if (rc && this._runMode === "draw" && this.techPress && this.isAdmin && (e.buttons & 1 || e.pointerType === "touch")) {
-              // the pen on the wall: the stroke grows under the pointer (a touch starts its line here, not on the tap)
+              // the pen on the wall: the stroke grows under the pointer; its line begins with the first movement
               const q = rc.pt(e);
-              const tap = this.wvTap;
-              if (tap && !this._runDraft && Math.hypot(q.s - tap.s, q.y - tap.y) > 0.02) {
+              const press = this.techPress;
+              if (!this._runDraft && !this.techStroke && Math.hypot(q.s - press.s, q.y - press.y) > 0.02) {
                 this.wvTap = null;
-                this.runAt(rc, tap.s, tap.y, false, 1, null);
+                this.runAt(rc, press.s, press.y, false, 1, null);
               }
               if (this._runDraft && !this.wvTap) {
                 const st = (this.techStroke ??= [this.techPress]);
@@ -7126,18 +7126,24 @@ export class Fp3dEditor extends LitElement {
             const stroke = this.techStroke;
             this.techStroke = null;
             const travel = stroke ? stroke.reduce((sum, p, i) => (i ? sum + Math.hypot(p.s - stroke[i - 1].s, p.y - stroke[i - 1].y) : 0), 0) : 0;
+            const pen = rc && this._techMode && this._runMode === "draw";
             if (stroke && travel > 0.12 && rc && this._runMode === "draw" && this._runDraft) {
               this.techPress = null;
               this.runHover = null;
               this.endStroke(rc, stroke, rc.pt(e));
-            } else {
-              if (tap && rc && this._runMode) this.runAt(rc, tap.s, tap.y, false, 1, null);
+            } else if (pen) {
+              // a tap with the pen: a stroke too short to be a line is dropped; the pipe under the tap is chosen
               const press = this.techPress;
               this.techPress = null;
-              if (rc && this._techMode && this._runMode === "draw" && this._runDraft && press) {
-                const q = rc.pt(e);
-                if (Math.hypot(q.s - press.s, q.y - press.y) > 0.12) this.runAt(rc, q.s, q.y, e.altKey, 1, null);
+              this._runDraft = null;
+              this.runHover = null;
+              if (press) {
+                const hit = this.runPick(rc!, press.s, press.y, true);
+                this._runSel = hit.pipe ? { pipe: hit.pipe.id, pt: null } : null;
               }
+            } else {
+              if (tap && rc && this._runMode) this.runAt(rc, tap.s, tap.y, false, 1, null);
+              this.techPress = null;
             }
             up();
             this.runPointUp();
@@ -7682,6 +7688,9 @@ export class Fp3dEditor extends LitElement {
     if (!this._runMode || !this.isAdmin) return;
     e.stopPropagation();
     this._techAsk = null;
+    // the pen of "Technik zeichnen": the press only marks where; the stroke begins with the first movement, and a
+    // press without one is a tap (it chooses the pipe under it, or nothing)
+    if (this._techMode && this._runMode === "draw") return;
     const { s, y } = c.pt(e);
     this.runAt(c, s, y, e.altKey, e.detail, null);
   }
@@ -7758,8 +7767,8 @@ export class Fp3dEditor extends LitElement {
     }
     let d = this._runDraft;
     if (d && this._techMode && !this.techStroke) {
-      // the pen: every press begins a stroke of its own – a draft still hanging is laid as it is (or dropped)
-      if (d.pts.length || d.extend || d.fromT || d.from) this.finishRun("", null);
+      // the pen: every press begins a stroke of its own – a draft still hanging is laid when it is a line, dropped when a bare point
+      if (d.pts.length >= 2 || ((d.extend || d.fromT || d.from) && d.pts.length)) this.finishRun("", null);
       this._runDraft = null;
       d = null;
     }
