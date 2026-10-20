@@ -200,9 +200,9 @@ def test_library_fields_are_accepted_and_checked() -> None:
     assert clean["items"][0]["group"] == "seating"
     assert clean["items"][0]["room"] == ["living", "kids"]
     assert clean["items"][0]["variant"] == {"de": "80", "en": "80"}
-    with pytest.raises(vol.Invalid):
+    with pytest.raises(packs.PackError):
         packs.validate_payload({**PAYLOAD, "items": [{**item, "room": "living"}]})
-    with pytest.raises(vol.Invalid):
+    with pytest.raises(packs.PackError):
         packs.validate_payload({**PAYLOAD, "items": [{**item, "group": "Not An Id"}]})
 
 
