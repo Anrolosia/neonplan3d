@@ -8446,16 +8446,21 @@ export class Fp3dEditor extends LitElement {
     // pool devices up to 1.5 m in front of the wall: where their pipes join (a pump in the middle of the room too)
     const nodeAt = poolNodeAt(this._doc, c.floor, c.pool);
     const letter: Record<string, string> = { pool_pump: "P", pool_filter: "F", pool_heat_pump: "W", pool_dosing: "D", pool_valve: "K" };
+    // the labels of connections close together (the three on a filter's valve head) would run into each other: they
+    // show one above the other, and only when zoomed in enough to read them
+    const placed: { s: number; y: number }[] = [];
     const marker = (node: string, text: string, cls = "", joint?: string) => {
       const q = nodeAt(node);
       const w = q && toWall(c.frame, [q.x, q.z]);
-      return q && w && w.d > -0.6 && w.d < 1.6 && w.s > -0.2 && w.s < c.L + 0.2
-        ? [
-            svg`<g class="fp3d-wv-node ${cls} ${joint ? "fp3d-wv-joint" : ""}" transform="translate(${X(w.s)} ${Y(q.y)}) scale(${this.wvScale})" @pointerdown=${(e: PointerEvent) => joint && this.jointDown(e, joint, w.d)}>
-              <circle r="0.05" /><text y="0.11">${text}</text><title>${this.poolNodeLabel(c.pool, node)}</title>
-            </g>`,
-          ]
-        : [];
+      if (!(q && w && w.d > -0.6 && w.d < 1.6 && w.s > -0.2 && w.s < c.L + 0.2)) return [];
+      const near = placed.filter((p) => Math.hypot(p.s - w.s, p.y - q.y) < 0.3 * this.wvScale).length;
+      placed.push({ s: w.s, y: q.y });
+      const label = near && this.wvScale > 0.5 ? "" : text;
+      return [
+        svg`<g class="fp3d-wv-node ${cls} ${joint ? "fp3d-wv-joint" : ""}" transform="translate(${X(w.s)} ${Y(q.y)}) scale(${this.wvScale})" @pointerdown=${(e: PointerEvent) => joint && this.jointDown(e, joint, w.d)}>
+            <circle r="0.05" /><text y=${0.11 + near * 0.07}>${label}</text><title>${this.poolNodeLabel(c.pool, node)}</title>
+          </g>`,
+      ];
     };
     const nodes = [
       ...c.floor.furniture.flatMap((f) => {
