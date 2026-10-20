@@ -253,7 +253,16 @@ Rollläden und Kontakte ordnet NeonPlan 3D über den Bereich automatisch zu. Du 
 
 ![Die Möbelbibliothek](images/editor-library.jpg)
 
-Das Werkzeug **Möbel** öffnet rechts die Bibliothek mit über 50 eingebauten Modellen in den Abschnitten Leuchten, Wohnen, Essen, Küche, Schlafen, Bad & Hauswirtschaft und Arbeiten & Sonstiges. Darunter folgen deine installierten Möbel-Packs. Die **Arbeitsplatte** (Küche sowie Arbeiten & Sonstiges) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm. Unter Wohnen stehen neben dem Sofa ein **Ecksofa (L-Form)** und eine **Wohnlandschaft (U-Form)**; mit **Spiegeln** sitzt der Schenkel des Ecksofas auf der anderen Seite. Das Suchfeld oben filtert alle Abschnitte und bleibt beim Scrollen stehen; es findet deutsche und englische Namen und den Pack-Namen, mehrere Wörter in beliebiger Reihenfolge („sofa ecke“), Escape leert es. Die Abschnitte klappen auf und zu. Fährst du mit der Maus über einen Eintrag, zeigt eine kleine 3D-Vorschau das Möbel.
+Das Werkzeug **Möbel** öffnet rechts die Bibliothek: die 80 eingebauten Modelle und alles aus deinen installierten Möbel-Packs, zusammen sortiert nach dem, **was** es ist – Sofas, Sitzmöbel, Tische, Schränke & Regale, Betten, Küche, Geräte, Bad, Leuchten, TV & Audio, Büro, Technik & Smart Home, Heizen & Klima, Energie, Haushalt, Deko, Pflanzen, Garten & Außen, Kinder, Fitness, Haustiere, Fahrzeuge, Treppen & Geländer, Architektur. Jede Karte zeigt ein **Bild**, das Maß (Breite × Tiefe) und woher das Möbel kommt („Basis“ oder der Pack-Name). Die Bilder zeichnet NeonPlan beim ersten Aufklappen und merkt sie sich im Browser; auf sehr schwachen Geräten bleiben die Karten ohne Bild, die Vorschau beim Darüberfahren gibt es trotzdem.
+
+- **Raum-Chips** oben: Beim Öffnen eines Raums ist sein Raumtyp vorgewählt (ein „Wohnzimmer“ zeigt Wohnen, eine „Küche“ Küche) – die Bibliothek zeigt dann nur, was in diesen Raum passt, plus alles, was überall passt (Leuchten, Technik). **Alle Räume** hebt den Filter auf, jeder andere Chip wechselt ihn.
+- **Filter-Chips:** ⚡ **Verknüpfbar** (nimmt eine Entität), 💡 **Leuchtet** (verknüpft ein Licht), 🌳 **Außen**.
+- **Familien:** Gibt es ein Möbel in mehreren Größen (Esstisch 120 / 160 / 200, Bett 90 bis 200, Unterschrank 30 bis 120), steht es als **eine Karte** mit Chips für die Größen; der Chip legt genau diese Größe ab. So bleibt die Liste auch mit vielen Packs überschaubar.
+- **★ Favoriten** und **🕘 Zuletzt benutzt** stehen ganz oben, sobald es welche gibt – der Stern an jeder Karte merkt sie, beides bleibt im Browser.
+- Das **Suchfeld** findet deutsche und englische Namen, den Pack-Namen und Alltagswörter („lampe“ findet alle Leuchten, „schrank“ alle Schränke), mehrere Wörter in beliebiger Reihenfolge („sofa ecke“); Escape leert es. Beim Suchen sind alle Abschnitte offen.
+- Lange Abschnitte zeigen zuerst 24 Karten und darunter **„… weitere zeigen“**.
+
+Die **Arbeitsplatte** (Küche) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm. Unter Sofas stehen neben dem Sofa ein **Ecksofa (L-Form)** und eine **Wohnlandschaft (U-Form)**; mit **Spiegeln** sitzt der Schenkel des Ecksofas auf der anderen Seite. Fährst du mit der Maus über eine Karte oder einen Größen-Chip, zeigt eine größere 3D-Vorschau das Möbel.
 
 **Symbole an den Einträgen:**
 

@@ -253,7 +253,16 @@ NeonPlan 3D matches covers and contacts through the area automatically. You can 
 
 ![The furniture library](images/editor-library.jpg)
 
-The **Furniture** tool opens the library with more than 50 built-in models in the sections Lights, Living, Dining, Kitchen, Sleeping, Bath & laundry and Work & other. Your installed furniture packs follow below. The **Worktop** (Kitchen and Work & other) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. Under Living, next to the sofa, there are a **Corner sofa (L-shaped)** and a **U-shaped sofa**; **Mirror** puts the corner sofa's side section on the other side. The search field filters all sections and stays put while you scroll; it finds English and German names and the pack name, several words in any order ("corner sofa"), Escape clears it. Sections fold open and closed. Hover over an entry for a small 3D preview.
+The **Furniture** tool opens the library: the 80 built-in models and everything from your installed furniture packs, sorted together by **what** it is – Sofas, Seating, Tables, Cabinets & shelves, Beds, Kitchen, Appliances, Bathroom, Lights, TV & audio, Office, Tech & smart home, Heating & climate, Energy, Household, Decoration, Plants, Garden & outdoors, Kids, Fitness, Pets, Vehicles, Stairs & railings, Architecture. Every card shows a **picture**, the size (width × depth) and where the item comes from ("Basic" or the pack's name). NeonPlan draws the pictures the first time a section opens and keeps them in the browser; on very weak devices the cards stay without pictures, the hover preview still works.
+
+- **Room chips** at the top: when you open a room, its room kind is preselected (a "Living room" shows Living, a "Kitchen" Kitchen) – the library then shows only what fits that room, plus everything that fits anywhere (lights, tech). **All rooms** lifts the filter, any other chip switches it.
+- **Filter chips:** ⚡ **Linkable** (takes an entity), 💡 **Lights up** (links a light), 🌳 **Outdoors**.
+- **Families:** an item that comes in several sizes (dining table 120 / 160 / 200, bed 90 to 200, base unit 30 to 120) stands as **one card** with chips for the sizes; the chip places exactly that size. That keeps the list short even with many packs.
+- **★ Favourites** and **🕘 Recently used** stand at the top as soon as there are any – the star on every card marks them, both stay in the browser.
+- The **search field** finds English and German names, the pack name and everyday words ("lamp" finds all lights, "cabinet" all cabinets), several words in any order ("corner sofa"); Escape clears it. While searching, every section is open.
+- Long sections show 24 cards first and **"Show … more"** below.
+
+The **Worktop** (Kitchen) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. Under Sofas, next to the sofa, there are a **Corner sofa (L-shaped)** and a **U-shaped sofa**; **Mirror** puts the corner sofa's side section on the other side. Hover over a card or a size chip for a bigger 3D preview.
 
 **Symbols on the entries:**
 

@@ -73,6 +73,13 @@ export interface PackItem {
   light?: LampModel;
   parts: PackPart[];
   symbol?: PackSymbol[];
+  /** Library (pack format since 1.23): what it is, the rooms it is made for, words that find it. */
+  group?: string;
+  room?: string[];
+  tags?: string[];
+  /** Variants of one thing (a table in three lengths) share a family; the variant names the chip, by language. */
+  family?: string;
+  variant?: Record<string, string>;
 }
 
 export interface FurniturePack {

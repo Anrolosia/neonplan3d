@@ -81,6 +81,16 @@ dessen öffentlicher Schlüssel zusätzlich in `PACK_PUBLIC_KEYS` eingetragen un
 - `screen`: ein Teil mit `"screen": true` ist ein Bildschirm (Fernseher, Monitor). Das Möbel lässt sich
   dann mit einem Media Player verknüpfen; die Vorderseite (+z) zeigt die Farbe der laufenden App und
   ihr Bild, wie die eingebauten Fernseher.
+- **Bibliothek** (optional, ab NeonPlan 1.23 – ältere Versionen lehnen Packs mit diesen Feldern ab,
+  also die Mindestversion setzen): `group` sagt, was das Möbel ist (`sofa`, `seating`, `table`,
+  `storage`, `bed`, `kitchen`, `appliance`, `bath`, `lamp`, `media`, `office`, `tech`, `heating`,
+  `energy`, `household`, `deco`, `plant`, `outdoor`, `kids`, `sport`, `pets`, `vehicle`, `stairs`,
+  `architecture`), `room` die Räume, für die es gedacht ist (`living`, `dining`, `kitchen`,
+  `bedroom`, `kids`, `bath`, `office`, `hall`, `utility`, `garage`, `garden`, `hobby`; leer = überall),
+  `tags` weitere Suchwörter. `family` fasst Varianten eines Möbels (ein Tisch in drei Längen) zu
+  einer Karte zusammen, `variant` (Text je Sprache wie `name`) beschriftet den Chip der Variante.
+  Ohne diese Felder ordnet NeonPlan das Möbel nach seinen Wörtern und dem Pack ein; Varianten
+  erkennt es an der Größe am Ende der ID (`table_160`) und an den Zahlen im Namen.
 
 ## Feature-Packs (NeonPlan Pro)
 

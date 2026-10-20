@@ -4,6 +4,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.23.0 (in progress)
+
+### New
+
+- **Furniture library 2.0:** the built-in models and every pack's items stand together, sorted by what they are (sofas, tables, cabinets, lights, appliances, …) instead of by pack. Room chips preselect the open room's kind, filter chips for linkable, lit and outdoor items, a picture and the size on every card, families of one item in several sizes as one card with size chips, favourites and recently used at the top, and a search that knows everyday words ("lamp", "cabinet"). Pictures are drawn once and kept in the browser; very weak devices show the cards without pictures.
+- **Pack format:** optional `group`, `room`, `tags`, `family` and `variant` per item tell the library what an item is and which sizes belong together (packs with these fields need 1.23).
+
 ## 1.22.0
 
 ### New
