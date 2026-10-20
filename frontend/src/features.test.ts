@@ -35,8 +35,8 @@ test("an unreleased add-on shows only to whoever has its pack", async () => {
   setPacks([]);
   assert.equal(released("diagnostics"), false);
   assert.equal(released("auto_pro"), true);
-  assert.equal(released("pool"), true);
-  // Pool Pro is a module now: released, the pack brings it
+  // Pool Pro is not released: hidden, unless the module is installed
+  assert.equal(released("pool"), false);
   setPacks([{ id: "mastershort.pro_pool", name: "Pro: Pool Pro", items: [], features: ["pool"] } as never]);
   assert.equal(released("pool"), true);
   setPacks([]);

@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.23.1
+
+### Fixed
+
+- An add-on that is not released yet showed in the list of Pro add-ons and in the pool's form; it is hidden again.
+
 ## 1.23.0
 
 ### New
@@ -38,9 +44,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Modules may draw:** a module adds water, pipe flows and device glows to the 3D stage, glass cards, warnings and fields in the editor's outdoor form, and lends the pipe tools their rules – the host draws, the module knows (`scene`, `cards`, `alerts`, `areaFields`, `pipes`, `watched`, `pools`; module kind `stage`).
 - **No restart for the frontend:** the bundles, languages and pictures are served with `Cache-Control: no-cache` – after an update of the files a reload of the page is enough (Home Assistant still restarts for its Python side); a 304 answers unchanged files.
 - **Second free module in the shop, Fenster-Wächter:** warns when a window stands open in the cold for 20 minutes or the heating runs with a window open (10 minutes); the room pulses, the voice answers "Welche Fenster sind zu lange offen?". Manual 7.5 lists the modules.
-- **Technik zeichnen like a pen:** in the wall view a stroke becomes a pipe with right angles (wiggles go, corners stay); a stroke ending on a device or pipe joins there, one ending on nothing asks where the line goes (skimmer, drain, inlets, waste) and lays the hole and the way outside itself. Works with mouse and finger.
-- **Pool Pro is a module** (`mastershort.pro_pool`, from the shop): its code left the public repository. The pool's state, the living water, the glass card (now with **salt** and a traffic light per value), the warnings (pH, chlorine, salt, frost), the pool's roles in the editor and the rules of the pipe tools all live in the module. New: the **plant assistant** (🛠 Anlage aufbauen) sets the technical room up at a tap – devices along the wall, the pool's ports and the usual piping with ball valves, bypass and waste line. Free as before: pool shapes, above-ground pools, depth, cut-out and the sensor values at the pool area. Pool Pro is no longer hidden; it shows with its module. Manual 6.9.
-- Module **Das Haus antwortet**, release 2: around forty kinds of questions – open things (also how long), temperatures, humidity and CO₂, thermostats, appliances and their time left (Haushalt Pro), media, energy, lights, blinds, locks, people and motion, warnings, today's household lines, plants, cars (Auto Pro), the pool (Pool Pro), weather, sun and time, the house's rooms and sizes, the morning report ("Guten Morgen") and the night check ("Gute Nacht"), plus a little small talk. Hosts tell modules more of the house (household, warnings, cars, pools, weather, time left, thirsty plants).
+- Module **Das Haus antwortet**, release 2: around forty kinds of questions – open things (also how long), temperatures, humidity and CO₂, thermostats, appliances and their time left (Haushalt Pro), media, energy, lights, blinds, locks, people and motion, warnings, today's household lines, plants, cars (Auto Pro), weather, sun and time, the house's rooms and sizes, the morning report ("Guten Morgen") and the night check ("Gute Nacht"), plus a little small talk. Hosts tell modules more of the house (household, warnings, cars, pools, weather, time left, thirsty plants).
 
 ### Improved
 

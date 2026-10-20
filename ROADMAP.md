@@ -36,7 +36,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 | Topic | What it is about | Wish |
 |---|---|---|
 | Furniture wave 2 | Kids, garden & terrace (with an outdoor staircase under a roof), garage, home cinema, utility, fitness, smart home and architecture grow; then new packs: dining & hall, balcony, decoration & plants | – |
-| Modules, round 2 | Pro add-ons move into modules; the voice module leaves its beta; the Pool module when its drawing is right | your feedback on Discord |
+| Modules, round 2 | Pro add-ons move into modules; the voice module leaves its beta | your feedback on Discord |
 | Roofs | Rotated roof sections, two roofs meeting at 90°, the floor edge under the roof | discussions #634, #605, #632 |
 | Even faster on old tablets | Fewer redraws, calmer warning pulses, a lower resolution on weak devices by itself | – |
 | Desk with height | A standing desk whose top moves with its height from Home Assistant (IKEA Idasen and others) | discussion #610 |
@@ -146,7 +146,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
 | Möbel-Welle 2 | Kinder, Garten & Terrasse (mit Außentreppe unter einem Dach), Garage, Heimkino, Hauswirtschaft, Fitness, Smart Home und Architektur wachsen; danach neue Packs: Esszimmer & Flur, Balkon, Deko & Pflanzen | – |
-| Module, Runde 2 | Die Pro-Erweiterungen ziehen in Module um; das Sprach-Modul verlässt die Beta; das Pool-Modul, sobald das Zeichnen stimmt | euer Feedback im Discord |
+| Module, Runde 2 | Die Pro-Erweiterungen ziehen in Module um; das Sprach-Modul verlässt die Beta | euer Feedback im Discord |
 | Dächer | Gedrehte Dachabschnitte, zwei Dächer im 90°-Winkel, die Etagenkante unterm Dach | Diskussionen #634, #605, #632 |
 | Noch schneller auf alten Tablets | Weniger Neuberechnungen, ruhigeres Pulsieren der Warnungen, auf schwachen Geräten von selbst eine niedrigere Auflösung | – |
 | Schreibtisch mit Höhe | Ein Steh-Schreibtisch, dessen Platte mit der Höhe aus Home Assistant hoch- und runterfährt (IKEA Idasen u. a.) | Diskussion #610 |
