@@ -12,6 +12,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Pack format:** optional `group`, `room`, `tags`, `family` and `variant` per item tell the library what an item is and which sizes belong together (packs with these fields need 1.23).
 - **Free sizes with fixed parts:** a pack part may say which of its measures stay when the item is resized (`fix`: legs, arms, plates, handles) – a sofa stretched to 3 m keeps its 20 cm arms and grows its seat, a taller one keeps the seat height and grows its back. The packs get these marks with their next releases; packs without them scale as before.
 
+### Changed
+
+- **Card loader:** the dashboard card's loader is served from NeonPlan's own path (`/neonplan3d_static/`); nothing is written into the user's `www` folder any more. A copy older versions left in `www/neonplan3d/` is removed and the dashboard resource is moved by itself.
+
 ## 1.22.1
 
 ### Fixed
