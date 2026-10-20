@@ -938,7 +938,7 @@ const de = {
   // Zeitreise (Pro): replay of the last 24 hours
   pro_name_time_travel: "Zeitreise",
   pro_name_pool: "Pool Pro",
-  pro_feature_pool: "Pool Pro: Das Wasser leuchtet in der Farbe der Poolbeleuchtung und bewegt sich, wenn die Filterpumpe läuft; eine Glaskarte zeigt Wassertemperatur, Wärmepumpe mit Solltemperatur, Filterpumpe, Licht, pH und Chlor/Redox mit Ampel; die Abdeckung fährt über das Wasser; Warnungen bei pH, Chlor und Frost",
+  pro_feature_pool: "Pool Pro (Modul): Das Wasser leuchtet in der Farbe der Poolbeleuchtung und bewegt sich, wenn die Filterpumpe läuft; die Glaskarte zeigt Wassertemperatur, Wärmepumpe mit Solltemperatur, pH, Chlor/Redox und Salz mit Ampel; die Abdeckung fährt über das Wasser; Warnungen bei pH, Chlor, Salz und Frost; die Pooltechnik baut sich auf Knopfdruck auf, das Wasser fließt sichtbar durch die Rohre",
   pool_pump: "Filterpumpe",
   pool_ph: "pH-Wert",
   pool_shape: "Form",
@@ -2892,7 +2892,7 @@ const en: Record<Key, string> = {
   // time travel (Pro): replay of the last 24 hours
   pro_name_time_travel: "Time travel",
   pro_name_pool: "Pool Pro",
-  pro_feature_pool: "Pool Pro: the water glows in the colour of the pool light and moves while the filter pump runs; a glass card shows water temperature, heat pump with target temperature, filter pump, light, pH and chlorine/redox with a traffic light; the cover slides over the water; warnings for pH, chlorine and frost",
+  pro_feature_pool: "Pool Pro (module): the water glows in the colour of the pool light and moves while the filter pump runs; the glass card shows water temperature, heat pump with target, pH, chlorine/redox and salt with a traffic light; the cover slides over the water; warnings for pH, chlorine, salt and frost; the pool plant sets itself up at a tap and the water flows visibly through the pipes",
   pool_pump: "Filter pump",
   pool_ph: "pH value",
   pool_shape: "Shape",
