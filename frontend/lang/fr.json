@@ -2015,5 +2015,10 @@
  "lib_more": "Afficher {n} de plus",
  "lib_basic": "Base",
  "lib_sizes": "{n} tailles",
- "lib_hint_room": "Suggéré pour la pièce ouverte – changez ci-dessus."
+ "lib_hint_room": "Suggéré pour la pièce ouverte – changez ci-dessus.",
+ "voice_sentences": "Phrases pour Assist",
+ "voice_sentences_distinct": "Seulement les phrases univoques (« Montre … », « Demande à la maison … »)",
+ "voice_sentences_all": "Toutes les questions (prend aussi des phrases auxquelles Home Assistant répond lui-même)",
+ "voice_sentences_off": "Aucune (le fichier de phrases est supprimé)",
+ "voice_sentences_hint": "Ce qu'Assist transmet à NeonPlan. Aux questions comme « Quelles fenêtres sont ouvertes ? » Home Assistant répond sinon lui-même – « Demande à la maison quelles fenêtres sont ouvertes » atteint toujours NeonPlan."
 }

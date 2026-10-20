@@ -1014,7 +1014,8 @@ export class Fp3dView3d extends LitElement {
         const caption = m.ownName && (m.showName || this.markerNames) ? m.ownName : "";
         // Klang & Kino: while a card floats over the speaker, its pin steps aside (it comes back when the music stops)
         const carded = (hasFeature("sound") && this.mediaCardUp(hass, m.id)) || (hasFeature("auto_pro") && !!m.furnitureId && carSpots.has(m.furnitureId));
-        return { ...marker, pin: this.showPin(marker) && !carded, full: m.show === "always", caption };
+        // a lock at its door asks for its text itself (full): the symbol mode does not take that away
+        return { ...marker, pin: this.showPin(marker) && !carded, full: m.show === "always" || m.full === true, caption };
       }),
       // Energie Pro: the street end of the grid cable carries a pin with what comes in or goes out
       ...(pro && (this.flows ?? this._flows) && !this.dimmed && summary.grid !== null ? [this.gridPin(hass, b, summary.grid)] : []).filter((m): m is NonNullable<typeof m> => !!m),
@@ -5502,6 +5503,49 @@ export class Fp3dView3d extends LitElement {
         color: var(--fp3d-text);
         cursor: pointer;
         z-index: 4;
+      }
+      /* the clock in a corner of the view (view settings / card option clock) */
+      .fp3d-clock {
+        position: absolute;
+        z-index: 4;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 14px;
+        border-radius: 14px;
+        background: rgba(4, 16, 24, 0.55);
+        color: var(--fp3d-text);
+        line-height: 1.1;
+        pointer-events: none;
+        backdrop-filter: blur(6px);
+      }
+      .fp3d-clock b {
+        font-size: 30px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+      }
+      .fp3d-clock span {
+        font-size: 13px;
+        color: var(--fp3d-muted);
+      }
+      /* at the top it sits under the energy strip and the walk button */
+      .fp3d-clock-tl {
+        top: 64px;
+        left: 12px;
+      }
+      .fp3d-clock-tr {
+        top: 64px;
+        right: 12px;
+      }
+      .fp3d-clock-bl {
+        bottom: calc(66px + var(--fp3d-bottom-inset, 0px));
+        left: 12px;
+      }
+      .fp3d-clock-br {
+        bottom: calc(66px + var(--fp3d-bottom-inset, 0px));
+        right: 12px;
       }
       .fp3d-mic {
         position: absolute;

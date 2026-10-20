@@ -2015,5 +2015,10 @@
  "lib_more": "Mostrar {n} más",
  "lib_basic": "Básico",
  "lib_sizes": "{n} tamaños",
- "lib_hint_room": "Sugerido para la habitación abierta – cambia arriba."
+ "lib_hint_room": "Sugerido para la habitación abierta – cambia arriba.",
+ "voice_sentences": "Frases para Assist",
+ "voice_sentences_distinct": "Solo inequívocas («Muestra …», «Pregunta a la casa …»)",
+ "voice_sentences_all": "Todas las preguntas (también toma frases que Home Assistant responde por sí mismo)",
+ "voice_sentences_off": "Ninguna (se elimina el archivo de frases)",
+ "voice_sentences_hint": "Lo que Assist pasa a NeonPlan. Preguntas como «¿Qué ventanas están abiertas?» las responde Home Assistant por sí mismo – «Pregunta a la casa qué ventanas están abiertas» siempre llega a NeonPlan."
 }

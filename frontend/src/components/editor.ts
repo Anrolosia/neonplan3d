@@ -3,7 +3,7 @@
 import { css, html, LitElement, nothing, svg, type PropertyValues, type TemplateResult } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { ref } from "lit/directives/ref.js";
-import { fetchImage, importPack, listHistory, restoreSnapshot, storeImage, takeSnapshot, type Snapshot } from "../api.ts";
+import { fetchImage, importPack, listHistory, restoreSnapshot, storeImage, takeSnapshot, type Snapshot, getVoiceSettings, setVoiceSentences, type SentenceMode } from "../api.ts";
 import { download, exportFile, parseExport } from "../transfer.ts";
 import { carEntities, type CarEntities, areaEntities, autoPlace, CLIMATE_CLASSES, defaultHeight, entityName, entityAreaId, furnitureEntities, groupByDevice, hasScreen, isMediaFurniture, isPlaceable, isRoomClimateSensor, kindOf, openingEntities, otherAreaEntities, pictureRuleMatches, roomClimateSensors, unassignedEntities, windowPosition, type ClimateKey } from "../devices.ts";
 import { furnitureSymbol } from "./furniture2d.ts";
@@ -10730,7 +10730,11 @@ export class Fp3dEditor extends LitElement {
           : nothing}
         ${window
           ? html`${o.leaves === 2 ? html`<h4 class="fp3d-lib-head fp3d-wide">${this.t("leaf_main")}</h4>` : nothing}
-              ${leafSensors(1)} ${o.leaves === 2 ? html`<h4 class="fp3d-lib-head fp3d-wide">${this.t("leaf_second")}</h4>${leafSensors(2)}` : nothing}`
+              ${leafSensors(1)} ${o.leaves === 2 ? html`<h4 class="fp3d-lib-head fp3d-wide">${this.t("leaf_second")}</h4>${leafSensors(2)}` : nothing}
+              ${o.sill <= 0.01
+                ? html`${this.entitySelect(this.t("door_lock"), o.lock ?? null, undefined, this.entityOptions((id) => id.startsWith("lock.")), (v) => this.updateOpening({ lock: v === "none" ? null : v }))}
+                  <p class="fp3d-sub fp3d-wide">${this.t("door_lock_hint")}</p>`
+                : nothing}`
           : html`${this.entitySelect(this.t(o.leaves === 2 ? "contact_main" : "contact_entity"), o.contact, autoPick("contact"), contacts, (v) => this.updateOpening({ contact: v }))}
               ${o.leaves === 2 && !garage
                 ? this.entitySelect(this.t("contact_second"), o.contact2, undefined, contacts, (v) => this.updateOpening({ contact2: v === "none" ? null : v }))
@@ -11269,6 +11273,7 @@ export class Fp3dEditor extends LitElement {
 
   private voicePipes: { id: string; name: string; stt: boolean }[] | null = null;
   private voicePipesAsked = false;
+  private voiceSentences: SentenceMode | null = null;
 
   /** The Assist pipeline for this device's voice control: Home Assistant's preferred one, or one chosen here. */
   private renderVoicePipeline() {
@@ -11276,6 +11281,12 @@ export class Fp3dEditor extends LitElement {
     if (!hass) return nothing;
     if (!this.voicePipesAsked) {
       this.voicePipesAsked = true;
+      getVoiceSettings(hass)
+        .then((res) => {
+          this.voiceSentences = res.sentences;
+          this.requestUpdate();
+        })
+        .catch(() => (this.voiceSentences = "distinct"));
       hass
         .callWS<{ pipelines: { id: string; name: string; stt_engine: string | null }[] }>({ type: "assist_pipeline/pipeline/list" })
         .then((res) => {
@@ -11285,7 +11296,22 @@ export class Fp3dEditor extends LitElement {
         .catch(() => undefined);
     }
     const own = voicePipeline();
+    const modes = ["distinct", "all", "off"] as const;
     return html`<div class="fp3d-form">
+      <label class="fp3d-field fp3d-wide"
+        >${this.t("voice_sentences")}
+        <select
+          ?disabled=${!this.isAdmin || this.voiceSentences === null}
+          @change=${(e: Event) => {
+            const mode = (e.target as HTMLSelectElement).value as SentenceMode;
+            this.voiceSentences = mode;
+            void setVoiceSentences(hass, mode).catch(() => undefined);
+          }}
+        >
+          ${modes.map((m) => html`<option value=${m} ?selected=${(this.voiceSentences ?? "distinct") === m}>${this.t(`voice_sentences_${m}`)}</option>`)}
+        </select></label
+      >
+      <p class="fp3d-sub fp3d-wide">${this.t("voice_sentences_hint")}</p>
       <label class="fp3d-field fp3d-wide"
         >${this.t("voice_pipeline")}
         <select

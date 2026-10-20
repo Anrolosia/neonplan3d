@@ -2015,5 +2015,10 @@
  "lib_more": "Vis {n} til",
  "lib_basic": "Basis",
  "lib_sizes": "{n} storleikar",
- "lib_hint_room": "Foreslått for det opne rommet – byt over."
+ "lib_hint_room": "Foreslått for det opne rommet – byt over.",
+ "voice_sentences": "Setningar for Assist",
+ "voice_sentences_distinct": "Berre eintydige («Vis …», «Spør huset …»)",
+ "voice_sentences_all": "Alle spørsmål (tek òg setningar Home Assistant svarar på sjølv)",
+ "voice_sentences_off": "Ingen (setningsfila vert fjerna)",
+ "voice_sentences_hint": "Kva Assist gjev vidare til NeonPlan. Spørsmål som «Kva vindauge er opne?» svarar Home Assistant elles på sjølv – «Spør huset kva vindauge som er opne» når alltid NeonPlan."
 }

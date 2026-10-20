@@ -266,3 +266,14 @@ export async function setDiagnostics(hass: HomeAssistant, enabled: boolean): Pro
 export async function deleteDiagnostics(hass: HomeAssistant): Promise<DiagnosticsStatus> {
   return hass.callWS<DiagnosticsStatus>({ type: "neonplan3d/diagnostics/delete" });
 }
+
+export type SentenceMode = "distinct" | "all" | "off";
+
+/** Which sentences Assist hands to NeonPlan (the sentence files Home Assistant reads). */
+export async function getVoiceSettings(hass: HomeAssistant): Promise<{ sentences: SentenceMode }> {
+  return hass.callWS({ type: "neonplan3d/voice/settings" });
+}
+
+export async function setVoiceSentences(hass: HomeAssistant, sentences: SentenceMode): Promise<{ sentences: SentenceMode }> {
+  return hass.callWS({ type: "neonplan3d/voice/settings/set", sentences });
+}

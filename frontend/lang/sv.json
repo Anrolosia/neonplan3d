@@ -2015,5 +2015,10 @@
  "lib_more": "Visa {n} till",
  "lib_basic": "Bas",
  "lib_sizes": "{n} storlekar",
- "lib_hint_room": "Föreslaget för det öppna rummet – byt ovan."
+ "lib_hint_room": "Föreslaget för det öppna rummet – byt ovan.",
+ "voice_sentences": "Meningar för Assist",
+ "voice_sentences_distinct": "Bara entydiga (”Visa …”, ”Fråga huset …”)",
+ "voice_sentences_all": "Alla frågor (tar även meningar som Home Assistant svarar på själv)",
+ "voice_sentences_off": "Inga (meningsfilen tas bort)",
+ "voice_sentences_hint": "Vad Assist lämnar vidare till NeonPlan. Frågor som ”Vilka fönster är öppna?” svarar Home Assistant annars på själv – ”Fråga huset vilka fönster som är öppna” når alltid NeonPlan."
 }

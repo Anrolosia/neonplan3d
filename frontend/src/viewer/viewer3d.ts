@@ -580,6 +580,7 @@ export class FloorplanViewer {
     winSolid: MeshBasicMaterial;
     winLines: LineBasicMaterial;
     winGlass: MeshBasicMaterial;
+    roofWinGlass: MeshBasicMaterial;
   } | null = null;
   /** The hologram's anchor: a point on the solar field (building coordinates) and the field's normal. */
   private anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null; near?: number }[] = [];
@@ -2267,6 +2268,7 @@ export class FloorplanViewer {
       this.roof.winSolid.dispose();
       this.roof.winLines.dispose();
       this.roof.winGlass.dispose();
+      this.roof.roofWinGlass.dispose();
       this.scene.remove(this.roof.wins);
       this.scene.remove(this.roof.group);
       this.roof = null;
@@ -2287,6 +2289,7 @@ export class FloorplanViewer {
     const winSolid = themed(new MeshBasicMaterial({ vertexColors: true, side: DoubleSide }), this.themeUniform);
     // the glass of the windows over a room: see-through like the windows in the walls (#598)
     const winGlass = themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.35, side: DoubleSide, depthWrite: false }), this.themeUniform);
+    const roofWinGlass = themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.35, side: DoubleSide, depthWrite: false }), this.themeUniform);
     const winLines = themed(new LineBasicMaterial({ vertexColors: true, transparent: true, blending: lineBlending(this.theme), depthWrite: false }), this.themeUniform, true);
     const below: { floorId: string; win: Group }[] = [];
     const parts = geos.map((geo) => {
@@ -2308,8 +2311,8 @@ export class FloorplanViewer {
       }
       // roof windows that only show in the roof ride and fade with it
       if (geo.winRoof?.solid.count) part.add(new Mesh(geo.winRoof.solid.geometry(), winSolid), new LineSegments(geo.winRoof.lines.geometry(), winLines));
-      // their glass fades with the roof's canopy glass
-      if (geo.winRoof?.glass.count) part.add(new Mesh(geo.winRoof.glass.geometry(), glass));
+      // their glass: as see-through as the windows in the walls, and it fades with the roof (#645)
+      if (geo.winRoof?.glass.count) part.add(new Mesh(geo.winRoof.glass.geometry(), roofWinGlass));
       part.renderOrder = 8;
       group.add(part);
       let win: Group | null = null;
@@ -2332,7 +2335,7 @@ export class FloorplanViewer {
     group.renderOrder = 8;
     this.scene.add(group);
     this.scene.add(wins);
-    this.roof = { group, parts, below, solid, lines, glass, live, lives, wins, winSolid, winLines, winGlass };
+    this.roof = { group, parts, below, solid, lines, glass, live, lives, wins, winSolid, winLines, winGlass, roofWinGlass };
     this.placeRoof();
   }
 
@@ -2383,6 +2386,7 @@ export class FloorplanViewer {
     roof.solid.depthWrite = this.roofO > 0.9;
     roof.lines.opacity = this.roofO;
     roof.glass.opacity = this.roofO * 0.28;
+    roof.roofWinGlass.opacity = this.roofO * 0.35;
     roof.live.opacity = this.roofO;
     return this.roofO !== before && this.roofO !== target;
   }

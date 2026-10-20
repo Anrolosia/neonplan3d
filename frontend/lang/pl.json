@@ -2015,5 +2015,10 @@
  "lib_more": "Pokaż jeszcze {n}",
  "lib_basic": "Podstawowe",
  "lib_sizes": "{n} rozmiarów",
- "lib_hint_room": "Propozycje dla otwartego pomieszczenia – zmień powyżej."
+ "lib_hint_room": "Propozycje dla otwartego pomieszczenia – zmień powyżej.",
+ "voice_sentences": "Zdania dla Assist",
+ "voice_sentences_distinct": "Tylko jednoznaczne („Pokaż …”, „Zapytaj dom …”)",
+ "voice_sentences_all": "Wszystkie pytania (przejmuje też zdania, na które Home Assistant odpowiada sam)",
+ "voice_sentences_off": "Żadne (plik zdań zostaje usunięty)",
+ "voice_sentences_hint": "Co Assist przekazuje do NeonPlan. Na pytania jak „Które okna są otwarte?” Home Assistant odpowiada inaczej sam – „Zapytaj dom, które okna są otwarte” zawsze trafia do NeonPlan."
 }

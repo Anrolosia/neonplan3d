@@ -2015,5 +2015,10 @@
  "lib_more": "Zobrazit dalších {n}",
  "lib_basic": "Základ",
  "lib_sizes": "{n} velikostí",
- "lib_hint_room": "Navrženo pro otevřenou místnost – přepni nahoře."
+ "lib_hint_room": "Navrženo pro otevřenou místnost – přepni nahoře.",
+ "voice_sentences": "Věty pro Assist",
+ "voice_sentences_distinct": "Jen jednoznačné („Ukaž …“, „Zeptej se domu …“)",
+ "voice_sentences_all": "Všechny otázky (přebírá i věty, které zodpoví Home Assistant sám)",
+ "voice_sentences_off": "Žádné (soubor s větami se odstraní)",
+ "voice_sentences_hint": "Co Assist předává NeonPlanu. Otázky jako „Která okna jsou otevřená?“ jinak zodpoví Home Assistant sám – „Zeptej se domu, která okna jsou otevřená“ vždy dojde k NeonPlanu."
 }

@@ -2015,5 +2015,10 @@
  "lib_more": "Näytä {n} lisää",
  "lib_basic": "Perus",
  "lib_sizes": "{n} kokoa",
- "lib_hint_room": "Ehdotus avoimelle huoneelle – vaihda yllä."
+ "lib_hint_room": "Ehdotus avoimelle huoneelle – vaihda yllä.",
+ "voice_sentences": "Lauseet Assistille",
+ "voice_sentences_distinct": "Vain yksiselitteiset (”Näytä …”, ”Kysy talolta …”)",
+ "voice_sentences_all": "Kaikki kysymykset (ottaa myös lauseet, joihin Home Assistant vastaa itse)",
+ "voice_sentences_off": "Ei mitään (lausetiedosto poistetaan)",
+ "voice_sentences_hint": "Mitä Assist välittää NeonPlanille. Kysymyksiin kuten ”Mitkä ikkunat ovat auki?” Home Assistant vastaa muuten itse – ”Kysy talolta, mitkä ikkunat ovat auki” tavoittaa aina NeonPlanin."
 }

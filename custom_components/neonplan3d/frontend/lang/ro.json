@@ -2015,5 +2015,10 @@
  "lib_more": "Arată încă {n}",
  "lib_basic": "De bază",
  "lib_sizes": "{n} mărimi",
- "lib_hint_room": "Sugerat pentru camera deschisă – schimbă mai sus."
+ "lib_hint_room": "Sugerat pentru camera deschisă – schimbă mai sus.",
+ "voice_sentences": "Propoziții pentru Assist",
+ "voice_sentences_distinct": "Doar cele clare („Arată …”, „Întreabă casa …”)",
+ "voice_sentences_all": "Toate întrebările (preia și propoziții la care Home Assistant răspunde singur)",
+ "voice_sentences_off": "Niciuna (fișierul cu propoziții este șters)",
+ "voice_sentences_hint": "Ce transmite Assist către NeonPlan. La întrebări ca „Ce ferestre sunt deschise?” răspunde altfel Home Assistant singur – „Întreabă casa ce ferestre sunt deschise” ajunge mereu la NeonPlan."
 }

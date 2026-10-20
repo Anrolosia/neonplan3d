@@ -12,6 +12,16 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Pack format:** optional `group`, `room`, `tags`, `family` and `variant` per item tell the library what an item is and which sizes belong together (packs with these fields need 1.23).
 - **Free sizes with fixed parts:** a pack part may say which of its measures stay when the item is resized (`fix`: legs, arms, plates, handles) – a sofa stretched to 3 m keeps its 20 cm arms and grows its seat, a taller one keeps the seat height and grows its back. The packs get these marks with their next releases; packs without them scale as before.
 
+## 1.22.1
+
+### Fixed
+
+- **Clock** (#642): the clock stood at the top left whatever corner was chosen – the corner styles were missing.
+- **Assist sentences** (#641): by default NeonPlan now registers only distinct sentences ("Zeig …", "Geh …", "Frag das Haus …", "NeonPlan, …", "Guten Morgen", "Gute Nacht"), so questions Home Assistant answers itself ("welche Fenster sind offen", "wo ist …") stay with Home Assistant. **⚙ Settings → Voice control → Sentences for Assist** switches to all questions or to none (the sentence file is removed). "Frag das Haus, welche Fenster offen sind" always reaches NeonPlan.
+- **Smart locks** (#645): the lock's pin at the door shows its text (locked / open) again – the symbol mode took it away; a terrace door (a window down to the floor) takes a lock too.
+- **Look Auto / Day** (#645): the day look keeps more of the shading and the hue, so furniture and devices stand out instead of washing out.
+- **Roof windows** (#645): their glass is as see-through as the windows in the walls, no more.
+
 ## 1.22.0
 
 ### New

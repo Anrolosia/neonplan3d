@@ -2015,5 +2015,10 @@
  "lib_more": "再显示 {n} 个",
  "lib_basic": "基础",
  "lib_sizes": "{n} 种尺寸",
- "lib_hint_room": "按当前房间推荐，可在上方切换。"
+ "lib_hint_room": "按当前房间推荐，可在上方切换。",
+ "voice_sentences": "Assist 语句",
+ "voice_sentences_distinct": "仅明确语句（“显示…”、“问问房子…”）",
+ "voice_sentences_all": "全部问题（也会接管 Home Assistant 自己能回答的语句）",
+ "voice_sentences_off": "无（删除语句文件）",
+ "voice_sentences_hint": "Assist 转交给 NeonPlan 的内容。“哪些窗户开着？”这类问题否则由 Home Assistant 自己回答，“问问房子哪些窗户开着”总能到达 NeonPlan。"
 }

@@ -2015,5 +2015,10 @@
  "lib_more": "Nog {n} tonen",
  "lib_basic": "Basis",
  "lib_sizes": "{n} maten",
- "lib_hint_room": "Voorgesteld voor de geopende kamer – hierboven wisselen."
+ "lib_hint_room": "Voorgesteld voor de geopende kamer – hierboven wisselen.",
+ "voice_sentences": "Zinnen voor Assist",
+ "voice_sentences_distinct": "Alleen eenduidige („Toon …”, „Vraag het huis …”)",
+ "voice_sentences_all": "Alle vragen (neemt ook zinnen over die Home Assistant zelf beantwoordt)",
+ "voice_sentences_off": "Geen (het zinnenbestand wordt verwijderd)",
+ "voice_sentences_hint": "Wat Assist aan NeonPlan doorgeeft. Vragen als „Welke ramen staan open?” beantwoordt Home Assistant anders zelf – „Vraag het huis welke ramen open staan” bereikt altijd NeonPlan."
 }

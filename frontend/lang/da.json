@@ -2015,5 +2015,10 @@
  "lib_more": "Vis {n} mere",
  "lib_basic": "Basis",
  "lib_sizes": "{n} størrelser",
- "lib_hint_room": "Foreslået til det åbne rum – skift ovenfor."
+ "lib_hint_room": "Foreslået til det åbne rum – skift ovenfor.",
+ "voice_sentences": "Sætninger til Assist",
+ "voice_sentences_distinct": "Kun entydige (\"Vis …\", \"Spørg huset …\")",
+ "voice_sentences_all": "Alle spørgsmål (tager også sætninger, Home Assistant selv besvarer)",
+ "voice_sentences_off": "Ingen (sætningsfilen fjernes)",
+ "voice_sentences_hint": "Hvad Assist giver videre til NeonPlan. Spørgsmål som \"Hvilke vinduer er åbne?\" besvarer Home Assistant ellers selv – \"Spørg huset, hvilke vinduer er åbne\" når altid NeonPlan."
 }
