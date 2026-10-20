@@ -776,6 +776,9 @@ export class Fp3dEditor extends LitElement {
   protected willUpdate(changed: PropertyValues): void {
     // this bundle keeps its own pack registry – and its own language table, so it fetches the language itself
     if (changed.has("packs")) setPacks(this.packs ?? []);
+    // the modules of the packs (Pool Pro's fields and pipe rules, the voice sentences) are loaded here too: an
+    // import in the editor must not wait for the 3D view
+    if ((changed.has("packs") || changed.has("hass")) && this.hass && this.packs?.some((p) => p.module)) void syncModules(this.hass, this.packs).then(() => this.requestUpdate());
     if (changed.has("_doc")) setTerrain(this._doc);
     if (changed.has("hass") && this.hass && !languageReady(this.hass.language)) void loadLanguage(this.hass.language).then(() => this.requestUpdate());
     // the 3D pane and the wall view's 3D both show the draft (otherwise a piece moved in the wall view jumps back)
