@@ -529,8 +529,8 @@ export class Fp3dEditor extends LitElement {
   private techPress: { s: number; y: number } | null = null;
   /** The pen: the stroke under the pointer (wall coordinates), made into a pipe with right angles when let go. */
   private techStroke: { s: number; y: number }[] | null = null;
-  /** A stroke ended on nothing: where does the line go? (the floor: down and out to the pool; higher: through the wall) */
-  private declare _techAsk: { s: number; y: number; pts: P3[] } | null;
+  /** A stroke ended on nothing: the pipe is laid with a loose end, and the side bar offers where the line could go. */
+  private declare _techAsk: { s: number; y: number; pipe: string } | null;
   /** The zoomed part of the 2D wall view (svg units), per wall; null: the whole wall. */
   private wvZoom: { key: string; k: number; x0: number; y0: number } | null = null;
   /** Touch points on the 2D wall view, and a two-finger zoom under way. */
@@ -7632,7 +7632,7 @@ export class Fp3dEditor extends LitElement {
         const l2 = vs * vs + vy * vy;
         const t = l2 > 0 ? Math.max(0, Math.min(1, ((s - pc.s0) * vs + (y - pc.y0) * vy) / l2)) : 0;
         const [qs, qy] = [pc.s0 + vs * t, pc.y0 + vy * t];
-        if (Math.hypot(qs - s, qy - y) < (pipesOnly ? 0.16 : 0.07)) return { pipe: { id: r.id, p: onWall(c.frame, qs, qy, pc.d0 + (pc.d1 - pc.d0) * t) } };
+        if (Math.hypot(qs - s, qy - y) < (pipesOnly ? 0.24 : 0.07)) return { pipe: { id: r.id, p: onWall(c.frame, qs, qy, pc.d0 + (pc.d1 - pc.d0) * t) } };
       }
     return {};
   }
@@ -7681,6 +7681,7 @@ export class Fp3dEditor extends LitElement {
   private runDown(e: PointerEvent, c: RunCtx): void {
     if (!this._runMode || !this.isAdmin) return;
     e.stopPropagation();
+    this._techAsk = null;
     const { s, y } = c.pt(e);
     this.runAt(c, s, y, e.altKey, e.detail, null);
   }
@@ -7736,18 +7737,32 @@ export class Fp3dEditor extends LitElement {
   private runAt(c: RunCtx, s: number, y: number, alt: boolean, detail: number, node: string | null): void {
     const mode = this._runMode;
     if (!mode) return;
+    if (mode === "tee" && this._techMode) {
+      // drawing the technical room: a T-piece goes into the pipe tapped (the pipe is cut there)
+      const hit = this.runPick(c, s, y, true);
+      if (hit.pipe) this.teeOnPipe(c, hit.pipe.id, hit.pipe.p);
+      return;
+    }
     if (mode === "hole_wall" || mode === "hole_floor" || mode === "tee" || mode === "y") return this.placeJoint(c, mode, s, y);
     if (mode === "feed") return this.placeFeed(c, s, y);
     if (mode === "erase") return this.eraseAt(c, s, y);
     const hit = node ? { node } : this.runPick(c, s, y, mode !== "draw");
     if (mode !== "draw") {
+      // a miss while placing a fitting keeps the tool (the hint says to tap the pipe)
+      if (!hit.pipe && this._techMode) return;
       if (hit.pipe) this.addFitting(c, hit.pipe.id, hit.pipe.p, mode);
       // drawing the technical room: back to the pen
       this._runMode = this._techMode ? "draw" : null;
       if (this._techMode) this._runSel = null;
       return;
     }
-    const d = this._runDraft;
+    let d = this._runDraft;
+    if (d && this._techMode && !this.techStroke) {
+      // the pen: every press begins a stroke of its own – a draft still hanging is laid as it is (or dropped)
+      if (d.pts.length || d.extend || d.fromT || d.from) this.finishRun("", null);
+      this._runDraft = null;
+      d = null;
+    }
     if (!d) {
       const start: RunDraft = { pool: c.pool.id, from: "", fromT: null, extend: null, pts: [], anchor: null, wall: c.key, d: c.gap };
       let draft: RunDraft;
@@ -7759,9 +7774,9 @@ export class Fp3dEditor extends LitElement {
       return;
     }
     // a double click finishes (its first click set the point already)
-    if (detail >= 2) return this.finishRun("", null);
-    if (hit.node && hit.node !== d.from) return this.finishRun(hit.node, null);
-    if (hit.pipe) return this.finishRun("", hit.pipe.p);
+    if (detail >= 2) return void this.finishRun("", null);
+    if (hit.node && hit.node !== d.from) return void this.finishRun(hit.node, null);
+    if (hit.pipe) return void this.finishRun("", hit.pipe.p);
     this._runDraft = { ...d, pts: [...d.pts, ...this.runStep(d, c, s, y, alt)], wall: c.key, d: c.gap };
   }
 
@@ -7797,12 +7812,12 @@ export class Fp3dEditor extends LitElement {
    * Ends the pipe being laid: at a node, at a T-piece on another pipe (`toT`), or loose; `extra` points come last
    * (down into the floor, through the wall), `height` is where points added later in the plan run.
    */
-  private finishRun(to: string, toT: P3 | null, extra: P3[] = [], height?: number): void {
+  private finishRun(to: string, toT: P3 | null, extra: P3[] = [], height?: number): string | null {
     const d = this._runDraft;
     const floor = this.floor;
     const rules = this.pipeRules;
     this._runDraft = null;
-    if (!d || !floor || !rules) return;
+    if (!d || !floor || !rules) return null;
     const pts = [...d.pts, ...extra];
     // drawing the technical room: into its end the line turns once – level first, then straight up or down into it –
     // instead of a slanted last piece
@@ -7820,7 +7835,7 @@ export class Fp3dEditor extends LitElement {
         if (Math.abs(a.s - b.s) > 0.03 && Math.abs(start[1] - n.y) > 0.03) pts.push(onWall(frame, b.s, start[1], d.d));
       }
     }
-    if (!pts.length && !toT && (!to || to === d.from) && !d.fromT) return;
+    if (!pts.length && !toT && (!to || to === d.from) && !d.fromT) return null;
     let chosen: string | null = null;
     this.changePool(d.pool, (l, area) => {
       const joints: PoolJoint[] = (l.joints ??= []);
@@ -7901,6 +7916,23 @@ export class Fp3dEditor extends LitElement {
     if (chosen && !this._techMode) this._runSel = { pipe: chosen, pt: null };
     // drawing the technical room: the pen stays in the hand
     this._runMode = this._techMode ? "draw" : null;
+    return chosen;
+  }
+
+  /** A T-piece into a pipe where it was tapped: the pipe is cut there, both halves end at the new piece. */
+  private teeOnPipe(c: RunCtx, pipeId: string, p: P3): void {
+    const nodeAt = poolNodeAt(this._doc, c.floor, c.pool);
+    this.changePool(c.pool.id, (l) => {
+      const pipes = [...(l.pipes ?? [])];
+      const i = pipes.findIndex((x) => x.id === pipeId);
+      if (i < 0) return;
+      const cut = splitPipe(pipes[i], nodeAt, p, uid("joint"), uid("pipe"));
+      if (!cut) return;
+      l.joints = [...(l.joints ?? []), cut.joint];
+      pipes.splice(i, 1, cut.first, cut.second);
+      l.pipes = pipes;
+    });
+    this._runMode = "draw";
   }
 
   /**
@@ -7980,25 +8012,40 @@ export class Fp3dEditor extends LitElement {
       return [round(r[0]), round(r[1]), round(r[2])];
     });
     const hit = this.runPick(c, q.s, q.y);
-    if (hit.node && hit.node !== d.from) return this.finishRun(hit.node, null, inner);
-    if (hit.pipe) return this.finishRun("", hit.pipe.p, inner);
+    this._techAsk = null;
+    if (hit.node && hit.node !== d.from) {
+      this.finishRun(hit.node, null, inner);
+      return;
+    }
+    if (hit.pipe) {
+      this.finishRun("", hit.pipe.p, inner);
+      return;
+    }
+    // nothing there: the pipe ends loose where the hand stopped – and may be led on to the pool from the side bar
     const end = corners[corners.length - 1];
-    this._techAsk = { s: end.s, y: end.y, pts: inner };
+    const endPt = onWall(c.frame, Math.round(end.s * 20) / 20, Math.round(end.y * 20) / 20, c.gap);
+    const id = this.finishRun("", null, [...inner, [round(endPt[0]), round(endPt[1]), round(endPt[2])]]);
+    if (id) this._techAsk = { s: end.s, y: end.y, pipe: id };
   }
 
-  /** The answer to "where does the line go": a pool line through a hole there, or a loose end. */
+  /** The answer to "where does the line go": a hole there with the way outside, the loose end joined to it. */
   private answerAsk(c: RunCtx, kind: string | null): void {
     const ask = this._techAsk;
     this._techAsk = null;
-    if (!ask || !this._runDraft) return;
+    if (!ask) return;
     if (kind === "cancel") {
-      this._runDraft = null;
+      this.changePool(c.pool.id, (l) => (l.pipes = (l.pipes ?? []).filter((p) => p.id !== ask.pipe)));
       return;
     }
-    const hole = kind ? this.feedAt(c, kind, ask.s, ask.y) : null;
-    const endPt = onWall(c.frame, Math.round(ask.s * 20) / 20, Math.round(ask.y * 20) / 20, c.gap);
-    if (hole) this.finishRun(`joint:${hole.id}:inside`, null, ask.pts);
-    else this.finishRun("", null, [...ask.pts, [round(endPt[0]), round(endPt[1]), round(endPt[2])]]);
+    if (!kind) return;
+    const hole = this.feedAt(c, kind, ask.s, ask.y);
+    if (!hole) return;
+    this.changePool(c.pool.id, (l) => {
+      const p = l.pipes?.find((x) => x.id === ask.pipe);
+      if (!p) return;
+      if (!p.to) p.to = `joint:${hole.id}:inside`;
+      else if (!p.from) p.from = `joint:${hole.id}:inside`;
+    });
   }
 
   /** The side bar of "Technik zeichnen": devices, the pool's lines to bring in, ball valve and sight glass, what is missing. */
@@ -8024,7 +8071,7 @@ export class Fp3dEditor extends LitElement {
             <b>${this.t("tech_ask")}</b>
             ${(["skimmer", "drain", "inlet", "waste"] as const).map((k) => html`<button class="fp3d-btn fp3d-tech-feed" @click=${() => this.answerAsk(c, k)}><i>${k === "waste" ? "🟤" : "〰"}</i>${this.t(`feed_${k}` as I18nKey)}</button>`)}
             <button class="fp3d-btn" @click=${() => this.answerAsk(c, null)}>${this.t("tech_ask_loose")}</button>
-            <button class="fp3d-btn" @click=${() => this.answerAsk(c, "cancel")}>${this.t("cancel")}</button>
+            <button class="fp3d-btn fp3d-danger" @click=${() => this.answerAsk(c, "cancel")}>${this.t("delete")}</button>
           </div>`
         : this.renderTechStep(c)}
       <div class="fp3d-seg fp3d-tech-pen" role="group">
@@ -8061,6 +8108,10 @@ export class Fp3dEditor extends LitElement {
       <div class="fp3d-wv-tiles">${(["pool_pump", "pool_filter", "pool_heat_pump", "pool_dosing"] as const).map(add)}</div>
       <h4>${this.t("tech_fittings")}</h4>
       ${fit("valve", "wall_run_valve")} ${fit("sight", "wall_run_sight")}
+      <button class="fp3d-btn ${this._runMode === "tee" ? "fp3d-primary" : ""}" title=${this.t("tech_step_tee")} @click=${() => {
+        this._runDraft = null;
+        this._runMode = this._runMode === "tee" ? "draw" : "tee";
+      }}>+ ${this.t("joint_add_tee")}</button>
       <p class="fp3d-sub">${this.t("tech_hint")}</p>
     </aside>`;
   }
@@ -8079,6 +8130,7 @@ export class Fp3dEditor extends LitElement {
     if (this._runMode === "feed") return box(1, this.t("tech_feed_place"));
     if (this._runMode === "erase") return html`<div class="fp3d-tech-step fp3d-tech-erasing"><b>🧽 ${this.t("tech_erase")}</b>${this.t("tech_erase_hint")}</div>`;
     if (this._runMode === "valve" || this._runMode === "sight") return box(4, this.t("tech_step_fit"));
+    if (this._runMode === "tee") return box(4, this.t("tech_step_tee"));
     if (this._runDraft) return box(3, this.t("tech_step_drawing"));
     if (!ports.some((q) => q.kind !== "waste")) return box(1, this.t("tech_no_ports"));
     const missing = ["skimmer", "drain", "inlet"].find((k) => ports.some((q) => q.kind === k) && !rules.feedDone(area, k));
@@ -8149,7 +8201,7 @@ export class Fp3dEditor extends LitElement {
     const d = this._runDraft;
     const last = d && this.runLast(d, c);
     if (!d || !last) return;
-    if (how === "down") return this.finishRun("", null, [[last[0], -0.3, last[2]]], -0.3);
+    if (how === "down") return void this.finishRun("", null, [[last[0], -0.3, last[2]]], -0.3);
     const w = toWall(c.frame, [last[0], last[2]]);
     const thick = sharedEdge(c.floor, c.room.id, c.frame.a, c.frame.b) ? this._doc.settings.wall_interior : this._doc.settings.wall_exterior;
     const out = onWall(c.frame, w.s, last[1], -(thick + 0.15));
