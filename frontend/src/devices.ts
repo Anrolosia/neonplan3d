@@ -620,7 +620,8 @@ export function openingEntities(hass: HomeAssistant, floors: readonly Floor[]): 
     contact: o.sensor === "handle" && o.contact == null ? null : pick(o.contact, autoK),
     tilt: o.tilt === "none" ? null : o.tilt,
     contact2: o.leaves === 2 && o.contact2 && o.contact2 !== "none" ? o.contact2 : null,
-    lock: o.type === "door" && o.lock && o.lock !== "none" ? o.lock : null,
+    // a smart lock on a door, or on a terrace door (a window down to the floor, #645)
+    lock: (o.type === "door" || (o.type === "window" && o.sill <= 0.01)) && o.lock && o.lock !== "none" ? o.lock : null,
     tilt2: o.leaves === 2 && o.tilt2 && o.tilt2 !== "none" ? o.tilt2 : null,
     position: o.position && o.position !== "none" ? o.position : null,
     positionInverted: !!o.position_inverted,

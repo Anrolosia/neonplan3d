@@ -100,13 +100,23 @@ async def test_intent_without_a_view(hass: HomeAssistant) -> None:
 def test_sentences_are_written_once_and_rewritten_when_they_change(tmp_path: Path) -> None:
     assert write_sentences(tmp_path) is True
     de = tmp_path / "custom_sentences" / "de" / "neonplan3d.yaml"
-    assert de.read_text(encoding="utf-8") == sentences_yaml("de")
-    assert "zeig[e] [mir] [mal] [bitte] {text}" in de.read_text(encoding="utf-8")
+    text = de.read_text(encoding="utf-8")
+    assert text == sentences_yaml("de")
+    assert "zeig[e] [mir] [mal] [bitte] {text}" in text
+    # by default only the distinct sentences: a question Home Assistant answers itself is not taken (#641)
+    assert "welche (fenster|türen) sind [noch] offen" not in text
+    assert "wo (ist|sind|steht|stehen) {text}" not in text
     assert (tmp_path / "custom_sentences" / "en" / "neonplan3d.yaml").is_file()
     # unchanged: nothing written, no reload
     assert write_sentences(tmp_path) is False
     de.write_text("old", encoding="utf-8")
     assert write_sentences(tmp_path) is True
+    # "all" adds the questions, "off" removes the files
+    assert write_sentences(tmp_path, "all") is True
+    assert "welche (fenster|türen) sind [noch] offen" in de.read_text(encoding="utf-8")
+    assert write_sentences(tmp_path, "off") is True
+    assert not de.exists()
+    assert write_sentences(tmp_path, "off") is False
 
 
 async def test_unload_removes_service_and_intent(hass: HomeAssistant) -> None:

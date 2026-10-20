@@ -18,9 +18,10 @@ from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, Supp
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import intent
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.storage import Store
 import voluptuous as vol
 
-from .const import DATA_ASK, DOMAIN, SIGNAL_ASK
+from .const import DATA_ASK, DATA_VOICE, DOMAIN, SIGNAL_ASK, STORAGE_KEY_VOICE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,14 +49,37 @@ _NOT_UNDERSTOOD = {
     "en": "NeonPlan did not understand that.",
 }
 
-# the sentences Assist hands to NeonPlan: explicit enough not to take sentences meant for Home Assistant itself
-_SENTENCES = {
+# which sentences Assist hands to NeonPlan: only the distinct ones (default), every question, or none at all
+SENTENCE_MODES = ("distinct", "all", "off")
+DEFAULT_SENTENCE_MODE = "distinct"
+
+# the distinct sentences: nobody says them to Home Assistant itself, so they never take a sentence meant for it
+_DISTINCT = {
     "de": [
         "zeig[e] [mir] [mal] [bitte] {text}",
         "geh[e] [mal] (in|ins|in die|in den|auf|aufs|auf die|auf den|zu|zum|zur) {text}",
-        "wo (ist|sind|steht|stehen) {text}",
         "(frag|frage) das haus {text}",
         "(haus|neonplan|neon plan) {text}",
+        "gute nacht",
+        "guten morgen",
+        "was kannst du [alles]",
+    ],
+    "en": [
+        "show [me] {text}",
+        "go to [the] {text}",
+        "ask the house {text}",
+        "(house|neonplan|neon plan) {text}",
+        "good night",
+        "good morning",
+        "what can you do",
+    ],
+}
+
+# the questions: handy, but some of them Home Assistant answers itself ("which windows are open", #641), so
+# they go to NeonPlan only with the setting "all"
+_QUESTIONS = {
+    "de": [
+        "wo (ist|sind|steht|stehen) {text}",
         "was ist [alles|gerade|denn] offen",
         "ist [irgend]was offen",
         "welche (fenster|türen) sind [noch] offen",
@@ -68,18 +92,11 @@ _SENTENCES = {
         "ist (die|das) {text} (abgeschlossen|verschlossen|zu|offen|an|aus|ein)",
         "läuft (die|der|das) {text}",
         "was läuft [gerade|noch|alles]",
-        "gute nacht",
-        "guten morgen",
-        "was kannst du [alles]",
         "was (steht|ist) heute an",
         "wie (ist|wird) das wetter [heute|morgen]",
     ],
     "en": [
-        "show [me] {text}",
-        "go to [the] {text}",
         "where (is|are) [the] {text}",
-        "ask the house {text}",
-        "(house|neonplan|neon plan) {text}",
         "what is open",
         "is anything open",
         "which (windows|doors) are [still] open",
@@ -92,37 +109,47 @@ _SENTENCES = {
         "is the {text} (locked|unlocked|closed|open|on|off)",
         "is the {text} running",
         "what is running",
-        "good night",
-        "good morning",
-        "what can you do",
         "what is on today",
         "what is the weather [like] [today|tomorrow]",
     ],
 }
 
 
-def sentences_yaml(language: str) -> str:
+def sentences_of(language: str, mode: str = DEFAULT_SENTENCE_MODE) -> list[str]:
+    """The sentences of a language in a mode (none for "off")."""
+    if mode == "off":
+        return []
+    return _DISTINCT[language] + (_QUESTIONS[language] if mode == "all" else [])
+
+
+def sentences_yaml(language: str, mode: str = DEFAULT_SENTENCE_MODE) -> str:
     """The custom sentences file of a language (written by hand: the file stays readable for the user)."""
     lines = [
         "# Written by NeonPlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that",
         "# understands answers). Rewritten on every start: put your own sentences for NeonPlanAsk into another file.",
+        "# Which sentences stand here is set in the editor: ⚙ Settings → Voice control → Sentences for Assist.",
         f'language: "{language}"',
         "intents:",
         f"  {INTENT_ASK}:",
         "    data:",
         "      - sentences:",
     ]
-    lines += [f'          - "{s}"' for s in _SENTENCES[language]]
+    lines += [f'          - "{s}"' for s in sentences_of(language, mode)]
     lines += ["lists:", "  text:", "    wildcard: true", ""]
     return "\n".join(lines)
 
 
-def write_sentences(config_dir: Path) -> bool:
-    """Writes the sentence files; True when any changed (Assist then reloads its sentences)."""
+def write_sentences(config_dir: Path, mode: str = DEFAULT_SENTENCE_MODE) -> bool:
+    """Writes the sentence files (or removes them for "off"); True when any changed (Assist then reloads)."""
     changed = False
-    for language in _SENTENCES:
+    for language in _DISTINCT:
         path = config_dir / "custom_sentences" / language / SENTENCES_FILE
-        text = sentences_yaml(language)
+        if mode == "off":
+            if path.is_file():
+                path.unlink()
+                changed = True
+            continue
+        text = sentences_yaml(language, mode)
         try:
             if path.read_text(encoding="utf-8") == text:
                 continue
@@ -131,6 +158,42 @@ def write_sentences(config_dir: Path) -> bool:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
         changed = True
+    return changed
+
+
+class VoiceSettings:
+    """The voice settings of the installation (.storage/neonplan3d.voice): which sentences Assist hands on."""
+
+    def __init__(self, hass: HomeAssistant) -> None:
+        self.hass = hass
+        self._store: Store[dict[str, Any]] = Store(hass, 1, STORAGE_KEY_VOICE)
+        self.sentences = DEFAULT_SENTENCE_MODE
+
+    async def async_load(self) -> None:
+        data = await self._store.async_load()
+        mode = (data or {}).get("sentences")
+        if mode in SENTENCE_MODES:
+            self.sentences = mode
+
+    async def async_set_sentences(self, mode: str) -> bool:
+        """Sets the mode, rewrites the sentence files and tells Assist; True when the files changed."""
+        if mode not in SENTENCE_MODES:
+            raise ValueError(mode)
+        self.sentences = mode
+        await self._store.async_save({"sentences": mode})
+        return await async_write_sentences(self.hass, mode)
+
+
+async def async_write_sentences(hass: HomeAssistant, mode: str) -> bool:
+    """Writes the sentence files for a mode and has Assist reload them when they changed."""
+    try:
+        changed = await hass.async_add_executor_job(write_sentences, Path(hass.config.config_dir), mode)
+    except OSError:
+        _LOGGER.debug("Could not write the Assist sentences", exc_info=True)
+        return False
+    # Assist reads custom sentences at its start: a changed file is loaded now (the service is there once it runs)
+    if changed and hass.services.has_service("conversation", "reload"):
+        await hass.services.async_call("conversation", "reload", {}, blocking=False)
     return changed
 
 
@@ -209,14 +272,10 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
     )
     intent.async_register(hass, AskIntentHandler(broker))
 
-    try:
-        changed = await hass.async_add_executor_job(write_sentences, Path(hass.config.config_dir))
-    except OSError:
-        _LOGGER.debug("Could not write the Assist sentences", exc_info=True)
-        return
-    # Assist reads custom sentences at its start: a changed file is loaded now (the service is there once it runs)
-    if changed and hass.services.has_service("conversation", "reload"):
-        await hass.services.async_call("conversation", "reload", {}, blocking=False)
+    settings = VoiceSettings(hass)
+    await settings.async_load()
+    hass.data[DATA_VOICE] = settings
+    await async_write_sentences(hass, settings.sentences)
 
 
 def async_unload_voice(hass: HomeAssistant) -> None:
@@ -224,3 +283,4 @@ def async_unload_voice(hass: HomeAssistant) -> None:
     hass.services.async_remove(DOMAIN, SERVICE_ASK)
     intent.async_remove(hass, INTENT_ASK)
     hass.data.pop(DATA_ASK, None)
+    hass.data.pop(DATA_VOICE, None)

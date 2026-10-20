@@ -1967,5 +1967,10 @@
  "voice_showing": "Mutatom: {name}.",
  "screen_name": "Képernyő neve (az Assisthez)",
  "screen_name_placeholder": "pl. Konyha",
- "screen_name_hint": "Ha az Assistet kérdezed („Mutasd a nappalit”) vagy egy automatizálás hívja a neonplan3d.ask szolgáltatást, minden nyitott NeonPlan-nézet reagál. Ha a szolgáltatás képernyőt nevez meg, csak az ilyen nevű nézet reagál."
+ "screen_name_hint": "Ha az Assistet kérdezed („Mutasd a nappalit”) vagy egy automatizálás hívja a neonplan3d.ask szolgáltatást, minden nyitott NeonPlan-nézet reagál. Ha a szolgáltatás képernyőt nevez meg, csak az ilyen nevű nézet reagál.",
+ "voice_sentences": "Mondatok az Assistnek",
+ "voice_sentences_distinct": "Csak egyértelműek („Mutasd …”, „Kérdezd a házat …”)",
+ "voice_sentences_all": "Minden kérdés (olyan mondatokat is elvesz, amelyekre a Home Assistant maga válaszol)",
+ "voice_sentences_off": "Nincs (a mondatfájl törlődik)",
+ "voice_sentences_hint": "Amit az Assist átad a NeonPlannek. Az olyan kérdésekre, mint „Melyik ablak van nyitva?”, különben a Home Assistant maga válaszol – „Kérdezd a házat, melyik ablak van nyitva” mindig a NeonPlanhez jut."
 }

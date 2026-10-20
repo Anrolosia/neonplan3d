@@ -1967,5 +1967,10 @@
  "voice_showing": "Afișez {name}.",
  "screen_name": "Numele ecranului (pentru Assist)",
  "screen_name_placeholder": "de ex. Bucătărie",
- "screen_name_hint": "Dacă întrebi Assist („Arată sufrageria”) sau o automatizare apelează serviciul neonplan3d.ask, reacționează fiecare vizualizare NeonPlan deschisă. Dacă serviciul numește un ecran, reacționează doar vizualizarea cu acel nume."
+ "screen_name_hint": "Dacă întrebi Assist („Arată sufrageria”) sau o automatizare apelează serviciul neonplan3d.ask, reacționează fiecare vizualizare NeonPlan deschisă. Dacă serviciul numește un ecran, reacționează doar vizualizarea cu acel nume.",
+ "voice_sentences": "Propoziții pentru Assist",
+ "voice_sentences_distinct": "Doar cele clare („Arată …”, „Întreabă casa …”)",
+ "voice_sentences_all": "Toate întrebările (preia și propoziții la care Home Assistant răspunde singur)",
+ "voice_sentences_off": "Niciuna (fișierul cu propoziții este șters)",
+ "voice_sentences_hint": "Ce transmite Assist către NeonPlan. La întrebări ca „Ce ferestre sunt deschise?” răspunde altfel Home Assistant singur – „Întreabă casa ce ferestre sunt deschise” ajunge mereu la NeonPlan."
 }

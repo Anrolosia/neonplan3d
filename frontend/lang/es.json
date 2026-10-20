@@ -1967,5 +1967,10 @@
  "voice_showing": "Muestro {name}.",
  "screen_name": "Nombre de pantalla (para Assist)",
  "screen_name_placeholder": "p. ej. Cocina",
- "screen_name_hint": "Si preguntas a Assist («Muestra el salón») o una automatización llama al servicio neonplan3d.ask, reacciona cada vista NeonPlan abierta. Si el servicio nombra una pantalla, solo reacciona la vista con ese nombre."
+ "screen_name_hint": "Si preguntas a Assist («Muestra el salón») o una automatización llama al servicio neonplan3d.ask, reacciona cada vista NeonPlan abierta. Si el servicio nombra una pantalla, solo reacciona la vista con ese nombre.",
+ "voice_sentences": "Frases para Assist",
+ "voice_sentences_distinct": "Solo inequívocas («Muestra …», «Pregunta a la casa …»)",
+ "voice_sentences_all": "Todas las preguntas (también toma frases que Home Assistant responde por sí mismo)",
+ "voice_sentences_off": "Ninguna (se elimina el archivo de frases)",
+ "voice_sentences_hint": "Lo que Assist pasa a NeonPlan. Preguntas como «¿Qué ventanas están abiertas?» las responde Home Assistant por sí mismo – «Pregunta a la casa qué ventanas están abiertas» siempre llega a NeonPlan."
 }

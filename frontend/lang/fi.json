@@ -1967,5 +1967,10 @@
  "voice_showing": "Näytän: {name}.",
  "screen_name": "Näytön nimi (Assistia varten)",
  "screen_name_placeholder": "esim. Keittiö",
- "screen_name_hint": "Kun kysyt Assistilta (”Näytä olohuone”) tai automaatio kutsuu palvelua neonplan3d.ask, jokainen avoin NeonPlan-näkymä reagoi. Jos palvelu nimeää näytön, vain sen niminen näkymä reagoi."
+ "screen_name_hint": "Kun kysyt Assistilta (”Näytä olohuone”) tai automaatio kutsuu palvelua neonplan3d.ask, jokainen avoin NeonPlan-näkymä reagoi. Jos palvelu nimeää näytön, vain sen niminen näkymä reagoi.",
+ "voice_sentences": "Lauseet Assistille",
+ "voice_sentences_distinct": "Vain yksiselitteiset (”Näytä …”, ”Kysy talolta …”)",
+ "voice_sentences_all": "Kaikki kysymykset (ottaa myös lauseet, joihin Home Assistant vastaa itse)",
+ "voice_sentences_off": "Ei mitään (lausetiedosto poistetaan)",
+ "voice_sentences_hint": "Mitä Assist välittää NeonPlanille. Kysymyksiin kuten ”Mitkä ikkunat ovat auki?” Home Assistant vastaa muuten itse – ”Kysy talolta, mitkä ikkunat ovat auki” tavoittaa aina NeonPlanin."
 }

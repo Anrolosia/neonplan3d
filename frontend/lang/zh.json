@@ -1967,5 +1967,10 @@
  "voice_showing": "正在显示{name}。",
  "screen_name": "屏幕名称（用于 Assist）",
  "screen_name_placeholder": "例如：厨房",
- "screen_name_hint": "向 Assist 提问（“显示客厅”）或自动化调用服务 neonplan3d.ask 时，每个打开的 NeonPlan 视图都会响应。若服务指定了屏幕，只有同名的视图会响应。"
+ "screen_name_hint": "向 Assist 提问（“显示客厅”）或自动化调用服务 neonplan3d.ask 时，每个打开的 NeonPlan 视图都会响应。若服务指定了屏幕，只有同名的视图会响应。",
+ "voice_sentences": "Assist 语句",
+ "voice_sentences_distinct": "仅明确语句（“显示…”、“问问房子…”）",
+ "voice_sentences_all": "全部问题（也会接管 Home Assistant 自己能回答的语句）",
+ "voice_sentences_off": "无（删除语句文件）",
+ "voice_sentences_hint": "Assist 转交给 NeonPlan 的内容。“哪些窗户开着？”这类问题否则由 Home Assistant 自己回答，“问问房子哪些窗户开着”总能到达 NeonPlan。"
 }
