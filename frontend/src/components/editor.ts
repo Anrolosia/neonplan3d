@@ -3,7 +3,7 @@
 import { css, html, LitElement, nothing, svg, type PropertyValues, type TemplateResult } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { ref } from "lit/directives/ref.js";
-import { fetchImage, listHistory, restoreSnapshot, storeImage, takeSnapshot, type Snapshot } from "../api.ts";
+import { fetchImage, importPack, listHistory, restoreSnapshot, storeImage, takeSnapshot, type Snapshot } from "../api.ts";
 import { download, exportFile, parseExport } from "../transfer.ts";
 import { carEntities, type CarEntities, areaEntities, autoPlace, CLIMATE_CLASSES, defaultHeight, entityName, entityAreaId, furnitureEntities, groupByDevice, hasScreen, isMediaFurniture, isPlaceable, isRoomClimateSensor, kindOf, openingEntities, otherAreaEntities, pictureRuleMatches, roomClimateSensors, unassignedEntities, windowPosition, type ClimateKey } from "../devices.ts";
 import { furnitureSymbol } from "./furniture2d.ts";
@@ -353,6 +353,7 @@ export class Fp3dEditor extends LitElement {
     _toolMenu: { state: true },
     _settingsMenu: { state: true },
     _sideWidth: { state: true },
+    _moduleMsg: { state: true },
     _settingsDialog: { state: true },
     _toolOpen: { state: true },
     _viewMenu: { state: true },
@@ -564,6 +565,8 @@ export class Fp3dEditor extends LitElement {
   private declare _settingsMenu: boolean;
   /** Width of the side bar (px), dragged at its left edge and remembered per browser (#620). */
   private declare _sideWidth: number;
+  /** What the last module import said (the ⚙ Module dialog). */
+  private declare _moduleMsg: { ok: boolean; text: string } | null;
   private sideDrag: { x: number; width: number } | null = null;
   private declare _settingsDialog: SettingsTopic | null;
   private declare _toolOpen: Tool | null;
@@ -734,6 +737,7 @@ export class Fp3dEditor extends LitElement {
       // no storage: the default width
     }
     this._sideWidth = Math.min(640, Math.max(280, width));
+    this._moduleMsg = null;
     this._settingsDialog = null;
     this._toolOpen = null;
     this._viewMenu = false;
@@ -5388,7 +5392,6 @@ export class Fp3dEditor extends LitElement {
   private renderSettingsMenu(closeTools: () => void) {
     const admin = this.isAdmin;
     const open = this._settingsMenu;
-    const modules = (this.packs ?? []).filter((p) => p.module);
     const all: { key: SettingsTopic; icon: string; label: string; admin: boolean }[] = [
       { key: "house", icon: "🏠", label: this.t("settings_house"), admin: true },
       { key: "weather", icon: "🌦", label: this.t("settings_weather"), admin: true },
@@ -5398,7 +5401,7 @@ export class Fp3dEditor extends LitElement {
       { key: "backdrop", icon: "🖼", label: this.t("backdrop"), admin: true },
       { key: "terrain", icon: "⛰", label: this.t("terrain"), admin: true },
       { key: "backup", icon: "💾", label: this.t("backup"), admin: true },
-      ...(modules.length ? [{ key: "modules" as const, icon: "🧩", label: this.t("settings_modules"), admin: true }] : []),
+      { key: "modules", icon: "🧩", label: this.t("settings_modules"), admin: true },
     ];
     const topics = all.filter((t) => admin || !t.admin);
     const toggle = () => {
@@ -5479,17 +5482,49 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** Modules installed from the shop; a module's own settings will show here once modules bring some. */
+  /** The modules installed (code from the shop) and the button that imports one – a module file need not go through the extensions page. */
   private renderModuleSettings() {
     const modules = (this.packs ?? []).filter((p) => p.module);
     return html`<div class="fp3d-form">
-      ${modules.map(
-        (p) => html`<div class="fp3d-wide">
-          <b>${packName(p, this.hass?.language ?? "de")}</b>
-          <p class="fp3d-sub">${this.t("pack_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</p>
-          <p class="fp3d-sub">${this.t("module_no_settings")}</p>
-        </div>`,
-      )}
+      ${modules.length
+        ? modules.map(
+            (p) => html`<div class="fp3d-wide">
+              <b>${packName(p, this.hass?.language ?? "de")}</b>
+              <p class="fp3d-sub">${this.t("pack_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</p>
+              <p class="fp3d-sub">${this.t("module_no_settings")}</p>
+            </div>`,
+          )
+        : html`<p class="fp3d-sub fp3d-wide">${this.t("modules_none")}</p>`}
+      <label class="fp3d-btn fp3d-primary fp3d-wide">
+        ${this.t("module_import")}
+        <input type="file" accept=".fp3dpack,.json,application/json" multiple hidden @change=${(e: Event) => void this.importModuleFile(e)} />
+      </label>
+      ${this._moduleMsg ? html`<p class="fp3d-sub fp3d-wide ${this._moduleMsg.ok ? "" : "fp3d-pack-error"}">${this._moduleMsg.text}</p>` : nothing}
+      <p class="fp3d-sub fp3d-wide">${this.t("module_import_hint")}</p>
     </div>`;
+  }
+
+  /** Imports module files like the extensions page imports packs (the same signed format, the same check). */
+  private async importModuleFile(e: Event): Promise<void> {
+    const input = e.target as HTMLInputElement;
+    const files = [...(input.files ?? [])];
+    input.value = "";
+    if (!files.length || !this.hass) return;
+    const done: string[] = [];
+    const failed: string[] = [];
+    for (const file of files) {
+      try {
+        const res = await importPack(this.hass, await file.text());
+        done.push(this.t("module_imported", { name: res.name, publisher: res.publisher }));
+      } catch (err) {
+        const { code, message } = (err ?? {}) as { code?: string; message?: string };
+        const key = `pack_error_${code}` as I18nKey;
+        const text = this.t(key, { detail: message ?? String(err) });
+        failed.push(`${file.name}: ${text === key ? this.t("pack_error_other", { detail: message ?? String(err) }) : text}`);
+      }
+    }
+    if (done.length) this.dispatchEvent(new CustomEvent("packs-changed", { bubbles: true, composed: true }));
+    this._moduleMsg = { ok: failed.length === 0, text: [...done, ...failed].join(" · ") };
   }
 
   protected render(): TemplateResult {

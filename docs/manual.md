@@ -193,7 +193,7 @@ Everything that belongs to the whole plan rather than to a floor, a room or an i
 | **🖼 Background** | what lies behind the 3D house (below) |
 | **⛰ Ground** | see [4.21](#421-cellar-and-ground) |
 | **💾 Backup** | export, import, restore, see chapter 9 |
-| **🧩 Modules** | the modules installed from the shop with their settings |
+| **🧩 Modules** | the modules installed (code from the shop, e.g. "The house answers") and **Import a module …** for the .fp3dpack file |
 
 The **roof shape** (none, flat, gable, ridge, pitch, overhang) sits with the roof tool, see [4.19](#419-roof). The **start view** is remembered in the 3D view: turn and zoom the house, then tap **📌** in the view settings (gear at the top right); **📌✕** resets it. The 3D view, the card and the kiosk then open the house like that, and an opened floor is shown from the same side.
 
@@ -708,7 +708,7 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devic
 
 Commands ("turn on the light", "set the heating to 22 degrees") still go to Assist. The answers come in your user's language (German or English).
 
-**Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). Once imported it is listed under Extensions → Furniture packs as "Module by Mastershort". Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
+**Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). You import the .fp3dpack file under **⚙ Settings → 🧩 Modules → Import a module …** (or under Extensions, together with the furniture packs); it is then listed there as "Module by Mastershort", and its sentences show under 🎙 Voice control. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
 
 **Switching it on.** Voice control is off by default. You switch it on where you want to speak:
 
@@ -1040,7 +1040,7 @@ The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked o
 
 Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 
-At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once.
+At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, add-ons and modules); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import packs and modules …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once.
 
 **Good to know:**
 

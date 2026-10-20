@@ -561,12 +561,14 @@ export class Extensions extends LitElement {
   private renderPacks() {
     const packs = this.packs ?? [];
     const items = packs.reduce((s, p) => s + p.items.length, 0);
-    const pro = packs.filter((p) => p.features?.length).length;
+    const pro = packs.filter((p) => p.features?.length && !p.module).length;
+    const modules = packs.filter((p) => p.module).length;
     return html`<section class="fp3d-ext-card">
       <h3>${this.t("packs")}</h3>
       ${this.summaryBar("packs", [
-        { n: packs.length - pro, label: this.t("ext_sum_packs", { items }), tone: "ok" },
+        { n: packs.length - pro - modules, label: this.t("ext_sum_packs", { items }), tone: "ok" },
         { n: pro, label: this.t("ext_sum_feature_packs"), tone: "missing" },
+        ...(modules ? [{ n: modules, label: this.t("ext_sum_modules"), tone: "ok" as const }] : []),
       ])}
       ${(this._open.has("packs") ? packs : []).map(
         (p) => html`<div class="fp3d-pack">

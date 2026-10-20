@@ -193,7 +193,7 @@ Alles, was zum ganzen Plan gehört und nicht zu einer Etage, einem Raum oder ein
 | **🖼 Hintergrund** | was hinter dem 3D-Haus liegt (unten) |
 | **⛰ Gelände** | siehe [4.21](#421-keller-und-gelände) |
 | **💾 Sicherung** | Export, Import, Wiederherstellen, siehe Kapitel 9 |
-| **🧩 Module** | die aus dem Shop eingespielten Module mit ihren Einstellungen |
+| **🧩 Module** | die eingespielten Module (Code aus dem Shop, etwa „Das Haus antwortet“) und **Modul einspielen …** für die .fp3dpack-Datei |
 
 Die **Dachform** (kein Dach, Flachdach, Satteldach, First, Neigung, Überstand) steht beim Dach-Werkzeug, siehe [4.19](#419-dach). Die **Startansicht** merkst du dir in der 3D-Ansicht: Haus drehen und zoomen, dann in den Ansicht-Einstellungen (Zahnrad oben rechts) **📌** antippen; **📌✕** setzt sie zurück. 3D-Ansicht, Karte und Kiosk öffnen das Haus dann so, und eine geöffnete Etage wird von derselben Seite gezeigt.
 
@@ -708,7 +708,7 @@ NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, 
 
 Befehle („Mach das Licht an“, „Stell die Heizung auf 22 Grad“) gehen weiter an Assist. Die Antworten kommen in der Sprache deines Nutzers (Deutsch oder Englisch).
 
-**Module.** Manche Fähigkeiten kommen als **Modul** aus dem Shop: ein signiertes Pack, das Code mitbringt, den NeonPlan nachlädt – geprüft und an deine Installation gebunden wie ein Möbel-Pack. Das erste Modul ist **Das Haus antwortet** (kostenlos mit Kundenkonto). Es steht nach dem Einspielen unter Erweiterungen → Möbel-Packs als „Modul von Mastershort“. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache); ohne sie bleibt es bei der Sprechblase.
+**Module.** Manche Fähigkeiten kommen als **Modul** aus dem Shop: ein signiertes Pack, das Code mitbringt, den NeonPlan nachlädt – geprüft und an deine Installation gebunden wie ein Möbel-Pack. Das erste Modul ist **Das Haus antwortet** (kostenlos mit Kundenkonto). Du spielst die .fp3dpack-Datei unter **⚙ Einstellungen → 🧩 Module → Modul einspielen …** ein (oder unter Erweiterungen, zusammen mit den Möbel-Packs); danach steht es dort als „Modul von Mastershort“, und seine Sätze erscheinen unter 🎙 Sprachsteuerung. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache); ohne sie bleibt es bei der Sprechblase.
 
 **Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
 
@@ -1040,7 +1040,7 @@ Die mittlere Kachelreihe zeigt die Pro-Erweiterungen. Aktive tragen ein ✓, ges
 
 Geräte in Packs haben eine kleine Leuchtfläche (Display, Status-LED): Verknüpft mit einem Media-Player, Schalter oder Licht leuchtet sie, solange das Gerät läuft; ein Aquarium leuchtet in der Farbe seines Lichts.
 
-Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Möbel-Packs mit der Zahl ihrer Möbel und Erweiterungen); **Liste zeigen** klappt die Liste mit **Entfernen** auf. Genauso fasst die Shop-Verbindung deine Käufe in einem Balken zusammen – installiert, Updates, noch nicht installiert – mit **Alle installieren/aktualisieren**. Darunter liegt **Möbel-Packs importieren …** für Pack-Dateien: Schnupper-Packs aus dem Newsletter, Downloads von der Website oder Installationen ohne Internet. Mehrere Dateien lassen sich auf einmal wählen.
+Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Möbel-Packs mit der Zahl ihrer Möbel, Erweiterungen und Module); **Liste zeigen** klappt die Liste mit **Entfernen** auf. Genauso fasst die Shop-Verbindung deine Käufe in einem Balken zusammen – installiert, Updates, noch nicht installiert – mit **Alle installieren/aktualisieren**. Darunter liegt **Packs und Module importieren …** für Pack-Dateien: Schnupper-Packs aus dem Newsletter, Downloads von der Website oder Installationen ohne Internet. Mehrere Dateien lassen sich auf einmal wählen.
 
 **Gut zu wissen:**
 
