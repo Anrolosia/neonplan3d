@@ -60,6 +60,8 @@ export interface SpokenAlert {
   entity: string;
   /** The sensor's name as Home Assistant has it. */
   name: string;
+  /** A module's warning in its own words (the house's own kinds carry none). */
+  text?: string;
   room: string | null;
   floorId: string | null;
   roomId: string | null;
