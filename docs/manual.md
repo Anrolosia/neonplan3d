@@ -493,7 +493,7 @@ A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Under **�
 - **Show cellars in the earth:** floors below the ground sit in the earth in 3D. Open the cellar and you see it as in a building pit, with the earth walls around it. Unticked, they stand free as before.
 - **Reset the ground** sets everything back.
 
-**Cellar window:** in a window's form, **Cellar window** sets the right size – 100 × 50 cm, 25 cm under the ceiling. A window below the ground gets a **light well** with a grate in 3D by itself. In the window form, the tick **Light well** takes it away again (e.g. where a path runs past outside); **Rim above the ground** raises the rim and grate so a gravel or paved path around the house does not cover them. Where a lawn, path or terrace of the garden tool reaches over the well up to the house, its rim stands just above that surface by itself.
+**Cellar window:** in a window's form, **Cellar window** sets the right size – 100 × 50 cm, 25 cm under the ceiling. A window below the ground gets a **light well** with a grate in 3D by itself. The tick **Light well** is in the window form exactly when 3D draws a well (a window in an outer wall below the ground) and takes it away again (e.g. where a path runs past outside); **Rim above the ground** raises the rim and grate so a gravel or paved path around the house does not cover them. Where a lawn, path or terrace of the garden tool reaches over the well up to the house, its rim stands just above that surface by itself.
 
 ### 4.22 Awnings
 
@@ -514,10 +514,10 @@ Under **Furniture → Household** you find the **waste bin** and the **mailbox**
 
 ### 4.24 Home technology: light switches, sockets, Wi-Fi and hot water
 
-Under **Furniture → Home technology** (in the wall view under 🔌 **Switches**) you find the **light switch** and the **socket**. They hang on the wall: the switch at 1.05 m, the socket at 0.3 m (the outdoor socket at 0.5 m); **Height above floor** sets your own.
+Under **Furniture → Home technology** (in the wall view under 🔌 **Switches**) you find the **light switch** and the **socket**. They hang on the wall: the switch at 1.05 m, the socket at 0.3 m (the outdoor socket at 0.5 m); **Height above floor** sets your own. A socket placed a little into the wall is shown on the wall's face in 3D; on a low wall (a balcony parapet, say) it comes down, without a height of its own, far enough to stay below the wall's top.
 
 - **Buttons / sockets in the frame:** 1 to 4 in one frame; the frame grows wider to fit.
-- **Every button, every socket gets its own entity:** a light, a switch (the relay, the smart plug) or a fan. It glows in 3D while the entity is on – a light in its colour, a socket green.
+- **Every button, every socket gets its own entity:** a light, a switch (the relay, the smart plug) or a fan. It glows in 3D while the entity is on – a socket green, a light switch's button softly: for a light in its colour, otherwise in the accent colour.
 - **The same entity on several sockets:** when one relay switches two sockets (inside and outside, or a double socket), choose the same entity for both. This works across any number of frames.
 - **Power (sockets only):** an optional power sensor per socket. The socket glows brighter the more it draws and counts as a consumer.
 - **Kind (socket):** indoor or **outdoor socket with lid**.
@@ -993,7 +993,7 @@ Not included are camera pictures (the recorder keeps none) and people and their 
 
 Household Pro shows what is due in the household, right where it happens. The waste bins and mailboxes themselves are for everyone (chapter 4.23); Household Pro brings them and other appliances to life. Its fields are in the item's form under **🏠 Household Pro**.
 
-- **Waste bins:** under **Waste calendar or sensor** pick a calendar (e.g. from *Waste Collection Schedule*) or a sensor. In a calendar NeonPlan finds the entries by the words of the bin's waste (paper, food, packaging, PMD, recycling … in many languages); if that does not fit, enter a **word** of your own. A sensor may report the days to the pickup, a date or "tomorrow"/"in 3 days". Every bin with a pickup wears a small **tag** on its lid – "Today", "Tomorrow", "in 3 days" – in its colour; today and tomorrow stand out. A tap on the bin shows its next pickups. **Glow from / until** sets from when the day before until when on pickup day a bin counts as due (for all bins).
+- **Waste bins:** under **Waste calendar or sensor** pick a calendar (e.g. from *Waste Collection Schedule*) or a sensor. In a calendar NeonPlan finds the entries by the words of the bin's waste (paper, food, packaging, PMD, recycling … in many languages); if that does not fit, enter a **word** of your own. A sensor may report the days to the pickup, a date or "tomorrow"/"in 3 days". Every bin with a pickup wears a small **tag** on its lid – "Today", "Tomorrow", "in 3 days" – in its colour; today and tomorrow stand out. A tap on the bin shows its next pickups. **Glow from / until** sets from when the day before until when on pickup day a bin counts as due (for all bins). In the Day and Blueprint looks, bins and pack furniture with colours of their own (a Halloween pumpkin, say) keep their colour down to the ground.
 - **Mailbox:** a **post sensor** – a flag (e.g. an input_boolean "post" set by an automation) or the letter flap – and optionally the **sensor of the emptying door**. While post is in it, the mailbox glows and shows "Post" until it is emptied.
 - **Plants:** a plant (plant.*) or a moisture sensor; below the set value (default 20 %) it shows "Thirsty".
 - **Pinboard:** under **⚙ Settings → House → Pinboard (text helper)** pick a text helper (`input_text`) or sensor. Its text stands at the top of "Today in the household", several lines separated by `|` – automations write into it ("parcel for Alla is in the garage", "plumber tomorrow at 10"), the card shows it.

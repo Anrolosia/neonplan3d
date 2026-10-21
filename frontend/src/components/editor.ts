@@ -129,8 +129,8 @@ import {
   type ScreenPicture,
   STAIR_TYPES,
   setTerrain,
-  terrainAt,
 } from "../model.ts";
+import { windowGetsWell } from "../geometry/wells.ts";
 import { controls, tokens } from "../styles.ts";
 import "./entity-picker.ts";
 import type { HassArea, HassFloor, HomeAssistant } from "../types.ts";
@@ -10758,7 +10758,7 @@ export class Fp3dEditor extends LitElement {
               ${this.t("contact_invert")}</label
             >`
           : nothing}
-        ${o.type === "window" && this.floor && o.sill < terrainAt() - this.floor.elevation - 0.05
+        ${this.floor && windowGetsWell(this._doc, this.floor, o)
           ? html`<label class="fp3d-check fp3d-wide" title=${this.t("well_hint")}
                 ><input type="checkbox" .checked=${o.well !== false} ?disabled=${!admin} @change=${(ev: Event) => this.updateOpening({ well: (ev.target as HTMLInputElement).checked ? undefined : false })} />
                 ${this.t("well")}</label

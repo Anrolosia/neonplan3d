@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.25.0
+
+### Fixed
+
+- A wall socket or switch placed a little into a wall is drawn on the wall's face in 3D (its glow and pin with it), and on a wall lower than its mounting height – a balcony parapet – it comes down to stay below the wall's top; it was hidden inside the wall (#593, thanks @RkcCorian).
+- Pack furniture with colours of its own (the Halloween pumpkins) keeps them down to the ground in the Day and Blueprint looks, like the waste bins; its lower half turned grey or blue (#609, thanks @TheBhim).
+- The **Light well** tick in the window form now comes from the same decision that draws the well in 3D (an outer wall, a floor in the ground, the sill under the ground), so it is offered for every window that gets a well and only for those (#524, thanks @1970lexi).
+
+### Changed
+
+- A light switch's button glows softly while what it switches is on: a light in its colour, anything else in the look's accent colour (#593, thanks @RkcCorian).
+
 ## 1.24.0
 
 ### Changed
