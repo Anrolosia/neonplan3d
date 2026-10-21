@@ -1967,6 +1967,42 @@ export function packMotionParts(item: PackItem, kind: PackMotion, open: number, 
 }
 
 /** A pack lamp into the lamp buffer: glowing parts in the light's colour (`glow`), or dark when off. */
+/**
+ * Where a pack lamp's light comes from (#680): the centre of its glowing parts – each weighed by its size, so the
+ * glass of a lantern counts more than a small indicator – turned and mirrored like the item, as plan x and z and the
+ * height y. Null for an item without glowing parts.
+ */
+export function packGlowCentre(item: PackItem, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "mirror">, base: number): [number, number, number] | null {
+  const w = Math.max(0.05, f.w);
+  const d = Math.max(0.05, f.d);
+  const h = Math.max(0.005, f.h);
+  let weight = 0;
+  let sx = 0;
+  let sy = 0;
+  let sz = 0;
+  for (const p of fitParts(item, w, d, h)) {
+    if (!p.glow) continue;
+    // a loft's centre lies between its bottom and its top rectangle; a turned part turns around its own centre
+    const x = ((p.x + (p.shape === "loft" ? (p.tx ?? p.x) : p.x)) / 2) * w;
+    const z = ((p.z + (p.shape === "loft" ? (p.tz ?? p.z) : p.z)) / 2) * d;
+    const y0 = p.y * h;
+    const y1 = Math.min(h, (p.y + p.h) * h);
+    const k = Math.max(1e-6, p.w * w * p.d * d * Math.max(0, y1 - y0));
+    weight += k;
+    sx += x * k;
+    sy += ((y0 + y1) / 2) * k;
+    sz += z * k;
+  }
+  if (!weight) return null;
+  const x = sx / weight;
+  const z = sz / weight;
+  const a = f.rotation * DEG;
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  const mx = f.mirror ? -1 : 1;
+  return [f.x + mx * x * c - z * s, base + sy / weight, f.z + mx * x * s + z * c];
+}
+
 export function pushPackLamp(buf: GeoBuffer, item: PackItem, f: Pick<Furniture, "x" | "z" | "rotation" | "w" | "d" | "h" | "mirror">, base: number, glow: number): void {
   const a = f.rotation * DEG;
   const c = Math.cos(a);

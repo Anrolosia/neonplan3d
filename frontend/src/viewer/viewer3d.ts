@@ -56,7 +56,7 @@ import { buildFloorGeometry, SLAB, stairHoleParts, type FloorGeometry } from "./
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { CameraProjections, PROJECTION_LAYER, type ProjectionSurface, type ProjectorPose } from "./projection.ts";
-import { pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook, hasFixedColors } from "./furniture.ts";
+import { packGlowCentre, pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook, hasFixedColors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -1409,7 +1409,7 @@ export class FloorplanViewer {
         for (const [id, cur] of fv.openings) {
           const to = states.get(id) ?? CLOSED;
           const next = { ...to, open2: to.open2 ?? 0, tilt2: to.tilt2 ?? 0 };
-          if (next.open === cur.open && next.open2 === (cur.open2 ?? 0) && next.tilt === cur.tilt && next.tilt2 === (cur.tilt2 ?? 0) && next.cover === cur.cover && !!next.sensed === !!cur.sensed) continue;
+          if (next.open === cur.open && next.open2 === (cur.open2 ?? 0) && next.tilt === cur.tilt && next.tilt2 === (cur.tilt2 ?? 0) && next.cover === cur.cover && !!next.sensed === !!cur.sensed && !!next.unlocked === !!cur.unlocked) continue;
           fv.openings.set(id, next);
           changed = true;
         }
@@ -1839,6 +1839,18 @@ export class FloorplanViewer {
     this.buildGlow(fv);
   }
 
+  /**
+   * A wall lamp from a furniture pack: the centre of its glowing parts (plan x, height, plan z), where its halo and its
+   * light sit (#680); null for any other lamp and for a pack lamp without glowing parts (they keep their old places).
+   */
+  private packLightAt(d: DeviceMarker): [number, number, number] | null {
+    if (d.lamp !== "wall" || !d.pack) return null;
+    const item = packItem(d.pack);
+    if (!item) return null;
+    const [w, dd, h] = d.size ?? LAMP_SIZE.wall;
+    return packGlowCentre(item, { x: d.x, z: d.z, rotation: d.rotation ?? 0, w, d: dd, h, mirror: d.mirror }, d.base ?? 0);
+  }
+
   /** Light sources of the lights that are on, with the height and characteristic of their lamp. */
   private lightSources(fv: FloorView): LightSource[] {
     const out: LightSource[] = [];
@@ -1883,7 +1895,11 @@ export class FloorplanViewer {
             out.push({ x: d.x + Math.cos(a) * w * t * Math.cos(r), y: y + Math.sin(r) * w * t, z: d.z + Math.sin(a) * w * t * Math.cos(r), color, level: glow.level * 0.55, kind: sideways || r ? "omni" : kind, room });
           }
         }
-      } else out.push({ x: d.x, y, z: d.z, color, level: glow.level, kind, room });
+      } else {
+        // a wall lamp from a pack shines from its glowing parts (the lantern's glass), not from in front of it (#680)
+        const at = this.packLightAt(d);
+        out.push({ x: at ? at[0] : d.x, y: at ? at[1] : y, z: at ? at[2] : d.z, color, level: glow.level, kind, room });
+      }
     }
     out.push(...this.lightFromAbove(fv));
     return out;
@@ -2555,8 +2571,8 @@ export class FloorplanViewer {
         const target = this.openingTargets.get(id) ?? CLOSED;
         // nothing to do for an opening that rests at its target (the usual case)
         const near = (a: number | null | undefined, b: number | null | undefined) => (a ?? null) === (b ?? null) || (typeof a === "number" && typeof b === "number" && Math.abs(a - b) < 0.003);
-        if (near(target.open, cur.open) && near(target.open2 ?? 0, cur.open2 ?? 0) && near(target.tilt, cur.tilt) && near(target.tilt2 ?? 0, cur.tilt2 ?? 0) && near(target.cover, cur.cover) && !!target.sensed === !!cur.sensed) continue;
-        const next = { ...cur, open2: cur.open2 ?? 0, tilt2: cur.tilt2 ?? 0, sensed: target.sensed };
+        if (near(target.open, cur.open) && near(target.open2 ?? 0, cur.open2 ?? 0) && near(target.tilt, cur.tilt) && near(target.tilt2 ?? 0, cur.tilt2 ?? 0) && near(target.cover, cur.cover) && !!target.sensed === !!cur.sensed && !!target.unlocked === !!cur.unlocked) continue;
+        const next = { ...cur, open2: cur.open2 ?? 0, tilt2: cur.tilt2 ?? 0, sensed: target.sensed, unlocked: target.unlocked };
         let busy = false;
         for (const key of ["open", "open2", "tilt", "tilt2"] as const) {
           const to = target[key] ?? 0;
@@ -2577,7 +2593,7 @@ export class FloorplanViewer {
             busy = true;
           }
         }
-        if (next.open !== cur.open || next.open2 !== (cur.open2 ?? 0) || next.tilt !== cur.tilt || next.tilt2 !== (cur.tilt2 ?? 0) || next.cover !== cur.cover || !!next.sensed !== !!cur.sensed) {
+        if (next.open !== cur.open || next.open2 !== (cur.open2 ?? 0) || next.tilt !== cur.tilt || next.tilt2 !== (cur.tilt2 ?? 0) || next.cover !== cur.cover || !!next.sensed !== !!cur.sensed || !!next.unlocked !== !!cur.unlocked) {
           fv.openings.set(id, next);
           changed = true;
         }
@@ -2924,7 +2940,13 @@ export class FloorplanViewer {
             hc.push(...glow.color.map((c) => c * glow.level * 0.7 * 0.6));
           } else push(d.x + Math.cos(ang) * w * t, d.z + Math.sin(ang) * w * t, 0.6);
         }
-      else if (d.lamp === "wall") push(d.x - Math.sin(ang) * (dd / 2 + 0.05), d.z + Math.cos(ang) * (dd / 2 + 0.05));
+      else if (d.lamp === "wall") {
+        const at = this.packLightAt(d);
+        if (at) {
+          hp.push(...at);
+          hc.push(...glow.color.map((c) => c * glow.level * 0.7));
+        } else push(d.x - Math.sin(ang) * (dd / 2 + 0.05), d.z + Math.cos(ang) * (dd / 2 + 0.05));
+      }
       else push(d.x, d.z);
       if (this.highQuality && (d.lamp === "downlight" || d.lamp === "spot")) {
         // soft cone from the lamp to the floor, fading towards the floor

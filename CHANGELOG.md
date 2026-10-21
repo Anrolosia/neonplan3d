@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.25.1
+
+### New
+
+- **Door with a smart lock:** a tap on the door itself opens its menu with **Lock** or **Unlock** (by the lock's state, always asking first), and the leaf's free edge glows softly in the accent colour while the lock is unlocked – whatever the door contact says. The lock pin stays as it is; doors without a lock and doors with a drive behave as before (#682, thanks @ciechompl).
+- **Garage door with a pulse switch:** **Drive** also takes a `switch`, a `button` or an `input_button` (an opener that answers a short pulse). A tap on the door switches it on or presses it – asking first when *Ask first* is ticked – and the door's state comes from **Contact**, so the separate door contact stays. A switch chosen under *Contact* in older plans still counts as open while on (#677, thanks @ciechompl).
+
+### Fixed
+
+- **Door with a smart lock showed a roller shutter:** a blind's position sensor that stayed in the door's data after the drive was set to *None* (or after a window was turned into a door) lowered a shutter over it; the position sensor now only counts with a blind (#682, thanks @ciechompl).
+- **Voice: "Zeige mir Garage" showed the outdoor area:** between names of the same length a room's own name now wins over an outdoor area's, and own names over further names (the Home Assistant area's name, aliases), so the room "Garage" in the cellar is no longer lost to a driveway linked to the garage's area (#668, thanks @1970lexi).
+- **Wall lamps from furniture packs:** the halo and the light now sit in the lamp's glowing parts (the lantern's glass) instead of floating in front of it; pack lamps without glowing parts are unchanged (#680, thanks @LiveSide).
+
 ## 1.25.0
 
 ### New

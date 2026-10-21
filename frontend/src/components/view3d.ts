@@ -31,6 +31,7 @@ import { carState, type CarState, heatSensorOn, roomClimateValue,
   onlyColor,
   fanSpeed,
   apOnline,
+  isPulseDrive,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
@@ -386,7 +387,7 @@ export class Fp3dView3d extends LitElement {
   /** A running swipe on a lamp or blind: the value shown next to the finger. */
   private declare _swipe: { entity: string; kind: "light" | "cover"; start: number; value: number; x: number; y: number } | null;
   /** Quick menu at a device (long press). */
-  private declare _menu: { entity: string; x: number; y: number; car?: CarState } | null;
+  private declare _menu: { entity: string; x: number; y: number; car?: CarState; doorLock?: boolean } | null;
   /** Looking through a camera: its live picture lies over the 3D view; `back` is the view to return to. */
   private declare _through: { entity: string; back: ReturnType<FloorplanViewer["getView"]> } | null;
   /** Camera wall: the camera shown big (null: all tiles). */
@@ -3383,6 +3384,12 @@ export class Fp3dView3d extends LitElement {
   private openingTargets(): Map<string, string> {
     const out = new Map<string, string>();
     for (const [id, e] of this.openingLinks ?? []) {
+      // a door with a smart lock (and no drive) offers to lock or unlock it (#682); a garage door driven by a pulse
+      // switch or button presses it (#677): both go through the opening itself
+      if ((e.lock && !e.cover) || isPulseDrive(e.cover)) {
+        out.set(id, `opening:${id}`);
+        continue;
+      }
       const target = e.cover ?? e.contact ?? e.tilt;
       if (target) out.set(id, target);
     }
@@ -3449,6 +3456,7 @@ export class Fp3dView3d extends LitElement {
 
   /** Long press: the quick menu at the device, or the details for devices without one. */
   private onDeviceHold(entityId: string, x: number, y: number): void {
+    if (entityId.startsWith("opening:")) return this.onOpeningTap(entityId.slice(8), x, y, true);
     // a wall switch or socket: the quick menu of its one entity, else the frame's menu
     if (entityId.startsWith("gangs:")) {
       const f = this.building?.floors.flatMap((m) => m.furniture).find((m) => m.id === entityId.slice(6));
@@ -4630,6 +4638,7 @@ export class Fp3dView3d extends LitElement {
         .hass=${this.hass}
         .entity=${m.entity}
         .car=${m.car ?? null}
+        ?doorLock=${!!m.doorLock}
         .presets=${hasFeature("sound") ? (this.building?.settings.media_presets ?? []) : []}
         ?confirmSwitch=${this.confirmSet.has(m.entity)}
         ?pro=${hasFeature("camera_cockpit")}
@@ -4641,6 +4650,7 @@ export class Fp3dView3d extends LitElement {
   private onDeviceTap(entityId: string, x = 0, y = 0): void {
     // trail pins and lamps without a light are drawn, but nothing of Home Assistant stands behind them
     if (entityId.startsWith("trail:") || entityId.startsWith("lamp:")) return;
+    if (entityId.startsWith("opening:")) return this.onOpeningTap(entityId.slice(8), x, y, false);
     // a wall switch or socket: one entity is switched right away, several open the frame's menu
     if (entityId.startsWith("gangs:")) {
       const fid = entityId.slice(6);
@@ -4701,6 +4711,40 @@ export class Fp3dView3d extends LitElement {
       if (this.confirmSet.has(entityId) && !confirm(translate(this.hass, "confirm_switch", { name: entityName(this.hass, entityId) }))) return;
       void toggleEntity(this.hass, entityId);
     } else openMoreInfo(this, entityId);
+  }
+
+  /**
+   * A tap on a door with a smart lock: its menu offers to lock or unlock (asking first, #682). A tap on a garage door
+   * driven by a pulse switch or button presses it – asking first when the door is marked so (#677); a long press
+   * opens the drive's details.
+   */
+  private onOpeningTap(openingId: string, x: number, y: number, hold: boolean): void {
+    const e = this.openingLinks?.get(openingId);
+    if (!e || !this.hass) return;
+    if (e.lock && !e.cover) {
+      if (this.ro) this.showInfo(e.lock, x, y);
+      else this._menu = { entity: e.lock, x, y, doorLock: true };
+      return;
+    }
+    const drive = e.cover;
+    if (!drive) return;
+    if (this.ro) {
+      this.showInfo(e.contact ?? drive, x, y);
+      return;
+    }
+    if (hold) {
+      openMoreInfo(this, drive);
+      return;
+    }
+    const st = this.hass.states[drive];
+    if (!st || isUnavailable(st)) {
+      openMoreInfo(this, drive);
+      return;
+    }
+    if (this.confirmSet.has(drive) && !confirm(translate(this.hass, "confirm_switch", { name: entityName(this.hass, drive) }))) return;
+    // a pulse switch turns itself off again: it is only ever switched on; buttons are pressed
+    const [domain] = drive.split(".");
+    void this.hass.callService(domain, domain === "switch" ? "turn_on" : "press", { entity_id: drive });
   }
 
   /** The look shown: the chosen one, or by the sun for "auto" – Day above the horizon, Neon below. */
