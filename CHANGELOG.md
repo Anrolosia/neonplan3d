@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.26.0
+
+### Faster on wall tablets
+
+- **Moving decorations rest on the Tablet level:** the energy flow, the solar fields, the sound rings, the pool water, robot vacuums, colour effects and the pets draw about 5 frames a second instead of 15 and stand still 30 seconds after the last touch; a touch, or something new that starts to move, wakes them. In the busy demo house an untouched Fire tablet drew about 45 frames a second without end; now it draws about 5 for half a minute and then none. Auto and High are unchanged.
+- **Warnings:** on the Tablet level the warning at the top glows steadily instead of pulsing (the pulsing shadow kept the tablet's graphics busy all the time); the rooms still pulse. A pulse now recolours only the floors whose rooms change.
+- **Power sensors:** on the Tablet level a change of measured values alone (watts, temperatures …) reaches the 3D view at most every 2 seconds; a switch, a door or an alarm still shows at once.
+- **Blinds and doors in motion** recompute the light and sunlight in their room about 5 times a second on the Tablet level instead of every frame (and once more where they stop).
+- **Fire tablets found more reliably:** "Auto" now also picks the Tablet level on the Fire HD 10 Plus (model codes with five letters, such as KFTRPWI).
+- The glowing link lines of the holograms drop their blur filter on the Tablet level, like the other glows.
+
 ## 1.25.1
 
 ### New

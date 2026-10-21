@@ -877,7 +877,7 @@ Auch ohne Solaranlage: Jedes Gerät mit Leistungssensor (Fernseher, Waschmaschin
 
 Der Knopf **Hologramme** in der Energieleiste (neben ⚡) blendet alle Karten aus und wieder ein – praktisch, wenn viele Geräte eine tragen. In der Karte gibt es den Knopf ebenfalls, oder du legst es mit `holograms` fest.
 
-**Wandtablet:** Auf der Tablet-Stufe laufen die Hologramme ohne Glaseffekt, die Leitungen mit halber Bildrate.
+**Wandtablet:** Auf der Tablet-Stufe laufen die Hologramme ohne Glaseffekt, die Leitungen mit etwa 5 Bildern pro Sekunde; 30 Sekunden nach der letzten Berührung bleiben sie stehen, bis jemand wieder tippt.
 
 **Wenn etwas fehlt:** Die Einrichtung oben im Werkzeug zeigt, was noch nicht passt. Kein Hologramm bedeutet meist: kein Sensor am Wechselrichter oder keine Hausansicht (Etagen- und Raumansichten haben keins). Keine Leitung zu einem Gerät: Das Gerät hat keinen Leistungssensor.
 
@@ -895,7 +895,7 @@ Klang & Kino bringt die Musik ins 3D-Haus. Voraussetzung ist ein Lautsprecher im
 
 **Smart Speaker und Displays:** Das Pack **Heimkino & Hi-Fi** hat ab Release 2 Smart Speaker als Kugel, Zylinder, Puck, Pod, hoch und oval, einen Kompakt- und einen tragbaren Multiroom-Lautsprecher, eine Premium-Soundbar und Smart Displays mit 5″, 7″, 8″ und 15″ (Wand) – passend für Echo, Nest, HomePod, Sonos und Co. Mit Klang & Kino leuchtet ihr Lichtring in der App-Farbe, solange sie spielen, und die Displays zeigen das Cover. Solange die Karte über einem Lautsprecher schwebt, tritt sein Pin zur Seite und kommt wieder, wenn die Musik endet. Fernseher und Bildschirme bekommen ihre Farben und Bilder weiter über **Bildschirme live** (6.3).
 
-**Wandtablet:** Auf der Tablet-Stufe laufen die Ringe mit halber Bildrate, die Karten ohne Glaseffekt.
+**Wandtablet:** Auf der Tablet-Stufe laufen die Ringe mit etwa 5 Bildern pro Sekunde und ruhen 30 Sekunden nach der letzten Berührung, die Karten ohne Glaseffekt.
 
 **Welche Lautsprecher passen?** NeonPlan nutzt die Standard-Schnittstelle der Media Player von Home Assistant: Was im Media-Player-Fenster von Home Assistant geht, geht auch hier. Das ist eine Einschätzung nach Dokumentation und Erfahrungen, keine Garantie für jedes Modell:
 
@@ -1197,7 +1197,7 @@ idle_orbit: false
 NeonPlan 3D ist für Wandtablets wie das Amazon Fire gebaut:
 
 - **Kein Rechnen im Leerlauf.** Ändert sich nichts, zeichnet die Ansicht kein einziges Bild. Die FPS-Anzeige zeigt dann „Ruhe (0 B/s)“.
-- **Qualitätsstufe Tablet:** Auf Fire-Tablets wählt „Auto“ sie von selbst. Muster, Schatten, Halos und Partikel fallen weg, Animationen laufen mit halber Rate.
+- **Qualitätsstufe Tablet:** Auf Fire-Tablets wählt „Auto“ sie von selbst. Muster, Schatten, Halos und Partikel fallen weg. Bewegte Deko (Energiefluss, Solarfelder, Klangringe, Poolwasser, Saugroboter, Farbeffekte, Haustiere) läuft mit etwa 5 Bildern pro Sekunde und bleibt 30 Sekunden nach der letzten Berührung stehen; Antippen oder etwas, das neu losläuft, weckt sie wieder. Reine Messwerte (Watt, Temperatur) erscheinen höchstens alle 2 Sekunden, Schalter, Türen und Alarme sofort.
 - **Kiosk-Optionen der Karte:** Nach einigen Minuten ohne Berührung kehrt die Karte zur Startansicht zurück. Nachts dimmt sie nach Sonnenstand oder Uhrzeit. Als Bildschirmschoner dreht sich das Haus langsam.
 - **Warnungen** springen auf Wunsch von selbst in den betroffenen Raum.
 - Hochkant erscheint das Raumfenster unten.

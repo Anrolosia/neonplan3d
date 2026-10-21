@@ -877,7 +877,7 @@ Also without a solar system: every device with a power sensor (TV, washing machi
 
 The **Holograms** button in the energy bar (next to ⚡) hides all cards and shows them again – handy when many devices carry one. The card has the button too, or you fix it with `holograms`.
 
-**Wall tablet:** on the tablet level the holograms run without the glass effect and the cables at half the frame rate.
+**Wall tablet:** on the tablet level the holograms run without the glass effect and the cables at about 5 frames a second; 30 seconds after the last touch they stand still until someone taps again.
 
 **When something is missing:** the Setup list at the top of the tool shows what does not fit yet. No hologram usually means: no sensor on the inverter, or not the house view (floor and room views have none). No cable to a device: the device has no power sensor.
 
@@ -895,7 +895,7 @@ Sound & Cinema brings the music into the 3D house. It needs a speaker in the pla
 
 **Smart speakers and displays:** from release 2 the **Home Cinema & Hi-Fi** pack has smart speakers as a ball, cylinder, puck, pod, tall and oval, a compact and a portable multiroom speaker, a premium soundbar and smart displays of 5″, 7″, 8″ and 15″ (wall) – fitting Echo, Nest, HomePod, Sonos and co. With Sound & Cinema their light ring glows in the app's colour while they play, and the displays show the cover. While the card floats over a speaker, its pin steps aside and comes back when the music ends. TVs and screens keep their colours and pictures through **Live screens** (6.3).
 
-**Wall tablet:** on the tablet level the rings run at half the frame rate, the cards without the glass effect.
+**Wall tablet:** on the tablet level the rings run at about 5 frames a second and rest 30 seconds after the last touch, the cards without the glass effect.
 
 **Which speakers fit?** NeonPlan uses Home Assistant's standard media player interface: what works in Home Assistant's media player dialog works here too. This is an assessment from documentation and experience, not a guarantee for every model:
 
@@ -1197,7 +1197,7 @@ idle_orbit: false
 NeonPlan 3D is built for wall tablets such as the Amazon Fire:
 
 - **No work while idle.** If nothing changes, the view draws not a single frame. The FPS display then reads "At rest (0 fps)".
-- **Tablet quality level:** "Auto" picks it by itself on Fire tablets. Patterns, shadows, halos and particles are left out, animations run at half rate.
+- **Tablet quality level:** "Auto" picks it by itself on Fire tablets. Patterns, shadows, halos and particles are left out. Moving decorations (energy flow, solar fields, sound rings, pool water, robot vacuums, colour effects, pets) run at about 5 frames a second and stand still 30 seconds after the last touch; a tap, or something new that starts to move, wakes them. Measured values alone (watts, temperature) show at most every 2 seconds, switches, doors and alarms at once.
 - **Kiosk options of the card:** After a few minutes without a touch the card returns to the start view. At night it dims by the sun or by the clock. As a screensaver the house turns slowly.
 - **Warnings** can jump into the affected room by themselves.
 - In portrait the room panel appears at the bottom.

@@ -78,6 +78,7 @@ import { ALWAYS, DEG, GeoBuffer, LineBuffer, pushPrism } from "./geo.ts";
 import { buildLightSurface, lightColors, roomIndexAt, type LightKind, type LightSource, type LightSurface, zoneOf } from "./lighting.ts";
 import { buildOpeningParts, CLOSED, type OpeningState } from "./openings.ts";
 import { circlePath, cleaningPath, stepRobot, type RobotInfo, type RobotMotion } from "./robot.ts";
+import { decorDelay, lowEndDevice } from "./pace.ts";
 
 export type { RobotInfo } from "./robot.ts";
 
@@ -357,6 +358,8 @@ const LOW_STRIP = 1.0;
 const HANGING = new Set<LampModel>(["ceiling", "downlight", "spot", "panel", "pendant", "fan", "strip"]);
 const FLASH_MS = 450;
 const EFFECT_MS = 125;
+/** Tablet level: light and sun follow a moving door or blind about 5 times a second (ms). */
+const LOW_LIGHT_MS = 200;
 /** Turns of the colour wheel per second while a colour effect runs. */
 const EFFECT_SPEED = 0.08;
 const LAMP_SIZE: Record<LampModel, [number, number, number]> = {
@@ -473,6 +476,8 @@ interface FloorView {
   mask: FoldMasks;
   /** Shown opening states (animated towards the targets set from Home Assistant). */
   openings: Map<string, OpeningState>;
+  /** When the light of this floor followed its doors and blinds last (performance.now). */
+  lightAt: number;
   /** Current and target height offset and opacity. */
   y: number;
   o: number;
@@ -486,9 +491,7 @@ const ACTIVE_FLOOR = new Color(0x1a2a4d);
 
 export function isLowEnd(): boolean {
   const nav = navigator as Navigator & { deviceMemory?: number };
-  const mem = nav.deviceMemory ?? 8;
-  const cores = navigator.hardwareConcurrency || 8;
-  return mem <= 3 || cores <= 4 || /Silk|KF[A-Z]{2,4}\b/.test(navigator.userAgent);
+  return lowEndDevice(navigator.userAgent, nav.deviceMemory, navigator.hardwareConcurrency);
 }
 
 export class FloorplanViewer {
@@ -559,6 +562,13 @@ export class FloorplanViewer {
   private lastStatsFrame = 0;
   private lowQuality = false;
   private highQuality = false;
+  /** Tablet level: when the view was last touched or something began to move (decorative animations rest 30 s later). */
+  private lastWake = performance.now();
+  /** The tints and selection last written into each floor's colours (applyHighlight skips floors that stay). */
+  private highlighted = new WeakMap<object, string>();
+  private decorWas = false;
+  /** A frame asked for by a module's decoration (pets, ghost, fish), at the decorative pace. */
+  private decorTimer: ReturnType<typeof setTimeout> | undefined;
   /** Seconds used for animated colour effects (advanced in steps while an effect runs). */
   private effectTime = 0;
   /** The frame was asked for by the effect timer or a room tint (shown in the statistics). */
@@ -703,6 +713,8 @@ export class FloorplanViewer {
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(host);
     document.addEventListener("visibilitychange", this.onVisibility);
+    // any touch on the view (canvas, pins, cards over it) wakes resting animations on the tablet level
+    for (const type of ["pointerdown", "pointerup", "wheel", "keydown"]) host.addEventListener(type, this.onInput, { capture: true, passive: true });
     if (typeof IntersectionObserver === "function") {
       this.intersection = new IntersectionObserver((entries) => {
         const on = entries.some((e) => e.isIntersecting);
@@ -719,6 +731,37 @@ export class FloorplanViewer {
   get low(): boolean {
     return this.lowQuality;
   }
+
+  /** Tablet level: the decorative animations rest (nobody touched the view for a while). */
+  get resting(): boolean {
+    return this.decor(0) === null;
+  }
+
+  /** Someone used the view (or something new began to move): the decorative animations run again on the tablet level. */
+  wake(): void {
+    const resting = this.resting;
+    this.lastWake = performance.now();
+    if (resting) this.invalidate();
+  }
+
+  /** A module's decoration moved (pets, ghost, fish): a frame now – on the tablet level at the decorative pace, none while resting. */
+  animate(): void {
+    if (!this.lowQuality) return this.invalidate();
+    if (this.decorTimer || this.frame) return;
+    const ms = this.decor(0);
+    if (ms === null) return;
+    this.decorTimer = setTimeout(() => {
+      this.decorTimer = undefined;
+      this.invalidate();
+    }, ms);
+  }
+
+  /** Delay until the next frame of a decorative animation (its own on normal devices), null while it rests. */
+  private decor(ms: number, lowMs?: number): number | null {
+    return decorDelay(ms, this.lowQuality, performance.now() - this.lastWake, lowMs);
+  }
+
+  private readonly onInput = () => this.wake();
 
   /** Vehicles in the parking spots (spot id -> pack item type); a change rebuilds the floors. */
   setParked(parked: Map<string, string>): void {
@@ -782,6 +825,7 @@ export class FloorplanViewer {
 
   setBuilding(building: Building): void {
     const first = this.building === null;
+    this.lastWake = performance.now();
     this.building = building;
     // this bundle's own copy of the ground (outdoor areas, earth around cellars)
     setTerrain(building);
@@ -802,6 +846,7 @@ export class FloorplanViewer {
   }
 
   setFloor(floorId: string | null, animate = true): void {
+    this.lastWake = performance.now();
     this.keepNext = this.keepView && floorId !== null && this.floorId !== null && floorId !== this.floorId;
     this.floorId = floorId;
     this.roomId = null;
@@ -841,6 +886,7 @@ export class FloorplanViewer {
 
   /** Highlight a room and fly into it (null = back to the floor overview). */
   selectRoom(roomId: string | null): void {
+    this.lastWake = performance.now();
     this.roomId = roomId;
     this.labelsDirty = true;
     this.applyHighlight();
@@ -1619,6 +1665,8 @@ export class FloorplanViewer {
     this.resizeObserver.disconnect();
     this.intersection?.disconnect();
     document.removeEventListener("visibilitychange", this.onVisibility);
+    for (const type of ["pointerdown", "pointerup", "wheel", "keydown"]) this.host.removeEventListener(type, this.onInput, { capture: true });
+    clearTimeout(this.decorTimer);
     this.controls.dispose();
     this.clear();
     this.disposeRetired();
@@ -2263,6 +2311,7 @@ export class FloorplanViewer {
         ty: 0,
         to: 1,
         appliedO: -1,
+        lightAt: 0,
         label,
       });
     }
@@ -2567,6 +2616,7 @@ export class FloorplanViewer {
     const k = 1 - Math.exp(-dt / OPENING_TAU);
     for (const fv of this.floors) {
       let changed = false;
+      let floorBusy = false;
       for (const [id, cur] of fv.openings) {
         const target = this.openingTargets.get(id) ?? CLOSED;
         // nothing to do for an opening that rests at its target (the usual case)
@@ -2598,11 +2648,18 @@ export class FloorplanViewer {
           changed = true;
         }
         moving ||= busy;
+        floorBusy ||= busy;
       }
       if (changed) {
         this.buildOpenings(fv);
-        this.buildGlow(fv);
-        this.buildSun(fv);
+        // the light through doors and the sun through blinds follow every frame; on the tablet level about
+        // 5 times a second while something moves, and once more where it stops
+        const now = performance.now();
+        if (!this.lowQuality || !floorBusy || now - fv.lightAt >= LOW_LIGHT_MS) {
+          fv.lightAt = now;
+          this.buildGlow(fv);
+          this.buildSun(fv);
+        }
       }
     }
     return moving;
@@ -3401,6 +3458,10 @@ export class FloorplanViewer {
   private applyHighlight(): void {
     for (const fv of this.floors) {
       const colors = fv.geo.floor.getAttribute("color");
+      // a pulsing warning recolours its rooms only: floors whose tints and selection stay are left alone
+      const sig = fv.geo.roomTris.map((r) => `${this.roomTint?.get(r.roomId)?.join(",") ?? ""}${r.roomId === this.roomId ? "*" : ""}`).join(";");
+      if (this.highlighted.get(colors) === sig) continue;
+      this.highlighted.set(colors, sig);
       for (const r of fv.geo.roomTris) {
         const c = new Color(r.color);
         const tint = this.roomTint?.get(r.roomId);
@@ -4348,9 +4409,14 @@ export class FloorplanViewer {
     // everything that keeps drawing (also the energy flow, effects, robots) shows in the frame rate
     this.reportStats(now, busy);
     if (moving) this.invalidate();
-    if (this.effectFloors.size && !this.effectTimer && !document.hidden) {
-      // colour effects: a few steps per second are enough and keep the tablet idle in between
-      const ms = this.lowQuality ? 2 * EFFECT_MS : EFFECT_MS;
+    // tablet level: something new began to move (music, a robot, the energy flow …) – it shows for a while
+    const decorNow = this.flowActive || this.solarActive || this.soundActive || this.poolActive || robotsMoving || fansTurning || this.effectFloors.size > 0;
+    if (decorNow && !this.decorWas) this.lastWake = now;
+    this.decorWas = decorNow;
+    // colour effects: a few steps per second are enough and keep the tablet idle in between
+    const effectMs = this.effectFloors.size ? this.decor(this.lowQuality ? 2 * EFFECT_MS : EFFECT_MS) : null;
+    if (effectMs !== null && !this.effectTimer && !document.hidden) {
+      const ms = effectMs;
       this.effectTimer = setTimeout(() => {
         this.effectTimer = undefined;
         this.effectTime += ms / 1000;
@@ -4360,7 +4426,8 @@ export class FloorplanViewer {
           this.buildLamps(fv);
           this.buildGlow(fv);
         }
-        this.invalidate();
+        // tablet level: a decorative frame that comes anyway shows the step as well
+        if (!this.decorTimer) this.invalidate();
       }, ms);
     }
     if (!moving && orbiting && !this.orbitTimer) {
@@ -4377,26 +4444,39 @@ export class FloorplanViewer {
         this.invalidate();
       }, 33);
     }
+    const flowing = this.flowActive || this.solarActive || this.soundActive || this.poolActive;
+    if (this.lowQuality) {
+      // tablet level: every decorative animation shares one frame about 5 times a second (12 while fan blades turn,
+      // fewer would make them seem to stand or turn back) and rests 30 s after the last touch
+      const ms = robotsMoving || flowing || fansTurning ? this.decor(fansTurning ? 83 : 0, fansTurning ? 83 : undefined) : null;
+      if (!moving && ms !== null && !this.decorTimer) {
+        this.decorTimer = setTimeout(() => {
+          this.decorTimer = undefined;
+          this.invalidate();
+        }, ms);
+      }
+      return;
+    }
     if (!moving && robotsMoving && !this.robotTimer) {
-      // a driving robot: about 30 frames per second, 15 on the tablet level
+      // a driving robot: about 30 frames per second
       this.robotTimer = setTimeout(() => {
         this.robotTimer = undefined;
         this.invalidate();
-      }, this.lowQuality ? 66 : 33);
+      }, 33);
     }
     if (!moving && fansTurning && !this.fanTimer) {
-      // turning blades: about 20 frames per second are enough (they blur anyway), 12 on the tablet level
+      // turning blades: about 20 frames per second are enough (they blur anyway)
       this.fanTimer = setTimeout(() => {
         this.fanTimer = undefined;
         this.invalidate();
-      }, this.lowQuality ? 83 : 50);
+      }, 50);
     }
-    if (!moving && (this.flowActive || this.solarActive || this.soundActive || this.poolActive) && !this.flowTimer) {
+    if (!moving && flowing && !this.flowTimer) {
       // only the energy flow (or the living modules) moves: about 30 frames per second are enough
       this.flowTimer = setTimeout(() => {
         this.flowTimer = undefined;
         this.invalidate();
-      }, this.lowQuality ? 2 * FLOW_FRAME_MS : FLOW_FRAME_MS);
+      }, FLOW_FRAME_MS);
     }
   }
 

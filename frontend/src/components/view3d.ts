@@ -114,6 +114,7 @@ import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
 import { pipePieces, poolAreas, poolNodeAt, poolWallNormal, underBasin, PIPE_IDLE, type PipePiece } from "../pool-runs.ts";
 import type { PipeTube } from "../viewer/viewer3d.ts";
 import type { PoolPiece } from "../viewer/pool-water.ts";
+import { lowSyncDelay } from "../viewer/pace.ts";
 import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HassEntity, HomeAssistant } from "../types.ts";
@@ -548,6 +549,9 @@ export class Fp3dView3d extends LitElement {
   private directorBack: { floorId: string | null; roomId: string | null; view: ReturnType<FloorplanViewer["getView"]> } | null = null;
   /** Haushalt Pro: looks again when an open fridge door reaches its limit. */
   private fridgeTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Tablet level: measured values alone are shown at most every SENSOR_SYNC_MS (the pending sync, the last one). */
+  private sensorTimer: ReturnType<typeof setTimeout> | undefined;
+  private lastSync = 0;
   /** Room values of the current heatmap (for the legend). */
   private heatValues = new Map<string, number>();
   /** Entities whose state changes redraw markers, cables, people and floor labels. */
@@ -737,6 +741,8 @@ export class Fp3dView3d extends LitElement {
     clearInterval(this.householdTimer);
     this.householdTimer = undefined;
     clearTimeout(this.fridgeTimer);
+    clearTimeout(this.sensorTimer);
+    this.sensorTimer = undefined;
     clearTimeout(this.directorTimer);
     clearTimeout(this.restTimer);
     clearTimeout(this.voiceTimer);
@@ -977,12 +983,37 @@ export class Fp3dView3d extends LitElement {
       if (anyModule()) this.watched = [...new Set([...this.watched, ...moduleWatched(this.sceneHost(hass, b))])];
       force = true;
     }
-    const changed = force || timed || this.watched.some((id) => this.shownStates.get(id) !== hass.states[id]);
+    let changed = force || timed;
+    // only measured values changed (sensor.*: power, temperature …), nothing switched, opened or alarmed
+    let sensorsOnly = !changed;
+    if (!changed) {
+      for (const id of this.watched) {
+        if (this.shownStates.get(id) === hass.states[id]) continue;
+        changed = true;
+        if (!id.startsWith("sensor.")) {
+          sensorsOnly = false;
+          break;
+        }
+      }
+    }
     // time travel: after a jump doors and blinds stand at once instead of swinging there
     const jump = !!this.replay && this.replay.seek !== this.seenSeek;
     this.seenSeek = this.replay?.seek ?? 0;
     this.seenT = this.replay?.t ?? 0;
     if (!changed) return;
+    // tablet level: a change of measured values alone is shown at most every 2 s (power sensors tick every second
+    // and each sync redoes markers, light, cables and cards); a switch, door or alarm shows at once
+    if (sensorsOnly && this._low && !this.replay) {
+      const wait = lowSyncDelay(performance.now() - this.lastSync);
+      if (wait > 0) {
+        this.sensorTimer ??= setTimeout(() => {
+          this.sensorTimer = undefined;
+          this.syncDevices(false);
+        }, wait);
+        return;
+      }
+    }
+    this.lastSync = performance.now();
     const began = this.showStats ? performance.now() : 0;
     this.shownStates = new Map(this.watched.map((id) => [id, hass.states[id]]));
 
@@ -5292,6 +5323,15 @@ export class Fp3dView3d extends LitElement {
         backdrop-filter: none;
         box-shadow: none;
         transition: none;
+      }
+      /* a shadow that pulses repaints the warning every frame: it glows steadily on the tablet level */
+      .fp3d-low .fp3d-alert {
+        animation: none;
+      }
+      .fp3d-low .fp3d-holo-link line,
+      .fp3d-low .fp3d-holo-link circle,
+      .fp3d-low .fp3d-holo-curve {
+        filter: none;
       }
       .fp3d-thumbs {
         position: absolute;
