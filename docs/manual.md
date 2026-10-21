@@ -39,17 +39,17 @@ This manual describes every feature of the current version. What changed in whic
 
 [![Open your Home Assistant instance and open the NeonPlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
-The button opens NeonPlan 3D straight in the HACS of your installation. By hand:
+The button opens NeonPlan 3D straight in the HACS of your installation. NeonPlan 3D is in the official HACS list, no custom repository needed. By hand:
 
 1. Open **HACS** in Home Assistant.
-2. Choose **⋮ → Custom repositories** at the top right.
-3. Enter `https://github.com/Mastershort/neonplan3d`, type **Integration**, and add it.
-4. Search for **NeonPlan 3D**, install it and restart Home Assistant.
-5. **Settings → Devices & services → Add integration → NeonPlan 3D**, or straight with this button:
+2. Search for **NeonPlan 3D**, install it and restart Home Assistant.
+3. **Settings → Devices & services → Add integration → NeonPlan 3D**, or straight with this button:
 
    [![Open your Home Assistant instance and start setting up NeonPlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d)
 
 **NeonPlan 3D** now appears in the sidebar. The dashboard card is available right away, no resource needed.
+
+If you added NeonPlan 3D as a custom repository before, there is nothing to do: updates keep coming as usual.
 
 ### By hand
 
