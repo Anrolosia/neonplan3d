@@ -106,7 +106,7 @@ import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
 import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
-import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
+import { activeSections, roofUnderAt, sectionAbove, sectionCutsBelow } from "../roof-sections.ts";
 import { centroid, furnitureFootprint, gangEntities, gangsOf, GANG_TYPES, TECH_TYPES, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, zonesOf, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
 
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -3260,8 +3260,8 @@ export class Fp3dView3d extends LitElement {
     // a room may reach above the floor's height (a vaulted living room open to the roof, #379)
     const room = own || floor.height;
     const b = this.building;
-    if (!b || !(b.settings.roof.sections ?? []).some((sec) => sectionCutsBelow(sec, floor.elevation + room))) return room;
-    const under = roofUnderAt(b, x, z);
+    if (!b || !activeSections(b).some((sec) => sectionCutsBelow(sec, floor.elevation + room) && sectionAbove(sec, floor.elevation))) return room;
+    const under = roofUnderAt(b, x, z, floor.elevation);
     return under === null ? room : Math.max(0.5, Math.min(room, under - floor.elevation));
   }
 

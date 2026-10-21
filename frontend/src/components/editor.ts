@@ -26,7 +26,7 @@ import { screenName, setScreenName, setVoiceHere, setVoicePipeline, voiceOnHere,
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
-import { sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
+import { activeSections, sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionAbove, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
 import { bestFace, clampField, faceAt, faceCompass, fieldFace, fieldModules, GROUND, moveField, pointOnFace, proposeField, proposeGroundField, proposeWindow, proposeWallField, roofFaces, rowCounts, turnGroundField, fieldCenter, wallFaces, windowAsField, windowCorners, onFace, onField, rayOnFace, type RoofFace } from "../solar.ts";
 import type { SurfaceGrab, SurfaceRay } from "../viewer/viewer3d.ts";
 import { storedImageIds } from "../transfer.ts";
@@ -48,7 +48,7 @@ import { type CarLinks, type Background, OUTDOOR_TOP, sidelightLayout, DEFAULT_W
   type ValvePosition,
 } from "../model.ts";
 import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
-import { generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
+import { edgeReach, generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
 import { moduleAreaFields, moduleHelp, modulePipeRules, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
@@ -2923,8 +2923,7 @@ export class Fp3dEditor extends LitElement {
       // along the wall: the arrow's share in the wall direction
       const along = (dx * (b[0] - a[0]) + dz * (b[1] - a[1])) / len;
       if (Math.abs(along) < 1e-9) return true;
-      const half = Math.min(o.width, len) / 2;
-      this.updateOpening({ offset: round(Math.min(len - half, Math.max(half, o.offset + along))) });
+      this.updateOpening({ offset: this.clampOffset(host.room, host.edge, o.width, o.offset + along) });
     } else if (this._wallId) {
       const id = this._wallId;
       this.change((_, f) => {
@@ -4504,8 +4503,22 @@ export class Fp3dEditor extends LitElement {
     const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
     const t = ((world[0] - a[0]) * (b[0] - a[0]) + (world[1] - a[1]) * (b[1] - a[1])) / len;
     const g = free ? 0.01 : this._doc.settings.grid;
-    const half = Math.min(width, len) / 2;
-    return round(Math.min(len - half, Math.max(half, Math.round(t / g) * g)));
+    return this.clampOffset(room, edge, width, Math.round(t / g) * g);
+  }
+
+  /**
+   * An opening's centre kept on its room edge with the whole opening inside the edge – or reaching on across
+   * a transition without a wall, where the outer wall carries on in line (#624).
+   */
+  private clampOffset(room: Room, edge: number, width: number, offset: number): number {
+    const a = room.points[edge];
+    const b = room.points[(edge + 1) % room.points.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const floor = this.floor;
+    const s = this._doc.settings;
+    const [before, after] = floor ? edgeReach(generateWalls(floor.rooms, { exterior: s.wall_exterior, interior: s.wall_interior }, floor.walls ?? []).walls, room, edge) : [0, 0];
+    const half = Math.min(width, len + before + after) / 2;
+    return round(Math.min(len, len + after - half, Math.max(0, half - before, offset)));
   }
 
   /** Add a door or window on the room edge nearest to a screen point. */
@@ -11025,8 +11038,8 @@ export class Fp3dEditor extends LitElement {
   /** Attic floors: dashed lines where the roof slope leaves 1.5 m and 2 m of headroom, with labels. */
   private renderHeadroom(floor: Floor) {
     const ceiling = floor.elevation + floor.height;
-    const sections = this._doc.settings.roof.sections ?? [];
-    if (!sections.some((s) => sectionCutsBelow(s, ceiling))) return nothing;
+    const sections = activeSections(this._doc);
+    if (!sections.some((s) => sectionCutsBelow(s, ceiling) && sectionAbove(s, floor.elevation))) return nothing;
     const b = { settings: this._doc.settings };
     return svg`${[1.5, 2].map((h) =>
       headroomLines(b, floor.elevation, h).map(([p, q]) => {

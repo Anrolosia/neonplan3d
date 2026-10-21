@@ -13,7 +13,7 @@
 import { Color, type BufferGeometry } from "three";
 import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
 import { furnitureFootprint, GANG_TYPES, isLamp, pointInPolygon, polygonArea, STAIR_TYPES } from "../model.ts";
-import { generateWalls, locateOpening, openingHost, placeWallPlate, slopeTop, type Wall } from "../geometry/walls.ts";
+import { generateWalls, locateOpening, openingHost, placeWallPlate, slopeTop, wallContinuation, type Wall } from "../geometry/walls.ts";
 import { clipConvex, isConvex } from "../geometry/area.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
@@ -106,6 +106,8 @@ interface Span {
   sill: number;
   top: number;
   info: OpeningInfo;
+  /** The part of an opening reaching into the next wall across a transition (#624): cuts it, draws no frame lines. */
+  cont?: boolean;
 }
 
 export function buildFloorGeometry(
@@ -230,8 +232,14 @@ export function buildFloorGeometry(
     const { wall, s } = hit;
     const ax: Vec2 = unit([wall.b[0] - wall.a[0], wall.b[1] - wall.a[1]]);
     const len = Math.hypot(wall.b[0] - wall.a[0], wall.b[1] - wall.a[1]);
-    const width = Math.min(o.width, len);
-    const s0 = Math.max(0, Math.min(len - width, s - width / 2));
+    // across a transition without a wall the opening may reach into the wall carrying on in line (#624)
+    const prev = s - o.width / 2 < -1e-6 ? wallContinuation(walls, wall, false) : null;
+    const next = s + o.width / 2 > len + 1e-6 ? wallContinuation(walls, wall, true) : null;
+    const lenOf = (w: Wall | null) => (w ? Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]) : 0);
+    const lo = -lenOf(prev);
+    const hi = len + lenOf(next);
+    const width = Math.min(o.width, hi - lo);
+    const s0 = Math.max(lo, Math.min(hi - width, s - width / 2));
     // in a free wall the "room" side is the left of the wall as drawn; an outer wall has its room on the left, whatever
     // room the opening was given (a window filed under the neighbouring room had its blind inside, #542)
     const hp = host.room.points;
@@ -261,6 +269,17 @@ export function buildFloorGeometry(
     let list = spans.get(wall);
     if (!list) spans.set(wall, (list = []));
     list.push({ s0, s1: s0 + width, sill, top, info });
+    for (const w of [prev, next]) {
+      if (!w) continue;
+      // the same stretch in the next wall's own measure
+      const t = (k: number) => (wall.a[0] + ax[0] * k - w.a[0]) * ax[0] + (wall.a[1] + ax[1] * k - w.a[1]) * ax[1];
+      const c0 = Math.max(0, t(s0));
+      const c1 = Math.min(lenOf(w), t(s0 + width));
+      if (c1 - c0 < 1e-4) continue;
+      let more = spans.get(w);
+      if (!more) spans.set(w, (more = []));
+      more.push({ s0: c0, s1: c1, sill, top, info, cont: true });
+    }
   }
 
   // ---------------------------------------------------------------- wall solids
@@ -363,11 +382,32 @@ export function buildFloorGeometry(
       }
     }
   }
+  const topOfWall = (w: Wall, p: Vec2) => topAt(p[0], p[1], wallHeight(w, floor.height), w);
   for (const c of outline.corners) {
-    const H = topAt(c.p[0], c.p[1], wallHeight(c.wall, floor.height), c.wall);
-    lines.segSplit([c.p[0], 0.004, c.p[1]], [c.p[0], H, c.p[1]], EDGE_SOFT, Math.min(cut, H), wallBucket.get(c.wall)!);
+    // the corner line reaches up to the tallest wall meeting there, not to whichever came first (#417)
+    const tall = c.walls.reduce((m, w) => (topOfWall(w, c.p) > topOfWall(m, c.p) + 1e-6 ? w : m), c.wall);
+    const H = topOfWall(tall, c.p);
+    lines.segSplit([c.p[0], 0.004, c.p[1]], [c.p[0], H, c.p[1]], EDGE_SOFT, Math.min(cut, H), wallBucket.get(tall)!);
   }
-  for (const list of spans.values()) for (const sp of list) pushOpeningLines(lines, sp, cut);
+  // a joint between walls of different heights: the taller wall's end stands free above the lower one, so
+  // its top edge runs across the joint and its edges come down to the lower wall's top (#417)
+  for (const j of outline.joints) {
+    const [lo, hi] = j.walls;
+    const ya = [topOfWall(lo, j.a), topOfWall(hi, j.a)];
+    const yb = [topOfWall(lo, j.b), topOfWall(hi, j.b)];
+    if (Math.abs(ya[0] - ya[1]) < 0.01 && Math.abs(yb[0] - yb[1]) < 0.01) continue;
+    const tall = ya[1] + yb[1] >= ya[0] + yb[0] ? hi : lo;
+    const b = wallBucket.get(tall)!;
+    const ha = Math.max(...ya);
+    const hb = Math.max(...yb);
+    lines.seg([j.a[0], ha, j.a[1]], [j.b[0], hb, j.b[1]], EDGE_TOP, Math.max(ha, hb) <= cut + 1e-6 ? LOWER_OFFSET + b : b);
+    for (const [p, y] of [[j.a, ya], [j.b, yb]] as const) {
+      const low = Math.min(...y);
+      const high = Math.max(...y);
+      if (high - low > 0.01) lines.segSplit([p[0], low, p[1]], [p[0], high, p[1]], EDGE_SOFT, cut, b);
+    }
+  }
+  for (const list of spans.values()) for (const sp of list) if (!sp.cont) pushOpeningLines(lines, sp, cut);
 
   // ---------------------------------------------------------------- furniture and shadows
   const shadow = buildShadow(outline.edges, floor.rooms, spans);
@@ -475,8 +515,10 @@ interface OutlineEdge {
 interface Outline {
   /** Edges of the merged wall footprints (joints between walls left out), counter-clockwise per wall. */
   edges: OutlineEdge[];
-  /** Vertices where the outline turns a corner, with a wall they belong to. */
-  corners: { p: Vec2; wall: Wall }[];
+  /** Vertices where the outline turns a corner, with a wall they belong to (and every wall meeting there). */
+  corners: { p: Vec2; wall: Wall; walls: Wall[] }[];
+  /** Edges two walls share (where they are joined), with both walls. */
+  joints: { a: Vec2; b: Vec2; walls: [Wall, Wall] }[];
 }
 
 const r3 = (v: number) => Math.round(v * 1000);
@@ -524,19 +566,26 @@ function splitEdges(poly: Vec2[], points: Vec2[]): [Vec2, Vec2][] {
 export function outlineOf(walls: Wall[], points: Vec2[]): Outline {
   const pieces = walls.map((w) => ({ wall: w, edges: splitEdges(w.footprint, points) }));
   const count = new Map<string, number>();
-  for (const { edges } of pieces) {
+  const owners = new Map<string, { a: Vec2; b: Vec2; walls: Wall[] }>();
+  for (const { wall, edges } of pieces) {
     for (const [a, b] of edges) {
       const k = ekey(a, b);
       count.set(k, (count.get(k) ?? 0) + 1);
+      const o = owners.get(k);
+      if (o) o.walls.push(wall);
+      else owners.set(k, { a, b, walls: [wall] });
     }
   }
+  const joints: Outline["joints"] = [];
+  for (const o of owners.values()) if (o.walls.length === 2 && o.walls[0] !== o.walls[1]) joints.push({ a: o.a, b: o.b, walls: [o.walls[0], o.walls[1]] });
   const edges: OutlineEdge[] = [];
-  const dirs = new Map<string, { p: Vec2; wall: Wall; d: Vec2[] }>();
+  const dirs = new Map<string, { p: Vec2; wall: Wall; walls: Wall[]; d: Vec2[] }>();
   const addDir = (p: Vec2, wall: Wall, d: Vec2) => {
     const k = vkey(p);
     let e = dirs.get(k);
-    if (!e) dirs.set(k, (e = { p, wall, d: [] }));
+    if (!e) dirs.set(k, (e = { p, wall, walls: [], d: [] }));
     e.d.push(d);
+    if (!e.walls.includes(wall)) e.walls.push(wall);
   };
   for (const { wall, edges: list } of pieces) {
     for (const [a, b] of list) {
@@ -550,11 +599,11 @@ export function outlineOf(walls: Wall[], points: Vec2[]): Outline {
     }
   }
   const corners: Outline["corners"] = [];
-  for (const { p, wall, d } of dirs.values()) {
+  for (const { p, wall, walls: at, d } of dirs.values()) {
     // a vertex where the outline just continues straight (e.g. a T-joint seen from outside) is no corner
-    if (d.some((u) => d.some((v) => Math.abs(u[0] * v[1] - u[1] * v[0]) > 0.05))) corners.push({ p, wall });
+    if (d.some((u) => d.some((v) => Math.abs(u[0] * v[1] - u[1] * v[0]) > 0.05))) corners.push({ p, wall, walls: at });
   }
-  return { edges, corners };
+  return { edges, corners, joints };
 }
 
 /** Parts of an outline edge outside the given opening spans (only for edges along the wall axis). */

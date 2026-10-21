@@ -60,7 +60,16 @@ export function sectionProfile(s: Pick<RoofSection, "x0" | "z0" | "x1" | "z1" | 
 }
 
 /** Anything that carries roof sections: a building, or just its settings in a test. */
-export type RoofHolder = { settings: { roof: { sections?: readonly RoofSection[] | null; overhang?: number } } };
+export type RoofHolder = { settings: { roof: { type?: string; sections?: readonly RoofSection[] | null; overhang?: number } } };
+
+/**
+ * The sections that make up the roof: only a "custom" roof is built from them. Switching the sections off
+ * keeps them in the plan (to switch them on again), but they must neither show nor cut walls (#621).
+ */
+export function activeSections(b: RoofHolder): readonly RoofSection[] {
+  const roof = b.settings.roof;
+  return roof.type === undefined || roof.type === "custom" ? (roof.sections ?? []) : [];
+}
 
 /** Thickness of the roof slab (the walls under it end this far below the profile). */
 export const ROOF_THICK = 0.14;
@@ -74,17 +83,28 @@ export function sectionCutsBelow(s: Pick<RoofSection, "open" | "base" | "eave_a"
 }
 
 /**
+ * Whether a section's underside rises above a floor level anywhere. A lower storey's roof that lies wholly
+ * under a floor (its ridge only pokes through the floor slab) is no ceiling of that floor and must not
+ * cut its walls (#621).
+ */
+export function sectionAbove(s: Parameters<typeof sectionProfile>[0], level: number): boolean {
+  return sectionProfile(s).rh - ROOF_THICK > level + 0.01;
+}
+
+/**
  * The underside of the roof above a plan point (absolute height): the lowest covered section, or
  * null outside every section (canopies do not count, and neither does a single roof: it sits on
  * the top floor's walls anyway).
  */
-export function roofUnderAt(b: RoofHolder, x: number, z: number): number | null {
+export function roofUnderAt(b: RoofHolder, x: number, z: number, level?: number): number | null {
   let best: number | null = null;
   const o = Math.max(0, b.settings.roof.overhang ?? 0);
   // where sections overlap, the higher roof is the ceiling: a dormer or a cross gable over the main
   // slope, a lower annex roof running under a higher one
-  for (const s of b.settings.roof.sections ?? []) {
+  for (const s of activeSections(b)) {
     if (s.open) continue;
+    // with a floor level: roofs lying wholly below that floor are left out (#621)
+    if (level !== undefined && !sectionAbove(s, level)) continue;
     const x0 = Math.min(s.x0, s.x1);
     const x1 = Math.max(s.x0, s.x1);
     const z0 = Math.min(s.z0, s.z1);
@@ -109,7 +129,7 @@ export function roofUnderAt(b: RoofHolder, x: number, z: number): number | null 
  */
 export function headroomLines(b: RoofHolder, level: number, headroom: number): [Vec2, Vec2][] {
   const out: [Vec2, Vec2][] = [];
-  for (const s of b.settings.roof.sections ?? []) {
+  for (const s of activeSections(b)) {
     if (s.open || s.shape === "flat" || s.shape === "parapet" || s.shape === "mansard") continue;
     const fr = sectionFrame(s);
     const pr = sectionProfile(s);

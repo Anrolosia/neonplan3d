@@ -35,6 +35,13 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Day look:** more contrast – walls, floors and furniture keep a wider range of shades and a bit more colour, lines are darker (#645, thanks @frops83).
 - **Rooms with hundreds of entities** (LED strip segments from Govee2MQTT): an unfolded device lists the first 40 (the search narrows it down), one button hides or shows all of its entities in the room panel, and a room can keep up to 2000 hidden entities (was 200, saving failed beyond that) (#645, thanks @frops83).
 
+- Walls cut by a roof that is no longer there: after **Back to one roof** the kept roof sections still trimmed the walls in 3D (a notch in the upper floor, odd slopes in the attic). Only a roof built from sections cuts walls now, and a lower storey's roof whose ridge just pokes through the floor above no longer cuts that floor (#621, thanks @Maddin2020).
+- Glowing top edges at wall joints: where a taller wall meets a lower one, its free end now gets its top edge and the edges down to the lower wall, and corner lines reach up to the tallest wall, so the top outline no longer breaks off at corners and T-joints (#417, thanks @rolandarends).
+
+### New
+
+- A window or door may reach across an open transition between two rooms when the outer wall carries on in a straight line (#624, thanks @Maddin2020).
+
 ## 1.24.0
 
 ### Changed

@@ -51,7 +51,7 @@ import { centroid, GANG_TYPES, outdoorZones, pointInPolygon, openingStyle, setTe
 import { placeWallPlate } from "../geometry/walls.ts";
 import { buildEarth } from "./earth.ts";
 import { clampIntoRoom } from "../geometry/snap.ts";
-import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
+import { activeSections, roofRider, roofUnderAt, sectionAbove, sectionCutsBelow } from "../roof-sections.ts";
 import { buildFloorGeometry, SLAB, stairHoleParts, type FloorGeometry } from "./build.ts";
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
@@ -2064,10 +2064,10 @@ export class FloorplanViewer {
       // an attic floor: its walls end under the roof sections above it
       // every floor whose ceiling lies above a section's base is cut by the slopes – the attic, and the
       // floor below it when the slope already starts there (a roof that reaches down past the ceiling)
-      const sloped = (b.settings.roof.sections ?? []).some((s) => sectionCutsBelow(s, floor.elevation + floor.height));
+      const sloped = activeSections(b).some((s) => sectionCutsBelow(s, floor.elevation + floor.height) && sectionAbove(s, floor.elevation));
       const roofUnder = sloped
         ? (x: number, z: number) => {
-            const y = roofUnderAt(b, x, z);
+            const y = roofUnderAt(b, x, z, floor.elevation);
             return y === null ? null : y - floor.elevation;
           }
         : undefined;
