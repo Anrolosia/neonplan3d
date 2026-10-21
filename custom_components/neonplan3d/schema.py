@@ -13,6 +13,9 @@ import voluptuous as vol
 MAX_FLOORS = 20
 MAX_ROOMS = 200
 MAX_POINTS = 200
+# entities a room keeps out of its panel or shows without state: an LED strip from Govee2MQTT alone brings
+# hundreds of segment lights into an area (#645)
+MAX_HIDDEN = 2000
 MAX_ITEMS = 1000
 MAX_IMAGE_CHARS = 8 * 1024 * 1024
 
@@ -65,9 +68,11 @@ ROOM_SCHEMA = vol.Schema(
         # entities shown in the room's panel although they are not in the plan
         vol.Optional("panel", default=list): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=100)),
         # entities of the area kept out of the room panel
-        vol.Optional("hidden", default=list): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=200)),
+        vol.Optional("hidden", default=list): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=MAX_HIDDEN)),
         # entities whose state text the room panel leaves out
-        vol.Optional("no_state", default=list): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=200)),
+        vol.Optional("no_state", default=list): vol.All(
+            [vol.All(str, vol.Length(max=255))], vol.Length(max=MAX_HIDDEN)
+        ),
         # split points on each edge (metres from the edge's start) that cut the wall into parts of their own
         vol.Optional("wall_splits"): vol.All(
             [vol.Any(None, vol.All([vol.All(vol.Coerce(float), vol.Range(min=0.05, max=200))], vol.Length(max=16)))],
@@ -168,6 +173,9 @@ OPENING_SCHEMA = vol.Schema(
         vol.Optional("well_rim", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=-0.3, max=1))),
         # highlight in 3D while open (None) or while closed ("closed": a WC or a child's room door)
         vol.Optional("mark", default=None): vol.Any(None, vol.In(["closed"])),
+        # windows: board inside and sill outside, "auto" (from 0.3 m sill height, none for a window
+        # directly above another opening), "none", "inside" or "outside"
+        vol.Optional("sill_board", default="auto"): vol.Any(None, vol.In(["auto", "none", "inside", "outside"])),
         # ask before moving the blind or garage door (no moving by a swipe then)
         vol.Optional("confirm", default=False): bool,
         vol.Optional("cover", default=None): _ENTITY_REF,
@@ -501,8 +509,8 @@ OUTDOOR_SCHEMA = vol.Schema(
         vol.Optional("area_id", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # like a room's: entities pinned to its panel, kept out of it, or shown without their state (#597)
         vol.Optional("panel"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=100)),
-        vol.Optional("hidden"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=200)),
-        vol.Optional("no_state"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=200)),
+        vol.Optional("hidden"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=MAX_HIDDEN)),
+        vol.Optional("no_state"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=MAX_HIDDEN)),
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -536,6 +544,9 @@ ROOF_SECTION_SCHEMA = vol.Schema(
         vol.Optional("locked", default=False): bool,
         # a canopy (terrace roof, carport): posts instead of walls, a see-through roof
         vol.Optional("open", default=False): bool,
+        # gable, hip and half-hip: how the ridge ends at either end (None = as the shape, #466)
+        vol.Optional("end_u0", default=None): vol.Any(None, vol.In(["gable", "hip", "halfhip"])),
+        vol.Optional("end_u1", default=None): vol.Any(None, vol.In(["gable", "hip", "halfhip"])),
     },
     extra=vol.ALLOW_EXTRA,
 )

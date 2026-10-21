@@ -128,6 +128,23 @@ def test_sentences_are_written_only_on_request_and_never_over_a_changed_file(tmp
     assert de.read_text(encoding="utf-8") == "my own sentences"
 
 
+def test_a_file_an_older_version_wrote_is_still_ours(tmp_path: Path) -> None:
+    """Files from 1.22.0 - 1.24.0 (older header lines) are replaced, not kept as the user's own."""
+    de = tmp_path / "custom_sentences" / "de" / "neonplan3d.yaml"
+    de.parent.mkdir(parents=True)
+    de.write_text(
+        sentences_yaml("de", "distinct").replace(
+            "# understands answers). Put your own sentences for NeonPlanAsk into another file.\n",
+            "# understands answers). Rewritten on every start: "
+            "put your own sentences for NeonPlanAsk into another file.\n",
+        ),
+        encoding="utf-8",
+    )
+    _, kept, changed = write_sentences(tmp_path, "distinct", {})
+    assert kept == [] and changed
+    assert de.read_text(encoding="utf-8") == sentences_yaml("de", "distinct")
+
+
 async def test_setup_writes_no_sentence_file(hass: HomeAssistant) -> None:
     """Nothing lands in the configuration folder unless an admin picks the sentences (HACS review)."""
     await _setup(hass)

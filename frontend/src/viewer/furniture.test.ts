@@ -3,7 +3,7 @@ import { test } from "node:test";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
 import { newFloor } from "../model.ts";
-import { packMotionParts, pushFurniture } from "./furniture.ts";
+import { hasFixedColors, packMotionParts, pushFurniture, setLightLook } from "./furniture.ts";
 import { packMotion, type PackItem } from "../packs.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
@@ -190,4 +190,49 @@ test("a motorised curtain opens to both ends and a roll-down screen rolls up wit
   // half up: the cloth is half as long and still hangs from the top
   const half = packMotionParts(screen, "screen", 0.5);
   assert.ok(Math.abs(half[0].y + half[0].h - 0.92) < 1e-9 && Math.abs(half[0].h - 0.425) < 1e-9);
+});
+
+test("pack parts in a colour of their own keep it down to the ground in the light looks (#609)", () => {
+  const pumpkin: FurniturePack = {
+    id: "t.fun",
+    name: "Fun",
+    publisher: "t",
+    licensee: null,
+    items: [
+      {
+        id: "pumpkin",
+        name: { de: "Kürbis", en: "Pumpkin" },
+        size: [0.4, 0.4, 0.4],
+        parts: [
+          { shape: "loft", x: 0, z: 0, w: 0.6, d: 0.6, y: 0, h: 0.5, color: "#c4500a", tx: 0, tz: 0, tw: 1, td: 1 },
+          { shape: "box", x: 0, z: 0, w: 0.4, d: 0.4, y: 0.5, h: 0.5, color: "dark" },
+        ],
+      },
+    ],
+  };
+  setPacks([pumpkin]);
+  assert.ok(hasFixedColors("pack:t.fun:pumpkin"));
+  assert.ok(!hasFixedColors("pack:t.cars:wedge") && !hasFixedColors("sofa"));
+  const f: Furniture = { id: "p", type: "pack:t.fun:pumpkin", x: 0, z: 0, rotation: 0, w: 0.4, d: 0.4, h: 0.4, variant: null, entity: null, power: null };
+  const colours = (light: boolean) => {
+    setLightLook(light);
+    const buf = new GeoBuffer();
+    pushFurniture(buf, new LineBuffer(), new GeoBuffer(), f);
+    setLightLook(false);
+    const out: number[][] = [];
+    for (let i = 0; i + 2 < buf.c.length; i += 3) out.push([buf.c[i], buf.c[i + 1], buf.c[i + 2]]);
+    return out;
+  };
+  // the looks keep a colour that is bright (> 0.45) and strong (saturation > 0.45)
+  const kept = (c: number[]) => {
+    const mx = Math.max(...c);
+    return mx > 0.45 && (mx - Math.min(...c)) / mx > 0.45;
+  };
+  const orange = (c: number[]) => c[0] > c[1] * 1.5 && c[0] > c[2] * 3;
+  const neon = colours(false).filter(orange);
+  const light = colours(true).filter(orange);
+  assert.ok(neon.some((c) => !kept(c)), "in neon the shading darkens the lower part");
+  assert.ok(light.length > 0 && light.every(kept), "in the light looks every orange vertex stays a signal colour");
+  // the neon look is unchanged
+  assert.deepEqual(colours(false), colours(false));
 });

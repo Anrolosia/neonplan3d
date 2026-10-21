@@ -37,7 +37,7 @@ import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
 import { binColors, binDue, binNext, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, serviceDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
 import { fieldFace, fieldSize } from "../solar.ts";
-import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, type PoolPipe, type SolarField, uid } from "../model.ts";
+import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, lockAlong, type PoolPipe, type SolarField, uid } from "../model.ts";
 
 /** A hologram card: the house's balance on the main plant, one plant (a balcony plant) on its own, or a device. */
 /** The unit a meter counts in (m³ when it does not say). */
@@ -90,7 +90,7 @@ import { HEAT_SCALES, heatColor, heatGradient, roomValues, type HeatMode } from 
 import { furnitureName } from "../furniture-names.ts";
 import { fetchImage, saveBuilding } from "../api.ts";
 import { formatNumber, translate, type I18nKey } from "../i18n.ts";
-import { getPacks, isPackCooktop, isPackType, isRobotVacuum, mountBase, packItem, packMotion, packsVersion } from "../packs.ts";
+import { getPacks, isPackCooktop, isPackHeater, isPackType, isRobotVacuum, mountBase, packItem, packRobotCentre, packMotion, packsVersion } from "../packs.ts";
 import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from "../parking.ts";
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
@@ -99,14 +99,14 @@ import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../f
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { anyModule, moduleAlerts, moduleCards, modulePools, moduleScene, moduleVoice, moduleWatched, syncModules, type ModuleCard, type ModuleHost, type ScenePiece, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
-import { openingHost, pointOnRoomEdge } from "../geometry/walls.ts";
+import { generateWalls, openingHost, placeWallPlate, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { signedArea } from "../model.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
 import { load3d } from "../load3d.ts";
 import { loadFun } from "../load-fun.ts";
 import { detectionKind, scaleGlow, buildMarkers, cameraMotionSensors, openMoreInfo, stateText, toggleEntity } from "../markers.ts";
-import { roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
+import { activeSections, roofUnderAt, sectionAbove, sectionCutsBelow } from "../roof-sections.ts";
 import { centroid, furnitureFootprint, gangEntities, gangsOf, GANG_TYPES, TECH_TYPES, isLamp, setTerrain, poolFloorY, LAMP_MODEL, LIFT_SPOTS, outdoorGround, pointInPolygon, poolWaterY, spotDepth, surfaceHeight, zonesOf, type Building, type Floor, type Furniture, type Pet, type StartView } from "../model.ts";
 
 import { pathLength, pipePath, pointAlong, type P3 } from "../geometry/runs.ts";
@@ -1007,7 +1007,8 @@ export class Fp3dView3d extends LitElement {
     v.setDevices([
       ...[...deviceMarkers, ...furniture.markers, ...this.lockMarkers(hass, b)].map((m) => {
         // "without watts" drops the power badge (a plug shows only on / off)
-        const power = m.show === "no_power" || ("energyDevice" in m && m.energyDevice) ? null : (byDevice.get(m.id) ?? null);
+        // below an item's own "running from" watts the standby draw is no badge either (#645)
+        const power = m.show === "no_power" || ("energyDevice" in m && m.energyDevice) || ("standby" in m && m.standby) ? null : (byDevice.get(m.id) ?? null);
         // at night (kiosk) colour effects rest
         const marker = { ...m, power, powerText: power === null ? undefined : formatPower(hass, power), effect: this.dimmed ? false : m.effect };
         // the own name under the pin: per device, or for every named device (card option marker_names)
@@ -2446,8 +2447,8 @@ export class Fp3dView3d extends LitElement {
     b: Building,
     taken: Set<string>,
     consumerSensors: Set<string>,
-  ): { markers: (DeviceMarker & { fromFurniture: boolean; energyDevice?: boolean })[]; consumers: Consumer[]; screens: Map<string, ScreenState>; targets: Map<string, string> } {
-    const markers: (DeviceMarker & { fromFurniture: boolean; energyDevice?: boolean })[] = [];
+  ): { markers: (DeviceMarker & { fromFurniture: boolean; energyDevice?: boolean; standby?: boolean })[]; consumers: Consumer[]; screens: Map<string, ScreenState>; targets: Map<string, string> } {
+    const markers: (DeviceMarker & { fromFurniture: boolean; energyDevice?: boolean; standby?: boolean })[] = [];
     const consumers: Consumer[] = [];
     const screens = new Map<string, ScreenState>();
     const targets = new Map<string, string>();
@@ -2569,6 +2570,8 @@ export class Fp3dView3d extends LitElement {
         }
         // an own threshold for appliances behind a smart plug that draw a few watts on standby (null: 10 W)
         const runW = typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 10;
+        // below its own threshold the pin shows only the state, not the standby watts (#645)
+        const standby = typeof f.run_w === "number" && f.run_w > 0 && power !== null && power <= f.run_w;
         const running = (power ?? 0) > runW || st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st));
         // the live director notices a program ending (a washer done) from the same reading
         if (appliance) this.appliances.set(f.id, { floorId: floor.id, x: f.x, z: f.z, entity: link.entity ?? link.power ?? f.id, running });
@@ -2657,6 +2660,8 @@ export class Fp3dView3d extends LitElement {
         taken.add(id);
         const kind = link.entity ? kindOf(link.entity) : null;
         const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+        // a pack's heat pump indoor unit (or boiler, buffer tank) with a water_heater entity: its mode and water temperature (#645)
+        const boiler = !!st && isPackHeater(f.type) && st.entity_id.startsWith("water_heater.") ? waterHeaterText(hass, st) : null;
         markers.push({
           id,
           floorId: floor.id,
@@ -2664,7 +2669,7 @@ export class Fp3dView3d extends LitElement {
           x: f.x,
           z: f.z,
           y: markerHeight(f) + mountBase(floor, f),
-          icon: f.icon ? mdiIcon(f.icon) : iconSvg(kind ?? "switch"),
+          icon: f.icon ? mdiIcon(f.icon) : boiler ? mdiIcon("water-boiler") : iconSvg(kind ?? "switch"),
           name: f.name || (link.entity ? entityName(hass, link.entity) : furnitureName(hass, f.type)),
           ownName: f.name || undefined,
           showName: !!f.show_name,
@@ -2677,18 +2682,23 @@ export class Fp3dView3d extends LitElement {
                 ? this.wallboxText(hass, extra, power)
                 : f.type === "meter"
                   ? this.meterText(hass, power)
-                  : st
+                  : boiler
+                    ? boiler.text
+                    : st
                     ? stateText(hass, st)
-                    : power !== null
-                      ? formatPower(hass, Math.max(0, power))
-                      : "")),
-          active: hhText ? true : car ? car.charging : st ? isActive(st) : (power ?? 0) > (typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 5),
+                    : standby
+                      ? translate(hass, "pin_standby")
+                      : power !== null
+                        ? formatPower(hass, Math.max(0, power))
+                        : "")),
+          active: hhText ? true : car ? car.charging : boiler ? boiler.on : st ? isActive(st) : (power ?? 0) > (typeof f.run_w === "number" && f.run_w > 0 ? f.run_w : 5),
           unavailable: st ? isUnavailable(st) : false,
           glow: null,
           // its pin grabs the item when furnishing
           furnitureId: f.id,
           // inverter, battery, wallbox: their own text (watts, charge, status) is always worth a pin
           energyDevice: f.type === "inverter" || f.type === "home_battery" || f.type === "wallbox" || f.type === "meter" || !!car || !!extraSensor,
+          ...(standby ? { standby } : {}),
           // Auto Pro: the car's charge and range are the point of the pin – shown in full by default
           show: f.marker ?? (car || hhText ? "always" : undefined),
           fromFurniture: true,
@@ -2797,8 +2807,14 @@ export class Fp3dView3d extends LitElement {
       if (!active) return;
       on++;
       const lit = st && kindOf(st.entity_id) === "light" ? lightGlow(st) : null;
-      const color: [number, number, number] = lit ? lit.color : socket ? [0.35, 1, 0.55] : [0.22, 0.88, 1];
-      faces.push({ part: "gang", index: i, of: gangs.length, color, level: socket && w !== null ? Math.min(1, 0.55 + w / 1500) : 0.8 });
+      if (!socket) {
+        // a switch's rocker glows softly while what it switches is on: a light in its colour, anything else in the
+        // look's accent colour
+        faces.push({ part: "gang", index: i, of: gangs.length, color: lit ? lit.color : [0.22, 0.88, 1], level: 0.5, accent: !lit });
+        return;
+      }
+      const color: [number, number, number] = lit ? lit.color : [0.35, 1, 0.55];
+      faces.push({ part: "gang", index: i, of: gangs.length, color, level: w !== null ? Math.min(1, 0.55 + w / 1500) : 0.8 });
     });
     if (faces.length) screens.set(f.id, { color: faces[0].color, level: faces[0].level, faces });
     if (!used) return null;
@@ -2807,13 +2823,15 @@ export class Fp3dView3d extends LitElement {
     const st = first ? hass.states[first] : undefined;
     const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
     const power = watts as number | null;
+    // the pin stands over the plate where the 3D view draws it (on the wall face, under a low wall's top, #593)
+    const at = placeWallPlate(this.floorWalls(floor), f, floor.height, mountBase(floor, f));
     return {
       id: `gangs:${f.id}`,
       floorId: floor.id,
       roomId: room?.id ?? null,
-      x: f.x,
-      z: f.z,
-      y: f.h + 0.2 + mountBase(floor, f),
+      x: at.x,
+      z: at.z,
+      y: f.h + 0.2 + at.y,
       icon: mdiIcon(f.icon || (socket ? "power-socket-de" : "light-switch")),
       name: f.name || (ids.length === 1 && first ? entityName(hass, first) : furnitureName(hass, f.type)),
       ownName: f.name || undefined,
@@ -2907,6 +2925,19 @@ export class Fp3dView3d extends LitElement {
       energyDevice: temp !== null,
     };
   }
+
+  /** The walls of a floor as the 3D view builds them (kept per floor object). */
+  private floorWalls(floor: Floor): Wall[] {
+    let walls = this.wallCache.get(floor);
+    if (!walls) {
+      const s = this.building?.settings;
+      walls = generateWalls(floor.rooms, { exterior: s?.wall_exterior ?? 0.24, interior: s?.wall_interior ?? 0.12 }, floor.walls ?? []).walls;
+      this.wallCache.set(floor, walls);
+    }
+    return walls;
+  }
+
+  private wallCache = new WeakMap<Floor, Wall[]>();
 
   /** A wall switch's or socket's menu: one button per gang, tapped it switches that gang. */
   private renderGangMenu() {
@@ -3142,16 +3173,16 @@ export class Fp3dView3d extends LitElement {
           vacuumCleaning(state) ? "cleaning" : state === "returning" ? "returning" : state === "error" ? "error" : state === "docked" || !state ? "docked" : "idle";
         // the robot rests in front of its dock, facing away from it
         const a = (f.rotation * Math.PI) / 180;
-        // the pack's dock has its own robot in the model, further out: the moving one starts (and hides) there
-        const inModel = isPackType(f.type);
-        const off = f.d * (inModel ? 0.227 : 0.14);
+        // a pack's dock: its own robot (taken out of the dock's model) rests where the model has it and drives (#645)
+        const pack = isPackType(f.type);
+        const off = f.d * (pack ? packRobotCentre(packItem(f.type)) : 0.14);
         const rest: [number, number] = [f.x - Math.sin(a) * off, f.z + Math.cos(a) * off];
         // the room the robot reports (a "current room" sensor), else the room of its dock
         const rooms = floor.rooms.filter((r) => r.points.length >= 3);
         const reported = mode === "cleaning" ? robotRoom(hass, rooms, entity, robotRoomSensor(hass, entity, f.room_sensor)) : null;
         const room = reported ?? rooms.find((r) => pointInPolygon(rest, r.points));
         const obstacles = mode === "cleaning" && room ? this.robotObstacles(floor, room.points) : [];
-        out.push({ id: f.id, floorId: floor.id, rest, restHeading: -a, mode, room: room?.points ?? null, roomId: room?.id ?? null, obstacles, ...(inModel ? { inModel } : {}) });
+        out.push({ id: f.id, floorId: floor.id, rest, restHeading: -a, mode, room: room?.points ?? null, roomId: room?.id ?? null, obstacles, ...(pack ? { model: { type: f.type, w: f.w, d: f.d, h: f.h } } : {}) });
       }
     }
     return out;
@@ -3187,7 +3218,8 @@ export class Fp3dView3d extends LitElement {
   /** The glowing faces of an item with a state entity (none while nothing is on). */
   private stateFaces(hass: HomeAssistant, f: Furniture): NonNullable<ScreenState["faces"]> {
     const out: NonNullable<ScreenState["faces"]> = [];
-    const refs: [EntityRef | undefined, "all" | "left" | "right" | "top" | "bottom"][] = f.state_entity2 && f.state_entity2 !== "none"
+    // the second state only counts beside a first one: the editor hides it once the first is "none" (#645)
+    const refs: [EntityRef | undefined, "all" | "left" | "right" | "top" | "bottom"][] = f.state_entity && f.state_entity !== "none" && f.state_entity2 && f.state_entity2 !== "none"
       ? [
           [f.state_entity, f.state_split === "top_bottom" ? "bottom" : "left"],
           [f.state_entity2, f.state_split === "top_bottom" ? "top" : "right"],
@@ -3228,8 +3260,8 @@ export class Fp3dView3d extends LitElement {
     // a room may reach above the floor's height (a vaulted living room open to the roof, #379)
     const room = own || floor.height;
     const b = this.building;
-    if (!b || !(b.settings.roof.sections ?? []).some((sec) => sectionCutsBelow(sec, floor.elevation + room))) return room;
-    const under = roofUnderAt(b, x, z);
+    if (!b || !activeSections(b).some((sec) => sectionCutsBelow(sec, floor.elevation + room) && sectionAbove(sec, floor.elevation))) return room;
+    const under = roofUnderAt(b, x, z, floor.elevation);
     return under === null ? room : Math.max(0.5, Math.min(room, under - floor.elevation));
   }
 
@@ -4165,7 +4197,8 @@ export class Fp3dView3d extends LitElement {
       for (const o of floor.openings) {
         const lock = this.openingLinks?.get(o.id)?.lock;
         if (!lock) continue;
-        const spot = this.openingSpot(b, o.id);
+        // on a double door the lock sits on the main leaf, not on the seam between the leaves (#645)
+        const spot = this.openingSpot(b, o.id, true);
         if (!spot) continue;
         const st = hass.states[lock];
         out.push({
@@ -4193,7 +4226,7 @@ export class Fp3dView3d extends LitElement {
    * Where an opening of the plan is: the middle of its frame at the height of its middle, and from which side to
    * look at it – from inside its room (null: not drawn).
    */
-  private openingSpot(b: Building, openingId: string): { floorId: string; x: number; z: number; y: number; theta: number } | null {
+  private openingSpot(b: Building, openingId: string, lock = false): { floorId: string; x: number; z: number; y: number; theta: number } | null {
     for (const floor of b.floors) {
       const o = floor.openings.find((x) => x.id === openingId);
       if (!o) continue;
@@ -4207,7 +4240,14 @@ export class Fp3dView3d extends LitElement {
       // the room lies to the left of the edge when its outline runs counter-clockwise, else to the right
       const left = signedArea(pts) > 0;
       const n = left ? [-d[1], d[0]] : [d[1], -d[0]];
-      const [x, z] = pointOnRoomEdge(host.room, host.edge, o.offset + o.width / 2);
+      // the offset is the opening's centre; a lock sits on its leaf (on a double door the main leaf), seen from the
+      // room "right" is (n.z, -n.x) like in the 3D build, so the hinge side follows the outline's direction
+      let along = o.offset;
+      if (lock) {
+        const startIsLeft = d[0] * n[1] - d[1] * n[0] > 0;
+        along = o.offset - o.width / 2 + lockAlong(o, (o.hinge === "left") === startIsLeft);
+      }
+      const [x, z] = pointOnRoomEdge(host.room, host.edge, along);
       // the camera stands on the room side: its horizontal offset from the target points along n
       return { floorId: floor.id, x: x + n[0] * 0.2, z: z + n[1] * 0.2, y: Math.max(0.5, o.sill + o.height / 2), theta: Math.atan2(n[0], n[1]) };
     }
@@ -4838,12 +4878,13 @@ export class Fp3dView3d extends LitElement {
         border-radius: 8px;
         pointer-events: none;
       }
+      /* the tags of bins, mailboxes and plants follow the symbol size like the pins' labels (#645) */
       .fp3d-holo-bin .fp3d-holo-body {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 0;
-        padding: 3px 8px;
+        padding: calc(3px * var(--fp3d-pin-k, 1)) calc(8px * var(--fp3d-pin-k, 1));
         white-space: nowrap;
       }
       .fp3d-holo.fp3d-holo-later {
@@ -4855,12 +4896,12 @@ export class Fp3dView3d extends LitElement {
         text-shadow: none;
       }
       .fp3d-holo-bin b {
-        font-size: 17px;
+        font-size: calc(17px * var(--fp3d-pin-k, 1));
         color: var(--bin);
         text-shadow: 0 0 8px color-mix(in srgb, var(--bin) 60%, transparent);
       }
       .fp3d-holo-bin span {
-        font-size: 12px;
+        font-size: calc(12px * var(--fp3d-pin-k, 1));
         opacity: 0.8;
       }
       .fp3d-holo-link[style*="--bin"] line,
@@ -6608,6 +6649,14 @@ export class Fp3dView3d extends LitElement {
 if (!customElements.get("fp3d-view3d")) customElements.define("fp3d-view3d", Fp3dView3d);
 
 /** Power as "850 W" or "1,2 kW". */
+/** A water_heater entity on a pack's heater: "Eco · 48 °C" and whether it is on (not off or gone), #645. */
+export function waterHeaterText(hass: HomeAssistant, st: HassEntity): { text: string; on: boolean } {
+  const t = st.attributes.current_temperature;
+  const temp = typeof t === "number" && Number.isFinite(t) ? `${formatNumber(hass, Math.round(t))} °C` : "";
+  const on = !["off", "unavailable", "unknown"].includes(st.state);
+  return { text: [stateText(hass, st), temp].filter(Boolean).join(" · "), on };
+}
+
 function formatPower(hass: HomeAssistant | undefined, w: number): string {
   return Math.abs(w) >= 1000 ? `${formatNumber(hass, w / 1000, 1)} kW` : `${Math.round(w)} W`;
 }

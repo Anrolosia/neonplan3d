@@ -2,8 +2,9 @@
 
 A sentence said to Assist (a voice satellite, the Assist dialog, an automation) is handed to the open NeonPlan
 views: the first one that understands it answers, shows the place and, when asked to, speaks. The sentences
-Assist recognises come from `custom_sentences/<lang>/neonplan3d.yaml`, which is written on setup (German and
-English, only when it changed); the user may add their own sentences to the same intent in another file.
+Assist recognises come from `custom_sentences/<lang>/neonplan3d.yaml`, which is written only when an admin picks
+the sentences in the voice settings (never on setup, never over a file the user changed, removed with the
+integration); the user may add their own sentences to the same intent in another file.
 """
 
 from __future__ import annotations
@@ -127,7 +128,7 @@ def sentences_yaml(language: str, mode: str = DEFAULT_SENTENCE_MODE) -> str:
     """The custom sentences file of a language (written by hand: the file stays readable for the user)."""
     lines = [
         "# Written by NeonPlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that",
-        "# understands answers). Rewritten on every start: put your own sentences for NeonPlanAsk into another file.",
+        "# understands answers). Put your own sentences for NeonPlanAsk into another file.",
         "# Which sentences stand here is set in the editor: ⚙ Settings → Voice control → Sentences for Assist.",
         "# Changed by hand, the file is never overwritten; removing the integration removes it.",
         f'language: "{language}"',
@@ -163,11 +164,22 @@ _SETTINGS_LINE = (
 )
 
 
+# the second header line as 1.22.0 - 1.24.0 wrote it
+_OLD_SECOND_LINE = (
+    "# understands answers). Rewritten on every start: put your own sentences for NeonPlanAsk into another file.\n"
+)
+_NEW_SECOND_LINE = "# understands answers). Put your own sentences for NeonPlanAsk into another file.\n"
+
+
 def _old_files() -> tuple[str, ...]:
     out = []
     for language in _DISTINCT:
         for mode in ("distinct", "all"):
-            text = sentences_yaml(language, mode).replace(_CHANGED_LINE, "")
+            old = sentences_yaml(language, mode).replace(_NEW_SECOND_LINE, _OLD_SECOND_LINE)
+            # 1.24.0
+            out.append(old)
+            # 1.22.1 - 1.23 (without the line about changed files), 1.22.0 (without the settings line too)
+            text = old.replace(_CHANGED_LINE, "")
             out.append(text)
             out.append(text.replace(_SETTINGS_LINE, ""))
     return tuple(out)

@@ -98,12 +98,21 @@ export function entityAreaId(hass: HomeAssistant, entityId: string): string | nu
   return (entry.device_id && hass.devices?.[entry.device_id]?.area_id) || null;
 }
 
+/**
+ * Hidden or disabled in Home Assistant's entity registry: never picked or listed automatically – only where the plan
+ * names it by hand (a placed device, a linked entity) it stays (#645).
+ */
+export function hiddenInHa(hass: HomeAssistant, entityId: string): boolean {
+  const entry = hass.entities?.[entityId];
+  return !!entry && (!!entry.hidden || !!entry.hidden_by || !!entry.disabled_by);
+}
+
 /** Whether an entity is shown at all: visible, no config/diagnostic entity, and a kind we handle. */
 export function isRelevant(hass: HomeAssistant, entityId: string): boolean {
   const kind = kindOf(entityId);
   if (!kind) return false;
   const entry = hass.entities?.[entityId];
-  if (entry?.hidden || entry?.entity_category) return false;
+  if (hiddenInHa(hass, entityId) || entry?.entity_category) return false;
   const st = hass.states[entityId];
   if (!st) return false;
   const dc = st.attributes.device_class as string | undefined;
@@ -143,7 +152,7 @@ const NOISE_CLASSES = new Set(["battery", "signal_strength", "timestamp", "date"
 function isLooseSensor(hass: HomeAssistant, entityId: string): boolean {
   if (kindOf(entityId) !== "sensor") return false;
   const entry = hass.entities?.[entityId];
-  if (entry?.hidden || entry?.entity_category) return false;
+  if (hiddenInHa(hass, entityId) || entry?.entity_category) return false;
   const st = hass.states[entityId];
   if (!st || !st.attributes.unit_of_measurement) return false;
   if (NOISE_CLASSES.has(String(st.attributes.device_class ?? ""))) return false;
@@ -170,7 +179,7 @@ function registryOf(hass: HomeAssistant): Registry {
     const device = entry.device_id;
     if (device && entry.area_id) (deviceAreas.get(device) ?? deviceAreas.set(device, new Set()).get(device)!).add(entry.area_id);
     if (device && isPower(hass, id)) (power.get(device) ?? power.set(device, []).get(device)!).push(id);
-    if (device && !entry.hidden && !entry.entity_category) (domains.get(device) ?? domains.set(device, new Set()).get(device)!).add(domainOf(id));
+    if (device && !hiddenInHa(hass, id) && !entry.entity_category) (domains.get(device) ?? domains.set(device, new Set()).get(device)!).add(domainOf(id));
     const relevant = isRelevant(hass, id);
     const area = entityAreaId(hass, id);
     if (!area) {
@@ -982,7 +991,7 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         } else if (isRobotVacuum(f.type)) {
           // vacuums are no device kind of their own: look them up in the room's area directly
           const area = room?.area_id ?? null;
-          entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && entityAreaId(hass, id) === area) ?? null;
+          entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && !hiddenInHa(hass, id) && entityAreaId(hass, id) === area) ?? null;
         } else if (f.type === "radiator" || f.type === "ac_unit") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;

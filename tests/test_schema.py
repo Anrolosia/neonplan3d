@@ -8,6 +8,7 @@ from custom_components.neonplan3d.schema import (
     HOLOGRAM_SCHEMA,
     OPENING_SCHEMA,
     OUTDOOR_SCHEMA,
+    ROOF_SECTION_SCHEMA,
     ROOM_SCHEMA,
     SETTINGS_SCHEMA,
     START_VIEW_SCHEMA,
@@ -44,6 +45,11 @@ def test_inverted_contact_and_plant_card_offsets() -> None:
     gate |= {"width": 2.5, "sill": 0, "height": 2.1}
     assert OPENING_SCHEMA(gate)["contact_invert"] is False
     assert OPENING_SCHEMA({**gate, "contact_invert": True})["contact_invert"] is True
+    # window board / sill: automatic unless the plan says otherwise (#655)
+    assert OPENING_SCHEMA(gate)["sill_board"] == "auto"
+    assert OPENING_SCHEMA({**gate, "sill_board": "inside"})["sill_board"] == "inside"
+    with pytest.raises(vol.Invalid):
+        OPENING_SCHEMA({**gate, "sill_board": "both"})
     inv = {"id": "f1", "type": "inverter", "x": 0, "z": 0, "rotation": 0, "w": 0.5, "d": 0.2, "h": 0.6, "variant": None}
     assert "plant_right" not in FURNITURE_SCHEMA(inv)
     moved = FURNITURE_SCHEMA({**inv, "plant_right": 1.5, "plant_up": -2})
@@ -245,3 +251,23 @@ def test_wall_socket_keeps_its_gangs() -> None:
     assert FURNITURE_SCHEMA({**base, "gangs": None})["gangs"] is None
     with pytest.raises(vol.Invalid):
         FURNITURE_SCHEMA({**base, "gangs": [{"entity": None}] * 5})
+
+
+def test_room_hides_hundreds_of_segment_lights() -> None:
+    # Govee2MQTT creates a light per LED strip segment: hiding them all must still save (#645)
+    many = [f"light.strip_segment_{i:03d}" for i in range(600)]
+    room = ROOM_SCHEMA({**ROOM, "hidden": many, "no_state": many})
+    assert len(room["hidden"]) == 600
+    area = OUTDOOR_SCHEMA({"id": "o1", "type": "lawn", "points": [[0, 0], [2, 0], [2, 2]], "hidden": many})
+    assert len(area["hidden"]) == 600
+
+
+def test_roof_section_keeps_its_end_shapes() -> None:
+    """A hip at one end only (#466): each end may differ from the shape, None = as the shape."""
+    sec = {"id": "s", "x0": 0, "z0": 0, "x1": 10, "z1": 8, "eave_a": 3, "eave_b": 3, "base": 3}
+    plain = ROOF_SECTION_SCHEMA(sec)
+    assert plain["end_u0"] is None and plain["end_u1"] is None
+    one = ROOF_SECTION_SCHEMA({**sec, "end_u0": "hip", "end_u1": "gable"})
+    assert (one["end_u0"], one["end_u1"]) == ("hip", "gable")
+    with pytest.raises(vol.Invalid):
+        ROOF_SECTION_SCHEMA({**sec, "end_u0": "pyramid"})
