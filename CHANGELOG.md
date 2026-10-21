@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.25.0
+
+### New
+
+- **Window sill per window:** a window's form has **Sill** – *automatic* (default: board inside and sill outside from 30 cm sill height, as before), *none*, *inside only* or *outside only*. In automatic mode a window that sits directly on another window or a door of the same wall (a transom light, a split floor-to-ceiling front) no longer gets a board sticking out of the wall. Plan field `sill_board`, also in the import format. (#655, reported by LiveSide)
+
 ## 1.24.0
 
 ### Changed
