@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Det kører først efter din godkendelse (Udvidelser → Moduler).",
  "voice_sentences_kept": "Sætningsfilen for {langs} har du selv ændret – NeonPlan lader den være.",
  "voice_sentences_failed": "Sætningsfilen kunne ikke skrives.",
- "voice_sentences_file": "NeonPlan opretter filen custom_sentences/<sprog>/neonplan3d.yaml først, når du vælger sætninger her. En fil, du selv har ændret, overskrives aldrig; fjernes integrationen, slettes NeonPlans fil."
+ "voice_sentences_file": "NeonPlan opretter filen custom_sentences/<sprog>/neonplan3d.yaml først, når du vælger sætninger her. En fil, du selv har ændret, overskrives aldrig; fjernes integrationen, slettes NeonPlans fil.",
+ "pin_standby": "Standby"
 }

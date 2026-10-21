@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Den körs först efter ditt godkännande (Tillägg → Moduler).",
  "voice_sentences_kept": "Meningsfilen för {langs} har du ändrat själv – NeonPlan rör den inte.",
  "voice_sentences_failed": "Meningsfilen kunde inte skrivas.",
- "voice_sentences_file": "NeonPlan skapar filen custom_sentences/<språk>/neonplan3d.yaml först när du väljer meningar här. En fil du själv har ändrat skrivs aldrig över; tas integrationen bort raderas NeonPlans fil."
+ "voice_sentences_file": "NeonPlan skapar filen custom_sentences/<språk>/neonplan3d.yaml först när du väljer meningar här. En fil du själv har ändrat skrivs aldrig över; tas integrationen bort raderas NeonPlans fil.",
+ "pin_standby": "Viloläge"
 }

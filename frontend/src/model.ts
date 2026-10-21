@@ -1302,7 +1302,8 @@ export const WALL_LAMP_Y = 1.75;
 export function canLift(f: Pick<Furniture, "type">): boolean {
   if (["lamp_pendant", "lamp_fan", "stairwell", "parking"].includes(f.type) || STAIR_TYPES.has(f.type)) return false;
   const item = packItem(f.type);
-  return !(item?.mount === "ceiling" && item.light);
+  // a pack's flat ceiling light (a workshop batten, a hexagon panel) can be lowered like the built-in LED panel (#645)
+  return !(item?.mount === "ceiling" && item.light && item.light !== "panel");
 }
 
 /**
@@ -1390,6 +1391,16 @@ export function step(p: Vec2, length: number, dir: Direction): Vec2 {
  * Height of the bottom of a built-in model as drawn (a wall cabinet hangs at 1.45 m, a wall TV is
  * centred at 1.3 m, a radiator stands on short brackets); the mount height replaces it.
  */
+/**
+ * The change when an item's first "state from" entity is picked: "none" moves a second one up into its place (and
+ * clears the second), so no hidden second state keeps lighting the item (#645).
+ */
+export function clearFirstState(f: Pick<Furniture, "state_entity2">, v: string | null): Pick<Furniture, "state_entity" | "state_entity2"> {
+  if (v && v !== "none") return { state_entity: v };
+  const second = f.state_entity2 && f.state_entity2 !== "none" ? f.state_entity2 : null;
+  return { state_entity: second, state_entity2: null };
+}
+
 export function builtinBase(f: Pick<Furniture, "type" | "h"> & { variant?: string | null }): number {
   switch (f.type) {
     case "home_battery":

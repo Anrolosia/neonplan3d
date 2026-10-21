@@ -4,6 +4,19 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.25.0
+
+### Fixed
+
+- Robot vacuum with dock (pack): while the robot cleans, the dock stands empty – the model's own robot drives off instead of a second one appearing (#645, thanks @frops83).
+- An item with its own **Running from (watts)** shows only its state (or "Standby") on the pin below that value, not its standby watts (#645, thanks @frops83).
+- The 3D lock keeps the saved start views of the house, floors and rooms: flying to one takes its own angle (#645, thanks @frops83).
+- Setting the first **State from** entity to *none* moves the second one up instead of leaving it active but hidden in the form (#645, thanks @frops83).
+- The workshop light and other flat ceiling lights from packs get the **Height above floor** field (#645, thanks @frops83).
+- The tags on bins, mailboxes and plants (Haushalt Pro) grow with the symbol size like the pins' labels (#645, thanks @frops83).
+- The heat pump's indoor unit, gas boiler, buffer tank and water heater from the packs take a `water_heater` entity; the pin shows its mode and water temperature (#645, thanks @frops83).
+- Entities hidden or disabled in Home Assistant are no longer picked automatically (e.g. a robot vacuum for its dock); one placed in a room before stays in the editor's device list so it can be removed or hidden (#645, thanks @frops83).
+
 ## 1.24.0
 
 ### Changed

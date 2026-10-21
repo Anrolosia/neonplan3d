@@ -55,7 +55,7 @@ import { buildFloorGeometry, SLAB, stairHoleParts, type FloorGeometry } from "./
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { CameraProjections, PROJECTION_LAYER, type ProjectionSurface, type ProjectorPose } from "./projection.ts";
-import { pushAwning, pushCameraModel, pushPackGlow, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook } from "./furniture.ts";
+import { pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -594,7 +594,7 @@ export class FloorplanViewer {
   private keepRoof = false;
   private hideRoof = false;
   /** Robot vacuums: their info from Home Assistant, how they move, and their meshes. */
-  private robots = new Map<string, { info: RobotInfo; motion: RobotMotion; group: Group; led: MeshBasicMaterial }>();
+  private robots = new Map<string, { info: RobotInfo; motion: RobotMotion; group: Group; led: MeshBasicMaterial; own: BufferGeometry[]; modelKey: string }>();
   private robotGeo: BufferGeometry | null = null;
   private robotMat: MeshBasicMaterial | null = null;
   private robotLedGeo: BufferGeometry | null = null;
@@ -855,7 +855,7 @@ export class FloorplanViewer {
       const base = fv.floor.elevation + fv.ty;
       const [mx, mz] = centroid(room.points);
       const t = own.target ?? { x: mx, y: 0.3, z: mz };
-      this.controls.flyTo({ target: new Vector3(t.x, t.y + base, t.z), radius: own.radius, phi: own.phi, theta: own.theta });
+      this.controls.flyTo({ target: new Vector3(t.x, t.y + base, t.z), radius: own.radius, phi: own.phi, theta: own.theta }, 700, true);
       return;
     }
     const [cx, cz] = centroid(room.points);
@@ -1626,7 +1626,10 @@ export class FloorplanViewer {
     this.blindTexture.dispose();
     this.groundTexture?.dispose();
     this.haloTexture.dispose();
-    for (const r of this.robots.values()) r.led.dispose();
+    for (const r of this.robots.values()) {
+      r.led.dispose();
+      for (const g of r.own) g.dispose();
+    }
     this.robots.clear();
     this.robotGeo?.dispose();
     this.robotLedGeo?.dispose();
@@ -3411,7 +3414,7 @@ export class FloorplanViewer {
       this.controls.flyTo({ target: new Vector3(cur.target.x, center.y, cur.target.z), radius: cur.radius, phi: cur.phi, theta: cur.theta }, duration);
       return;
     }
-    this.controls.flyTo({ target: center, radius: useRadius ? start!.radius : radius, phi: start ? start.phi : 0.85, theta: start ? start.theta : -0.6 }, duration);
+    this.controls.flyTo({ target: center, radius: useRadius ? start!.radius : radius, phi: start ? start.phi : 0.85, theta: start ? start.theta : -0.6 }, duration, !!start);
   }
 
   /** The ground grid lies under the lowest floor and reaches well beyond the building. */
@@ -3961,6 +3964,15 @@ export class FloorplanViewer {
     for (const info of list) {
       seen.add(info.id);
       let r = this.robots.get(info.id);
+      // a pack's robot is rebuilt when its pack arrives (or goes) or the dock's size changes
+      if (r && r.modelKey !== this.robotModelKey(info)) {
+        const old = r;
+        old.group.removeFromParent();
+        old.led.dispose();
+        for (const g of old.own) g.dispose();
+        r = { ...this.makeRobot(info), motion: old.motion, info: old.info };
+        this.robots.set(info.id, r);
+      }
       if (!r) {
         r = this.makeRobot(info);
         this.robots.set(info.id, r);
@@ -3990,13 +4002,39 @@ export class FloorplanViewer {
       if (seen.has(id)) continue;
       r.group.removeFromParent();
       r.led.dispose();
+      for (const g of r.own) g.dispose();
       this.robots.delete(id);
     }
     this.robotLast = 0;
     this.invalidate();
   }
 
-  private makeRobot(info: RobotInfo): { info: RobotInfo; motion: RobotMotion; group: Group; led: MeshBasicMaterial } {
+  /** What a robot's meshes are built from: the built-in robot, or a pack's robot at the dock's size. */
+  private robotModelKey(info: RobotInfo): string {
+    const m = info.model;
+    return m && packItem(m.type) ? `${m.type}|${m.w}|${m.d}|${m.h}` : "";
+  }
+
+  private makeRobot(info: RobotInfo): { info: RobotInfo; motion: RobotMotion; group: Group; led: MeshBasicMaterial; own: BufferGeometry[]; modelKey: string } {
+    const motion: RobotMotion = { pos: [...info.rest] as [number, number], heading: info.restHeading, path: [], next: 0 };
+    const ledMat = new MeshBasicMaterial({ color: ROBOT_LED[info.mode] });
+    const modelKey = this.robotModelKey(info);
+    const item = info.model ? packItem(info.model.type) : undefined;
+    if (info.model && item && modelKey) {
+      // a pack's dock: its own robot (left out of the dock's model) drives around, with a status light on top (#645)
+      const { w, d, h } = info.model;
+      const buf = new GeoBuffer();
+      const { radius, top } = pushPackRobot(buf, item, w, d, h);
+      const led = new GeoBuffer();
+      const lw = Math.min(0.05, radius * 0.3);
+      const z0 = Math.min(0.1, radius * 0.55);
+      pushPrism(led, [[-lw, z0], [lw, z0], [lw, z0 + lw * 0.8], [-lw, z0 + lw * 0.8]], top, top + 0.005, 0xffffff, 0xffffff, { aoFrom: 0, bottom: false });
+      this.robotMat ??= new MeshBasicMaterial({ vertexColors: true });
+      const own = [buf.geometry(), led.geometry()];
+      const group = new Group();
+      group.add(new Mesh(own[0], this.robotMat), new Mesh(own[1], ledMat));
+      return { info, motion, group, led: ledMat, own, modelKey };
+    }
     if (!this.robotGeo) {
       const buf = new GeoBuffer();
       const disc = (r: number, y0: number, y1: number, side: number, top: number) => {
@@ -4007,15 +4045,14 @@ export class FloorplanViewer {
       disc(0.17, 0.012, 0.08, 0x243049, 0x34425f);
       disc(0.055, 0.08, 0.1, 0x3a4a6a, 0x4d5f86);
       this.robotGeo = buf.geometry();
-      this.robotMat = new MeshBasicMaterial({ vertexColors: true });
+      this.robotMat ??= new MeshBasicMaterial({ vertexColors: true });
       const led = new GeoBuffer();
       pushPrism(led, [[-0.05, 0.1], [0.05, 0.1], [0.05, 0.14], [-0.05, 0.14]], 0.08, 0.085, 0xffffff, 0xffffff, { aoFrom: 0, bottom: false });
       this.robotLedGeo = led.geometry();
     }
     const group = new Group();
-    const ledMat = new MeshBasicMaterial({ color: ROBOT_LED[info.mode] });
     group.add(new Mesh(this.robotGeo, this.robotMat!), new Mesh(this.robotLedGeo!, ledMat));
-    return { info, motion: { pos: [...info.rest] as [number, number], heading: info.restHeading, path: [], next: 0 }, group, led: ledMat };
+    return { info, motion, group, led: ledMat, own: [], modelKey };
   }
 
   /** Ceiling fans: a group with the blades for each, at its place and with its speed. */
@@ -4094,7 +4131,6 @@ export class FloorplanViewer {
       if (dt > 0) active = stepRobot(r.motion, r.info, dt) || active;
       else active ||= r.info.mode === "cleaning" || r.info.mode === "returning";
       r.group.position.set(r.motion.pos[0], 0, r.motion.pos[1]);
-      r.group.visible = !r.info.inModel || r.info.mode === "cleaning" || Math.hypot(r.motion.pos[0] - r.info.rest[0], r.motion.pos[1] - r.info.rest[1]) > 0.05;
       r.group.rotation.y = r.motion.heading;
     }
     if (!active) this.robotLast = 0;
