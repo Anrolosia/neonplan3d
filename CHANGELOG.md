@@ -17,6 +17,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - The heat pump's indoor unit, gas boiler, buffer tank and water heater from the packs take a `water_heater` entity; the pin shows its mode and water temperature (#645, thanks @frops83).
 - Entities hidden or disabled in Home Assistant are no longer picked automatically (e.g. a robot vacuum for its dock); one placed in a room before stays in the editor's device list so it can be removed or hidden (#645, thanks @frops83).
 
+### New
+
+- **Window sill per window:** a window's form has **Sill** – *automatic* (default: board inside and sill outside from 30 cm sill height, as before), *none*, *inside only* or *outside only*. In automatic mode a window that sits directly on another window or a door of the same wall (a transom light, a split floor-to-ceiling front) no longer gets a board sticking out of the wall. Plan field `sill_board`, also in the import format. (#655, reported by LiveSide)
+
 ## 1.24.0
 
 ### Changed
