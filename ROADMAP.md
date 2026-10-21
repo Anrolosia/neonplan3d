@@ -32,7 +32,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 - **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
 - A tidied-up editor, furniture blocks and multi-select, 18 languages.
 
-## 🔨 Next up (1.24)
+## 🔨 Next up (1.25)
 
 | Topic | What it is about | Wish |
 |---|---|---|
@@ -143,7 +143,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 - **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
 - Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## 🔨 Als Nächstes (1.24)
+## 🔨 Als Nächstes (1.25)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
