@@ -324,7 +324,12 @@ const urls = new Map<string, string>();
 export interface ModulePack {
   id: string;
   release?: number;
-  module?: { api: number; kind: string };
+  module?: { api: number; kind: string; approved?: boolean };
+}
+
+/** A module whose code an admin still has to read and approve (new, or an update waiting beside the running code). */
+export function moduleWaits(pack: { module?: { approved?: boolean }; pending?: unknown }): boolean {
+  return !!pack.module && (pack.module.approved !== true || !!pack.pending);
 }
 
 async function fetchCode(hass: HomeAssistant, packId: string): Promise<{ code: string; release: number; api: number }> {
@@ -356,7 +361,8 @@ async function load(hass: HomeAssistant, pack: ModulePack): Promise<Loaded | nul
  * module never stop the others – a broken module is simply not there.
  */
 export async function syncModules(hass: HomeAssistant, packs: readonly ModulePack[]): Promise<void> {
-  const wanted = new Map(packs.filter((p) => p.module && p.module.api === MODULE_API).map((p) => [p.id, p]));
+  // only code an admin has read and approved runs (HACS review): a module waiting for approval is not loaded
+  const wanted = new Map(packs.filter((p) => p.module && p.module.api === MODULE_API && p.module.approved === true).map((p) => [p.id, p]));
   for (const id of [...loaded.keys()]) if (!wanted.has(id)) loaded.delete(id);
   await Promise.all(
     [...wanted.values()].map((p) => {

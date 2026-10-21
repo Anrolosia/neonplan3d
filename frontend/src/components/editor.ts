@@ -51,7 +51,7 @@ import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
-import { moduleAreaFields, moduleHelp, modulePipeRules, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
+import { moduleAreaFields, moduleHelp, modulePipeRules, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
 import { pipePlanner } from "../pipe-planner.ts";
 import {
   bounds,
@@ -5540,7 +5540,11 @@ export class Fp3dEditor extends LitElement {
             (p) => html`<div class="fp3d-wide">
               <b>${packName(p, this.hass?.language ?? "de")}</b>
               <p class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t((p.features ?? []).every((f) => f.startsWith("fun_")) ? "pack_fun_module" : "pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</p>
-              ${p.module ? html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>` : nothing}
+              ${p.module && moduleWaits(p)
+                ? html`<p class="fp3d-sub">${this.t(p.module.approved === true ? "module_update_waits" : "module_waits", { from: p.release ?? 1, to: p.pending?.release ?? 1 })} ${this.t("module_waits_where")}</p>`
+                : p.module
+                  ? html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>`
+                  : nothing}
             </div>`,
           )
         : html`<p class="fp3d-sub fp3d-wide">${this.t("modules_none")}</p>`}
@@ -5564,7 +5568,8 @@ export class Fp3dEditor extends LitElement {
     for (const file of files) {
       try {
         const res = await importPack(this.hass, await file.text());
-        done.push(this.t("module_imported", { name: res.name, publisher: res.publisher }));
+        const text = this.t("module_imported", { name: res.name, publisher: res.publisher });
+        done.push(res.approval ? `${text} ${this.t("module_imported_waits")}` : text);
       } catch (err) {
         const { code, message } = (err ?? {}) as { code?: string; message?: string };
         const key = `pack_error_${code}` as I18nKey;
@@ -11274,6 +11279,8 @@ export class Fp3dEditor extends LitElement {
   private voicePipes: { id: string; name: string; stt: boolean }[] | null = null;
   private voicePipesAsked = false;
   private voiceSentences: SentenceMode | null = null;
+  /** What became of the last sentence choice (a file the user changed is kept, writing failed). */
+  private voiceSentencesMsg: string | null = null;
 
   /** The Assist pipeline for this device's voice control: Home Assistant's preferred one, or one chosen here. */
   private renderVoicePipeline() {
@@ -11286,7 +11293,7 @@ export class Fp3dEditor extends LitElement {
           this.voiceSentences = res.sentences;
           this.requestUpdate();
         })
-        .catch(() => (this.voiceSentences = "distinct"));
+        .catch(() => (this.voiceSentences = "off"));
       hass
         .callWS<{ pipelines: { id: string; name: string; stt_engine: string | null }[] }>({ type: "assist_pipeline/pipeline/list" })
         .then((res) => {
@@ -11305,13 +11312,23 @@ export class Fp3dEditor extends LitElement {
           @change=${(e: Event) => {
             const mode = (e.target as HTMLSelectElement).value as SentenceMode;
             this.voiceSentences = mode;
-            void setVoiceSentences(hass, mode).catch(() => undefined);
+            this.voiceSentencesMsg = null;
+            void setVoiceSentences(hass, mode)
+              .then((res) => {
+                if (res.kept?.length) this.voiceSentencesMsg = this.t("voice_sentences_kept", { langs: res.kept.join(", ") });
+                this.requestUpdate();
+              })
+              .catch(() => {
+                this.voiceSentencesMsg = this.t("voice_sentences_failed");
+                this.requestUpdate();
+              });
           }}
         >
-          ${modes.map((m) => html`<option value=${m} ?selected=${(this.voiceSentences ?? "distinct") === m}>${this.t(`voice_sentences_${m}`)}</option>`)}
+          ${modes.map((m) => html`<option value=${m} ?selected=${(this.voiceSentences ?? "off") === m}>${this.t(`voice_sentences_${m}`)}</option>`)}
         </select></label
       >
-      <p class="fp3d-sub fp3d-wide">${this.t("voice_sentences_hint")}</p>
+      ${this.voiceSentencesMsg ? html`<p class="fp3d-sub fp3d-wide fp3d-pack-error">${this.voiceSentencesMsg}</p>` : nothing}
+      <p class="fp3d-sub fp3d-wide">${this.t("voice_sentences_hint")} ${this.t("voice_sentences_file")}</p>
       <label class="fp3d-field fp3d-wide"
         >${this.t("voice_pipeline")}
         <select

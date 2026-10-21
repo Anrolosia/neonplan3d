@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { clearModules, loadedModules, MODULE_API, moduleVoice, registerModule, type ModuleHost } from "./modules.ts";
+import { clearModules, loadedModules, MODULE_API, moduleVoice, moduleWaits, registerModule, syncModules, type ModuleHost } from "./modules.ts";
 
 const host = {
   api: MODULE_API,
@@ -26,4 +26,19 @@ test("voice modules are asked in turn; the first answer wins, a failing one is s
   assert.equal(await moduleVoice("wie spät ist es", host), null);
   clearModules();
   assert.equal(loadedModules().length, 0);
+});
+
+test("only module code an admin approved is fetched and run", async () => {
+  clearModules();
+  const asked: string[] = [];
+  const hass = { callWS: async (msg: { pack_id: string }) => (asked.push(msg.pack_id), Promise.reject(new Error("not_approved"))) } as never;
+  await syncModules(hass, [
+    { id: "a", module: { api: MODULE_API, kind: "voice" } },
+    { id: "b", module: { api: MODULE_API, kind: "voice", approved: false } },
+  ]);
+  assert.deepEqual(asked, []);
+  assert.equal(moduleWaits({ module: { approved: false } }), true);
+  assert.equal(moduleWaits({ module: { approved: true }, pending: { release: 2 } }), true);
+  assert.equal(moduleWaits({ module: { approved: true } }), false);
+  assert.equal(moduleWaits({}), false);
 });

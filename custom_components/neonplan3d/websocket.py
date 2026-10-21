@@ -218,7 +218,9 @@ def _without_code(pack: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(module, dict):
         return pack
     sha = module_sha(pack)
-    code = module.get("code") if isinstance(module.get("code"), str) else ""
+    code = module.get("code")
+    if not isinstance(code, str):
+        code = ""
     info = {k: v for k, v in module.items() if k != "code"}
     info.update({"approved": bool(sha) and pack.get("approved") == sha, "size": len(code), "sha": sha})
     slim = {k: v for k, v in pack.items() if k not in ("pending", "approved")}
@@ -614,7 +616,7 @@ def ws_modules_review(hass: HomeAssistant, connection: websocket_api.ActiveConne
     pack = next((p for p in data.packs if p["id"] == msg["pack_id"]), None)
     target = (pack or {}).get("pending") if msg["pending"] else pack
     module = target.get("module") if isinstance(target, dict) else None
-    if not isinstance(module, dict) or not isinstance(module.get("code"), str):
+    if not isinstance(target, dict) or not isinstance(module, dict) or not isinstance(module.get("code"), str):
         connection.send_error(msg["id"], "not_found", "no such module")
         return
     connection.send_result(
