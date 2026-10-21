@@ -93,6 +93,11 @@ export interface FloorGeometry {
 }
 
 export const SLAB = 0.2;
+/**
+ * A wall ends under a roof at its underside, but never lower than 5 cm: where the underside lies this far below
+ * the floor, even that stub would show above the roof's top face (0.14 m slab), so the wall is left out there.
+ */
+const BURIED = -0.06;
 /** How far the slab under a doorway stays below the floor. */
 const DOORWAY_DROP = 0.01;
 const BUCKETS = 8;
@@ -129,6 +134,12 @@ export function buildFloorGeometry(
     const own = wall?.slope ? Math.min(H, slopeTop(wall.slope, x, z)) : H;
     const r = roofUnder ? roofUnder(x, z) : null;
     return r === null ? own : Math.max(0.05, Math.min(own, r));
+  };
+  // a wall under a roof that lies below this floor's own level there (the corner of a room beside a hip, #638):
+  // even the shortest stub would stand out above the roof's top face, so nothing is built there
+  const buried = (x: number, z: number): boolean => {
+    const r = roofUnder ? roofUnder(x, z) : null;
+    return r !== null && r < BURIED;
   };
   // the lowest wall top along a stretch of a wall (sampled), for openings and the top edge line
   const lowestTop = (a: Vec2, ax: Vec2, s0: number, s1: number, H: number, wall?: Wall): number => {
@@ -324,7 +335,25 @@ export function buildFloorGeometry(
         })
       : pieces.map((piece) => ({ ...piece, inner0: false, inner1: false }));
     const tOf = (p: Vec2) => (p[0] - wall.a[0]) * ax[0] + (p[1] - wall.a[1]) * ax[1];
-    for (const piece of steps) {
+    // a step partly over a roof below the floor is cut finer, and the buried bits are left out (#638)
+    const fine = (piece: (typeof steps)[number]): (typeof steps)[number][] => {
+      if (!roofUnder) return [piece];
+      const poly = clipAlong(wall.footprint, wall.a, ax, piece.t0, piece.t1);
+      const hits = poly.filter(([x, z]) => buried(x, z)).length;
+      if (hits === 0) return [piece];
+      if (hits === poly.length) return [];
+      const t0 = Math.max(piece.t0, -0.5);
+      const t1 = Math.min(piece.t1, len + 0.5);
+      const n = Math.max(1, Math.ceil((t1 - t0) / 0.05));
+      return Array.from({ length: n }, (_, i) => ({
+        t0: i === 0 ? piece.t0 : t0 + ((t1 - t0) * i) / n,
+        t1: i === n - 1 ? piece.t1 : t0 + ((t1 - t0) * (i + 1)) / n,
+        ranges: piece.ranges,
+        inner0: i > 0 || piece.inner0,
+        inner1: i < n - 1 || piece.inner1,
+      })).filter((st) => !clipAlong(wall.footprint, wall.a, ax, st.t0, st.t1).every(([x, z]) => buried(x, z)));
+    };
+    for (const piece of underRoof ? steps.flatMap(fine) : steps) {
       const poly = clipAlong(wall.footprint, wall.a, ax, piece.t0, piece.t1);
       if (poly.length < 3) continue;
       // the faces between two steps of one piece are inside the wall: left out, or they show as stripes
@@ -376,6 +405,7 @@ export function buildFloorGeometry(
       for (let i = 0; i < n; i++) {
         const a: Vec2 = [p[0] + ((q[0] - p[0]) * i) / n, p[1] + ((q[1] - p[1]) * i) / n];
         const c: Vec2 = [p[0] + ((q[0] - p[0]) * (i + 1)) / n, p[1] + ((q[1] - p[1]) * (i + 1)) / n];
+        if (buried(a[0], a[1]) && buried(c[0], c[1])) continue;
         const ya = topAt(a[0], a[1], H, e.wall);
         const yc = topAt(c[0], c[1], H, e.wall);
         lines.seg([a[0], ya, a[1]], [c[0], yc, c[1]], EDGE_TOP, Math.max(ya, yc) <= cut + 1e-6 ? LOWER_OFFSET + b : b);
@@ -384,9 +414,10 @@ export function buildFloorGeometry(
   }
   const topOfWall = (w: Wall, p: Vec2) => topAt(p[0], p[1], wallHeight(w, floor.height), w);
   for (const c of outline.corners) {
+    if (buried(c.p[0], c.p[1])) continue;
     // the corner line reaches up to the tallest wall meeting there, not to whichever came first (#417)
     const tall = c.walls.reduce((m, w) => (topOfWall(w, c.p) > topOfWall(m, c.p) + 1e-6 ? w : m), c.wall);
-    const H = topOfWall(tall, c.p);
+    const H = topAt(c.p[0], c.p[1], wallHeight(tall, floor.height), tall);
     lines.segSplit([c.p[0], 0.004, c.p[1]], [c.p[0], H, c.p[1]], EDGE_SOFT, Math.min(cut, H), wallBucket.get(tall)!);
   }
   // a joint between walls of different heights: the taller wall's end stands free above the lower one, so

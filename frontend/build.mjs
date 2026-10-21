@@ -85,6 +85,7 @@ function copyFonts() {
   }
 }
 
+// 3D 796 KB and editor 916 KB on 2026-10-21 for roof sections that cut each other, wings meeting a roof in valleys (#466, #605) and the ends per section
 // editor 860 KB on 2026-10-19 for sloping walls, the background section and the 1.21 texts
 // main 632 KB and 3D 792 KB on 2026-10-19 for wall switches and sockets (gangs with their own entities, #593) and their texts
 // card editor 256 KB on 2026-10-19 for the 1.21 texts (3D lock, full screen, ceiling fan)
