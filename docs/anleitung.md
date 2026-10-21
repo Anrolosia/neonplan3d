@@ -218,6 +218,8 @@ Unter **Vorlage (Grundriss-Bild)** lädst du ein Foto oder einen Scan deines Gru
 
 Mit **Tür & Fenster** tippst du auf eine Wand, eine Raumwand oder eine einzelne Wand. Danach wählst du rechts die **Art**: Tür, Fenster oder Garagentor. Ein Fenster mit Brüstung 0 ist eine Terrassentür; wie bei Türen dreht **⇅ Öffnungsrichtung umdrehen** sie nach außen (in 3D schwingen die Flügel dann nach draußen, gekippt wird weiter nach innen). Die Vorlage **Glaswand** setzt eine feststehende, raumhohe Verglasung mit schmalen Sprossen ohne Flügel – für eine gläserne Innenwand oder Trennwand; Breite und Höhe stellst du frei ein, als Art geht sie auch bei jedem Fenster unter **Stil**.
 
+Stoßen zwei Räume ohne Wand aneinander (offener Übergang) und läuft die Außenwand dort in einer Linie weiter, darf ein Fenster oder eine Tür über den Übergang hinaus in die Wand des Nachbarraums reichen. Die Mitte der Öffnung bleibt auf der Wand ihres eigenen Raums.
+
 ![Arten von Öffnungen](images/editor-opening-kinds.jpg)
 
 Jede Öffnung hat:
@@ -440,7 +442,7 @@ Ein einfaches Haus bekommt unter **Bauen → Dach** bei **Dachform** ein Flach- 
 - **Dachschrägen (Kniestock):** Liegt die Wandoberkante unter der Deckenhöhe des Geschosses darunter (auch wenn die Schräge schon im Geschoss darunter beginnt: dann enden dessen Wände an der Traufseite ebenfalls an der Schräge) – zum Beispiel 0,9 m über dem Boden des Dachgeschosses –, enden dessen Wände an der Dachunterseite: Kniestock an der Traufe, Giebel bis zum First, Innenwände an der Schräge. Fenster passen dann nur, wo die Wand hoch genug ist (im Giebel); an der Traufseite nimmst du Dachfenster. Im Grundriss zeigen gestrichelte Linien, wo unter der Schräge noch 1,5 m und 2 m Kopfhöhe bleiben.
 - Wo eine Dachfläche an einen höheren Teil des Hauses stößt, etwa ein Pultdach an der Hauswand, entfällt dort der Überstand; das Dach endet an der Wand.
 - Unten im Formular steht die **Firsthöhe**. Dachflächen dürfen sich überschneiden: Das niedrigere Dach läuft unter das höhere, wie bei einem echten Anbau.
-- **Neu aus den Räumen erzeugen** ersetzt alle Dachflächen durch einen neuen Vorschlag, **Zurück zu einem Dach** schaltet auf das einfache Dach zurück.
+- **Neu aus den Räumen erzeugen** ersetzt alle Dachflächen durch einen neuen Vorschlag, **Zurück zu einem Dach** schaltet auf das einfache Dach zurück. Die Dachflächen bleiben dabei für später gespeichert, schneiden aber keine Wände mehr an.
 - **Überdachung:** Für ein Terrassendach oder einen Carport ziehst du eine Dachfläche über eine Fläche ohne Raum. Sie wird automatisch zur Überdachung: ein flaches Pultdach auf 2,4 m, getragen von Pfosten und Balken statt Wänden, mit durchsichtiger Dachfläche. An der Hauswand liegt sie auf. Den Schalter **Überdachung** gibt es auch im Formular jeder Dachfläche.
 
 ![Eine Terrassenüberdachung vor dem Haus](images/view-canopy.jpg)

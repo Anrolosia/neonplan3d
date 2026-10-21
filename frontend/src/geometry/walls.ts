@@ -537,6 +537,45 @@ export function locateOpening(walls: readonly Wall[], o: Pick<Opening, "wall" | 
   return { wall, s: dot(sub(p, wall.a), unit(sub(wall.b, wall.a))) };
 }
 
+/**
+ * The wall that carries on an outer wall in a straight line past one of its ends (`atEnd`: past b), where two
+ * rooms meet without a wall between them: same direction and thickness, and no other wall meeting there. An
+ * opening may reach across such a transition (#624).
+ */
+export function wallContinuation(walls: readonly Wall[], wall: Wall, atEnd: boolean): Wall | null {
+  if (!wall.exterior || wall.free) return null;
+  const p = atEnd ? wall.b : wall.a;
+  const ax = unit(sub(wall.b, wall.a));
+  const at = (q: Vec2) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 1e-3;
+  let next: Wall | null = null;
+  for (const w of walls) {
+    if (w === wall || !(at(w.a) || at(w.b))) continue;
+    // any other wall meeting at the transition (a partition, a corner) ends the reach
+    if (next || !w.exterior || w.free || !at(atEnd ? w.a : w.b) || dot(unit(sub(w.b, w.a)), ax) < 0.9999) return null;
+    if (Math.abs(w.left - wall.left) > 1e-3 || Math.abs(w.right - wall.right) > 1e-3) return null;
+    next = w;
+  }
+  return next;
+}
+
+/**
+ * How far an opening on a room edge may reach past the edge's start and end: the length of the wall carrying
+ * on across a transition without a wall (see wallContinuation), 0 elsewhere.
+ */
+export function edgeReach(walls: readonly Wall[], room: Room, edge: number): [number, number] {
+  const len = Math.hypot(room.points[(edge + 1) % room.points.length][0] - room.points[edge][0], room.points[(edge + 1) % room.points.length][1] - room.points[edge][1]);
+  return ([0, len] as const).map((t) => {
+    const hit = locateOnWalls(walls, room, edge, t);
+    if (!hit) return 0;
+    const l = Math.hypot(hit.wall.b[0] - hit.wall.a[0], hit.wall.b[1] - hit.wall.a[1]);
+    // the edge's end must be the wall's end on that side
+    const atEnd = hit.s > l / 2;
+    if (Math.abs(hit.s - (atEnd ? l : 0)) > 1e-3) return 0;
+    const next = wallContinuation(walls, hit.wall, atEnd);
+    return next ? Math.hypot(next.b[0] - next.a[0], next.b[1] - next.a[1]) : 0;
+  }) as [number, number];
+}
+
 /** Locate a position on a room edge in the generated walls: the wall and the distance from wall.a. */
 export function locateOnWalls(walls: readonly Wall[], room: Room, edge: number, offset: number): { wall: Wall; s: number } | null {
   for (const wall of walls) {

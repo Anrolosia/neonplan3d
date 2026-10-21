@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Room, Vec2 } from "../model.ts";
 import { polygonArea, signedArea } from "../model.ts";
-import { generateWalls, locateOnWalls, locateOpening, openingHost } from "./walls.ts";
+import { edgeReach, generateWalls, locateOnWalls, locateOpening, openingHost } from "./walls.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -257,4 +257,20 @@ test("rooms with a ceiling of their own: walls end at the taller room, a room wi
   const outer = walls.filter((w) => w.exterior);
   assert.ok(outer.filter((w) => w.roomLeft === "wohnen" || w.roomRight === "wohnen").every((w) => w.height === 2.5));
   assert.ok(outer.filter((w) => w.roomLeft === "garage" || w.roomRight === "garage").every((w) => w.height === undefined));
+});
+
+test("an opening may reach across a transition without a wall where the outer wall carries on in line (#624)", () => {
+  const room = (id: string, pts: Vec2[], wall_heights?: (number | null)[]): Room => ({ id, name: id, area_id: null, points: pts, floor_material: "wood", ...(wall_heights ? { wall_heights } : {}) });
+  // living room and dining room side by side, open to each other (no wall on the shared edge)
+  const a = room("a", [[0, 0], [0, 4], [3, 4], [3, 0]]);
+  const b = room("b", [[0, 4], [0, 8], [3, 8], [3, 4]], [null, null, null, 0]);
+  const open = generateWalls([a, b], { exterior: 0.3, interior: 0.115 }, []).walls;
+  // a's edge 0 runs along x = 0 from z 0 to 4; past its end the outer wall of b carries on for 4 m
+  assert.deepEqual(edgeReach(open, a, 0), [0, 4]);
+  assert.deepEqual(edgeReach(open, b, 0), [4, 0]);
+  // the far ends are corners: no reach
+  assert.deepEqual(edgeReach(open, a, 1), [0, 0]);
+  // with a wall between the rooms the opening stays on its own edge
+  const closed = generateWalls([a, { ...b, wall_heights: undefined }], { exterior: 0.3, interior: 0.115 }, []).walls;
+  assert.deepEqual(edgeReach(closed, a, 0), [0, 0]);
 });
