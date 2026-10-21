@@ -623,24 +623,29 @@ function pair(openings: Opening[], ids: string[], shared = false): Map<string, s
 export function openingEntities(hass: HomeAssistant, floors: readonly Floor[]): Map<string, OpeningEntities> {
   const out = new Map<string, OpeningEntities>();
   const pick = (ref: string | null, auto: string | undefined) => (ref === "none" ? null : (ref ?? auto ?? null));
-  const link = (o: Opening, autoC?: string, autoK?: string): OpeningEntities => ({
-    cover: pick(o.cover, autoC),
-    // a window with a handle sensor gets no plain contact assigned automatically
-    contact: o.sensor === "handle" && o.contact == null ? null : pick(o.contact, autoK),
-    tilt: o.tilt === "none" ? null : o.tilt,
-    contact2: o.leaves === 2 && o.contact2 && o.contact2 !== "none" ? o.contact2 : null,
-    // a smart lock on a door, or on a terrace door (a window down to the floor, #645)
-    lock: (o.type === "door" || (o.type === "window" && o.sill <= 0.01)) && o.lock && o.lock !== "none" ? o.lock : null,
-    tilt2: o.leaves === 2 && o.tilt2 && o.tilt2 !== "none" ? o.tilt2 : null,
-    position: o.position && o.position !== "none" ? o.position : null,
-    positionInverted: !!o.position_inverted,
-    tiltAngle: o.tilt_angle && o.tilt_angle !== "none" ? o.tilt_angle : null,
-    tiltMax: o.tilt_max ?? null,
-    tiltOffset: o.tilt_offset ?? null,
-    tiltInvert: !!o.tilt_invert,
-    shut: !!o.shut,
-    ...(o.contact_invert ? { contactInvert: true } : {}),
-  });
+  const link = (o: Opening, autoC?: string, autoK?: string): OpeningEntities => {
+    const cover = pick(o.cover, autoC);
+    return {
+      cover,
+      // a window with a handle sensor gets no plain contact assigned automatically
+      contact: o.sensor === "handle" && o.contact == null ? null : pick(o.contact, autoK),
+      tilt: o.tilt === "none" ? null : o.tilt,
+      contact2: o.leaves === 2 && o.contact2 && o.contact2 !== "none" ? o.contact2 : null,
+      // a smart lock on a door, or on a terrace door (a window down to the floor, #645)
+      lock: (o.type === "door" || (o.type === "window" && o.sill <= 0.01)) && o.lock && o.lock !== "none" ? o.lock : null,
+      tilt2: o.leaves === 2 && o.tilt2 && o.tilt2 !== "none" ? o.tilt2 : null,
+      // the blind's position sensor only counts with a blind: one left behind after the drive was set to "none" (or
+      // from a window turned into a door) would otherwise lower a roller shutter over a plain door (#682)
+      position: cover && kindOf(cover) === "cover" && o.position && o.position !== "none" ? o.position : null,
+      positionInverted: !!o.position_inverted,
+      tiltAngle: o.tilt_angle && o.tilt_angle !== "none" ? o.tilt_angle : null,
+      tiltMax: o.tilt_max ?? null,
+      tiltOffset: o.tilt_offset ?? null,
+      tiltInvert: !!o.tilt_invert,
+      shut: !!o.shut,
+      ...(o.contact_invert ? { contactInvert: true } : {}),
+    };
+  };
   for (const floor of floors) {
     for (const room of floor.rooms) {
       const own = floor.openings.filter((o) => o.room_id === room.id).sort((a, b) => a.edge - b.edge || a.offset - b.offset);
@@ -692,6 +697,17 @@ export function windowPosition(st: HassEntity | undefined): "open" | "tilted" | 
   return null;
 }
 
+/** Lock states that leave the door unlocked (Nuki's "open" is unlatched). */
+const LOCK_OPEN_STATES = new Set(["unlocked", "unlocking", "open", "opening"]);
+
+/**
+ * A garage door's drive that only gives a pulse (#677): a switch the opener turns off again by itself, or a button.
+ * It is pressed on a tap; the door's state comes from its contact.
+ */
+export function isPulseDrive(id: string | null | undefined): boolean {
+  return !!id && /^(switch|button|input_button)\./.test(id);
+}
+
 /** Door leaves without a contact sensor stand half open, so the doorway stays readable. */
 export const DOOR_DEFAULT_OPEN = 0.5;
 
@@ -703,7 +719,12 @@ export function openingState(
   hass: HomeAssistant,
   e: OpeningEntities,
   type: Opening["type"] = "window",
-): { open: number; open2: number; tilt: number; tilt2: number; cover: number | null; sensed: boolean } {
+): { open: number; open2: number; tilt: number; tilt2: number; cover: number | null; sensed: boolean; unlocked?: boolean } {
+  // a drive that only gives a pulse (a switch, a button) reports nothing about the door: the contact does (#677)
+  if (e.cover && isPulseDrive(e.cover)) e = { ...e, cover: null, position: null };
+  // the door's smart lock: unlocked (or unlatched) gives the leaf a soft glow at its edge (#682)
+  const lockSt = e.lock ? hass.states[e.lock] : undefined;
+  const lockOpen = !!lockSt && LOCK_OPEN_STATES.has(lockSt.state) ? { unlocked: true } : {};
   const on = (id: string | null | undefined) => !!id && hass.states[id]?.state === "on";
   const known = (id: string | null | undefined) => !!id && !!hass.states[id] && !isUnavailable(hass.states[id]);
   const raw = (id: string | null | undefined) => (id ? windowPosition(hass.states[id]) : null);
@@ -742,10 +763,10 @@ export function openingState(
     // leaf – as far as its position says – and no blind is drawn (#544); the contact still wins when there is one
     if (cover !== null && c && DOOR_COVERS.has(String(c.attributes.device_class ?? ""))) {
       const leaf = p === null ? 1 - cover : p === "closed" ? 0 : 1;
-      return { open: leaf, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover: null, sensed: true };
+      return { open: leaf, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover: null, sensed: true, ...lockOpen };
     }
     // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
-    return { open: p === null ? (e.shut ? 0 : DOOR_DEFAULT_OPEN) : p === "closed" ? 0 : 1, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover, sensed: p !== null || cover !== null };
+    return { open: p === null ? (e.shut ? 0 : DOOR_DEFAULT_OPEN) : p === "closed" ? 0 : 1, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover, sensed: p !== null || cover !== null, ...lockOpen };
   }
   if (type === "garage") {
     // a garage door without a cover shows its contact: open or closed (read like a door's, so text states and
@@ -755,7 +776,7 @@ export function openingState(
     if (cover === null) cover = p === null || p === "closed" ? 1 : 0;
     return { open: 0, open2: 0, tilt: 0, tilt2: 0, cover, sensed };
   }
-  return { open, open2, tilt: tiltFrac, tilt2: tilted2 ? 1 : 0, cover, sensed: known(e.contact) || known(e.tilt) || Number.isFinite(angleRaw) };
+  return { open, open2, tilt: tiltFrac, tilt2: tilted2 ? 1 : 0, cover, sensed: known(e.contact) || known(e.tilt) || Number.isFinite(angleRaw), ...lockOpen };
 }
 
 /**

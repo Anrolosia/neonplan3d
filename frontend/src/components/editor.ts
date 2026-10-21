@@ -25,7 +25,7 @@ import { backdropImage } from "../backdrop.ts";
 import { screenName, setScreenName, setVoiceHere, setVoicePipeline, voiceOnHere, voicePipeline } from "../load-voice.ts";
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
-import { CLIMATE_ATTRS, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
+import { CLIMATE_ATTRS, isPulseDrive, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
 import { activeSections, sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionAbove, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
 import { bestFace, clampField, faceAt, faceCompass, fieldFace, fieldModules, GROUND, moveField, pointOnFace, proposeField, proposeGroundField, proposeWindow, proposeWallField, roofFaces, rowCounts, turnGroundField, fieldCenter, wallFaces, windowAsField, windowCorners, onFace, onField, rayOnFace, type RoofFace } from "../solar.ts";
 import type { SurfaceGrab, SurfaceRay } from "../viewer/viewer3d.ts";
@@ -10639,6 +10639,8 @@ export class Fp3dEditor extends LitElement {
     };
     const dc = (id: string) => this.hass?.states[id]?.attributes.device_class as string | undefined;
     const covers = this.entityOptions((id) => id.startsWith("cover."));
+    // a garage door's drive may also be a pulse switch or a button that the opener answers (#677)
+    const garageDrives = garage ? this.entityOptions((id) => id.startsWith("cover.") || isPulseDrive(id)) : covers;
     // sensors with a number for the live position of a blind
     const positions = this.entityOptions((id) => /^(sensor|number|input_number)\./.test(id) && Number.isFinite(Number(this.hass?.states[id]?.state)));
     // plain contacts, and handle sensors with three states (open / tilted / closed)
@@ -10763,10 +10765,11 @@ export class Fp3dEditor extends LitElement {
             <option value="right" ?selected=${o.hinge === "right"}>${this.t("hinge_right")}</option>
           </select></label
         >`}
-        ${window || garage || door ? this.entitySelect(this.t(window ? "cover_entity" : "door_cover"), o.cover, autoPick("cover"), covers, (v) => this.updateOpening({ cover: v })) : nothing}
+        ${window || garage || door ? this.entitySelect(this.t(window ? "cover_entity" : "door_cover"), o.cover, autoPick("cover"), garage ? garageDrives : covers, (v) => this.updateOpening({ cover: v })) : nothing}
+        ${garage && isPulseDrive(o.cover) ? html`<p class="fp3d-sub fp3d-wide">${this.t("garage_pulse_hint")}</p>` : nothing}
         ${(window || garage || door) && o.cover !== "none" && (o.cover || autoPick("cover"))
-          ? html`${this.entitySelect(this.t("cover_position_entity"), o.position ?? null, undefined, positions, (v) => this.updateOpening({ position: v === "none" ? null : v }))}
-              ${o.position
+          ? html`${isPulseDrive(o.cover) ? nothing : this.entitySelect(this.t("cover_position_entity"), o.position ?? null, undefined, positions, (v) => this.updateOpening({ position: v === "none" ? null : v }))}
+              ${o.position && !isPulseDrive(o.cover)
                 ? html`<label class="fp3d-check fp3d-wide"
                     ><input
                       type="checkbox"

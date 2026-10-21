@@ -21,6 +21,8 @@ export interface OpeningState {
   cover: number | null;
   /** A sensor reports the state (contact, tilt sensor or cover); without one "closed" is a guess. */
   sensed?: boolean;
+  /** The door's smart lock is unlocked: the leaf's free edge glows softly (#682). */
+  unlocked?: boolean;
 }
 
 export const CLOSED: OpeningState = { open: 0, open2: 0, tilt: 0, tilt2: 0, cover: null };
@@ -31,6 +33,8 @@ const SASH = 0x22375f;
 const SILL = 0x1c2a47;
 const BLIND_BOX = 0x16223a;
 const OPEN_WARM = 0xffb547;
+/** The stock accent: the leaf edge of an unlocked door (takes the user's accent in the neon look). */
+const UNLOCKED = 0x37e0ff;
 
 const OPEN_ANGLE = 1.2;
 const DOOR_ANGLE = 1.5;
@@ -256,6 +260,8 @@ export function buildOpeningParts(infos: readonly OpeningInfo[], states: Readonl
         const hx1 = front ? lw - 0.08 : lw - 0.05;
         splitBox(frames, leafTf, hx0, hx1, 0.004, 0.05, hy - hh, hy + hh, new Color(HANDLE), new Color(HANDLE_TOP), cut, leafBucket);
         splitBox(frames, leafTf, hx0, hx1, -thick - 0.05, -thick - 0.004, hy - hh, hy + hh, new Color(HANDLE), new Color(HANDLE_TOP), cut, leafBucket);
+        // an unlocked smart lock: a soft accent strip along the leaf's free edge, on both faces (#682)
+        if (st.unlocked && atStart === info.hingeAtStart) splitBox(frames, leafTf, lw - 0.022, lw + 0.004, -thick - 0.006, 0.006, 0.03, T - 0.03, shade(UNLOCKED, 0.85), shade(UNLOCKED, 1), cut, leafBucket);
       }
     } else if (info.opening.type === "garage") {
       // sectional door: the closed part hangs in the opening, the open part lies under the ceiling
@@ -339,6 +345,8 @@ export function buildOpeningParts(infos: readonly OpeningInfo[], states: Readonl
         splitBox(frames, sashTf, sw, sashW - sw, n0, n1, sy0, sy0 + sw, sashC, sashTop, cut, sashBucket);
         splitBox(frames, sashTf, sw, sashW - sw, n0, n1, sy1 - sw, sy1, sashC, sashTop, cut, sashBucket);
         panel(glass, sashTf, sw, sashW - sw, (n0 + n1) / 2, sy0 + sw, sy1 - sw, alert ? shade(OPEN_WARM, 0.16) : GLASS, cut, sashBucket);
+        // a terrace door with an unlocked smart lock: the main sash's free edge glows like a door leaf's (#682)
+        if (st.unlocked && sash.atStart === info.hingeAtStart) splitBox(frames, sashTf, sashW - 0.022, sashW + 0.004, n0 - 0.006, n1 + 0.006, sy0 + 0.02, sy1 - 0.02, shade(UNLOCKED, 0.85), shade(UNLOCKED, 1), cut, sashBucket);
         if (openingStyle(info.opening, info.exterior) === "bars") {
           // glazing bars: a cross over the pane
           const ym = (sy0 + sy1) / 2;

@@ -3,7 +3,7 @@ import { test } from "node:test";
 import type { Furniture } from "../model.ts";
 import { mountBase, setPacks, type FurniturePack } from "../packs.ts";
 import { newFloor } from "../model.ts";
-import { hasFixedColors, packMotionParts, pushFurniture, setLightLook } from "./furniture.ts";
+import { hasFixedColors, packGlowCentre, packMotionParts, pushFurniture, setLightLook } from "./furniture.ts";
 import { packMotion, type PackItem } from "../packs.ts";
 import { GeoBuffer, LineBuffer } from "./geo.ts";
 
@@ -235,4 +235,26 @@ test("pack parts in a colour of their own keep it down to the ground in the ligh
   assert.ok(light.length > 0 && light.every(kept), "in the light looks every orange vertex stays a signal colour");
   // the neon look is unchanged
   assert.deepEqual(colours(false), colours(false));
+});
+
+test("a pack wall lamp's light sits in its glowing parts, turned and mirrored with it (#680)", () => {
+  // a wall lantern 0.2 wide, 0.24 deep, 0.4 tall: a back plate at the wall (-z), the glass box out front, a small LED
+  const lantern = {
+    id: "lantern",
+    name: { de: "Laterne", en: "Lantern" },
+    size: [0.2, 0.24, 0.4],
+    parts: [
+      { shape: "box", x: 0, z: -0.45, w: 1, d: 0.1, y: 0, h: 1, color: "body" },
+      { shape: "box", x: 0.1, z: 0.2, w: 0.6, d: 0.5, y: 0.25, h: 0.5, color: "glass", glow: true },
+    ],
+  } as unknown as PackItem;
+  const f = { x: 2, z: 1, rotation: 0, w: 0.2, d: 0.24, h: 0.4, mirror: false };
+  const near = (a: number[] | null, b: number[]) => !!a && a.every((v, i) => Math.abs(v - b[i]) < 1e-9);
+  // the glass's centre: 0.1 × 0.2 to the side, 0.2 × 0.24 out from the middle, halfway up the glass above the mount
+  assert.ok(near(packGlowCentre(lantern, f, 1.8), [2.02, 1.8 + 0.2, 1.048]), String(packGlowCentre(lantern, f, 1.8)));
+  // mirrored: the side offset changes sides; turned by 90°: the depth points along -x
+  assert.ok(near(packGlowCentre(lantern, { ...f, mirror: true }, 1.8), [1.98, 2, 1.048]));
+  assert.ok(near(packGlowCentre(lantern, { ...f, rotation: 90 }, 1.8), [2 - 0.048, 2, 1.02]));
+  // no glowing part: null (the lamp keeps its old halo and light)
+  assert.equal(packGlowCentre({ ...lantern, parts: [lantern.parts[0]] } as PackItem, f, 1.8), null);
 });
