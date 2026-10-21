@@ -1225,6 +1225,8 @@
  "devices_search": "Hledat zařízení …",
  "devices_more": "+{n} další",
  "devices_less": "méně",
+ "devices_hide_all": "Skrýt všech {n} v panelu místnosti",
+ "devices_show_all": "Znovu zobrazit všech {n}",
  "panel_more": "Další zařízení oblasti ({n})",
  "panel_less": "Zobrazit méně",
  "gaps_close": "Uzavřít mezery",
@@ -1266,6 +1268,12 @@
  "well": "Anglický dvorek",
  "well_hint": "Toto okno leží pod úrovní terénu: ve 3D dostane anglický dvorek s mřížkou. Odškrtni, pokud žádný nechceš – např. když venku vede cesta.",
  "well_rim": "Okraj nad terénem (m)",
+ "sill_board": "Parapet",
+ "sill_board_hint": "Automaticky: od výšky parapetu 30 cm vnitřní i vnější parapet; žádný u okna, které sedí přímo na jiném (nadsvětlík, dělená prosklená stěna).",
+ "sill_board_auto": "automaticky",
+ "sill_board_none": "žádný",
+ "sill_board_inside": "jen uvnitř",
+ "sill_board_outside": "jen venku",
  "cellar_window_hint": "Malé a vysoko ve stěně: 100 × 50 cm, 25 cm pod stropem. Pod terénem dostane ve 3D světlík s mřížkou.",
  "opening_height": "Výška (m)",
  "hinge": "Panty (z pohledu místnosti)",
@@ -2036,5 +2044,6 @@
  "module_imported_waits": "Spustí se až po tvém schválení (Rozšíření → Moduly).",
  "voice_sentences_kept": "Soubor vět pro {langs} jsi sám upravil – NeonPlan na něj nesahá.",
  "voice_sentences_failed": "Soubor vět se nepodařilo zapsat.",
- "voice_sentences_file": "NeonPlan vytvoří soubor custom_sentences/<jazyk>/neonplan3d.yaml až tehdy, když zde vybereš věty. Soubor, který jsi upravil, se nikdy nepřepíše; odebráním integrace se soubor NeonPlanu smaže."
+ "voice_sentences_file": "NeonPlan vytvoří soubor custom_sentences/<jazyk>/neonplan3d.yaml až tehdy, když zde vybereš věty. Soubor, který jsi upravil, se nikdy nepřepíše; odebráním integrace se soubor NeonPlanu smaže.",
+ "pin_standby": "Pohotovost"
 }

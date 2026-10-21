@@ -1225,6 +1225,8 @@
  "devices_search": "Cerca dispositivi …",
  "devices_more": "+{n} altri",
  "devices_less": "meno",
+ "devices_hide_all": "Nascondi tutti i {n} nel pannello della stanza",
+ "devices_show_all": "Mostra di nuovo tutti i {n}",
  "panel_more": "Altri dispositivi dell'area ({n})",
  "panel_less": "Mostra meno",
  "gaps_close": "Chiudi gli spazi",
@@ -1266,6 +1268,12 @@
  "well": "Bocca di lupo",
  "well_hint": "Questa finestra si trova sotto il livello del terreno: in 3D riceve una bocca di lupo con griglia. Togli la spunta per non averla – ad esempio se fuori passa un vialetto.",
  "well_rim": "Bordo sopra il terreno (m)",
+ "sill_board": "Davanzale",
+ "sill_board_hint": "Automatico: da 30 cm di parapetto un davanzale dentro e fuori; nessuno per una finestra che poggia direttamente su un'altra (sopraluce, vetrata divisa).",
+ "sill_board_auto": "automatico",
+ "sill_board_none": "nessuno",
+ "sill_board_inside": "solo dentro",
+ "sill_board_outside": "solo fuori",
  "cellar_window_hint": "Piccola e in alto nella parete: 100 × 50 cm, 25 cm sotto il soffitto. Sotto il terreno riceve in 3D una bocca di lupo con griglia.",
  "opening_height": "Altezza (m)",
  "hinge": "Cerniere (viste dalla stanza)",
@@ -2036,5 +2044,6 @@
  "module_imported_waits": "Funziona solo dopo la tua approvazione (Estensioni → Moduli).",
  "voice_sentences_kept": "Hai modificato tu il file delle frasi per {langs} – NeonPlan non lo tocca.",
  "voice_sentences_failed": "Non è stato possibile scrivere il file delle frasi.",
- "voice_sentences_file": "NeonPlan crea il file custom_sentences/<lingua>/neonplan3d.yaml solo quando scegli qui delle frasi. Un file che hai modificato non viene mai sovrascritto; rimuovendo l'integrazione il file di NeonPlan viene cancellato."
+ "voice_sentences_file": "NeonPlan crea il file custom_sentences/<lingua>/neonplan3d.yaml solo quando scegli qui delle frasi. Un file che hai modificato non viene mai sovrascritto; rimuovendo l'integrazione il file di NeonPlan viene cancellato.",
+ "pin_standby": "Standby"
 }

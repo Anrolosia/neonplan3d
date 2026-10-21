@@ -1225,6 +1225,8 @@
  "devices_search": "Søk etter einingar …",
  "devices_more": "+{n} til",
  "devices_less": "færre",
+ "devices_hide_all": "Gøym alle {n} i rompanelet",
+ "devices_show_all": "Vis alle {n} igjen",
  "panel_more": "Fleire einingar i området ({n})",
  "panel_less": "Vis færre",
  "gaps_close": "Lukk mellomrom",
@@ -1266,6 +1268,12 @@
  "well": "Lyssjakt",
  "well_hint": "Dette vindauget ligg under bakkenivå: i 3D får det ei lyssjakt med rist. Fjern haken for inga – t.d. om ein sti går forbi utanfor.",
  "well_rim": "Kant over bakken (m)",
+ "sill_board": "Vindaugskarm",
+ "sill_board_hint": "Automatisk: frå 30 cm brystningshøgd ein karm inne og ute; ingen for eit vindauge som sit rett oppå eit anna (overvindauge, delt glasfront).",
+ "sill_board_auto": "automatisk",
+ "sill_board_none": "ingen",
+ "sill_board_inside": "berre inne",
+ "sill_board_outside": "berre ute",
  "cellar_window_hint": "Lite og høgt oppe i veggen: 100 × 50 cm, 25 cm under taket. Under bakken får det ein lyssjakt med rist i 3D.",
  "opening_height": "Høgd (m)",
  "hinge": "Hengsel (sett frå rommet)",
@@ -2036,5 +2044,6 @@
  "module_imported_waits": "Han køyrer først etter godkjenninga di (Utvidingar → Modular).",
  "voice_sentences_kept": "Setningsfila for {langs} har du endra sjølv – NeonPlan lèt henne vere.",
  "voice_sentences_failed": "Setningsfila kunne ikkje skrivast.",
- "voice_sentences_file": "NeonPlan lagar fila custom_sentences/<språk>/neonplan3d.yaml først når du vel setningar her. Ei fil du har endra sjølv, blir aldri skriven over; vert integrasjonen fjerna, blir NeonPlan si fil sletta."
+ "voice_sentences_file": "NeonPlan lagar fila custom_sentences/<språk>/neonplan3d.yaml først når du vel setningar her. Ei fil du har endra sjølv, blir aldri skriven over; vert integrasjonen fjerna, blir NeonPlan si fil sletta.",
+ "pin_standby": "Kvilemodus"
 }

@@ -1225,6 +1225,8 @@
  "devices_search": "Søk etter enheter …",
  "devices_more": "+{n} til",
  "devices_less": "færre",
+ "devices_hide_all": "Skjul alle {n} i rompanelet",
+ "devices_show_all": "Vis alle {n} igjen",
  "panel_more": "Flere enheter i området ({n})",
  "panel_less": "Vis færre",
  "gaps_close": "Lukk mellomrom",
@@ -1266,6 +1268,12 @@
  "well": "Lyssjakt",
  "well_hint": "Dette vinduet ligger under bakkenivå: i 3D får det en lyssjakt med rist. Fjern haken for ingen – f.eks. hvis en sti går forbi utenfor.",
  "well_rim": "Kant over bakken (m)",
+ "sill_board": "Vinduskarm",
+ "sill_board_hint": "Automatisk: fra 30 cm brystningshøyde en karm inne og ute; ingen for et vindu som sitter rett oppå et annet (overvindu, delt glassfront).",
+ "sill_board_auto": "automatisk",
+ "sill_board_none": "ingen",
+ "sill_board_inside": "bare inne",
+ "sill_board_outside": "bare ute",
  "cellar_window_hint": "Lite og høyt oppe i veggen: 100 × 50 cm, 25 cm under taket. Under terrenget får det en lyssjakt med rist i 3D.",
  "opening_height": "Høyde (m)",
  "hinge": "Hengsler (sett fra rommet)",
@@ -2036,5 +2044,6 @@
  "module_imported_waits": "Den kjører først etter godkjenningen din (Utvidelser → Moduler).",
  "voice_sentences_kept": "Setningsfilen for {langs} har du endret selv – NeonPlan lar den være.",
  "voice_sentences_failed": "Setningsfilen kunne ikke skrives.",
- "voice_sentences_file": "NeonPlan lager filen custom_sentences/<språk>/neonplan3d.yaml først når du velger setninger her. En fil du har endret selv, blir aldri overskrevet; fjernes integrasjonen, slettes NeonPlans fil."
+ "voice_sentences_file": "NeonPlan lager filen custom_sentences/<språk>/neonplan3d.yaml først når du velger setninger her. En fil du har endret selv, blir aldri overskrevet; fjernes integrasjonen, slettes NeonPlans fil.",
+ "pin_standby": "Hvilemodus"
 }
