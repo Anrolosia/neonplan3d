@@ -12,8 +12,8 @@
 
 import { Color, type BufferGeometry } from "three";
 import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
-import { furnitureFootprint, isLamp, pointInPolygon, polygonArea, STAIR_TYPES } from "../model.ts";
-import { generateWalls, locateOpening, openingHost, slopeTop, type Wall } from "../geometry/walls.ts";
+import { furnitureFootprint, GANG_TYPES, isLamp, pointInPolygon, polygonArea, STAIR_TYPES } from "../model.ts";
+import { generateWalls, locateOpening, openingHost, placeWallPlate, slopeTop, type Wall } from "../geometry/walls.ts";
 import { clipConvex, isConvex } from "../geometry/area.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
@@ -377,11 +377,18 @@ export function buildFloorGeometry(
 
   // lamps are drawn live by the viewer (they glow with their light)
   const furnitureTris: FloorGeometry["furnitureTris"] = [];
-  for (const f of floor.furniture) {
-    if (isLamp(f.type)) continue;
+  for (const item of floor.furniture) {
+    if (isLamp(item.type)) continue;
     const start = wallBuf.count;
     const l0 = lines.p.length / 6;
-    const base = mountBase(floor, f);
+    let f = item;
+    let base = mountBase(floor, f);
+    if (GANG_TYPES.has(f.type)) {
+      // a switch or socket dropped into a wall stands on its face, on a low wall below its top (#593)
+      const at = placeWallPlate(walls, f, floor.height, base);
+      f = { ...f, x: at.x, z: at.z };
+      base = at.y;
+    }
     pushFurniture(wallBuf, lines, shadow, f, base);
     // a wardrobe or a stair reaching above the cut height is cut with the walls, so it hides nothing behind it
     if (base + f.h > cut + 0.05) {

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Room, Vec2 } from "../model.ts";
 import { polygonArea, signedArea } from "../model.ts";
-import { generateWalls, locateOnWalls, locateOpening, openingHost } from "./walls.ts";
+import { generateWalls, locateOnWalls, locateOpening, openingHost, placeWallPlate } from "./walls.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -257,4 +257,31 @@ test("rooms with a ceiling of their own: walls end at the taller room, a room wi
   const outer = walls.filter((w) => w.exterior);
   assert.ok(outer.filter((w) => w.roomLeft === "wohnen" || w.roomRight === "wohnen").every((w) => w.height === 2.5));
   assert.ok(outer.filter((w) => w.roomLeft === "garage" || w.roomRight === "garage").every((w) => w.height === undefined));
+});
+
+test("a socket dropped into a low balcony wall is drawn on its face (#593)", () => {
+  const balcony = { id: "b", name: "Balkon", area_id: null, points: [[0.24, -6.011], [2.23, -6.011], [2.23, -0.241], [0.24, -0.241]], wall_heights: [1.28, 0, 1.28, 1.28] } as unknown as Room;
+  const { walls } = generateWalls([balcony], { exterior: 0.24, interior: 0.08 });
+  // in the middle of the 24 cm wall, its front towards the balcony
+  const at = placeWallPlate(walls, { x: 0.46, z: -6.18, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3);
+  assert.ok(Math.abs(at.x - 0.46) < 1e-6);
+  assert.ok(Math.abs(at.z - (-6.011 + 0.007)) < 1e-6, String(at.z));
+  assert.equal(at.y, 0.3);
+  // already on the face: unchanged
+  const on = placeWallPlate(walls, { x: 1, z: -6.004, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3);
+  assert.ok(Math.abs(on.z - -6.004) < 1e-6);
+  // standing free in the room: unchanged
+  assert.deepEqual(placeWallPlate(walls, { x: 1, z: -3, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3), { x: 1, z: -3, y: 0.3 });
+});
+
+test("a light switch on a free wall lower than its mount height comes down onto it (#593)", () => {
+  const free = [{ id: "w", a: [0, 0] as Vec2, b: [2, 0] as Vec2, thickness: 0.1, height: 1.1 }];
+  const { walls } = generateWalls([], { exterior: 0.24, interior: 0.12 }, free);
+  const at = placeWallPlate(walls, { x: 1, z: 0.057, rotation: 0, d: 0.014, h: 0.085 }, 2.5, 1.05);
+  assert.ok(at.y < 1.05 && at.y + 0.085 < 1.1, String(at.y));
+  // an explicit mount height is kept
+  assert.equal(placeWallPlate(walls, { x: 1, z: 0.057, rotation: 0, d: 0.014, h: 0.085, mount_y: 1.2 }, 2.5, 1.2).y, 1.2);
+  // on a full-height wall nothing changes
+  const tall = generateWalls([], { exterior: 0.24, interior: 0.12 }, [{ ...free[0], height: undefined as unknown as number }]).walls;
+  assert.equal(placeWallPlate(tall, { x: 1, z: 0.057, rotation: 0, d: 0.014, h: 0.085 }, 2.5, 1.05).y, 1.05);
 });

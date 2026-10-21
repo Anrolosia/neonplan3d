@@ -547,3 +547,48 @@ export function locateOnWalls(walls: readonly Wall[], room: Room, edge: number, 
   }
   return null;
 }
+
+/**
+ * Where a wall switch or socket is drawn (#593): a plate whose centre lies inside a wall (dropped onto the wall in
+ * the plan) moves out onto the wall face it looks at, and on a wall lower than its mount height it comes down so it
+ * stays on the wall (its bottom at most 10 cm under the wall top). An explicit mount height is kept. `base` is its
+ * mount height (mountBase); returns the plan position and the bottom height to draw it at.
+ */
+export function placeWallPlate(
+  walls: readonly Wall[],
+  f: { x: number; z: number; rotation: number; d: number; h: number; mount_y?: number | null },
+  floorHeight: number,
+  base: number,
+): { x: number; z: number; y: number } {
+  const a = (f.rotation * Math.PI) / 180;
+  const front: Vec2 = [-Math.sin(a), Math.cos(a)];
+  const d = Math.max(0.005, f.d);
+  let best: { x: number; z: number; top: number; off: number } | null = null;
+  for (const w of walls) {
+    const len = Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]);
+    if (len < 0.05) continue;
+    const u: Vec2 = [(w.b[0] - w.a[0]) / len, (w.b[1] - w.a[1]) / len];
+    const s = (f.x - w.a[0]) * u[0] + (f.z - w.a[1]) * u[1];
+    if (s < -0.02 || s > len + 0.02) continue;
+    // signed distance from the wall line towards its left face
+    const n: Vec2 = [-u[1], u[0]];
+    const t = (f.x - w.a[0]) * n[0] + (f.z - w.a[1]) * n[1];
+    // the face the plate looks out of: its front points away from the wall
+    const side = front[0] * n[0] + front[1] * n[1] >= 0 ? 1 : -1;
+    if (Math.abs(front[0] * n[0] + front[1] * n[1]) < 0.5) continue;
+    const face = side > 0 ? w.left : -w.right;
+    const inside = t > -w.right - 1e-4 && t < w.left + 1e-4;
+    // on that face already (its back on the wall) or buried in the wall
+    const off = Math.abs(t - (face + side * (d / 2)));
+    if (!inside && off > 0.03) continue;
+    if (best && off >= best.off) continue;
+    const px = w.a[0] + u[0] * s;
+    const pz = w.a[1] + u[1] * s;
+    const at = inside ? face + side * (d / 2) : t;
+    const top = w.slope ? slopeTop(w.slope, f.x, f.z) : Math.min(floorHeight, w.height ?? floorHeight);
+    best = { x: px + n[0] * at, z: pz + n[1] * at, top, off };
+  }
+  if (!best) return { x: f.x, z: f.z, y: base };
+  const y = f.mount_y == null ? Math.max(0.02, Math.min(base, best.top - 0.1, best.top - f.h - 0.02)) : base;
+  return { x: best.x, z: best.z, y };
+}

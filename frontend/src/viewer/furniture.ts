@@ -44,6 +44,11 @@ class Builder {
   /** The transform mirrors (negative determinant): parts not wound by ccw() come out inside out. */
   readonly mirrored: boolean;
 
+  /** The vertex colours drawn so far (a part's own range is lifted for the light looks). */
+  get colors(): number[] {
+    return this.buf.c;
+  }
+
   constructor(buf: GeoBuffer, lines: LineBuffer, tf: Tf) {
     this.buf = buf;
     this.lines = lines;
@@ -1804,6 +1809,14 @@ function buildFurniture(buf: GeoBuffer, lines: LineBuffer, shadow: GeoBuffer, f:
   contactShadow(shadow, tf, w, d, f.type === "plant" ? 0.35 : 0.5);
 }
 
+/**
+ * A pack item with parts in a colour of their own ("#rrggbb", a pumpkin's orange): the light looks keep such colours
+ * only while bright and strong enough, so these parts are drawn anew on a look change (#609).
+ */
+export function hasFixedColors(type: string): boolean {
+  return !!packItem(type)?.parts.some((p) => p.color?.startsWith("#") || p.top?.startsWith("#"));
+}
+
 /** Colour of a pack part: a palette role (so packs follow the look) or "#rrggbb". */
 function packColor(value: string | undefined, top: boolean): number | null {
   if (!value) return null;
@@ -1836,6 +1849,7 @@ function packModel(
     const top = lit ? glow : (packColor(p.top, false) ?? packColor(p.color, true) ?? shade(side, 1.25).getHex());
     const y0 = base + p.y * h;
     const y1 = base + Math.min(h, (p.y + p.h) * h);
+    const c0 = b.colors.length;
     // "glow" lines are as bright as the wall lines, so a pack item can be drawn like the walls
     const edges = p.edges === "glow" ? EDGE_TOP : p.edges === "faint" ? EDGE_FAINT : p.edges ? EDGE_FURN : null;
     // a turned part draws through a builder whose coordinates turn around the part's centre
@@ -1850,6 +1864,10 @@ function packModel(
       const td = p.td ?? p.d;
       bb.loft([(p.x - p.w / 2) * w, (p.x + p.w / 2) * w, (p.z - p.d / 2) * d, (p.z + p.d / 2) * d], [(tx - tw / 2) * w, (tx + tw / 2) * w, (tz - td / 2) * d, (tz + td / 2) * d], y0, y1, side, top, edges);
     } else bb.box((p.x - p.w / 2) * w, (p.x + p.w / 2) * w, y0, y1, (p.z - p.d / 2) * d, (p.z + p.d / 2) * d, side, top, edges);
+    // a part in a colour of its own keeps it in the light looks down to the ground, like a waste bin (#609): the
+    // shading towards the floor would push its lower half under the looks' signal-colour threshold (palette roles
+    // follow the look and stay as they are)
+    if (lightLook && !lit && !onlyGlow && (p.color?.startsWith("#") || p.top?.startsWith("#"))) keepBright(b.colors, c0);
   }
 }
 

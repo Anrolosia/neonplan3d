@@ -47,7 +47,8 @@ import {
 } from "three";
 import type { Building, Floor, Furniture, Room, StartView } from "../model.ts";
 import { recolorLamps, SHADE_SENTINEL, shadeFactors } from "./lamp-colors.ts";
-import { centroid, outdoorZones, pointInPolygon, openingStyle, setTerrain, WALL_LAMP_Y, zonesOf } from "../model.ts";
+import { centroid, GANG_TYPES, outdoorZones, pointInPolygon, openingStyle, setTerrain, WALL_LAMP_Y, zonesOf } from "../model.ts";
+import { placeWallPlate } from "../geometry/walls.ts";
 import { buildEarth } from "./earth.ts";
 import { clampIntoRoom } from "../geometry/snap.ts";
 import { roofRider, roofUnderAt, sectionCutsBelow } from "../roof-sections.ts";
@@ -55,7 +56,7 @@ import { buildFloorGeometry, SLAB, stairHoleParts, type FloorGeometry } from "./
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { CameraProjections, PROJECTION_LAYER, type ProjectionSurface, type ProjectorPose } from "./projection.ts";
-import { pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook } from "./furniture.ts";
+import { pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook, hasFixedColors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -257,7 +258,7 @@ export interface ScreenState {
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
   // "gang": one rocker or socket of a wall switch or socket (`index` of `of`)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang" | "drum" | "apring"; color: [number, number, number]; level: number; index?: number; of?: number }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang" | "drum" | "apring"; color: [number, number, number]; level: number; index?: number; of?: number; accent?: boolean }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -305,6 +306,8 @@ export interface ViewerStats {
   gpu: string | null;
 }
 
+/** The stock neon cyan (a light switch glows in it without an accent colour of the user). */
+const ACCENT_STOCK: [number, number, number] = [0.22, 0.88, 1];
 /** Extra gap between floors in the pulled-apart house view (metres). */
 const EXPLODE_GAP = 2.4;
 /** How far the roof lifts off the top floor while the floors are pulled apart. */
@@ -1173,10 +1176,10 @@ export class FloorplanViewer {
     if (theme === this.theme) return;
     this.theme = theme;
     this.themeUniform.value = themeIndex(theme);
-    // waste bins keep their colours in the light looks: drawn anew in full colour (#609)
+    // waste bins and pack items in colours of their own keep them in the light looks: drawn anew in full colour (#609)
     const light = theme !== "neon";
     setLightLook(light);
-    if (this.building?.floors.some((f) => f.furniture.some((m) => m.type === "waste_bin"))) this.rebuild();
+    if (this.building?.floors.some((f) => f.furniture.some((m) => m.type === "waste_bin" || hasFixedColors(m.type)))) this.rebuild();
     const blending = lineBlending(theme);
     const lineMats = [...this.floors.map((f) => f.materials.lines), ...(this.roof ? [this.roof.lines] : [])];
     for (const m of lineMats) {
@@ -2945,13 +2948,18 @@ export class FloorplanViewer {
   private buildScreens(fv: FloorView): void {
     // the vehicles in the parking spots count as furniture here too (Auto Pro lights a band on them)
     const items = withVehicles(fv.floor, this.parked).furniture.filter((f) => this.screens.has(f.id));
-    const sig = items.map((f) => `${f.id}:${f.x},${f.z},${f.rotation},${f.w},${f.d},${f.h},${f.mount_y ?? ""},${f.mirror ? 1 : 0}:${JSON.stringify(this.screens.get(f.id))}`).join(";");
+    // (with the accent colour: a light switch's rocker glows in it)
+    const accent = accentOnUniform.value ? accentUniform.value.toArray().map((v) => Math.round(v * 255)).join(",") : "";
+    const sig = accent + "|" + items.map((f) => `${f.id}:${f.x},${f.z},${f.rotation},${f.w},${f.d},${f.h},${f.mount_y ?? ""},${f.mirror ? 1 : 0}:${JSON.stringify(this.screens.get(f.id))}`).join(";");
     // pictures follow the screens even when only they changed
     if (sig === fv.screenSig && fv.screenMesh.geometry.getAttribute("position")) return this.updateScreenPictures(fv, items);
     fv.screenSig = sig;
     const buf = new GeoBuffer();
-    for (const f of items) {
-      const st = this.screens.get(f.id)!;
+    for (const item of items) {
+      const st = this.screens.get(item.id)!;
+      // a switch or socket is drawn where the walls put it (#593), its glow with it
+      const plate = GANG_TYPES.has(item.type) ? placeWallPlate(fv.geo.walls2d, item, fv.floor.height, mountBase(fv.floor, item)) : null;
+      const f = plate ? { ...item, x: plate.x, z: plate.z, mount_y: plate.y } : item;
       const a = f.rotation * DEG;
       const c = Math.cos(a);
       const s = Math.sin(a);
@@ -3080,7 +3088,9 @@ export class FloorplanViewer {
             const gw = aw / n;
             const cx = (-aw / 2 + gw * ((face.index ?? 0) + 0.5)) * Math.sign(w);
             const zf = d / 2 + (f.variant === "outdoor" ? 0.02 : 0.008);
-            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.35 + 0.65 * face.level))) as [number, number, number]);
+            // a light switch glows softly in the accent colour of the look (the stock cyan without one)
+            const rgb = face.accent ? (accentOnUniform.value ? (accentUniform.value.toArray() as [number, number, number]) : ACCENT_STOCK) : face.color;
+            const col = new Color(...rgb.map((v) => Math.min(1, v * (0.35 + 0.65 * face.level))) as [number, number, number]);
             const halo = col.clone().multiplyScalar(0.5);
             const dark = new Color(0, 0, 0);
             const hx = gw * 0.34;

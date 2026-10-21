@@ -99,7 +99,7 @@ import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../f
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { anyModule, moduleAlerts, moduleCards, modulePools, moduleScene, moduleVoice, moduleWatched, syncModules, type ModuleCard, type ModuleHost, type ScenePiece, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
-import { openingHost, pointOnRoomEdge } from "../geometry/walls.ts";
+import { generateWalls, openingHost, placeWallPlate, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { signedArea } from "../model.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
 import "./quick-menu.ts";
@@ -2807,8 +2807,14 @@ export class Fp3dView3d extends LitElement {
       if (!active) return;
       on++;
       const lit = st && kindOf(st.entity_id) === "light" ? lightGlow(st) : null;
-      const color: [number, number, number] = lit ? lit.color : socket ? [0.35, 1, 0.55] : [0.22, 0.88, 1];
-      faces.push({ part: "gang", index: i, of: gangs.length, color, level: socket && w !== null ? Math.min(1, 0.55 + w / 1500) : 0.8 });
+      if (!socket) {
+        // a switch's rocker glows softly while what it switches is on: a light in its colour, anything else in the
+        // look's accent colour
+        faces.push({ part: "gang", index: i, of: gangs.length, color: lit ? lit.color : [0.22, 0.88, 1], level: 0.5, accent: !lit });
+        return;
+      }
+      const color: [number, number, number] = lit ? lit.color : [0.35, 1, 0.55];
+      faces.push({ part: "gang", index: i, of: gangs.length, color, level: w !== null ? Math.min(1, 0.55 + w / 1500) : 0.8 });
     });
     if (faces.length) screens.set(f.id, { color: faces[0].color, level: faces[0].level, faces });
     if (!used) return null;
@@ -2817,13 +2823,15 @@ export class Fp3dView3d extends LitElement {
     const st = first ? hass.states[first] : undefined;
     const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
     const power = watts as number | null;
+    // the pin stands over the plate where the 3D view draws it (on the wall face, under a low wall's top, #593)
+    const at = placeWallPlate(this.floorWalls(floor), f, floor.height, mountBase(floor, f));
     return {
       id: `gangs:${f.id}`,
       floorId: floor.id,
       roomId: room?.id ?? null,
-      x: f.x,
-      z: f.z,
-      y: f.h + 0.2 + mountBase(floor, f),
+      x: at.x,
+      z: at.z,
+      y: f.h + 0.2 + at.y,
       icon: mdiIcon(f.icon || (socket ? "power-socket-de" : "light-switch")),
       name: f.name || (ids.length === 1 && first ? entityName(hass, first) : furnitureName(hass, f.type)),
       ownName: f.name || undefined,
@@ -2917,6 +2925,19 @@ export class Fp3dView3d extends LitElement {
       energyDevice: temp !== null,
     };
   }
+
+  /** The walls of a floor as the 3D view builds them (kept per floor object). */
+  private floorWalls(floor: Floor): Wall[] {
+    let walls = this.wallCache.get(floor);
+    if (!walls) {
+      const s = this.building?.settings;
+      walls = generateWalls(floor.rooms, { exterior: s?.wall_exterior ?? 0.24, interior: s?.wall_interior ?? 0.12 }, floor.walls ?? []).walls;
+      this.wallCache.set(floor, walls);
+    }
+    return walls;
+  }
+
+  private wallCache = new WeakMap<Floor, Wall[]>();
 
   /** A wall switch's or socket's menu: one button per gang, tapped it switches that gang. */
   private renderGangMenu() {
