@@ -8,6 +8,7 @@ from custom_components.neonplan3d.schema import (
     HOLOGRAM_SCHEMA,
     OPENING_SCHEMA,
     OUTDOOR_SCHEMA,
+    ROOF_SECTION_SCHEMA,
     ROOM_SCHEMA,
     SETTINGS_SCHEMA,
     START_VIEW_SCHEMA,
@@ -245,3 +246,14 @@ def test_wall_socket_keeps_its_gangs() -> None:
     assert FURNITURE_SCHEMA({**base, "gangs": None})["gangs"] is None
     with pytest.raises(vol.Invalid):
         FURNITURE_SCHEMA({**base, "gangs": [{"entity": None}] * 5})
+
+
+def test_roof_section_keeps_its_end_shapes() -> None:
+    """A hip at one end only (#466): each end may differ from the shape, None = as the shape."""
+    sec = {"id": "s", "x0": 0, "z0": 0, "x1": 10, "z1": 8, "eave_a": 3, "eave_b": 3, "base": 3}
+    plain = ROOF_SECTION_SCHEMA(sec)
+    assert plain["end_u0"] is None and plain["end_u1"] is None
+    one = ROOF_SECTION_SCHEMA({**sec, "end_u0": "hip", "end_u1": "gable"})
+    assert (one["end_u0"], one["end_u1"]) == ("hip", "gable")
+    with pytest.raises(vol.Invalid):
+        ROOF_SECTION_SCHEMA({**sec, "end_u0": "pyramid"})

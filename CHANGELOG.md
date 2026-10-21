@@ -4,6 +4,18 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 1.25.0
+
+### New
+
+- **Roof sections with a different end at each end:** gable, hip and half-hip sections get **End left/right** (or top/bottom) – a hip at one end and an upright gable at the other, for example. Without a choice every end stays as the shape has it (#466, thanks @14RL67).
+
+### Fixed
+
+- Two roofs meeting at a right angle form a proper valley: a wing running into the slope of a higher roof reaches on into it and ends at its surface instead of standing up with a gable (#605, thanks @holle021272).
+- Overlapping roof sections cut each other cleanly: what lies under another section is left out, ridges and eaves stop where they go under it, and the valleys are drawn (#466, thanks @14RL67).
+- An attic floor under a half-hip no longer pokes through the roof at the gables: walls whose roof lies below the floor there are left out instead of standing as stubs (#638, thanks @Kuddelsoft).
+
 ## 1.24.0
 
 ### Changed

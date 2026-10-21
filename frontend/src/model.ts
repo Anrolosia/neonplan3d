@@ -385,6 +385,10 @@ export type RoofType = "none" | "flat" | "gable" | "custom";
 export const ROOF_SHAPES = ["gable", "hip", "halfhip", "pyramid", "mansard", "pent", "flat", "parapet"] as const;
 export type RoofShape = (typeof ROOF_SHAPES)[number];
 
+/** How a gable, hip or half-hip section ends at one end of its ridge (#466: a hip at one end only). */
+export const ROOF_ENDS = ["gable", "hip", "halfhip"] as const;
+export type RoofEnd = (typeof ROOF_ENDS)[number];
+
 /**
  * One roof section over a rectangle of the plan (at the outer wall faces; the overhang comes on top).
  * Heights are above the ground. Across the ridge, side "a" is the low coordinate (z for a ridge along
@@ -422,6 +426,12 @@ export interface RoofSection {
   locked?: boolean;
   /** A canopy (terrace roof, carport): posts and beams instead of walls, a see-through roof. */
   open?: boolean;
+  /**
+   * Gable, hip and half-hip only: how the ridge ends at its u0 end (left, or the top of the plan for a ridge
+   * up and down) and at its u1 end – null or missing = as the shape (#466).
+   */
+  end_u0?: RoofEnd | null;
+  end_u1?: RoofEnd | null;
 }
 
 export interface RoofSettings {
