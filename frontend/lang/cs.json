@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Spustí se až po tvém schválení (Rozšíření → Moduly).",
  "voice_sentences_kept": "Soubor vět pro {langs} jsi sám upravil – NeonPlan na něj nesahá.",
  "voice_sentences_failed": "Soubor vět se nepodařilo zapsat.",
- "voice_sentences_file": "NeonPlan vytvoří soubor custom_sentences/<jazyk>/neonplan3d.yaml až tehdy, když zde vybereš věty. Soubor, který jsi upravil, se nikdy nepřepíše; odebráním integrace se soubor NeonPlanu smaže."
+ "voice_sentences_file": "NeonPlan vytvoří soubor custom_sentences/<jazyk>/neonplan3d.yaml až tehdy, když zde vybereš věty. Soubor, který jsi upravil, se nikdy nepřepíše; odebráním integrace se soubor NeonPlanu smaže.",
+ "pin_standby": "Pohotovost"
 }

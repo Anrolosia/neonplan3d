@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Rulează doar după aprobarea ta (Extensii → Module).",
  "voice_sentences_kept": "Fișierul de propoziții pentru {langs} l-ai modificat tu – NeonPlan nu îl atinge.",
  "voice_sentences_failed": "Fișierul de propoziții nu a putut fi scris.",
- "voice_sentences_file": "NeonPlan creează fișierul custom_sentences/<limbă>/neonplan3d.yaml doar când alegi propoziții aici. Un fișier modificat de tine nu este suprascris niciodată; la eliminarea integrării fișierul NeonPlan este șters."
+ "voice_sentences_file": "NeonPlan creează fișierul custom_sentences/<limbă>/neonplan3d.yaml doar când alegi propoziții aici. Un fișier modificat de tine nu este suprascris niciodată; la eliminarea integrării fișierul NeonPlan este șters.",
+ "pin_standby": "Așteptare"
 }

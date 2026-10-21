@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Se toimii vasta hyväksyntäsi jälkeen (Laajennukset → Moduulit).",
  "voice_sentences_kept": "Muutit itse kielen {langs} lausetiedostoa – NeonPlan ei koske siihen.",
  "voice_sentences_failed": "Lausetiedostoa ei voitu kirjoittaa.",
- "voice_sentences_file": "NeonPlan luo tiedoston custom_sentences/<kieli>/neonplan3d.yaml vasta, kun valitset lauseet tässä. Itse muuttamaasi tiedostoa ei koskaan korvata; integraation poisto poistaa NeonPlanin tiedoston."
+ "voice_sentences_file": "NeonPlan luo tiedoston custom_sentences/<kieli>/neonplan3d.yaml vasta, kun valitset lauseet tässä. Itse muuttamaasi tiedostoa ei koskaan korvata; integraation poisto poistaa NeonPlanin tiedoston.",
+ "pin_standby": "Valmiustila"
 }

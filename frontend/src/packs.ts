@@ -156,6 +156,29 @@ export function isRobotVacuum(type: string): boolean {
   return type === "robot_vacuum" || (isPackType(type) && type.endsWith(":robot_vacuum"));
 }
 
+/**
+ * A pack's robot vacuum model shows the dock at the back and the robot in front of it (+z). The robot's own parts
+ * are left out of the static model and drive around as the viewer's robot instead (#645).
+ */
+export function packRobotPart(p: Pick<PackPart, "z">): boolean {
+  return p.z > 0.05;
+}
+
+/** Where the pack's robot sits in its model: the centre of its largest disc (fraction of the depth; 0.227 when unknown). */
+export function packRobotCentre(item: PackItem | undefined): number {
+  const discs = (item?.parts ?? []).filter((p) => p.shape === "cyl" && packRobotPart(p));
+  if (!discs.length) return 0.227;
+  return discs.reduce((a, b) => (b.w * b.d > a.w * a.d ? b : a)).z;
+}
+
+/**
+ * A pack's heater with hot water (a heat pump's indoor unit, a gas boiler, a buffer tank, a hot water tank): besides a
+ * climate entity it takes a water_heater entity like the built-in water heater (#645).
+ */
+export function isPackHeater(type: string): boolean {
+  return isPackType(type) && /:(heat_pump_indoor|gas_boiler|buffer_tank|water_heater)$/.test(type);
+}
+
 /** The pack item of a furniture type (undefined for built-in types and removed packs). */
 /** Packs that were merged into another one: furniture placed from them keeps working. */
 const PACK_ALIASES: Record<string, string> = {

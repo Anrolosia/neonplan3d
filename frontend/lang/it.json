@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Funziona solo dopo la tua approvazione (Estensioni → Moduli).",
  "voice_sentences_kept": "Hai modificato tu il file delle frasi per {langs} – NeonPlan non lo tocca.",
  "voice_sentences_failed": "Non è stato possibile scrivere il file delle frasi.",
- "voice_sentences_file": "NeonPlan crea il file custom_sentences/<lingua>/neonplan3d.yaml solo quando scegli qui delle frasi. Un file che hai modificato non viene mai sovrascritto; rimuovendo l'integrazione il file di NeonPlan viene cancellato."
+ "voice_sentences_file": "NeonPlan crea il file custom_sentences/<lingua>/neonplan3d.yaml solo quando scegli qui delle frasi. Un file che hai modificato non viene mai sovrascritto; rimuovendo l'integrazione il file di NeonPlan viene cancellato.",
+ "pin_standby": "Standby"
 }

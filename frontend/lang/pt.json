@@ -2036,5 +2036,6 @@
  "module_imported_waits": "Só funciona após a tua aprovação (Extensões → Módulos).",
  "voice_sentences_kept": "Alteraste tu o ficheiro de frases de {langs} – o NeonPlan não lhe toca.",
  "voice_sentences_failed": "Não foi possível escrever o ficheiro de frases.",
- "voice_sentences_file": "O NeonPlan só cria o ficheiro custom_sentences/<idioma>/neonplan3d.yaml quando escolhes frases aqui. Um ficheiro que alteraste nunca é substituído; ao remover a integração o ficheiro do NeonPlan é apagado."
+ "voice_sentences_file": "O NeonPlan só cria o ficheiro custom_sentences/<idioma>/neonplan3d.yaml quando escolhes frases aqui. Um ficheiro que alteraste nunca é substituído; ao remover a integração o ficheiro do NeonPlan é apagado.",
+ "pin_standby": "Em espera"
 }
