@@ -9,25 +9,25 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### New
 
 - **Window sill per window:** a window's form has **Sill** – *automatic* (default: board inside and sill outside from 30 cm sill height, as before), *none*, *inside only* or *outside only*. In automatic mode a window that sits directly on another window or a door of the same wall (a transom light, a split floor-to-ceiling front) no longer gets a board sticking out of the wall. Plan field `sill_board`, also in the import format. (#655, reported by LiveSide)
-- A wall socket or switch placed a little into a wall is drawn on the wall's face in 3D (its glow and pin with it), and on a wall lower than its mounting height – a balcony parapet – it comes down to stay below the wall's top; it was hidden inside the wall (#593, thanks @RkcCorian).
-- Pack furniture with colours of its own (the Halloween pumpkins) keeps them down to the ground in the Day and Blueprint looks, like the waste bins; its lower half turned grey or blue (#609, thanks @TheBhim).
-- The **Light well** tick in the window form now comes from the same decision that draws the well in 3D (an outer wall, a floor in the ground, the sill under the ground), so it is offered for every window that gets a well and only for those (#524, thanks @1970lexi).
 - A window or door may reach across an open transition between two rooms when the outer wall carries on in a straight line (#624, thanks @Maddin2020).
 - **Roof sections with a different end at each end:** gable, hip and half-hip sections get **End left/right** (or top/bottom) – a hip at one end and an upright gable at the other, for example. Without a choice every end stays as the shape has it (#466, thanks @14RL67).
 
 ### Changed
 
 - A light switch's button glows softly while what it switches is on: a light in its colour, anything else in the look's accent colour (#593, thanks @RkcCorian).
-- **Editor:** with "3D beside" and the side panel not pinned, the opened panel became an extra column (since 1.24.0) that pushed the plan and the 3D pane aside; it opens over the 3D pane again and can be made wider at its edge like the pinned one (#658, thanks @fschade).
-- **Editor with "3D beside" slowed down:** every change of the plan disposed the 3D materials before the new ones were drawn, so the shaders were compiled again on each rebuild; the old materials are now released after the next frame, when the new ones already use the same shaders (#645, thanks @frops83).
-- **Smart lock on a double (terrace) door:** the pin sits on the main leaf (hinge side) instead of on the seam or the second leaf (#645, thanks @frops83).
 - **Day look:** more contrast – walls, floors and furniture keep a wider range of shades and a bit more colour, lines are darker (#645, thanks @frops83).
 - **Rooms with hundreds of entities** (LED strip segments from Govee2MQTT): an unfolded device lists the first 40 (the search narrows it down), one button hides or shows all of its entities in the room panel, and a room can keep up to 2000 hidden entities (was 200, saving failed beyond that) (#645, thanks @frops83).
-- Walls cut by a roof that is no longer there: after **Back to one roof** the kept roof sections still trimmed the walls in 3D (a notch in the upper floor, odd slopes in the attic). Only a roof built from sections cuts walls now, and a lower storey's roof whose ridge just pokes through the floor above no longer cuts that floor (#621, thanks @Maddin2020).
-- Glowing top edges at wall joints: where a taller wall meets a lower one, its free end now gets its top edge and the edges down to the lower wall, and corner lines reach up to the tallest wall, so the top outline no longer breaks off at corners and T-joints (#417, thanks @rolandarends).
 
 ### Fixed
 
+- A wall socket or switch placed a little into a wall is drawn on the wall's face in 3D (its glow and pin with it), and on a wall lower than its mounting height – a balcony parapet – it comes down to stay below the wall's top; it was hidden inside the wall (#593, thanks @RkcCorian).
+- Pack furniture with colours of its own (the Halloween pumpkins) keeps them down to the ground in the Day and Blueprint looks, like the waste bins; its lower half turned grey or blue (#609, thanks @TheBhim).
+- The **Light well** tick in the window form now comes from the same decision that draws the well in 3D (an outer wall, a floor in the ground, the sill under the ground), so it is offered for every window that gets a well and only for those (#524, thanks @1970lexi).
+- **Editor:** with "3D beside" and the side panel not pinned, the opened panel became an extra column (since 1.24.0) that pushed the plan and the 3D pane aside; it opens over the 3D pane again and can be made wider at its edge like the pinned one (#658, thanks @fschade).
+- **Editor with "3D beside" slowed down:** every change of the plan disposed the 3D materials before the new ones were drawn, so the shaders were compiled again on each rebuild; the old materials are now released after the next frame, when the new ones already use the same shaders (#645, thanks @frops83).
+- **Smart lock on a double (terrace) door:** the pin sits on the main leaf (hinge side) instead of on the seam or the second leaf (#645, thanks @frops83).
+- Walls cut by a roof that is no longer there: after **Back to one roof** the kept roof sections still trimmed the walls in 3D (a notch in the upper floor, odd slopes in the attic). Only a roof built from sections cuts walls now, and a lower storey's roof whose ridge just pokes through the floor above no longer cuts that floor (#621, thanks @Maddin2020).
+- Glowing top edges at wall joints: where a taller wall meets a lower one, its free end now gets its top edge and the edges down to the lower wall, and corner lines reach up to the tallest wall, so the top outline no longer breaks off at corners and T-joints (#417, thanks @rolandarends).
 - Robot vacuum with dock (pack): while the robot cleans, the dock stands empty – the model's own robot drives off instead of a second one appearing (#645, thanks @frops83).
 - An item with its own **Running from (watts)** shows only its state (or "Standby") on the pin below that value, not its standby watts (#645, thanks @frops83).
 - The 3D lock keeps the saved start views of the house, floors and rooms: flying to one takes its own angle (#645, thanks @frops83).
