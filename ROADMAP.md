@@ -6,8 +6,9 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 
 **Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## ✅ Recently done (1.13 – 1.23)
+## ✅ Recently done (1.13 – 1.24)
 
+- **Modules with admin approval** (1.24): module code and every update run only after an admin read and approved them; Assist sentence files only on request.
 - **Furniture library 2.0** (1.23): everything sorted by what it is, room chips, pictures and sizes on the cards, one card per family of sizes, favourites, everyday search words; **free sizes with fixed parts**; **furniture wave 1** in the shop: five packs with 213 more models.
 - **The house talks back** (1.22): the voice module answers around forty kinds of questions (beta for supporters), further names for rooms and devices, Assist asks the house (service `neonplan3d.ask`, custom sentences, screen names).
 - **Modules** (1.22): packs that carry code, signed and bound like every pack; Pro add-ons become modules one by one; ⚙ Settings → Modules; the free Fenster-Wächter module.
@@ -116,8 +117,9 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 
 **Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
-## ✅ Zuletzt erledigt (1.13 – 1.23)
+## ✅ Zuletzt erledigt (1.13 – 1.24)
 
+- **Module mit Freigabe** (1.24): Modul-Code und jedes Update laufen erst, wenn ein Admin sie angesehen und freigegeben hat; Assist-Satzdateien nur auf Wunsch.
 - **Möbel-Bibliothek 2.0** (1.23): alles sortiert nach dem, was es ist, Raum-Chips, Bilder und Maße auf den Karten, eine Karte je Größen-Familie, Favoriten, Alltagswörter in der Suche; **freie Maße mit festen Teilen**; **Möbel-Welle 1** im Shop: fünf Packs mit 213 Modellen mehr.
 - **Das Haus spricht zurück** (1.22): das Sprach-Modul beantwortet rund vierzig Frage-Arten (Beta für Supporter), weitere Namen für Räume und Geräte, Assist fragt das Haus (Dienst `neonplan3d.ask`, eigene Sätze, Bildschirmnamen).
 - **Module** (1.22): Packs, die Code mitbringen, signiert und gebunden wie jedes Pack; die Pro-Erweiterungen werden nach und nach Module; ⚙ Einstellungen → Module; das kostenlose Modul Fenster-Wächter.

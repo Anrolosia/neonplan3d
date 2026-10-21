@@ -9,6 +9,7 @@ English, only when it changed); the user may add their own sentences to the same
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 from pathlib import Path
 from typing import Any, ClassVar
@@ -51,7 +52,7 @@ _NOT_UNDERSTOOD = {
 
 # which sentences Assist hands to NeonPlan: only the distinct ones (default), every question, or none at all
 SENTENCE_MODES = ("distinct", "all", "off")
-DEFAULT_SENTENCE_MODE = "distinct"
+DEFAULT_SENTENCE_MODE = "off"
 
 # the distinct sentences: nobody says them to Home Assistant itself, so they never take a sentence meant for it
 _DISTINCT = {
@@ -128,6 +129,7 @@ def sentences_yaml(language: str, mode: str = DEFAULT_SENTENCE_MODE) -> str:
         "# Written by NeonPlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that",
         "# understands answers). Rewritten on every start: put your own sentences for NeonPlanAsk into another file.",
         "# Which sentences stand here is set in the editor: ⚙ Settings → Voice control → Sentences for Assist.",
+        "# Changed by hand, the file is never overwritten; removing the integration removes it.",
         f'language: "{language}"',
         "intents:",
         f"  {INTENT_ASK}:",
@@ -139,62 +141,147 @@ def sentences_yaml(language: str, mode: str = DEFAULT_SENTENCE_MODE) -> str:
     return "\n".join(lines)
 
 
-def write_sentences(config_dir: Path, mode: str = DEFAULT_SENTENCE_MODE) -> bool:
-    """Writes the sentence files (or removes them for "off"); True when any changed (Assist then reloads)."""
+def _sha(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _path(config_dir: Path, language: str) -> Path:
+    return config_dir / "custom_sentences" / language / SENTENCES_FILE
+
+
+def _ours(text: str) -> bool:
+    """A file NeonPlan wrote (in any mode, by any version): the user has not changed it."""
+    return any(text == sentences_yaml(language, mode) for language in _DISTINCT for mode in ("distinct", "all")) or (
+        text.startswith("# Written by NeonPlan 3D") and text in _old_files()
+    )
+
+
+# the file as 1.22.0 - 1.23 wrote it (the header without the line about changed files): still ours
+_CHANGED_LINE = "# Changed by hand, the file is never overwritten; removing the integration removes it.\n"
+_SETTINGS_LINE = (
+    "# Which sentences stand here is set in the editor: ⚙ Settings → Voice control → Sentences for Assist.\n"
+)
+
+
+def _old_files() -> tuple[str, ...]:
+    out = []
+    for language in _DISTINCT:
+        for mode in ("distinct", "all"):
+            text = sentences_yaml(language, mode).replace(_CHANGED_LINE, "")
+            out.append(text)
+            out.append(text.replace(_SETTINGS_LINE, ""))
+    return tuple(out)
+
+
+def write_sentences(config_dir: Path, mode: str, written: dict[str, str]) -> tuple[dict[str, str], list[str], bool]:
+    """Writes the sentence files for a mode (removes them for "off") - never over a file the user changed.
+
+    `written`: the hash of what NeonPlan last wrote per language. Returns the new hashes, the languages whose
+    file was left alone because the user changed it, and whether any file changed (Assist then reloads).
+    """
+    hashes = dict(written)
+    kept: list[str] = []
     changed = False
     for language in _DISTINCT:
-        path = config_dir / "custom_sentences" / language / SENTENCES_FILE
+        path = _path(config_dir, language)
+        try:
+            current: str | None = path.read_text(encoding="utf-8")
+        except OSError:
+            current = None
+        if current is not None and _sha(current) != written.get(language) and not _ours(current):
+            # the user wrote or changed this file: it stays as it is
+            kept.append(language)
+            continue
         if mode == "off":
-            if path.is_file():
+            if current is not None:
                 path.unlink()
                 changed = True
+            hashes.pop(language, None)
             continue
         text = sentences_yaml(language, mode)
+        if current != text:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8")
+            changed = True
+        hashes[language] = _sha(text)
+    return hashes, kept, changed
+
+
+def remove_sentences(config_dir: Path, written: dict[str, str]) -> None:
+    """Removes the files NeonPlan wrote (and the user did not change) when the integration is removed."""
+    for language in _DISTINCT:
+        path = _path(config_dir, language)
         try:
-            if path.read_text(encoding="utf-8") == text:
-                continue
+            current = path.read_text(encoding="utf-8")
         except OSError:
-            pass
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
-        changed = True
-    return changed
+            continue
+        if _sha(current) == written.get(language) or _ours(current):
+            path.unlink()
 
 
 class VoiceSettings:
-    """The voice settings of the installation (.storage/neonplan3d.voice): which sentences Assist hands on."""
+    """The voice settings of the installation (.storage/neonplan3d.voice): which sentences Assist hands on, and the
+    hash of each sentence file NeonPlan wrote (so a file the user changed is never overwritten). Nothing is written
+    on setup: only when an admin picks the sentences in the voice settings."""
 
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
         self._store: Store[dict[str, Any]] = Store(hass, 1, STORAGE_KEY_VOICE)
         self.sentences = DEFAULT_SENTENCE_MODE
+        self.written: dict[str, str] = {}
 
     async def async_load(self) -> None:
-        data = await self._store.async_load()
-        mode = (data or {}).get("sentences")
+        data = await self._store.async_load() or {}
+        mode = data.get("sentences")
         if mode in SENTENCE_MODES:
             self.sentences = mode
+        written = data.get("written")
+        if isinstance(written, dict):
+            self.written = {str(k): str(v) for k, v in written.items()}
+        elif mode in SENTENCE_MODES and mode != "off":
+            # stored by 1.22.1 - 1.23 (no hashes yet): the files there are ours as long as they match
+            self.written = await self.hass.async_add_executor_job(self._adopt)
 
-    async def async_set_sentences(self, mode: str) -> bool:
-        """Sets the mode, rewrites the sentence files and tells Assist; True when the files changed."""
+    def _adopt(self) -> dict[str, str]:
+        out: dict[str, str] = {}
+        for language in _DISTINCT:
+            try:
+                text = _path(Path(self.hass.config.config_dir), language).read_text(encoding="utf-8")
+            except OSError:
+                continue
+            if _ours(text):
+                out[language] = _sha(text)
+        return out
+
+    async def async_set_sentences(self, mode: str) -> list[str]:
+        """An admin picked the sentences: writes (or removes) the files, Assist reloads them. Returns the
+        languages whose file was left alone because the user changed it."""
         if mode not in SENTENCE_MODES:
             raise ValueError(mode)
+        try:
+            hashes, kept, changed = await self.hass.async_add_executor_job(
+                write_sentences, Path(self.hass.config.config_dir), mode, self.written
+            )
+        except OSError:
+            _LOGGER.warning("Could not write the Assist sentences", exc_info=True)
+            raise
         self.sentences = mode
-        await self._store.async_save({"sentences": mode})
-        return await async_write_sentences(self.hass, mode)
+        self.written = hashes
+        await self._store.async_save({"sentences": mode, "written": hashes})
+        # Assist reads custom sentences at its start: a changed file is loaded now
+        if changed and self.hass.services.has_service("conversation", "reload"):
+            await self.hass.services.async_call("conversation", "reload", {}, blocking=False)
+        return kept
 
 
-async def async_write_sentences(hass: HomeAssistant, mode: str) -> bool:
-    """Writes the sentence files for a mode and has Assist reload them when they changed."""
-    try:
-        changed = await hass.async_add_executor_job(write_sentences, Path(hass.config.config_dir), mode)
-    except OSError:
-        _LOGGER.debug("Could not write the Assist sentences", exc_info=True)
-        return False
-    # Assist reads custom sentences at its start: a changed file is loaded now (the service is there once it runs)
-    if changed and hass.services.has_service("conversation", "reload"):
-        await hass.services.async_call("conversation", "reload", {}, blocking=False)
-    return changed
+async def async_remove_sentences(hass: HomeAssistant) -> None:
+    """The integration is removed: the sentence files NeonPlan wrote go with it."""
+    settings = VoiceSettings(hass)
+    await settings.async_load()
+    if not settings.written:
+        return
+    await hass.async_add_executor_job(remove_sentences, Path(hass.config.config_dir), settings.written)
+    await settings._store.async_remove()
 
 
 class AskBroker:
@@ -272,10 +359,10 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
     )
     intent.async_register(hass, AskIntentHandler(broker))
 
+    # the sentence files are written only when an admin picks them in the voice settings (never on setup)
     settings = VoiceSettings(hass)
     await settings.async_load()
     hass.data[DATA_VOICE] = settings
-    await async_write_sentences(hass, settings.sentences)
 
 
 def async_unload_voice(hass: HomeAssistant) -> None:

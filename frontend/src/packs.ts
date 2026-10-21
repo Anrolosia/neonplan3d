@@ -98,8 +98,11 @@ export interface FurniturePack {
   /** Pro features the pack unlocks (see features.ts). */
   features?: string[];
   items: PackItem[];
-  /** A module (code the shop delivers; see modules.ts) – the code itself is fetched apart. */
-  module?: { api: number; kind: string };
+  /** A module (code the shop delivers; see modules.ts) – the code itself is fetched apart. It runs only once an
+   * admin approved exactly this code (`approved`); `sha` is the code's fingerprint, `size` its length. */
+  module?: { api: number; kind: string; approved?: boolean; size?: number; sha?: string };
+  /** A new release of the module code that waits for an admin's approval (the approved one keeps running). */
+  pending?: { release: number; size: number; sha: string };
   imported_at?: number;
 }
 

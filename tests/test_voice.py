@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import intent
 
 from custom_components.neonplan3d.const import DOMAIN
-from custom_components.neonplan3d.voice import sentences_yaml, write_sentences
+from custom_components.neonplan3d.voice import remove_sentences, sentences_yaml, write_sentences
 
 from .test_init import _setup
 
@@ -97,26 +97,41 @@ async def test_intent_without_a_view(hass: HomeAssistant) -> None:
     assert response.speech["plain"]["speech"] == "No NeonPlan screen is open right now."
 
 
-def test_sentences_are_written_once_and_rewritten_when_they_change(tmp_path: Path) -> None:
-    assert write_sentences(tmp_path) is True
+def test_sentences_are_written_only_on_request_and_never_over_a_changed_file(tmp_path: Path) -> None:
     de = tmp_path / "custom_sentences" / "de" / "neonplan3d.yaml"
+    en = tmp_path / "custom_sentences" / "en" / "neonplan3d.yaml"
+    hashes, kept, changed = write_sentences(tmp_path, "distinct", {})
+    assert changed and kept == []
     text = de.read_text(encoding="utf-8")
-    assert text == sentences_yaml("de")
+    assert text == sentences_yaml("de", "distinct")
     assert "zeig[e] [mir] [mal] [bitte] {text}" in text
-    # by default only the distinct sentences: a question Home Assistant answers itself is not taken (#641)
+    # only the distinct sentences: a question Home Assistant answers itself is not taken (#641)
     assert "welche (fenster|türen) sind [noch] offen" not in text
-    assert "wo (ist|sind|steht|stehen) {text}" not in text
-    assert (tmp_path / "custom_sentences" / "en" / "neonplan3d.yaml").is_file()
-    # unchanged: nothing written, no reload
-    assert write_sentences(tmp_path) is False
-    de.write_text("old", encoding="utf-8")
-    assert write_sentences(tmp_path) is True
-    # "all" adds the questions, "off" removes the files
-    assert write_sentences(tmp_path, "all") is True
-    assert "welche (fenster|türen) sind [noch] offen" in de.read_text(encoding="utf-8")
-    assert write_sentences(tmp_path, "off") is True
-    assert not de.exists()
-    assert write_sentences(tmp_path, "off") is False
+    assert en.is_file()
+    # unchanged: nothing written
+    hashes, kept, changed = write_sentences(tmp_path, "distinct", hashes)
+    assert not changed
+    # "all" adds the questions
+    hashes, kept, changed = write_sentences(tmp_path, "all", hashes)
+    assert changed and "welche (fenster|türen) sind [noch] offen" in de.read_text(encoding="utf-8")
+    # a file the user changed is never overwritten, nor removed
+    de.write_text("my own sentences", encoding="utf-8")
+    hashes, kept, changed = write_sentences(tmp_path, "distinct", hashes)
+    assert kept == ["de"]
+    assert de.read_text(encoding="utf-8") == "my own sentences"
+    hashes, kept, _ = write_sentences(tmp_path, "off", hashes)
+    assert kept == ["de"] and de.exists() and not en.exists()
+    # removing the integration takes only NeonPlan's own files
+    hashes, _, _ = write_sentences(tmp_path, "distinct", hashes)
+    remove_sentences(tmp_path, hashes)
+    assert not en.exists()
+    assert de.read_text(encoding="utf-8") == "my own sentences"
+
+
+async def test_setup_writes_no_sentence_file(hass: HomeAssistant) -> None:
+    """Nothing lands in the configuration folder unless an admin picks the sentences (HACS review)."""
+    await _setup(hass)
+    assert not (Path(hass.config.config_dir) / "custom_sentences").exists()
 
 
 async def test_unload_removes_service_and_intent(hass: HomeAssistant) -> None:

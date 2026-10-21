@@ -40,7 +40,7 @@ from .const import (
 from .diagnostics_report import DiagnosticsReporter
 from .license import FIRST_CHECK_DELAY, REFRESH_INTERVAL, async_refresh_quietly
 from .storage import FloorplanData
-from .voice import async_setup_voice, async_unload_voice
+from .voice import async_remove_sentences, async_setup_voice, async_unload_voice
 from .websocket import async_register_commands
 
 _LOGGER = logging.getLogger(__name__)
@@ -182,3 +182,6 @@ async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     await async_remove_card_resource(hass)
     with contextlib.suppress(OSError):
         await hass.async_add_executor_job(remove_loader, Path(hass.config.path("www")))
+    # the Assist sentence files NeonPlan wrote (a file the user changed stays)
+    with contextlib.suppress(OSError):
+        await async_remove_sentences(hass)
