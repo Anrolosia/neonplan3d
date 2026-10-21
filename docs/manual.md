@@ -228,7 +228,7 @@ Every opening has:
 - **Leaves:** single or double, with an own contact for the second leaf.
 - **Highlight in 3D:** *When open* (default) makes open windows and doors glow warm. *When closed* turns this round, e.g. for the WC or a child's room door: it glows while it is shut. This needs a contact; without a sensor nothing is highlighted.
 - **Show closed without a sensor:** a door without a contact stands half open in 3D, so it is seen as a door. The checkbox draws it closed, e.g. for a front door or a carport without a sensor.
-- **Smart lock:** the door's lock (Nuki, Aqara, `lock.*`). A pin stands at the door in 3D: 🔒 locked, glowing red while it is unlocked; a tap locks or unlocks. The voice asks it ("Is the front door locked?").
+- **Smart lock:** the door's lock (Nuki, Aqara, `lock.*`). A pin stands at the door in 3D: 🔒 locked, glowing red while it is unlocked; a tap locks or unlocks. On a double door or terrace door the pin sits on the main leaf (on the hinge side). The voice asks it ("Is the front door locked?").
 - **Invert contact:** for sensors that report open and closed the other way round. NeonPlan then shows open when the sensor reports closed, and vice versa (default: off).
 
 Doors and windows can also be tapped in a wide band around the opening in the plan; a selected room lists its doors and windows in its form.
@@ -305,7 +305,7 @@ The **Worktop** (Kitchen) is a free top without a base, for gaps in the kitchen 
 
 ![Devices of a room](images/editor-devices.jpg)
 
-A room with an area lists all devices of that area on the right, grouped by device. The main entity comes first, further ones such as LED indicators or effects sit behind **"+n more"**. A search field helps with big areas.
+A room with an area lists all devices of that area on the right, grouped by device. The main entity comes first, further ones such as LED indicators or effects sit behind **"+n more"**. A search field helps with big areas. When a device brings very many entities (such as the segments of an LED strip from Govee2MQTT), the unfolded list shows the first 40 – the search narrows it down – and **"Hide all n in the room panel"** takes them out of the room panel with one click (**"Show all n again"** brings them back).
 
 Sensors appear when they measure something for the room: temperature, humidity, CO₂ and air quality, power and energy, gas and water meters, illuminance and pressure. Meters without a device class count too when their unit fits (m³, l, kWh, lx). Battery and signal sensors stay out. The value shows the decimals set in Home Assistant. If a device is missing, check in Home Assistant that it is assigned to the room's area.
 

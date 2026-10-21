@@ -29,6 +29,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 - A light switch's button glows softly while what it switches is on: a light in its colour, anything else in the look's accent colour (#593, thanks @RkcCorian).
 
+- **Editor:** with "3D beside" and the side panel not pinned, the opened panel became an extra column (since 1.24.0) that pushed the plan and the 3D pane aside; it opens over the 3D pane again and can be made wider at its edge like the pinned one (#658, thanks @fschade).
+- **Editor with "3D beside" slowed down:** every change of the plan disposed the 3D materials before the new ones were drawn, so the shaders were compiled again on each rebuild; the old materials are now released after the next frame, when the new ones already use the same shaders (#645, thanks @frops83).
+- **Smart lock on a double (terrace) door:** the pin sits on the main leaf (hinge side) instead of on the seam or the second leaf (#645, thanks @frops83).
+- **Day look:** more contrast – walls, floors and furniture keep a wider range of shades and a bit more colour, lines are darker (#645, thanks @frops83).
+- **Rooms with hundreds of entities** (LED strip segments from Govee2MQTT): an unfolded device lists the first 40 (the search narrows it down), one button hides or shows all of its entities in the room panel, and a room can keep up to 2000 hidden entities (was 200, saving failed beyond that) (#645, thanks @frops83).
+
 ## 1.24.0
 
 ### Changed

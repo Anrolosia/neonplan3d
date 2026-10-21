@@ -1225,6 +1225,8 @@
  "devices_search": "Søg enheder …",
  "devices_more": "+{n} flere",
  "devices_less": "færre",
+ "devices_hide_all": "Skjul alle {n} i rumpanelet",
+ "devices_show_all": "Vis alle {n} igen",
  "panel_more": "Flere enheder i området ({n})",
  "panel_less": "Vis færre",
  "gaps_close": "Luk mellemrum",

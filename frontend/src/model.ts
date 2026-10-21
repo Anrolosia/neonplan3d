@@ -1686,6 +1686,19 @@ export function sidelightLayout(
   return atStart ? { panels: [[0.02, 0.02 + s1]], x0: 0.02 + s1, x1: W - 0.02 } : { panels: [[W - 0.02 - s1, W - 0.02]], x0: 0.02, x1: W - 0.02 - s1 };
 }
 
+/**
+ * Where a door's lock sits along the opening (0 … W from its start): the middle of the leaf, beside any sidelight;
+ * on a double door or terrace door the middle of the main leaf – the one on the hinge side – not the seam (#645).
+ */
+export function lockAlong(o: Pick<Opening, "type" | "style" | "width" | "leaves" | "sidelight_hinge" | "sidelight_width" | "sidelight_width2">, hingeAtStart: boolean): number {
+  const W = o.width;
+  const lights = sidelightLayout(W, openingStyle(o, false), hingeAtStart, o);
+  const x0 = lights?.x0 ?? 0;
+  const x1 = lights?.x1 ?? W;
+  if (o.leaves !== 2) return (x0 + x1) / 2;
+  return hingeAtStart ? x0 + (x1 - x0) / 4 : x1 - (x1 - x0) / 4;
+}
+
 /** A front door look (thick leaf, threshold, light above it). */
 export function isFrontDoor(style: OpeningStyle): boolean {
   return style === "front" || style === "front_glass" || style === "sidelight" || style === "sidelights";

@@ -1225,6 +1225,8 @@
  "devices_search": "Buscar dispositivos …",
  "devices_more": "+{n} más",
  "devices_less": "menos",
+ "devices_hide_all": "Ocultar los {n} en el panel de la habitación",
+ "devices_show_all": "Mostrar de nuevo los {n}",
  "panel_more": "Más dispositivos del área ({n})",
  "panel_less": "Mostrar menos",
  "gaps_close": "Cerrar huecos",

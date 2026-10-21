@@ -250,3 +250,12 @@ def test_wall_socket_keeps_its_gangs() -> None:
     assert FURNITURE_SCHEMA({**base, "gangs": None})["gangs"] is None
     with pytest.raises(vol.Invalid):
         FURNITURE_SCHEMA({**base, "gangs": [{"entity": None}] * 5})
+
+
+def test_room_hides_hundreds_of_segment_lights() -> None:
+    # Govee2MQTT creates a light per LED strip segment: hiding them all must still save (#645)
+    many = [f"light.strip_segment_{i:03d}" for i in range(600)]
+    room = ROOM_SCHEMA({**ROOM, "hidden": many, "no_state": many})
+    assert len(room["hidden"]) == 600
+    area = OUTDOOR_SCHEMA({"id": "o1", "type": "lawn", "points": [[0, 0], [2, 0], [2, 2]], "hidden": many})
+    assert len(area["hidden"]) == 600

@@ -1225,6 +1225,8 @@
  "devices_search": "Išči naprave …",
  "devices_more": "+{n} več",
  "devices_less": "manj",
+ "devices_hide_all": "Skrij vseh {n} na plošči prostora",
+ "devices_show_all": "Znova prikaži vseh {n}",
  "panel_more": "Več naprav območja ({n})",
  "panel_less": "Pokaži manj",
  "gaps_close": "Zapri reže",
