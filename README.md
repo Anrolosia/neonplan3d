@@ -91,7 +91,7 @@ Bought packs and modules are signed for your installation and update by themselv
 
 [![Open your Home Assistant instance and open the NeonPlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
-1. Click the button above, or in HACS: ⋮ → *Custom repositories* → add `https://github.com/Mastershort/neonplan3d` as **Integration**.
+1. Click the button above, or open HACS and search for **NeonPlan 3D** (it is in the HACS default list, no custom repository needed).
 2. Install **NeonPlan 3D** and restart Home Assistant.
 3. Add the integration:
 
