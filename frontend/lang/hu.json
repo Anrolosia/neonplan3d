@@ -1225,6 +1225,8 @@
  "devices_search": "Eszközök keresése …",
  "devices_more": "+{n} további",
  "devices_less": "kevesebb",
+ "devices_hide_all": "Mind a(z) {n} elrejtése a szobapanelen",
+ "devices_show_all": "Mind a(z) {n} megjelenítése újra",
  "panel_more": "A terület további eszközei ({n})",
  "panel_less": "Kevesebb mutatása",
  "gaps_close": "Hézagok zárása",

@@ -1225,6 +1225,8 @@
  "devices_search": "Hae laitteita …",
  "devices_more": "+{n} lisää",
  "devices_less": "vähemmän",
+ "devices_hide_all": "Piilota kaikki {n} huonepaneelista",
+ "devices_show_all": "Näytä kaikki {n} uudelleen",
  "panel_more": "Lisää alueen laitteita ({n})",
  "panel_less": "Näytä vähemmän",
  "gaps_close": "Sulje raot",

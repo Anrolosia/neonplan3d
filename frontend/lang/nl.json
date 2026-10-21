@@ -1225,6 +1225,8 @@
  "devices_search": "Apparaten zoeken …",
  "devices_more": "+{n} meer",
  "devices_less": "minder",
+ "devices_hide_all": "Alle {n} verbergen in het ruimtepaneel",
+ "devices_show_all": "Alle {n} weer tonen",
  "panel_more": "Meer apparaten van de ruimte ({n})",
  "panel_less": "Minder tonen",
  "gaps_close": "Kieren sluiten",

@@ -1618,6 +1618,7 @@ export class FloorplanViewer {
     document.removeEventListener("visibilitychange", this.onVisibility);
     this.controls.dispose();
     this.clear();
+    this.disposeRetired();
     this.building = null;
     this.buildRoofMesh();
     this.ground.geometry.dispose();
@@ -1699,6 +1700,15 @@ export class FloorplanViewer {
     this.invalidate();
   }
 
+  /** Materials of a previous build, disposed after the next frame (see clear()). */
+  private retired: Material[] = [];
+
+  private disposeRetired(): void {
+    if (!this.retired.length) return;
+    for (const m of this.retired) m.dispose();
+    this.retired = [];
+  }
+
   private clear(): void {
     // robots share one geometry: keep them out of the floor groups while those are disposed
     for (const r of this.robots.values()) r.group.removeFromParent();
@@ -1712,7 +1722,10 @@ export class FloorplanViewer {
         const g = (o as Mesh).geometry as BufferGeometry | undefined;
         g?.dispose();
       });
-      for (const m of Object.values(fv.materials)) m.dispose();
+      // the floor materials are disposed after the next frame, once the new ones use the same shader programs:
+      // disposing them now let three.js delete the programs and compile them again on every rebuild – a
+      // dragged corner with the 3D view beside the plan rebuilt (and recompiled) the house many times (#645)
+      for (const m of Object.values(fv.materials)) this.retired.push(m);
       this.root.remove(fv.group);
     }
     this.floors = [];
@@ -4258,6 +4271,7 @@ export class FloorplanViewer {
     this.updateWalls();
     if (this.projections.active) this.updateProjections();
     this.renderer.render(this.scene, this.camera);
+    this.disposeRetired();
     // labels are placed only when the view or something on it moved (style writes cost layout)
     if (this.viewChanged() || floorsMoving || this.labelsDirty) {
       this.labelsDirty = false;

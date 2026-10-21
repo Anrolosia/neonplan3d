@@ -1225,6 +1225,8 @@
  "devices_search": "Pesquisar dispositivos …",
  "devices_more": "+{n} mais",
  "devices_less": "menos",
+ "devices_hide_all": "Ocultar todos os {n} no painel da divisão",
+ "devices_show_all": "Mostrar novamente todos os {n}",
  "panel_more": "Mais dispositivos da área ({n})",
  "panel_less": "Mostrar menos",
  "gaps_close": "Fechar espaços",

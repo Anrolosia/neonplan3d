@@ -37,7 +37,7 @@ import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
 import { binColors, binDue, binNext, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, serviceDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
 import { fieldFace, fieldSize } from "../solar.ts";
-import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, type PoolPipe, type SolarField, uid } from "../model.ts";
+import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, lockAlong, type PoolPipe, type SolarField, uid } from "../model.ts";
 
 /** A hologram card: the house's balance on the main plant, one plant (a balcony plant) on its own, or a device. */
 /** The unit a meter counts in (m³ when it does not say). */
@@ -4165,7 +4165,8 @@ export class Fp3dView3d extends LitElement {
       for (const o of floor.openings) {
         const lock = this.openingLinks?.get(o.id)?.lock;
         if (!lock) continue;
-        const spot = this.openingSpot(b, o.id);
+        // on a double door the lock sits on the main leaf, not on the seam between the leaves (#645)
+        const spot = this.openingSpot(b, o.id, true);
         if (!spot) continue;
         const st = hass.states[lock];
         out.push({
@@ -4193,7 +4194,7 @@ export class Fp3dView3d extends LitElement {
    * Where an opening of the plan is: the middle of its frame at the height of its middle, and from which side to
    * look at it – from inside its room (null: not drawn).
    */
-  private openingSpot(b: Building, openingId: string): { floorId: string; x: number; z: number; y: number; theta: number } | null {
+  private openingSpot(b: Building, openingId: string, lock = false): { floorId: string; x: number; z: number; y: number; theta: number } | null {
     for (const floor of b.floors) {
       const o = floor.openings.find((x) => x.id === openingId);
       if (!o) continue;
@@ -4207,7 +4208,14 @@ export class Fp3dView3d extends LitElement {
       // the room lies to the left of the edge when its outline runs counter-clockwise, else to the right
       const left = signedArea(pts) > 0;
       const n = left ? [-d[1], d[0]] : [d[1], -d[0]];
-      const [x, z] = pointOnRoomEdge(host.room, host.edge, o.offset + o.width / 2);
+      // the offset is the opening's centre; a lock sits on its leaf (on a double door the main leaf), seen from the
+      // room "right" is (n.z, -n.x) like in the 3D build, so the hinge side follows the outline's direction
+      let along = o.offset;
+      if (lock) {
+        const startIsLeft = d[0] * n[1] - d[1] * n[0] > 0;
+        along = o.offset - o.width / 2 + lockAlong(o, (o.hinge === "left") === startIsLeft);
+      }
+      const [x, z] = pointOnRoomEdge(host.room, host.edge, along);
       // the camera stands on the room side: its horizontal offset from the target points along n
       return { floorId: floor.id, x: x + n[0] * 0.2, z: z + n[1] * 0.2, y: Math.max(0.5, o.sill + o.height / 2), theta: Math.atan2(n[0], n[1]) };
     }

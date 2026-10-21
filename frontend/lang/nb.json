@@ -1225,6 +1225,8 @@
  "devices_search": "Søk etter enheter …",
  "devices_more": "+{n} til",
  "devices_less": "færre",
+ "devices_hide_all": "Skjul alle {n} i rompanelet",
+ "devices_show_all": "Vis alle {n} igjen",
  "panel_more": "Flere enheter i området ({n})",
  "panel_less": "Vis færre",
  "gaps_close": "Lukk mellomrom",

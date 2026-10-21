@@ -227,7 +227,7 @@ Jede Öffnung hat:
 - **Flügel:** einflügelig oder zweiflügelig, mit eigenem Kontakt für den zweiten Flügel.
 - **Markieren in 3D:** *Wenn offen* (Standard) lässt offene Fenster und Türen warm leuchten. *Wenn geschlossen* dreht das um, etwa für die WC- oder die Kinderzimmertür: Sie leuchtet, solange sie zu ist. Das braucht einen Kontakt; ohne Sensor wird nichts markiert.
 - **Ohne Sensor geschlossen zeigen:** Eine Tür ohne Kontakt steht in 3D halb offen, damit man sie als Tür erkennt. Der Haken zeichnet sie geschlossen, etwa für eine Haustür oder ein Carport ohne Sensor.
-- **Smart Lock:** Das Schloss der Tür (Nuki, Aqara, `lock.*`). In 3D steht ein Pin an der Tür: 🔒 zu, rot leuchtend, solange sie offen ist; ein Tipp schließt auf oder ab. Die Sprache fragt es ab („Ist die Haustür abgeschlossen?“).
+- **Smart Lock:** Das Schloss der Tür (Nuki, Aqara, `lock.*`). In 3D steht ein Pin an der Tür: 🔒 zu, rot leuchtend, solange sie offen ist; ein Tipp schließt auf oder ab. An einer zweiflügeligen Tür oder Terrassentür sitzt der Pin am Hauptflügel (auf der Seite des Anschlags). Die Sprache fragt es ab („Ist die Haustür abgeschlossen?“).
 - **Kontakt umkehren:** Für Sensoren, die offen und geschlossen andersherum melden. NeonPlan zeigt dann offen, wenn der Sensor geschlossen meldet, und umgekehrt (Standard: aus).
 
 Türen und Fenster lassen sich im Plan auch an einem breiten Streifen um die Öffnung antippen; ein ausgewählter Raum listet seine Türen und Fenster im Formular.
@@ -304,7 +304,7 @@ Die **Arbeitsplatte** (Küche) ist eine freie Platte ohne Unterbau, für Lücken
 
 ![Geräte eines Raums](images/editor-devices.jpg)
 
-Ein Raum mit Bereich listet rechts alle Geräte dieses Bereichs, nach Gerät gruppiert. Die Hauptentität steht vorn, weitere wie LED-Anzeigen oder Effekte stehen hinter **„+n mehr“**. Ein Suchfeld hilft bei großen Bereichen.
+Ein Raum mit Bereich listet rechts alle Geräte dieses Bereichs, nach Gerät gruppiert. Die Hauptentität steht vorn, weitere wie LED-Anzeigen oder Effekte stehen hinter **„+n mehr“**. Ein Suchfeld hilft bei großen Bereichen. Bringt ein Gerät sehr viele Entitäten mit (z. B. die Segmente eines LED-Streifens aus Govee2MQTT), zeigt die aufgeklappte Liste die ersten 40 – die Suche grenzt weiter ein –, und **„Alle n im Raumfenster ausblenden“** nimmt sie mit einem Klick aus dem Raumfenster (**„Alle n wieder zeigen“** holt sie zurück).
 
 Sensoren erscheinen, wenn sie etwas für den Raum messen: Temperatur, Luftfeuchte, CO₂ und Luftqualität, Leistung und Energie, Gas- und Wasserzähler, Helligkeit und Luftdruck. Zähler ohne Geräteklasse zählen mit, wenn ihre Einheit passt (m³, l, kWh, lx). Akku- und Signalsensoren bleiben außen vor. Der Wert erscheint mit den Nachkommastellen, die in Home Assistant eingestellt sind. Fehlt ein Gerät, prüfe in Home Assistant, ob es dem Bereich des Raums zugeordnet ist.
 

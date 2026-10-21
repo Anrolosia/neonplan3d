@@ -10116,6 +10116,7 @@ export class Fp3dEditor extends LitElement {
     // open over the 3D pane, so the pane keeps its size
     return html`<aside class="fp3d-side fp3d-side-strip"></aside>
       <aside class="fp3d-side fp3d-side-overlay">
+        ${this.renderSideGrip()}
         ${this.renderPinRow(true)}
         ${this.renderSide(floor)}
       </aside>`;
@@ -12482,7 +12483,7 @@ export class Fp3dEditor extends LitElement {
                         ${open ? this.t("devices_less") : this.t("devices_more", { n: g.others.length })}
                       </button>`
                     : nothing}
-                  ${open ? (q ? others : g.others).map((id) => row(id, false, areaName, true)) : nothing}`;
+                  ${open ? this.renderDeviceOthers(q ? others : g.others, (id) => row(id, false, areaName, true), hidden, admin) : nothing}`;
                 })}
               </div>
               ${admin && unplacedMain.length > 1
@@ -12490,6 +12491,30 @@ export class Fp3dEditor extends LitElement {
                 : nothing}
               <p class="fp3d-sub">${this.t("devices_hint")}</p>`}
     </section>`;
+  }
+
+  /**
+   * The further entities of an unfolded device: an LED strip from Govee2MQTT brings hundreds of segment lights
+   * (#645), so the list stops after a few dozen (the search narrows it) and one button hides or shows them all.
+   */
+  private renderDeviceOthers(ids: string[], row: (id: string) => unknown, hidden: Set<string>, admin: boolean) {
+    const LIMIT = 40;
+    const allHidden = ids.every((id) => hidden.has(id));
+    const toggleAll = () => {
+      const set = new Set(hidden);
+      for (const id of ids) {
+        if (allHidden) set.delete(id);
+        else set.add(id);
+      }
+      this.updateRoom({ hidden: [...set] });
+    };
+    return html`${admin && ids.length >= 5
+        ? html`<button class="fp3d-link fp3d-dev-all" @click=${toggleAll}>
+            ${this.t(allHidden ? "devices_show_all" : "devices_hide_all", { n: ids.length })}
+          </button>`
+        : nothing}
+      ${ids.slice(0, LIMIT).map(row)}
+      ${ids.length > LIMIT ? html`<p class="fp3d-sub">${this.t("devices_narrow", { n: ids.length - LIMIT })}</p>` : nothing}`;
   }
 
   /** Devices from other areas or without an area, for the chosen source (computed only when shown). */
@@ -13086,7 +13111,7 @@ export class Fp3dEditor extends LitElement {
         top: 0;
         right: 0;
         bottom: 0;
-        width: min(340px, 60%);
+        width: min(var(--fp3d-side-w, 340px), 60%);
         /* open over the 3D pane: above the toolbar too, so its buttons never sit on the sidebar's */
         z-index: 30;
         box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45);
@@ -13498,7 +13523,6 @@ export class Fp3dEditor extends LitElement {
         background: linear-gradient(90deg, rgba(55, 224, 255, 0.35), transparent);
       }
       .fp3d-side {
-        position: relative;
         border-left: 1px solid var(--fp3d-line);
         background: var(--fp3d-chrome-solid);
         overflow-y: auto;
@@ -13508,6 +13532,8 @@ export class Fp3dEditor extends LitElement {
         gap: 18px;
         min-height: 0;
       }
+      /* the grip's containing block; the overlay keeps its absolute position (#658: "position: relative" on
+         every side bar made the unpinned bar a third grid cell, which pushed the plan and the 3D pane aside) */
       .fp3d-side:not(.fp3d-side-overlay) {
         position: relative;
         z-index: 7;
@@ -15767,6 +15793,11 @@ export class Fp3dEditor extends LitElement {
         border-radius: 8px;
         padding: 7px 9px;
         margin: 2px 0 6px;
+      }
+      .fp3d-dev-all {
+        display: block;
+        padding: 2px 26px 6px;
+        font-size: 12px;
       }
       .fp3d-more {
         font: inherit;

@@ -1225,6 +1225,8 @@
  "devices_search": "搜索设备…",
  "devices_more": "还有 {n} 个",
  "devices_less": "收起",
+ "devices_hide_all": "在房间面板中隐藏全部 {n} 个",
+ "devices_show_all": "重新显示全部 {n} 个",
  "panel_more": "该区域的更多设备（{n}）",
  "panel_less": "收起",
  "gaps_close": "闭合缝隙",

@@ -1225,6 +1225,8 @@
  "devices_search": "Caută dispozitive …",
  "devices_more": "încă {n}",
  "devices_less": "mai puțin",
+ "devices_hide_all": "Ascunde toate cele {n} în panoul camerei",
+ "devices_show_all": "Afișează din nou toate cele {n}",
  "panel_more": "Mai multe dispozitive ale zonei ({n})",
  "panel_less": "Arată mai puțin",
  "gaps_close": "Închide golurile",

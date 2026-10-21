@@ -1225,6 +1225,8 @@
  "devices_search": "Rechercher des appareils …",
  "devices_more": "+{n} de plus",
  "devices_less": "moins",
+ "devices_hide_all": "Masquer les {n} dans le panneau de la pièce",
+ "devices_show_all": "Réafficher les {n}",
  "panel_more": "Autres appareils de la zone ({n})",
  "panel_less": "Afficher moins",
  "gaps_close": "Fermer les écarts",
