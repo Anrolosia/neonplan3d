@@ -8,11 +8,13 @@
 
 [![Open your Home Assistant instance and open the NeonPlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
-[![NeonPlan 3D: the house turns with its solar roof and energy cards, voice control opens the living room, the doorbell rings and the live director looks through the front door camera, then back to the whole house](docs/images/demo.webp)](https://neonplan3d.mastershort.de/)
+[![NeonPlan 3D: the whole house in neon – solar roof with live energy cards, lit rooms on two floors, garden and drive](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/hero-house.jpg)](https://neonplan3d.mastershort.de/)
 
-📖 **Manual:** [English](https://mastershort.de/en/neonplan3d/manual/?lang=en) · [Deutsch](https://mastershort.de/neonplan3d/anleitung/?lang=de) (also here: [manual.md](docs/manual.md), [anleitung.md](docs/anleitung.md))
+[![NeonPlan 3D: the house turns with its solar roof and energy cards, voice control opens the living room, the doorbell rings and the live director looks through the front door camera, then back to the whole house](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/demo.webp)](https://neonplan3d.mastershort.de/)
+
+📖 **Manual:** [English](https://mastershort.de/en/neonplan3d/manual/?lang=en) · [Deutsch](https://mastershort.de/neonplan3d/anleitung/?lang=de) (also here: [manual.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/manual.md), [anleitung.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/anleitung.md))
 💬 **Community:** [Discord](https://discord.gg/SSdVVFsev7) – show your 3D home, ask, share ideas
-🗺️ **What comes next:** [Roadmap](ROADMAP.md) · **What changed:** [Changelog](CHANGELOG.md)
+🗺️ **What comes next:** [Roadmap](https://github.com/Mastershort/neonplan3d/blob/main/ROADMAP.md) · **What changed:** [Changelog](https://github.com/Mastershort/neonplan3d/blob/main/CHANGELOG.md)
 
 ---
 
@@ -22,7 +24,7 @@ Everything happens in the editor inside Home Assistant, with the 3D house growin
 
 | 1. Draw | 2. Furnish | 3. Link |
 |---|---|---|
-| [![Draw rooms with the 3D view beside the plan](docs/images/editor-draw.jpg)](docs/images/editor-draw.jpg) | [![The furniture library with pictures, room chips and sizes](docs/images/editor-library-en.jpg)](docs/images/editor-library-en.jpg) | [![The devices of a room's Home Assistant area](docs/images/editor-devices-en.jpg)](docs/images/editor-devices-en.jpg) |
+| [![Draw rooms with the 3D view beside the plan](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-draw.jpg)](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-draw.jpg) | [![The furniture library with pictures, room chips and sizes](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-library-en.jpg)](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-library-en.jpg) | [![The devices of a room's Home Assistant area](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-devices-en.jpg)](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-devices-en.jpg) |
 | Rooms as rectangles or free shapes – walls, corners and measures follow by themselves. Doors, windows, stairs, roofs and the garden come from the same toolbar. | Pick furniture by room and kind, each with a picture and its size; one card per item with its sizes, left and right versions. Resize freely – legs and arms stay as they are. | Each room takes its Home Assistant area: lights, blinds, sensors and media are found and placed with one tap. From then on the house is live. |
 
 Not drawing at all? The [import page](https://neonplan3d.mastershort.de/import/) turns Sweet Home 3D, iPhone LiDAR scans and more into a plan (see below).
@@ -39,7 +41,7 @@ Not drawing at all? The [import page](https://neonplan3d.mastershort.de/import/)
 
 | Neon | Blueprint | Day |
 |---|---|---|
-| ![The neon look](docs/images/look-neon.jpg) | ![The blueprint look](docs/images/look-blueprint.jpg) | ![The day look](docs/images/look-day.jpg) |
+| ![The neon look](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/look-neon.jpg) | ![The blueprint look](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/look-blueprint.jpg) | ![The day look](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/look-day.jpg) |
 
 Three looks, an accent colour of your choice, and **Auto** – day while the sun is up, neon after sunset.
 
@@ -47,19 +49,19 @@ Three looks, an accent colour of your choice, and **Auto** – day while the sun
 
 | | |
 |---|---|
-| ![Editor](docs/images/editor-draw.jpg) | **Plan editor in Home Assistant** – floors, rooms as rectangles or free shapes, automatic walls and free-standing partitions, doors, windows, garage doors, stairs, floor openings, cellars with light wells, roofs with dormers, outdoor areas, pools, balconies and solar fields. The 3D view runs next to the plan while you draw. A **wall view** shows each wall from the front for exact placing. |
-| ![Room](docs/images/view-room-panel.jpg) | **Live 3D view** – tap a lamp to switch it, swipe to dim, long press for colours, blinds and covers; doors swing, windows tilt, curtains and awnings run with their cover. A **room panel** lists everything of the room's Home Assistant area; gardens and terraces open like rooms too. |
-| ![Voice control](docs/images/view-voice.jpg) | **Voice control** – tap the microphone or ask Assist: "Show the living room", "Where is the washing machine?", "Show the front door camera"; anything else goes to Home Assistant's Assist. Free for everyone; the answer module ("What's open?", "Good morning") is in beta for supporters. |
-| ![Library](docs/images/editor-library-en.jpg) | **Furniture and lamps** – 80 built-in models plus furniture packs, in one library sorted by room and kind, with a picture and the size on every card. Lamps light their room in their own colour (and the floor below through a stairwell), TVs, washers and radiators glow while they run, robot vacuums drive their lanes, pets roam the house. |
-| ![Camera](docs/images/view-camera-through.jpg) | **Cameras** – on walls or ceilings with their field of view, red while they see motion; snapshots, a camera wall and live streams. |
-| ![Live director](docs/images/view-live-director.jpg) | **Live director** (Camera Cockpit) – the doorbell rings and the wall tablet flies to the front door and looks through its camera; it also shows a camera that sees someone, a finished washer or a new warning, then goes back. |
-| ![Time travel](docs/images/view-timetravel.jpg) | **Time travel** (Pro) – replay the last day or week: lights, doors, motion and the robot's run, with a timeline of events. |
-| ![Walk](docs/images/walk.jpg) | **Walk and wall view** – walk through the house at eye level with keys or a touch stick; in the editor, each wall from the front to place furniture to the centimetre. |
-| ![Warnings](docs/images/view-alert-banner.jpg) | **Made for the wall** – warnings for smoke, gas, CO, water, alarm, a window open in the rain and power outages pulse in their room; kiosk mode with idle return, night dimming and a slow orbit; favourites and scene buttons. |
-| ![Heatmap](docs/images/view-heat.jpg) | **Values and heatmap** – temperature, humidity and CO₂ per room, sunlight through the windows from `sun.sun`, the weather around the house. |
-| ![Card](docs/images/card-og-dim.jpg) | **Dashboard card** – `custom:neonplan3d-card` with a visual editor, loaded automatically. |
+| ![Editor](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-draw.jpg) | **Plan editor in Home Assistant** – floors, rooms as rectangles or free shapes, automatic walls and free-standing partitions, doors, windows, garage doors, stairs, floor openings, cellars with light wells, roofs with dormers, outdoor areas, pools, balconies and solar fields. The 3D view runs next to the plan while you draw. A **wall view** shows each wall from the front for exact placing. |
+| ![Room](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-room-panel.jpg) | **Live 3D view** – tap a lamp to switch it, swipe to dim, long press for colours, blinds and covers; doors swing, windows tilt, curtains and awnings run with their cover. A **room panel** lists everything of the room's Home Assistant area; gardens and terraces open like rooms too. |
+| ![Voice control](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-voice.jpg) | **Voice control** – tap the microphone or ask Assist: "Show the living room", "Where is the washing machine?", "Show the front door camera"; anything else goes to Home Assistant's Assist. Free for everyone; the answer module ("What's open?", "Good morning") is in beta for supporters. |
+| ![Library](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/editor-library-en.jpg) | **Furniture and lamps** – 80 built-in models plus furniture packs, in one library sorted by room and kind, with a picture and the size on every card. Lamps light their room in their own colour (and the floor below through a stairwell), TVs, washers and radiators glow while they run, robot vacuums drive their lanes, pets roam the house. |
+| ![Camera](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-camera-through.jpg) | **Cameras** – on walls or ceilings with their field of view, red while they see motion; snapshots, a camera wall and live streams. |
+| ![Live director](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-live-director.jpg) | **Live director** (Camera Cockpit) – the doorbell rings and the wall tablet flies to the front door and looks through its camera; it also shows a camera that sees someone, a finished washer or a new warning, then goes back. |
+| ![Time travel](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-timetravel.jpg) | **Time travel** (Pro) – replay the last day or week: lights, doors, motion and the robot's run, with a timeline of events. |
+| ![Walk](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/walk.jpg) | **Walk and wall view** – walk through the house at eye level with keys or a touch stick; in the editor, each wall from the front to place furniture to the centimetre. |
+| ![Warnings](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-alert-banner.jpg) | **Made for the wall** – warnings for smoke, gas, CO, water, alarm, a window open in the rain and power outages pulse in their room; kiosk mode with idle return, night dimming and a slow orbit; favourites and scene buttons. |
+| ![Heatmap](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/view-heat.jpg) | **Values and heatmap** – temperature, humidity and CO₂ per room, sunlight through the windows from `sun.sun`, the weather around the house. |
+| ![Card](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/card-og-dim.jpg) | **Dashboard card** – `custom:neonplan3d-card` with a visual editor, loaded automatically. |
 
-**Coming from another program?** The [import page](https://neonplan3d.mastershort.de/import/) turns Sweet Home 3D, iPhone LiDAR scans (RoomPlan), CAD (DXF), Blender/SketchUp models (glTF, OBJ, STL), Floorplanner and Valetudo robot maps into a NeonPlan plan – in your browser. Or let an AI write it with [this template](docs/ai-import.md) ([format](docs/plan-format.md)).
+**Coming from another program?** The [import page](https://neonplan3d.mastershort.de/import/) turns Sweet Home 3D, iPhone LiDAR scans (RoomPlan), CAD (DXF), Blender/SketchUp models (glTF, OBJ, STL), Floorplanner and Valetudo robot maps into a NeonPlan plan – in your browser. Or let an AI write it with [this template](https://github.com/Mastershort/neonplan3d/blob/main/docs/ai-import.md) ([format](https://github.com/Mastershort/neonplan3d/blob/main/docs/plan-format.md)).
 
 Also included: parking spots with vehicles that appear while a car is home, waste bins and mailboxes, smart locks on doors, a clock in the view, search, restore points, a full backup of plan, pictures and packs, and 18 languages.
 
@@ -155,11 +157,11 @@ npm run screenshot  # renders preview/index.html (invented demo data) with a loc
 - **Preview without Home Assistant**: open `preview/index.html` through any local web server.
 - **Deploy to a test instance**: create `deploy.local.json` with `{"target": "<config>/custom_components/neonplan3d"}` and run `npm run deploy` in `frontend/`.
 - **Python tests** run in CI with `pytest-homeassistant-custom-component`.
-- **Furniture pack format**: [docs/packs.md](docs/packs.md) (German).
+- **Furniture pack format**: [docs/packs.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/packs.md) (German).
 
 ## Licence
 
-MIT – see [LICENSE](LICENSE). "NeonPlan 3D" is the name of the original project by Mastershort; furniture packs and Pro add-ons sold in the shop are not part of this repository.
+MIT – see [LICENSE](https://github.com/Mastershort/neonplan3d/blob/main/LICENSE). "NeonPlan 3D" is the name of the original project by Mastershort; furniture packs and Pro add-ons sold in the shop are not part of this repository.
 
 ## Unterstützen / Support
 
