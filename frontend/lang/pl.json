@@ -2028,7 +2028,7 @@
  "module_review": "Zobacz kod i zatwierdź",
  "module_review_update": "Zobacz aktualizację i zatwierdź",
  "module_review_title": "Zatwierdź moduł: {name}",
- "module_review_meta": "Od {publisher} · wersja {release} · {kb} KB · odcisk {sha}…",
+ "module_review_meta": "Od {publisher} · wersja {release} · {kb} KB · odcisk {sha}",
  "module_review_note": "Moduł to kod, który działa w Twojej przeglądarce z Twoim dostępem do Home Assistant. NeonPlan uruchamia go dopiero po Twojej zgodzie, a każda aktualizacja znów jej wymaga. Zatwierdź go tylko, jeśli ufasz wydawcy.",
  "module_approve": "Zatwierdź",
  "module_approved": "{name} jest zatwierdzony i już działa.",

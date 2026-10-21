@@ -2028,7 +2028,7 @@
  "module_review": "Vezi codul și aprobă",
  "module_review_update": "Vezi actualizarea și aprobă",
  "module_review_title": "Aprobă modulul: {name}",
- "module_review_meta": "De la {publisher} · versiunea {release} · {kb} KB · amprentă {sha}…",
+ "module_review_meta": "De la {publisher} · versiunea {release} · {kb} KB · amprentă {sha}",
  "module_review_note": "Un modul este cod care rulează în browserul tău cu accesul tău la Home Assistant. NeonPlan îl pornește doar după aprobarea ta, iar fiecare actualizare are nevoie din nou de aprobarea ta. Aprobă-l doar dacă ai încredere în editor.",
  "module_approve": "Aprobă",
  "module_approved": "{name} este aprobat și rulează acum.",

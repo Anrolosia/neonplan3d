@@ -2028,7 +2028,7 @@
  "module_review": "Zobrazit kód a schválit",
  "module_review_update": "Zobrazit aktualizaci a schválit",
  "module_review_title": "Schválit modul: {name}",
- "module_review_meta": "Od {publisher} · verze {release} · {kb} KB · otisk {sha}…",
+ "module_review_meta": "Od {publisher} · verze {release} · {kb} KB · otisk {sha}",
  "module_review_note": "Modul je kód, který běží v tvém prohlížeči s tvým přístupem k Home Assistant. NeonPlan ho spustí až po tvém schválení a každá aktualizace potřebuje znovu tvé schválení. Schval ho jen, pokud vydavateli důvěřuješ.",
  "module_approve": "Schválit",
  "module_approved": "{name} je schválen a nyní běží.",

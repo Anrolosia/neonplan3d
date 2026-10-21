@@ -83,7 +83,7 @@ The integration and everything above are **free and open source (MIT)**. Safety 
 
 - **Modules** – extensions that bring their own code from the shop, signed and bound to your installation like every pack; they update through the shop without waiting for a NeonPlan release. The Pro add-ons move over one by one; free modules: *Fenster-Wächter* (warns when a window stays open in the cold).
 
-Bought packs and modules are signed for your installation and update by themselves once a day. Everything installed keeps working without the shop.
+Bought packs and modules are signed for your installation. Packs update by themselves once a day; a module's code runs only after an admin has viewed and approved it, and every module update waits for that approval too. Everything installed keeps working without the shop.
 
 ## Installation
 

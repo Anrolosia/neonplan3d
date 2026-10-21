@@ -2028,7 +2028,7 @@
  "module_review": "Näytä koodi ja hyväksy",
  "module_review_update": "Näytä päivitys ja hyväksy",
  "module_review_title": "Hyväksy moduuli: {name}",
- "module_review_meta": "Julkaisija {publisher} · versio {release} · {kb} kt · sormenjälki {sha}…",
+ "module_review_meta": "Julkaisija {publisher} · versio {release} · {kb} kt · sormenjälki {sha}",
  "module_review_note": "Moduuli on koodia, joka toimii selaimessasi Home Assistant -oikeuksillasi. NeonPlan käynnistää sen vasta hyväksyntäsi jälkeen, ja jokainen päivitys tarvitsee taas hyväksyntäsi. Hyväksy se vain, jos luotat julkaisijaan.",
  "module_approve": "Hyväksy",
  "module_approved": "{name} on hyväksytty ja toimii nyt.",

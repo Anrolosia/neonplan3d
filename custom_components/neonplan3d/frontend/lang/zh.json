@@ -2028,7 +2028,7 @@
  "module_review": "查看代码并批准",
  "module_review_update": "查看更新并批准",
  "module_review_title": "批准模块：{name}",
- "module_review_meta": "发布者 {publisher} · 版本 {release} · {kb} KB · 指纹 {sha}…",
+ "module_review_meta": "发布者 {publisher} · 版本 {release} · {kb} KB · 指纹 {sha}",
  "module_review_note": "模块是在你的浏览器中以你的 Home Assistant 权限运行的代码。NeonPlan 只在你批准后才启动它，每次更新都需要你再次批准。只有在你信任发布者时才批准。",
  "module_approve": "批准",
  "module_approved": "{name} 已批准，现在运行。",

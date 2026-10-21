@@ -2028,7 +2028,7 @@
  "module_review": "Visa kod och godkänn",
  "module_review_update": "Visa uppdatering och godkänn",
  "module_review_title": "Godkänn modul: {name}",
- "module_review_meta": "Från {publisher} · version {release} · {kb} KB · fingeravtryck {sha}…",
+ "module_review_meta": "Från {publisher} · version {release} · {kb} KB · fingeravtryck {sha}",
  "module_review_note": "En modul är kod som körs i din webbläsare med din Home Assistant-åtkomst. NeonPlan startar den först efter ditt godkännande, och varje uppdatering kräver ditt godkännande igen. Godkänn den bara om du litar på utgivaren.",
  "module_approve": "Godkänn",
  "module_approved": "{name} är godkänd och körs nu.",

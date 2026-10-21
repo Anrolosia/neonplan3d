@@ -2028,7 +2028,7 @@
  "module_review": "Code bekijken & goedkeuren",
  "module_review_update": "Update bekijken & goedkeuren",
  "module_review_title": "Module goedkeuren: {name}",
- "module_review_meta": "Van {publisher} · versie {release} · {kb} KB · vingerafdruk {sha}…",
+ "module_review_meta": "Van {publisher} · versie {release} · {kb} KB · vingerafdruk {sha}",
  "module_review_note": "Een module is code die in je browser draait met je Home Assistant-toegang. NeonPlan start hem pas na je goedkeuring, en elke update heeft opnieuw je goedkeuring nodig. Keur hem alleen goed als je de aanbieder vertrouwt.",
  "module_approve": "Goedkeuren",
  "module_approved": "{name} is goedgekeurd en draait nu.",

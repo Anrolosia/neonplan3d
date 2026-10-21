@@ -2028,7 +2028,7 @@
  "module_review": "Kód megtekintése és jóváhagyása",
  "module_review_update": "Frissítés megtekintése és jóváhagyása",
  "module_review_title": "Modul jóváhagyása: {name}",
- "module_review_meta": "Kiadó: {publisher} · verzió {release} · {kb} KB · ujjlenyomat {sha}…",
+ "module_review_meta": "Kiadó: {publisher} · verzió {release} · {kb} KB · ujjlenyomat {sha}",
  "module_review_note": "A modul olyan kód, amely a böngésződben fut a Home Assistant-hozzáféréseddel. A NeonPlan csak a jóváhagyásod után indítja el, és minden frissítéshez újra jóváhagyás kell. Csak akkor hagyd jóvá, ha megbízol a kiadóban.",
  "module_approve": "Jóváhagyás",
  "module_approved": "{name} jóváhagyva, mostantól fut.",

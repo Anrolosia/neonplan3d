@@ -2028,7 +2028,7 @@
  "module_review": "Poglej kodo in odobri",
  "module_review_update": "Poglej posodobitev in odobri",
  "module_review_title": "Odobri modul: {name}",
- "module_review_meta": "Od {publisher} · različica {release} · {kb} KB · prstni odtis {sha}…",
+ "module_review_meta": "Od {publisher} · različica {release} · {kb} KB · prstni odtis {sha}",
  "module_review_note": "Modul je koda, ki teče v tvojem brskalniku s tvojim dostopom do Home Assistanta. NeonPlan ga zažene šele po tvoji odobritvi in vsaka posodobitev spet potrebuje tvojo odobritev. Odobri ga le, če zaupaš izdajatelju.",
  "module_approve": "Odobri",
  "module_approved": "{name} je odobren in zdaj teče.",

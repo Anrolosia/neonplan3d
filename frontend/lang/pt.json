@@ -2028,7 +2028,7 @@
  "module_review": "Ver código e aprovar",
  "module_review_update": "Ver atualização e aprovar",
  "module_review_title": "Aprovar módulo: {name}",
- "module_review_meta": "De {publisher} · versão {release} · {kb} KB · impressão digital {sha}…",
+ "module_review_meta": "De {publisher} · versão {release} · {kb} KB · impressão digital {sha}",
  "module_review_note": "Um módulo é código que corre no teu navegador com o teu acesso ao Home Assistant. O NeonPlan só o inicia após a tua aprovação, e cada atualização precisa novamente da tua aprovação. Aprova-o apenas se confiares no editor.",
  "module_approve": "Aprovar",
  "module_approved": "{name} está aprovado e já funciona.",
