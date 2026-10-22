@@ -77,6 +77,7 @@ export function mountLocateLab(source: Source): () => void {
       }</div>
       ${error ? `<div style="color:#ff8fa3">${esc(error)}</div>` : ""}
       ${devices || (s ? "<div><small>Keine iPhone/Watch-Schlüssel (Private BLE Device) in HA – alles wird trotzdem aufgezeichnet.</small></div>" : "")}
+      ${s?.mark ? `<div style="margin-top:6px">⏱ seit <b>${clock(Date.now() / 1000 - (s.mark as { t?: number }).t!)}</b> in <b>${esc(s.mark.name)}</b> ${Date.now() / 1000 - (s.mark as { t?: number }).t! >= 120 ? "✓ 2 Min. geschafft" : ""}</div>` : ""}
       <div class="fl">Ich bin jetzt in …</div>
       <button data-room="" class="${mark ? "" : "on"}">🚶 unterwegs / nirgends</button>
       ${rooms}`;
@@ -95,12 +96,17 @@ export function mountLocateLab(source: Source): () => void {
   });
 
   void call("status");
-  const timer = window.setInterval(() => void call("status"), 2000);
+  const timer = window.setInterval(() => void call("status"), 1000);
   return () => {
     window.clearInterval(timer);
     box.remove();
     style.remove();
   };
+}
+
+function clock(sec: number): string {
+  const n = Math.max(0, Math.round(sec));
+  return `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
 }
 
 function esc(s: string): string {
