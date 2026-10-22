@@ -16,6 +16,7 @@ const PUBLIC = ["README.md", "CHANGELOG.md", "ROADMAP.md", "docs/manual.md", "do
 const NAMES: Record<string, RegExp> = {
   pool: /pool\s*pro|pro_pool|pool-modul|pool module/i,
   diagnostics: /diagnostics_report|debug[- ]daten|nutzungs- und fehlerberichte|usage and error reports/i,
+  locate: /\bortung\b|raumortung|bluetooth[- ]ortung|\blocating\b|room locating/i,
 };
 
 test("unreleased add-ons are named in no public text", () => {

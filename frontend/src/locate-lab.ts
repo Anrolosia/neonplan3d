@@ -3,6 +3,7 @@
 
 import type { Building } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
+import { loadLocate } from "./load-locate.ts";
 
 interface RecStatus {
   running: boolean;
@@ -70,6 +71,7 @@ export function mountLocateLab(source: Source): () => void {
       )
       .join("");
     box.innerHTML = `${head}
+      <div><button data-a="setup">⚙ Ortung einrichten</button></div>
       <div>${
         s?.running
           ? `<button class="rec" data-a="stop">■ Stopp</button> <small>${Math.floor(s.seconds / 60)}:${String(s.seconds % 60).padStart(2, "0")} · ${s.lines} Zeilen</small>`
@@ -92,6 +94,10 @@ export function mountLocateLab(source: Source): () => void {
       draw();
     } else if (a === "start") void call("start", { note: "lab walk" });
     else if (a === "stop") void call("stop");
+    else if (a === "setup") {
+      const { hass, building } = source();
+      if (hass && building) void loadLocate().then((m) => m.openLocateSetup(hass, building));
+    }
     else if (el.dataset.room !== undefined) void call("mark", el.dataset.room ? { room: el.dataset.room, name: el.dataset.name } : { room: null });
   });
 

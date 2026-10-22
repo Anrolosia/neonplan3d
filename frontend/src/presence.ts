@@ -73,6 +73,49 @@ export function personsInRooms(hass: HomeAssistant, building: Building): PersonM
   return out;
 }
 
+/**
+ * People and things NeonPlan's own locating puts in a room: its sensors (attribute neonplan_locate) name a room of
+ * the plan. A device of a person who is away is left out; several in one room stand on a small circle.
+ */
+export function locatedPersons(hass: HomeAssistant, building: Building, skip: ReadonlySet<string> = new Set()): PersonMarker[] {
+  const out: PersonMarker[] = [];
+  const perRoom = new Map<string, number>();
+  const shown = new Set<string>(skip);
+  for (const [entityId, st] of Object.entries(hass.states)) {
+    const a = st.attributes;
+    if (!entityId.startsWith("sensor.") || a.neonplan_locate !== true || typeof a.room_id !== "string") continue;
+    const personId = typeof a.person === "string" ? a.person : null;
+    const person = personId ? hass.states[personId] : undefined;
+    if (person && person.state !== "home" && person.state !== "on") continue;
+    // a person with a watch and a phone stands once: the first sensor wins (the watch is listed first)
+    const id = personId ?? entityId;
+    if (shown.has(id)) continue;
+    let hit: { floorId: string; room: Room } | null = null;
+    for (const floor of building.floors) {
+      const room = floor.rooms.find((r) => r.id === a.room_id);
+      if (room) hit = { floorId: floor.id, room };
+    }
+    if (!hit) continue;
+    shown.add(id);
+    const i = perRoom.get(hit.room.id) ?? 0;
+    perRoom.set(hit.room.id, i + 1);
+    const [cx, cz] = centroid(hit.room.points);
+    const angle = -Math.PI / 2 + 0.9 + i * 1.15;
+    const name = (person?.attributes.friendly_name as string | undefined) ?? (typeof a.device_name === "string" ? a.device_name : entityId);
+    out.push({
+      id,
+      name,
+      initials: initials(name),
+      picture: (person?.attributes.entity_picture as string | undefined) ?? null,
+      floorId: hit.floorId,
+      roomId: hit.room.id,
+      x: cx + Math.cos(angle) * 0.75,
+      z: cz + Math.sin(angle) * 0.75,
+    });
+  }
+  return out;
+}
+
 export interface FloorCounts {
   rooms: number;
   lightsOn: number;

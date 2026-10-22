@@ -18,6 +18,7 @@ import { holeInRoom } from "../geometry/holes.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, labOn, manualUrl, released, shopUrl, UNRELEASED } from "../features.ts";
+import { loadLocate } from "../load-locate.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
 import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlant, MAILBOX_SHAPES, MAILBOX_SIZE, mailboxShape, WASTE_KINDS, wasteColors } from "../household.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
@@ -10312,6 +10313,7 @@ export class Fp3dEditor extends LitElement {
               : nothing}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
+      ${admin && released("locate") ? this.renderLocate() : nothing}
       ${floor && admin ? this.renderBackgroundForm(floor) : nothing}
       ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
@@ -11456,6 +11458,16 @@ export class Fp3dEditor extends LitElement {
       </div>
       <p class="fp3d-sub">${this.t("director_mic_hint")}</p>
     </details>`;
+  }
+
+  /** Locating (lab): who and what is where, from the Bluetooth scanners – the setup opens as its own window. */
+  private renderLocate() {
+    const de = this.hass?.language?.startsWith("de");
+    return html`<section>
+      <h3>📡 ${de ? "Ortung" : "Locating"} <small class="fp3d-muted">${de ? "Labor" : "lab"}</small></h3>
+      <p class="fp3d-sub">${de ? "Wer und was ist wo – über die Bluetooth-Empfänger, die Home Assistant schon hat (Shelly, ESPHome)." : "Who and what is where – from the Bluetooth scanners Home Assistant already has (Shelly, ESPHome)."}</p>
+      <button class="fp3d-btn" @click=${() => this.hass && void loadLocate().then((m) => m.openLocateSetup(this.hass!, this._doc))}>${de ? "Ortung einrichten" : "Set up locating"}</button>
+    </section>`;
   }
 
   private renderPresenceSettings() {
