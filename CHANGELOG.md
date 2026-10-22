@@ -25,6 +25,8 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Haushalt Pro
 
+- **Out of beta:** Household Pro is now in the shop for everyone (it stays in the Supporter Pass).
+
 Polished with the wishes of the beta testers on Discord – thanks to MacGywer, Frops, Obaid, Pol3cat and Michael M.
 
 - **Bin tags easier to read:** light, larger letters on a solid dark plate with the bin's colour as its edge (blue text on glass was hard to read); from afar they no longer shrink to unreadable. Bins standing together share one tag with a line per bin in pickup order, and tags that would still cover each other move up.

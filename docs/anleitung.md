@@ -994,9 +994,9 @@ Nicht dabei sind Kamerabilder (der Recorder speichert keine) sowie Personen und 
 
 **Voraussetzungen:** der Recorder von Home Assistant (er läuft standardmäßig) und Home Assistant nach dem Update einmal neu gestartet. Wie weit der Verlauf zurückreicht, bestimmt `purge_keep_days` des Recorders (Standard 10 Tage); die Zeitreise braucht davon 24 Stunden, für die ganze Woche mindestens 7 Tage. Wer die Woche nutzen will, lässt `purge_keep_days` also bei 7 oder mehr.
 
-### 6.8 Haushalt Pro (Beta)
+### 6.8 Haushalt Pro
 
-> **Beta, zuerst für Supporter:** Haushalt Pro testen zuerst die Supporter (mit dem [Supporter-Pass](https://mastershort.de/neonplan3d/unterstuetzer/) ist es dabei). Rückmeldungen gern auf Discord in **#beta-feedback** oder auf GitHub.
+> Haushalt Pro gibt es im [Shop](https://mastershort.de/neonplan3d/); mit dem [Supporter-Pass](https://mastershort.de/neonplan3d/unterstuetzer/) ist es dabei. Danke an alle, die es in der Beta getestet haben.
 
 Haushalt Pro zeigt im Haus, was im Haushalt ansteht – dort, wo es passiert. Die Mülltonnen und Briefkästen selbst gibt es für alle (Kapitel 4.23); Haushalt Pro bringt sie und andere Geräte zum Leben. Die Felder dazu stehen im Formular des Möbels unter **🏠 Haushalt Pro**.
 
