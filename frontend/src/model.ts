@@ -213,6 +213,8 @@ export interface Furniture {
   bin_source?: EntityRef;
   /** Haushalt Pro: own words that find this bin's entries in the calendar (comma separated; null = by its kind). */
   bin_match?: string | null;
+  /** Haushalt Pro: an entity that is on while the bin is out (input_boolean, switch, binary_sensor; null = none). */
+  bin_out?: EntityRef;
   /** Haushalt Pro, mailbox: the sensor of the door it is emptied through (post counts until it opens). */
   mailbox_door?: EntityRef;
   /** Haushalt Pro, plant: a plant.* entity or a soil moisture sensor; thirsty below `moisture_min`. */
@@ -227,6 +229,9 @@ export interface Furniture {
   service?: EntityRef;
   /** Haushalt Pro: the number (percent or days left) at or below which the service is due (null = 10). */
   service_min?: number | null;
+  /** Haushalt Pro: a second service (a robot vacuum's dock), like `service` with its own threshold `service2_min`. */
+  service2?: EntityRef;
+  service2_min?: number | null;
   /** Haushalt Pro, fridge: minutes a door may stand open before it warns (null = 2). */
   door_alarm?: number | null;
   /** An own symbol for the marker: a Material Design icon name without "mdi:" (null = by kind). */
@@ -707,8 +712,11 @@ export interface BuildingSettings {
   sun_patches?: boolean;
   /** The ground around the house: its height and the earth around cellars. */
   terrain?: Terrain | null;
-  /** Haushalt Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12). */
-  household?: { bin_from?: number | null; bin_until?: number | null; notes?: EntityRef } | null;
+  /**
+   * Haushalt Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12);
+   * only the bins of the next pickup wear a tag (`bin_next_only`), tags only from `bin_days` days before (null = always).
+   */
+  household?: { bin_from?: number | null; bin_until?: number | null; notes?: EntityRef; bin_next_only?: boolean | null; bin_days?: number | null } | null;
   /** The floor the editor opens with (null: the first of the list) (D418). */
   editor_floor?: string | null;
   /** Fun pack "Halloween": the ghost that floats through the house now and then (on unless switched off). */

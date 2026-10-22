@@ -23,6 +23,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 - **Awnings without a marker** (#688, thanks @fammastrodaiuto): a copied awning keeps its pin (two pieces of furniture on one entity each get one, like lamps), and a new awning over a terrace or garden area finds that area's awning cover by itself (never a roller blind).
 
+### Haushalt Pro
+
+Polished with the wishes of the beta testers on Discord – thanks to MacGywer, Frops, Obaid, Pol3cat and Michael M.
+
+- **Bin tags easier to read:** light, larger letters on a solid dark plate with the bin's colour as its edge (blue text on glass was hard to read); from afar they no longer shrink to unreadable. Bins standing together share one tag with a line per bin in pickup order, and tags that would still cover each other move up.
+- **Only the next pickup, only a few days before:** two new settings in the bin's form, for all bins of the plan – *Label only the next pickup* and *Show tags only … days before* (empty = always). Without them everything stays as before; bins without a tag still show in "Today in the household" and their pickups on a tap.
+- **"Put out" per bin:** an optional helper, switch or binary sensor that is on while the bin is outside – the bin stops glowing, its tag says "put out ✓", and a tap on the bin offers *Mark as put out* (for a helper or switch; a nightly automation resets it). Plan field `bin_out`.
+- **Mailbox and plants from afar:** a round letter or plant symbol instead of tiny text; the text appears when zooming in.
+- **Second service:** every electric item can have a second service sensor with its own threshold – a robot vacuum's brush and its dock's dust bag, say; each one due is a line on "Today in the household". Plan fields `service2`, `service2_min`.
+- **No phantom time left:** a washer, dryer or dishwasher shows its time left only while it runs – not when its plug or state says off, ready or standby, or its power is at standby, even if the display sensor still reports minutes after a power cut.
+
 ## 1.25.1
 
 ### New
