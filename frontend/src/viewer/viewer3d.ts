@@ -231,6 +231,8 @@ export interface FlowPiece {
   dist: number;
   power: number;
   color: [number, number, number];
+  /** Width against a cable's (1; a module's pipe may be wider). */
+  width?: number;
 }
 
 /** A see-through surface over an area of a floor (floor coordinates): a module's tint on a room, soil under a lawn. */
@@ -3463,7 +3465,7 @@ export class FloorplanViewer {
           ];
       for (const [width, strength] of layers) {
         for (const n of sides) {
-          const h = width / 2;
+          const h = (width * (f.width ?? 1)) / 2;
           const v = (q: number[], k: number) => [q[0] + n[0] * h * k, q[1] + n[1] * h * k, q[2] + n[2] * h * k];
           const quad = [
             [v(f.a, -1), f.dist, 0],
@@ -4910,7 +4912,7 @@ function makeBlindTexture(): CanvasTexture {
 
 function flowKey(f: FlowPiece): string {
   const r = (n: number) => Math.round(n * 100);
-  return `${f.floorId}:${f.a.map(r).join(",")}>${f.b.map(r).join(",")}`;
+  return `${f.floorId}:${f.a.map(r).join(",")}>${f.b.map(r).join(",")}${f.width ? `~${f.width}` : ""}`;
 }
 
 /** Stripe speed (m/s): still at 0 W, faster with more power (square root, so 2 kW is not 20 × 100 W). */

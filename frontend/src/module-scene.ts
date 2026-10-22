@@ -15,6 +15,7 @@ export interface LineFlow {
   dist: number;
   power: number;
   color: Rgb;
+  width?: number;
 }
 
 /** The points of a small curve through the values in a box of w × h (SVG coordinates, the lowest value at the bottom). */
@@ -62,7 +63,7 @@ export function lineFlows(lines: readonly Line[]): LineFlow[] {
       const len = lens[i - 1];
       if (len < 0.005) continue;
       const color = perPoint ? colorAt([l.colors[i - 1], l.colors[i]], 0.5) : colorAt(l.colors, (dist + len / 2) / total);
-      out.push({ floorId: l.floorId, a: [...pts[i - 1]], b: [...pts[i]], dist, power: Math.max(0, l.flow), color });
+      out.push({ floorId: l.floorId, a: [...pts[i - 1]], b: [...pts[i]], dist, power: Math.max(0, l.flow), color, ...(l.width ? { width: Math.min(3, Math.max(0.5, l.width)) } : {}) });
       dist += len;
     }
   }

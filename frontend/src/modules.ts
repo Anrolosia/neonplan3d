@@ -203,6 +203,8 @@ export type ScenePiece =
       colors: [number, number, number][];
       /** How fast the light runs, like watts on a cable (0: it rests and glows faintly, 100 slow … 2500 fast). */
       flow: number;
+      /** Its width against an energy cable's (1 … 3; a pipe is wider). */
+      width?: number;
     }
   | {
       /** A see-through surface over an area (floor coordinates; y above the floor): a tint on a room's floor, soil under a lawn. */
