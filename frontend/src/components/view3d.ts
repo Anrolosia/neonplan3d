@@ -47,6 +47,11 @@ function meterUnit(hass: HomeAssistant, id: string | null | undefined): string {
 }
 
 /** Today's water: litres while it is less than 10 m³ (a household's day), else in the meter's unit. */
+/** A module card's small curve (the last hours) in its colour. */
+function sparkLine(values: readonly number[], color: string) {
+  return html`<svg class="fp3d-holo-spark" viewBox="0 0 120 22" preserveAspectRatio="none" aria-hidden="true">${svg`<polyline points=${sparkPoints(values, 120, 22)} style=${`stroke:${color}`} />`}</svg>`;
+}
+
 function waterText(hass: HomeAssistant, v: number, unit: string): string {
   if ((unit === "m³" || unit === "m3") && v < 10) return `${formatNumber(hass, v * 1000, 0)} l`;
   return `${formatNumber(hass, v, v < 10 ? 2 : 0)} ${unit}`;
@@ -56,6 +61,8 @@ interface HoloCard {
   kind: "main" | "plant" | "device" | "media" | "car" | "module" | "bin";
   /** Haushalt Pro: a waste bin that goes out – its colour and when ("Tomorrow"). */
   bin?: { color: string; when: string; soon: boolean };
+  /** A module's small label, drawn like a bin's tag. */
+  tag?: boolean;
   /** A module's card (Pool Pro: the pool), drawn by the host from what the module says. */
   module?: ModuleCard;
   name: string;
@@ -100,6 +107,7 @@ import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../f
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { anyModule, moduleAlerts, moduleCards, modulePools, moduleScene, moduleVoice, moduleWatched, syncModules, type ModuleCard, type ModuleHost, type ScenePiece, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
+import { lineFlows, sparkPoints } from "../module-scene.ts";
 import { generateWalls, openingHost, placeWallPlate, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { signedArea } from "../model.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
@@ -551,6 +559,8 @@ export class Fp3dView3d extends LitElement {
   private fridgeTimer: ReturnType<typeof setTimeout> | undefined;
   /** Tablet level: measured values alone are shown at most every SENSOR_SYNC_MS (the pending sync, the last one). */
   private sensorTimer: ReturnType<typeof setTimeout> | undefined;
+  /** A module asked to be drawn again (its own state changed: a target just set, a simulation ticking). */
+  private moduleTimer: ReturnType<typeof setTimeout> | undefined;
   private lastSync = 0;
   /** Room values of the current heatmap (for the legend). */
   private heatValues = new Map<string, number>();
@@ -1392,6 +1402,14 @@ export class Fp3dView3d extends LitElement {
         anchors.push({ p, n: [0, 1, 0], floorId: floor.id, size: holoSize * 0.7, roof: false, views: "all" });
         cards.push({ kind: "module", name: card.title, w: null, dayIds: [], battery: null, module: card });
       }
+      // a module's small labels (a value at a point) look like Haushalt Pro's tags
+      for (const tag of this.scene) {
+        if (tag.kind !== "tag") continue;
+        const floor = b.floors.find((f) => f.id === tag.floorId);
+        if (!floor) continue;
+        anchors.push({ p: [tag.at[0], floor.elevation + tag.at[1], tag.at[2]], n: [0, 1, 0], floorId: floor.id, size: holoSize * 0.75, roof: false, views: "all" });
+        cards.push({ kind: "bin", name: tag.sub ?? "", w: null, dayIds: [], battery: null, bin: { color: tag.color ?? "#37e0ff", when: tag.text, soon: true }, tag: true });
+      }
     }
     // Haushalt Pro: a small tag on every bin that goes out today or tomorrow (and on a mailbox with post, a thirsty plant)
     if (hasFeature("household")) {
@@ -1426,8 +1444,11 @@ export class Fp3dView3d extends LitElement {
             color: flowColor(f.kind, summary),
           }));
     const pool = this.poolPipes(b);
-    v.setFlows(this.dimmed ? energyFlows : [...energyFlows, ...pool.flows]);
+    // a module's lines (pipes, a loop in the ground) flow in the same layer; its surfaces lie over floors and lawns
+    const lines = this.scene.filter((p): p is Extract<ScenePiece, { kind: "line" }> => p.kind === "line");
+    v.setFlows(this.dimmed ? energyFlows : [...energyFlows, ...pool.flows, ...lineFlows(lines)]);
     v.setPipes(pool.tubes);
+    v.setPatches(this.scene.filter((p): p is Extract<ScenePiece, { kind: "patch" }> => p.kind === "patch").map((p) => ({ floorId: p.floorId, points: p.points, y: p.y, color: p.color, opacity: this.dimmed ? p.opacity * 0.4 : p.opacity })));
     const persons = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
     v.setPersons(persons);
     const counts = floorCounts(hass, b, this.openingLinks!, persons);
@@ -1889,8 +1910,10 @@ export class Fp3dView3d extends LitElement {
     const e = this._energy;
     // Haushalt Pro's tags (bins, post, a thirsty plant) are no energy holograms: they show on their own
     const tagsOnly = () => this._holos.map((card, i) => (card.kind === "bin" ? this.renderBinCard(card, i) : nothing));
+    // a module with a card or a label of its own needs no Pro add-on for them
+    const fromModule = this._holos.some((c) => c.kind === "module" || c.tag);
     // the editor keeps the energy bar off but asks for the holograms in its energy tool
-    if (!(hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool") || hasFeature("household")) || (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) || !(this.showEnergy || this.holograms) || !this.holoVisible()) return hasFeature("household") ? tagsOnly() : nothing;
+    if (!(fromModule || hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool") || hasFeature("household")) || (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) || !(this.showEnergy || this.holograms) || !this.holoVisible()) return hasFeature("household") || fromModule ? tagsOnly() : nothing;
     // the plants' cards belong to the house view – with a single floor that floor is the house view (#255)
     const house = this.floorId === null || (this.building?.floors.length ?? 0) <= 1;
     const plants = !!e && (e.solar !== null || e.grid !== null || e.battery !== null) && house;
@@ -1979,6 +2002,7 @@ export class Fp3dView3d extends LitElement {
               )
             : nothing}
           ${open ? (m.lines ?? []).map((l) => html`<div class="fp3d-holo-mline">${l}</div>`) : nothing}
+          ${open && (m.spark?.values.length ?? 0) > 1 ? sparkLine(m.spark!.values, m.spark!.color ?? "#ffb347") : nothing}
           ${open && m.chips?.length
             ? html`<div class="fp3d-holo-chips">
                 ${m.chips.map(
@@ -2767,6 +2791,11 @@ export class Fp3dView3d extends LitElement {
         const bg: [number, number, number] = f.screen_bg === "white" ? [0.92, 0.94, 1] : [0.08, 0.08, 0.1];
         if (picture) screens.set(f.id, { color: bg, level: 1, picture, plain: true });
       }
+    }
+    // a module's band of light round an item, or its layers (a tank warm above, cool below): on any item, over its own glow
+    for (const g of glows.values()) {
+      if (g.top) screens.set(g.furnitureId, { color: g.color, level: g.level, faces: [{ part: "strata", color: g.color, top: g.top, level: g.level }] });
+      else if (g.band) screens.set(g.furnitureId, { color: g.color, level: g.level, faces: [{ part: "band", color: g.color, level: g.level }] });
     }
     this.watchCameras(this.cameraScreens > 0 || !!this._through || this.cameraWall || this.projecting);
     return { markers, consumers, screens, targets };
@@ -4409,7 +4438,14 @@ export class Fp3dView3d extends LitElement {
         if (!floor || !area || area.type !== "pool") return null;
         return { y: poolWaterY(floor, area), floorY: poolFloorY(floor, area) };
       },
-      refresh: () => this.requestUpdate(),
+      refresh: () => {
+        this.requestUpdate();
+        // the stage and the cards come from the module: ask it again (once, however often it asks)
+        this.moduleTimer ??= setTimeout(() => {
+          this.moduleTimer = undefined;
+          this.syncDevices(false, true);
+        }, 50);
+      },
       plan: pipePlanner,
       openings: () => this.spokenOpenings(hass, b),
       energy: () => (this._energy ? { consumption: this._energy.consumption, solar: this._energy.solar, grid: this._energy.grid, battery: this._energy.battery, soc: this._energy.soc } : null),
@@ -6321,6 +6357,18 @@ export class Fp3dView3d extends LitElement {
         margin-top: 5px;
         font-size: 12px;
         opacity: 0.85;
+      }
+      .fp3d-holo-spark {
+        display: block;
+        width: 100%;
+        height: 22px;
+        margin-top: 6px;
+      }
+      .fp3d-holo-spark polyline {
+        fill: none;
+        stroke-width: 1.6;
+        vector-effect: non-scaling-stroke;
+        stroke-linejoin: round;
       }
       /* a module's chips (Pool Pro: ball valves and the six-way valve, set by hand) */
       .fp3d-holo-chips {

@@ -28,6 +28,9 @@ _ENTITY_REF = vol.Any(None, vol.All(str, vol.Length(max=255)))
 
 _SENSOR_REF = vol.Any(None, vol.All(str, vol.Length(max=255)))
 
+# what a module keeps on an item of the plan, by the module's id (plain JSON the module reads itself)
+_MODULE_DATA = vol.Any(None, vol.All({vol.All(str, vol.Length(min=1, max=64)): dict}, vol.Length(max=20)))
+
 # a camera to open with: angles, distance and (optional) the point it looks at; for a floor or a room the
 # point's height is counted from that floor
 START_VIEW_SCHEMA = vol.Schema(
@@ -345,6 +348,8 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("group", default=None): vol.Any(None, vol.All(str, vol.Length(max=64))),
         # fixed against moving by accident
         vol.Optional("locked", default=None): vol.Any(None, bool),
+        # a module's own data for this item
+        vol.Optional("mods"): _MODULE_DATA,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -511,6 +516,8 @@ OUTDOOR_SCHEMA = vol.Schema(
         vol.Optional("panel"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=100)),
         vol.Optional("hidden"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=MAX_HIDDEN)),
         vol.Optional("no_state"): vol.All([vol.All(str, vol.Length(max=255))], vol.Length(max=MAX_HIDDEN)),
+        # a module's own data for this area
+        vol.Optional("mods"): _MODULE_DATA,
     },
     extra=vol.ALLOW_EXTRA,
 )

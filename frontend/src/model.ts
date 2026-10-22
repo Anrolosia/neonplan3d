@@ -295,12 +295,17 @@ export interface Furniture {
   car?: CarLinks | null;
   /** Parking spots: size factor of the vehicle (1 = the pack item's size). */
   scale?: number;
+  /** What a module keeps for this item (its settings, the entities it found), by the module's id. */
+  mods?: ModuleData | null;
   /** Parking spots: a sensor naming the kind of vehicle, and which vehicle each state means. */
   type_entity?: string | null;
   types?: { state: string; vehicle: string }[];
 }
 
 export type LampMount = "ceiling" | "floor" | "table" | "wall";
+
+/** A module's own data on an item of the plan, by the module's id ("mastershort.window_watch": {…}); plain JSON. */
+export type ModuleData = Record<string, Record<string, unknown>>;
 
 /** How a device's marker shows in 3D (null = automatic by the marker mode). */
 export const MARKER_SHOWS = ["always", "no_power", "never"] as const;
@@ -902,6 +907,8 @@ export interface OutdoorArea {
   rim?: number | null;
   /** Pool Pro: the pool's entities (water temperature, heat pump, filter pump, light, pH, chlorine, cover). */
   pool?: PoolLinks | null;
+  /** What a module keeps for this area, by the module's id. */
+  mods?: ModuleData | null;
   /** Outdoor areas like rooms (#100): a name and a Home Assistant area – a tap opens it with its devices like a room. */
   name?: string | null;
   area_id?: string | null;

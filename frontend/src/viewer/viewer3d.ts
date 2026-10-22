@@ -74,7 +74,7 @@ import { buildPools, disposePools, type PoolPiece } from "./pool-water.ts";
 import { accentOnUniform, accentUniform, parseAccent, lineBlending, themed, themeIndex, type Theme, type ThemeUniform } from "./theme.ts";
 
 export type { Theme } from "./theme.ts";
-import { ALWAYS, DEG, GeoBuffer, LineBuffer, pushPrism } from "./geo.ts";
+import { ALWAYS, DEG, GeoBuffer, LineBuffer, pushPrism, triangulate } from "./geo.ts";
 import { buildLightSurface, lightColors, roomIndexAt, type LightKind, type LightSource, type LightSurface, zoneOf } from "./lighting.ts";
 import { buildOpeningParts, CLOSED, type OpeningState } from "./openings.ts";
 import { circlePath, cleaningPath, stepRobot, type RobotInfo, type RobotMotion } from "./robot.ts";
@@ -233,6 +233,15 @@ export interface FlowPiece {
   color: [number, number, number];
 }
 
+/** A see-through surface over an area of a floor (floor coordinates): a module's tint on a room, soil under a lawn. */
+export interface PatchPiece {
+  floorId: string;
+  points: [number, number][];
+  y: number;
+  color: [number, number, number];
+  opacity: number;
+}
+
 /** A lit TV or monitor screen: colour of the running app and brightness (0..1). */
 /** Klang & Kino: a speaker or media player in the house – rings pulse around it while it plays, group members are joined by a line. */
 export interface SoundSource {
@@ -259,7 +268,7 @@ export interface ScreenState {
   /** Furniture with a state: glowing faces on top of the item instead of a screen – the whole top, or a half of it. */
   // (see also SoundSource below)
   // "gang": one rocker or socket of a wall switch or socket (`index` of `of`)
-  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang" | "drum" | "apring"; color: [number, number, number]; level: number; index?: number; of?: number; accent?: boolean }[];
+  faces?: { part: "all" | "left" | "right" | "top" | "bottom" | "band" | "cabin" | "lights" | "burners" | "lid" | "beacon" | "gang" | "drum" | "apring" | "strata"; color: [number, number, number]; level: number; index?: number; of?: number; accent?: boolean; top?: [number, number, number] }[];
 }
 
 /** Position of the sun (from sun.sun): degrees above the horizon and clockwise from north. */
@@ -392,6 +401,7 @@ interface FloorMaterials {
   /** Pool water: see-through, so the basin shows below it. */
   water: MeshBasicMaterial;
   flow: MeshBasicMaterial;
+  patch: MeshBasicMaterial;
   /** Energie Pro: the living overlay of the solar fields on this floor (garden, walls). */
   solarLive: MeshBasicMaterial;
   lamps: MeshBasicMaterial;
@@ -439,6 +449,9 @@ interface FloorView {
   /** Pool Pro: the pipes as tubes. */
   pipeMesh: Mesh;
   pipeSig: string;
+  /** A module's see-through surfaces (see PatchPiece). */
+  patchMesh: Mesh;
+  patchSig: string;
   /** Triangle ranges of lamps (entity ids), furniture walls mesh and openings, for tapping. */
   lampTris: { id: string; start: number; end: number }[];
   /** Triangle range of every camera's field-of-view wedge, by device id (a tap on it hits the camera). */
@@ -516,6 +529,7 @@ export class FloorplanViewer {
   private flashes = new Map<string, number>();
   private flows: FlowPiece[] = [];
   private pipes: PipeTube[] = [];
+  private patches: PatchPiece[] = [];
   /** Editor: things on surfaces (solar fields, roof windows) are grabbed and moved with a ray from the camera. */
   private surfaceGrab: SurfaceGrab | null = null;
   private surfaceDragging = false;
@@ -1149,6 +1163,37 @@ export class FloorplanViewer {
     this.pipes = pipes;
     for (const fv of this.floors) this.buildPipes(fv);
     this.invalidate();
+  }
+
+  /** A module's see-through surfaces (a warm tint on a room's floor, soil under a lawn). */
+  setPatches(patches: PatchPiece[]): void {
+    this.patches = patches;
+    for (const fv of this.floors) this.buildPatches(fv);
+    this.invalidate();
+  }
+
+  private buildPatches(fv: FloorView): void {
+    const mine = this.patches.filter((t) => t.floorId === fv.floor.id && t.points.length >= 3 && t.opacity > 0);
+    const sig = JSON.stringify(mine);
+    if (sig === fv.patchSig) return;
+    fv.patchSig = sig;
+    const p: number[] = [];
+    const c: number[] = [];
+    for (const t of mine) {
+      const a = Math.min(1, t.opacity);
+      for (const tri of triangulate(t.points)) {
+        for (const i of tri) {
+          p.push(t.points[i][0], t.y, t.points[i][1]);
+          c.push(t.color[0], t.color[1], t.color[2], a);
+        }
+      }
+    }
+    const g = new Geometry();
+    g.setAttribute("position", new Float32BufferAttribute(p, 3));
+    g.setAttribute("color", new Float32BufferAttribute(c, 4));
+    fv.patchMesh.geometry.dispose();
+    fv.patchMesh.geometry = g;
+    fv.patchMesh.visible = p.length > 0;
   }
 
   private buildPipes(fv: FloorView): void {
@@ -2087,6 +2132,8 @@ export class FloorplanViewer {
       blinds: themed(makeFoldable(new MeshBasicMaterial({ map: this.blindTexture, vertexColors: true, side: DoubleSide }), mask), this.themeUniform),
       water: themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false, side: DoubleSide }), this.themeUniform),
       flow: flowMaterial(this.flowTime),
+      // a module's surfaces: colour and opacity per vertex, over the floor without hiding what stands on it
+      patch: new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
       solarLive: solarLiveMaterial(this.flowTime),
       lamps: themed(new MeshBasicMaterial({ vertexColors: true }), this.themeUniform),
       halos: new PointsMaterial({
@@ -2169,6 +2216,9 @@ export class FloorplanViewer {
       fridgeMesh.visible = false;
       const pipeMesh = new Mesh(new Geometry(), materials.lamps);
       pipeMesh.visible = false;
+      const patchMesh = new Mesh(new Geometry(), materials.patch);
+      patchMesh.visible = false;
+      patchMesh.renderOrder = 3;
       const screenMesh = new Mesh(new Geometry(), materials.screens);
       screenMesh.visible = false;
       screenMesh.renderOrder = 5;
@@ -2217,6 +2267,7 @@ export class FloorplanViewer {
         trailMesh,
         fridgeMesh,
         pipeMesh,
+        patchMesh,
         screenMesh,
         glassWalls,
         ...(solarMesh ? [solarMesh] : []),
@@ -2284,6 +2335,8 @@ export class FloorplanViewer {
         fridgeMesh,
         pipeMesh,
         pipeSig: "",
+        patchMesh,
+        patchSig: "",
         lampTris: [],
         coneTris: [],
         lampFurnTris: [],
@@ -2319,6 +2372,7 @@ export class FloorplanViewer {
     for (const fv of this.floors) {
       this.buildFridges(fv);
       this.buildPipes(fv);
+      this.buildPatches(fv);
     }
     this.labelsDirty = true;
     if (this.floorId && !b.floors.some((f) => f.id === this.floorId)) this.floorId = null;
@@ -3128,6 +3182,27 @@ export class FloorplanViewer {
               // the screen material is double-sided: one winding is enough (both would add up twice)
               buf.tri(p00, p10, p11, col);
               buf.tri(p00, p11, p01, col);
+            }
+            continue;
+          }
+          if (face.part === "strata") {
+            // layers: light round the item from its foot (colour) up to its top (top) – a tank warm above, cool below
+            const top = face.top ?? face.color;
+            const k = 0.22 + 0.4 * face.level;
+            const lo = new Color(...face.color.map((v) => Math.min(1, v * k)) as [number, number, number]);
+            const hi = new Color(...top.map((v) => Math.min(1, v * k)) as [number, number, number]);
+            const y0 = base + h * 0.06;
+            const y1 = base + h * 0.94;
+            const rx = Math.abs(w) / 2 + 0.012;
+            const rz = d / 2 + 0.012;
+            const n = 20;
+            for (let i = 0; i < n; i++) {
+              const a0 = (i / n) * Math.PI * 2;
+              const a1 = ((i + 1) / n) * Math.PI * 2;
+              const q0 = [Math.cos(a0) * rx, Math.sin(a0) * rz];
+              const q1 = [Math.cos(a1) * rx, Math.sin(a1) * rz];
+              buf.tri(P(q0[0], y0, q0[1]), P(q1[0], y0, q1[1]), P(q1[0], y1, q1[1]), lo, lo, hi);
+              buf.tri(P(q0[0], y0, q0[1]), P(q1[0], y1, q1[1]), P(q0[0], y1, q0[1]), lo, hi, hi);
             }
             continue;
           }

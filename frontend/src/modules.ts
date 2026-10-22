@@ -2,7 +2,7 @@
 // a small, versioned interface. A module is an ES module whose default export is a `NeonModule`; the backend
 // checked its signature and binding like a furniture pack's, so what runs here is what we signed.
 
-import type { Building, OutdoorArea, PoolPipe, PoolPort, Vec2 } from "./model.ts";
+import type { Building, Furniture, OutdoorArea, PoolPipe, PoolPort, Vec2 } from "./model.ts";
 import type { PipePlanner } from "./pipe-planner.ts";
 import type { HomeAssistant } from "./types.ts";
 
@@ -184,6 +184,44 @@ export type ScenePiece =
       furnitureId: string;
       color: [number, number, number];
       level: number;
+      /** A band of light round the item at mid height instead of its screen. */
+      band?: boolean;
+      /** Layers: light round the item from its foot (`color`) up to its top (this colour) – a tank warm above, cool below. */
+      top?: [number, number, number];
+    }
+  | {
+      /**
+       * A line along points (floor coordinates, y above the floor), drawn like the energy cables: a pipe, a loop in
+       * the ground. Light runs along it from the first point to the last.
+       */
+      kind: "line";
+      floorId: string;
+      points: [number, number, number][];
+      /** One colour, or one per point (the colour runs along the line). */
+      colors: [number, number, number][];
+      /** How fast the light runs, like watts on a cable (0: it rests and glows faintly, 100 slow … 2500 fast). */
+      flow: number;
+    }
+  | {
+      /** A see-through surface over an area (floor coordinates; y above the floor): a tint on a room's floor, soil under a lawn. */
+      kind: "patch";
+      floorId: string;
+      points: Vec2[];
+      y: number;
+      color: [number, number, number];
+      /** 0 (invisible) … 1 (covering). */
+      opacity: number;
+    }
+  | {
+      /** A small label floating at a point (floor coordinates): a value and what it is. */
+      kind: "tag";
+      id: string;
+      floorId: string;
+      at: [number, number, number];
+      text: string;
+      sub?: string;
+      /** CSS colour of the value. */
+      color?: string;
     }
   | {
       /** The water in an area's pipes: which pipe carries water now and in what colour (the host draws the pipes). */
@@ -229,6 +267,8 @@ export interface ModuleCard {
   chips?: { title: string; items: CardButton[] }[];
   /** The buttons at the bottom (−/+, on/off, open/close …). */
   buttons?: CardButton[];
+  /** A small curve under the rows (the last hours), oldest value first. */
+  spark?: { values: number[]; color?: string };
 }
 
 /** A warning a module raises; the host shows it like its own (banner, pulsing rooms). */
@@ -303,6 +343,10 @@ export interface NeonModule {
   alerts?(host: ModuleHost): ModuleAlert[];
   /** Fields the module adds to an outdoor area's form in the editor (a pool's entities, an assistant). */
   areaFields?(host: ModuleHost, area: OutdoorArea): ModuleField[];
+  /** Fields the module adds to a piece of furniture's form in the editor (a device's entities, a setup assistant). */
+  furnitureFields?(host: ModuleHost, item: Furniture): ModuleField[];
+  /** The module's own settings (the editor's module dialog shows them under its name). */
+  settings?(host: ModuleHost): ModuleField[];
   /** The module's knowledge about drawing pipes (the host's pipe tools show only with it). */
   pipes?: PipeRules;
   /** Pool Pro: the pools as the voice modules ask for them. */
@@ -434,6 +478,22 @@ export function moduleWatched(host: ModuleHost): string[] {
 
 export function moduleAreaFields(host: ModuleHost, area: OutdoorArea): ModuleField[] {
   return collect((m) => m.areaFields?.(host, area));
+}
+
+export function moduleFurnitureFields(host: ModuleHost, item: Furniture): ModuleField[] {
+  return collect((m) => m.furnitureFields?.(host, item));
+}
+
+/** The settings of the module loaded from a pack (empty without a module, or one without settings). */
+export function moduleSettings(packId: string, host: ModuleHost): ModuleField[] {
+  const m = loaded.get(packId);
+  if (!m?.module.settings) return [];
+  try {
+    return m.module.settings(host) ?? [];
+  } catch (err) {
+    console.warn(`NeonPlan 3D: module ${m.id} failed`, err);
+    return [];
+  }
 }
 
 export function modulePools(host: ModuleHost): SpokenPool[] {

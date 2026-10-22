@@ -51,7 +51,7 @@ import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { edgeReach, generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
-import { moduleAreaFields, moduleHelp, modulePipeRules, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
+import { moduleAreaFields, moduleFurnitureFields, moduleHelp, modulePipeRules, moduleSettings, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
 import { pipePlanner } from "../pipe-planner.ts";
 import {
   bounds,
@@ -5583,7 +5583,10 @@ export class Fp3dEditor extends LitElement {
               ${p.module && moduleWaits(p)
                 ? html`<p class="fp3d-sub">${this.t(p.module.approved === true ? "module_update_waits" : "module_waits", { from: p.release ?? 1, to: p.pending?.release ?? 1 })} ${this.t("module_waits_where")}</p>`
                 : p.module
-                  ? html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>`
+                  ? (() => {
+                      const own = this.hass ? moduleSettings(p.id, this.editorHost()) : [];
+                      return own.length ? html`<div class="fp3d-form">${this.renderFields(own, false)}</div>` : html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>`;
+                    })()
                   : nothing}
             </div>`,
           )
@@ -9593,7 +9596,17 @@ export class Fp3dEditor extends LitElement {
   /** Fields a module adds to an outdoor area's form (Pool Pro: the pool's entities, the assistant), rendered here. */
   private renderModuleFields(a: OutdoorArea) {
     if (!this.hass) return nothing;
-    const fields = moduleAreaFields(this.editorHost(), a);
+    return this.renderFields(moduleAreaFields(this.editorHost(), a));
+  }
+
+  /** Fields a module adds to a piece of furniture's form (a device's entities, a setup assistant). */
+  private renderModuleFurnitureFields(f: Furniture) {
+    if (!this.hass) return nothing;
+    return this.renderFields(moduleFurnitureFields(this.editorHost(), f));
+  }
+
+  /** A module's fields, drawn like the editor's own. */
+  private renderFields(fields: ModuleField[], wrap = true) {
     if (!fields.length) return nothing;
     const admin = this.isAdmin;
     const field = (f: ModuleField) => {
@@ -9617,6 +9630,7 @@ export class Fp3dEditor extends LitElement {
           return html`<button class="fp3d-btn ${f.primary ? "fp3d-primary" : ""} fp3d-wide" ?disabled=${!admin} title=${f.title ?? ""} @click=${() => f.onTap()}>${f.label}</button>`;
       }
     };
+    if (!wrap) return fields.map(field);
     return html`<section>
       <div class="fp3d-form fp3d-links">${fields.map(field)}</div>
     </section>`;
@@ -10933,6 +10947,7 @@ export class Fp3dEditor extends LitElement {
           </div>`
         : nothing}
       ${isElectric(f.type) ? this.renderFurnitureLinks(f) : !NO_STATE_TYPES.has(f.type) ? html`<div class="fp3d-form fp3d-links">${this.renderStateLinks(f)}</div>` : nothing} ${GANG_TYPES.has(f.type) ? this.renderGangsForm(f) : nothing} ${TECH_TYPES.has(f.type) ? this.renderTechForm(f) : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing} ${f.type === "waste_bin" || f.type === "mailbox" ? this.renderHouseholdForm(f) : this.renderHouseholdExtras(f)}
+      ${this.renderModuleFurnitureFields(f)}
       ${f.type.startsWith("pack:mastershort.vehicles:") && this.isAdmin
         ? html`<section>
             <p class="fp3d-sub">${this.t("vehicle_to_spot_hint")}</p>
