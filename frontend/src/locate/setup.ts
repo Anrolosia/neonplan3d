@@ -132,14 +132,25 @@ export class LocateSetup extends LitElement {
     _error: { state: true },
   };
 
-  hass!: HomeAssistant;
-  building!: Building;
-  _step: Step = "scanners";
-  _cfg: Config | null = null;
-  _near: Nearby[] = [];
-  _live: Live | null = null;
-  _quality: Record<string, { overall: number | null; rooms: Record<string, number> }> | null = null;
-  _error = "";
+  declare hass: HomeAssistant;
+  declare building: Building;
+  declare _step: Step;
+  declare _cfg: Config | null;
+  declare _near: Nearby[];
+  declare _live: Live | null;
+  declare _quality: Record<string, { overall: number | null; rooms: Record<string, number> }> | null;
+  declare _error: string;
+
+  constructor() {
+    super();
+    // reactive fields are declared, not initialised as class fields (that would hide Lit's accessors)
+    this._step = "scanners";
+    this._cfg = null;
+    this._near = [];
+    this._live = null;
+    this._quality = null;
+    this._error = "";
+  }
   private timer = 0;
   private unsub: (() => void) | null = null;
 
@@ -157,8 +168,8 @@ export class LocateSetup extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    void this.load();
-    this.timer = window.setInterval(() => void this.tick(), 1500);
+    this.load().catch((e: unknown) => (this._error = `load: ${(e as Error)?.stack ?? String(e)}`));
+    this.timer = window.setInterval(() => void this.tick(), 1000);
     void this.hass.connection
       .subscribeMessage<Live>((live) => (this._live = live), { type: "neonplan3d/locate/subscribe" })
       .then((u) => (this.unsub = u))
@@ -196,7 +207,7 @@ export class LocateSetup extends LitElement {
       }
     }
     this._cfg = { ...cfg, scanner_rooms: rooms };
-    if (guessed || !cfg.enabled) await this.save({ scanner_rooms: rooms });
+    if (guessed) await this.save({ scanner_rooms: rooms });
   }
 
   private guessRoom(s: Scanner): string | null {
@@ -216,10 +227,16 @@ export class LocateSetup extends LitElement {
 
   /** Every save sends the plan's rooms and doors along, so the service always knows the current plan. */
   private async save(changes: Record<string, unknown>): Promise<void> {
+    let doors: [string, string][] = [];
+    try {
+      doors = doorPairs(this.building);
+    } catch (e) {
+      console.warn("NeonPlan locate: no door graph", e);
+    }
     const cfg = await this.call<Config>({
       type: "neonplan3d/locate/configure",
       rooms: this.rooms,
-      doors: doorPairs(this.building),
+      doors,
       ...changes,
     });
     if (cfg) this._cfg = { ...cfg, scanner_rooms: { ...cfg.scanner_rooms } };
@@ -230,9 +247,13 @@ export class LocateSetup extends LitElement {
       const res = await this.call<{ devices: Nearby[] }>({ type: "neonplan3d/locate/nearby" });
       if (res) this._near = res.devices;
     }
-    if (this._step === "walk" && this._live?.calibration) {
-      const res = await this.call<{ samples: Config["samples"] }>({ type: "neonplan3d/locate/calibrate", action: "status" });
-      if (res && this._cfg) this._cfg = { ...this._cfg, samples: res.samples };
+    if (this._step === "walk") {
+      // the countdown and the sample counts come from here (the live state only changes when a room changes)
+      const res = await this.call<{ calibration: Live["calibration"]; samples: Config["samples"] }>({ type: "neonplan3d/locate/calibrate", action: "status" });
+      if (res && this._cfg) {
+        this._cfg = { ...this._cfg, samples: res.samples };
+        this._live = { ...(this._live ?? { running: true, devices: [] }), calibration: res.calibration };
+      }
     }
   }
 
@@ -251,7 +272,7 @@ export class LocateSetup extends LitElement {
         <button class="x" @click=${() => this.remove()} aria-label=${t.close}>✕</button>
       </header>
       <nav>${steps.map(([s, label]) => html`<button class=${this._step === s ? "on" : ""} @click=${() => (this._step = s)}>${label}</button>`)}</nav>
-      ${this._error ? html`<p class="err">${this._error}</p>` : nothing}
+      ${this._error ? html`<pre class="err">${this._error}</pre>` : nothing}
       ${!cfg ? html`<p>…</p>` : !cfg.bluetooth ? html`<p>${t.no_bt}</p>` : this.renderStep(cfg)}
     </div>`;
   }
@@ -386,7 +407,10 @@ export class LocateSetup extends LitElement {
                 return html`<button
                   class=${cal?.room === r.id ? "on" : n >= 30 ? "done" : ""}
                   ?disabled=${!!cal}
-                  @click=${() => void this.call({ type: "neonplan3d/locate/calibrate", action: "start", room: r.id, seconds: 90 })}
+                  @click=${async () => {
+                    const res = await this.call<{ calibration: Live["calibration"] }>({ type: "neonplan3d/locate/calibrate", action: "start", room: r.id, seconds: 90 });
+                    if (res) this._live = { ...(this._live ?? { running: true, devices: [] }), calibration: res.calibration };
+                  }}
                 >
                   ${n >= 30 ? "✓ " : ""}${r.name}<small>${this.tr(t.samples, { n })}${acc !== null ? ` · ${Math.round(acc * 100)} %` : ""}</small>
                 </button>`;
@@ -574,6 +598,8 @@ export class LocateSetup extends LitElement {
     }
     .err {
       color: #ff8fa3;
+      white-space: pre-wrap;
+      font-size: 12px;
     }
     h4 {
       margin: 12px 0 4px;
