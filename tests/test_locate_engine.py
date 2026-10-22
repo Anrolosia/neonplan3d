@@ -89,3 +89,17 @@ def test_unheard_device_is_away() -> None:
     later = t + engine.AWAY_AFTER + 5
     est = tracker.step(later, fp.scores(tracker.window(later)))
     assert est.room is None
+
+
+def test_presence_sensor_moves_to_a_plausible_room_at_once() -> None:
+    rng = random.Random(4)
+    fp = calibrated(rng)
+    tracker = engine.RoomTracker(list(PROFILE), DOORS)
+    _shown, t = walk(tracker, fp, [("kitchen", 20)], rng)
+    assert tracker.shown == "kitchen"
+    # living is two doors away: a sensor there does not pull the kitchen device over
+    assert not tracker.confirm("living", t)
+    assert tracker.shown == "kitchen"
+    # the hall is the neighbour: its sensor moves the device at once
+    assert tracker.confirm("hall", t)
+    assert tracker.shown == "hall"

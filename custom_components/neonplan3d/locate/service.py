@@ -8,7 +8,10 @@ import logging
 import time
 from typing import Any
 
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.const import EVENT_STATE_CHANGED
+from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
@@ -29,6 +32,7 @@ CALIBRATE_SECONDS = 90
 SAMPLE_EVERY = 2.0
 NEARBY_KEEP = 30.0
 MAX_SAMPLES_PER_ROOM = 120
+PRESENCE_CLASSES = {"motion", "occupancy", "presence"}
 
 
 def _clean_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -67,6 +71,8 @@ class LocateService:
         self._identity = Identity([])
         self._trackers: dict[str, RoomTracker] = {}
         self._unsub = None
+        self._unsub_sensors = None
+        self._sensor_rooms: dict[str, str | None] = {}
         self._last_step = 0.0
         self._last_sample = 0.0
         self._nearby_until = 0.0
@@ -112,6 +118,7 @@ class LocateService:
 
     def _rebuild(self) -> None:
         self._identity = Identity(self.devices)
+        self._sensor_rooms = {}
         room_ids = [r["id"] for r in self.rooms]
         self._trackers = {d["id"]: RoomTracker(room_ids, self.doors) for d in self.devices}
         self.state = {k: v for k, v in self.state.items() if k in self._trackers}
@@ -198,12 +205,55 @@ class LocateService:
     def start(self) -> None:
         if self._unsub is None and self._bluetooth():
             self._unsub = async_track_time_interval(self.hass, self._tick, POLL)
+            self._unsub_sensors = self.hass.bus.async_listen(EVENT_STATE_CHANGED, self._presence_changed)
+
+    def _sensor_room(self, entity_id: str) -> str | None:
+        """The plan room of a presence sensor: its area (or its device's) linked to a room of the plan."""
+        if entity_id in self._sensor_rooms:
+            return self._sensor_rooms[entity_id]
+        room = None
+        entry = er.async_get(self.hass).async_get(entity_id)
+        area = entry.area_id if entry else None
+        if entry and not area and entry.device_id:
+            device = dr.async_get(self.hass).async_get(entry.device_id)
+            area = device.area_id if device else None
+        if area:
+            room = next((r["id"] for r in self.rooms if r.get("area_id") == area), None)
+        self._sensor_rooms[entity_id] = room
+        return room
+
+    @callback
+    def _presence_changed(self, event: Event) -> None:
+        """A motion/presence sensor turned on: Bluetooth says who, the sensor says when (see RoomTracker.confirm)."""
+        entity_id: str = event.data["entity_id"]
+        if not entity_id.startswith("binary_sensor."):
+            return
+        new = event.data.get("new_state")
+        old = event.data.get("old_state")
+        if new is None or new.state != "on" or (old is not None and old.state == "on"):
+            return
+        if new.attributes.get("device_class") not in PRESENCE_CLASSES:
+            return
+        room = self._sensor_room(entity_id)
+        if room is None:
+            return
+        now = time.time()
+        # one sensor, one person: the device that finds the room most plausible moves (the others stay)
+        for tracker in sorted(self._trackers.values(), key=lambda tr: -tr.belief.get(room, 0.0)):
+            if tracker.shown == room:
+                return
+            if tracker.confirm(room, now):
+                self._estimate(now)
+                return
 
     @callback
     def stop(self) -> None:
         if self._unsub is not None:
             self._unsub()
             self._unsub = None
+        if self._unsub_sensors is not None:
+            self._unsub_sensors()
+            self._unsub_sensors = None
         self.state = {}
         self.calibration = None
         async_dispatcher_send(self.hass, SIGNAL_LOCATE)

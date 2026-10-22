@@ -7,6 +7,8 @@ How a room is chosen, every STEP seconds per tracked device:
 3. Filter: a forward filter over the rooms - staying is likely, moving through a door to a neighbour less so, other
    jumps rare (the door graph comes from the floor plan).
 4. Hysteresis: the shown room only changes when another room leads with SWITCH_PROB for SWITCH_HOLD steps.
+5. Presence sensors: a motion/presence sensor of a room turning on moves the device there at once, when Bluetooth
+   finds that room plausible (a neighbour of the shown room, or some belief) - Bluetooth says who, the sensor when.
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ FLOOR_EPS = 0.02
 SWITCH_PROB = 0.8
 SWITCH_HOLD = 3
 AWAY_AFTER = 60.0  # seconds without any reading
+CONFIRM_PLAUSIBLE = 0.1  # belief a room needs for a presence sensor to move the device there
 
 
 Vector = dict[str, float]
@@ -130,6 +133,20 @@ class RoomTracker:
         if dst in near:
             return moving * NEIGHBOUR_SHARE / len(near)
         return moving * (1.0 - NEIGHBOUR_SHARE) / max(len(self.rooms) - 1 - len(near), 1)
+
+    def confirm(self, room: str, now: float) -> bool:
+        """A presence sensor of `room` turned on: move there at once if Bluetooth finds it plausible."""
+        if room not in self.belief or room == self.shown or self.shown is None:
+            return False
+        if self.last_seen is None or now - self.last_seen > AWAY_AFTER:
+            return False
+        if self.belief[room] < CONFIRM_PLAUSIBLE and room not in self.neighbours.get(self.shown, set()):
+            return False
+        rest = (1.0 - 0.9) / max(len(self.belief) - 1, 1)
+        self.belief = {r: 0.9 if r == room else rest for r in self.belief}
+        self.shown, self.since = room, now
+        self._streak, self._candidate = 0, None
+        return True
 
     def step(self, now: float, evidence: dict[str, float]) -> Estimate:
         if self.last_seen is None or now - self.last_seen > AWAY_AFTER:
