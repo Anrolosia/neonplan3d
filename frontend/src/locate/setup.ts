@@ -233,8 +233,13 @@ export class LocateSetup extends LitElement {
         }
       }
     }
-    if (s.area_id) {
-      const room = this.rooms.find((r) => r.area_id === s.area_id);
+    // the Home Assistant area of the scanner's device (found by name when the backend did not find it by address)
+    const deviceId =
+      s.device_id ?? Object.values(this.hass.devices ?? {}).find((d) => [d.name_by_user, d.name].some((n) => n && n.toLowerCase() === s.name.toLowerCase()))?.id ?? null;
+    const entityAreas = deviceId ? Object.values(this.hass.entities ?? {}).filter((e) => e.device_id === deviceId && e.area_id).map((e) => e.area_id!) : [];
+    const area = s.area_id ?? (deviceId ? this.hass.devices?.[deviceId]?.area_id : null) ?? entityAreas[0] ?? null;
+    if (area) {
+      const room = this.rooms.find((r) => r.area_id === area);
       if (room) return room.id;
     }
     const plain = (text: string) =>

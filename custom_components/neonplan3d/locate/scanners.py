@@ -62,6 +62,45 @@ class ScanReader:
         return out
 
 
+def _neighbour_macs(mac: str) -> list[str]:
+    """An ESP32's Bluetooth address is its Wi-Fi address plus 2 (Shelly, ESPHome): try the address and its
+    neighbours, the device registry knows the Wi-Fi one."""
+    try:
+        value = int(mac.replace(":", ""), 16)
+    except ValueError:
+        return [mac]
+    out = []
+    for delta in (0, -2, -1, 1, 2, -3, 3):
+        v = (value + delta) % (1 << 48)
+        out.append(":".join(f"{(v >> s) & 0xFF:02x}" for s in range(40, -1, -8)))
+    return out
+
+
+def _scanner_device(registry: dr.DeviceRegistry, scanner: Any) -> dr.DeviceEntry | None:
+    for mac in _neighbour_macs(scanner.source.lower()):
+        for kind in (dr.CONNECTION_NETWORK_MAC, dr.CONNECTION_BLUETOOTH):
+            if device := registry.async_get_device(connections={(kind, mac)}):
+                return device
+    # by name: a Shelly scanner is named after its device ("Herd (08:92:…)")
+    name = scanner.name.split(" (")[0].strip().lower()
+    matches = [d for d in registry.devices.values() if name and name in (_lower(d.name_by_user), _lower(d.name))]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _lower(text: str | None) -> str:
+    return (text or "").lower()
+
+
+def _device_area(hass: HomeAssistant, device: dr.DeviceEntry) -> str | None:
+    """The device's area, else the area most of its entities are in."""
+    if device.area_id:
+        return device.area_id
+    from homeassistant.helpers import entity_registry as er
+
+    areas = [e.area_id for e in er.async_entries_for_device(er.async_get(hass), device.id) if e.area_id]
+    return max(set(areas), key=areas.count) if areas else None
+
+
 def scanner_list(hass: HomeAssistant) -> list[dict[str, Any]]:
     """The scanners Home Assistant knows, with their Home Assistant device (for placing them in the plan)."""
     try:
@@ -71,10 +110,7 @@ def scanner_list(hass: HomeAssistant) -> list[dict[str, Any]]:
     registry = dr.async_get(hass)
     out = []
     for scanner in bluetooth.async_current_scanners(hass):
-        mac = scanner.source.lower()
-        device = registry.async_get_device(connections={(dr.CONNECTION_NETWORK_MAC, mac)}) or registry.async_get_device(
-            connections={(dr.CONNECTION_BLUETOOTH, mac)}
-        )
+        device = _scanner_device(registry, scanner)
         out.append(
             {
                 "source": scanner.source,
@@ -85,7 +121,7 @@ def scanner_list(hass: HomeAssistant) -> list[dict[str, Any]]:
                 if "ESPHome" in type(scanner).__name__
                 else "other",
                 "device_id": device.id if device else None,
-                "area_id": device.area_id if device else None,
+                "area_id": _device_area(hass, device) if device else None,
                 "scanning": bool(getattr(scanner, "scanning", True)),
             }
         )
