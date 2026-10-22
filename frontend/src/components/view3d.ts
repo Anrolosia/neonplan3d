@@ -2484,6 +2484,8 @@ export class Fp3dView3d extends LitElement {
     const consumers: Consumer[] = [];
     const screens = new Map<string, ScreenState>();
     const targets = new Map<string, string>();
+    // devices placed on their own keep their pin; two pieces of furniture on one entity (a copy) each get theirs, like lamps (#688)
+    const placed = new Set(taken);
     // Haushalt Pro: what is due now, for the glass card
     const household = hasFeature("household");
     const today: HouseholdItem[] = [];
@@ -2688,7 +2690,7 @@ export class Fp3dView3d extends LitElement {
           const picture = live && kindOf(st.entity_id) === "media" ? ((st.attributes.entity_picture as string | undefined) ?? null) : null;
           if (color) screens.set(f.id, { color, level: st.state === "playing" ? 1 : 0.6, picture, ring: ringed && hasFeature("sound") && st.state === "playing" });
         }
-        if (taken.has(id)) continue;
+        if (placed.has(id)) continue;
         taken.add(id);
         const kind = link.entity ? kindOf(link.entity) : null;
         const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));

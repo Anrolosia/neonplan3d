@@ -15,6 +15,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Fire tablets found more reliably:** "Auto" now also picks the Tablet level on the Fire HD 10 Plus (model codes with five letters, such as KFTRPWI).
 - The glowing link lines of the holograms drop their blur filter on the Tablet level, like the other glows.
 
+### Fixed
+
+- **Awnings without a marker** (#688, thanks @fammastrodaiuto): a copied awning keeps its pin (two pieces of furniture on one entity each get one, like lamps), and a new awning over a terrace or garden area finds that area's awning cover by itself (never a roller blind).
+
 ## 1.25.1
 
 ### New
