@@ -205,6 +205,35 @@ export type ScenePiece =
       flow: number;
       /** Its width against an energy cable's (1 … 3; a pipe is wider). */
       width?: number;
+      /**
+       * "flow" (default): a glowing cable with comets like the energy cables. "pipe": a solid pipe in its colour with
+       * a dark edge, readable on bright floors, with a soft light running along it while it flows.
+       */
+      look?: "flow" | "pipe";
+      /** "house": shown only in the house view (hidden while a floor is opened); "all" (default): always. */
+      views?: "all" | "house";
+    }
+  | {
+      /**
+       * A round symbol marker on a piece of furniture, like the device markers (a technical device's symbol). A tap opens
+       * the module's card `card` (unfolds it and flies there).
+       */
+      kind: "marker";
+      id: string;
+      floorId: string;
+      furnitureId: string;
+      /** A 24 × 24 line icon as an SVG path (stroke drawn); without one the `text` alone shows. */
+      path?: string;
+      /** The short state under the symbol ("heizt", "3,8 kW"). */
+      text?: string;
+      name: string;
+      /** The colour (0..1) of its glow while active. */
+      color?: [number, number, number];
+      active?: boolean;
+      /** The id of the module's card a tap opens. */
+      card?: string;
+      /** Height of the marker above the floor (m; default the item's top). */
+      y?: number;
     }
   | {
       /** A see-through surface over an area (floor coordinates; y above the floor): a tint on a room's floor, soil under a lawn. */
@@ -215,6 +244,8 @@ export type ScenePiece =
       color: [number, number, number];
       /** 0 (invisible) … 1 (covering). */
       opacity: number;
+      /** Adds light instead of tinting: the surface glows (a heated floor), drawn like light on the floor. */
+      glow?: boolean;
     }
   | {
       /** A small label floating at a point (floor coordinates): a value and what it is. */
@@ -242,6 +273,19 @@ export interface CardRow {
   color?: string;
   /** Where the value sits on its scale (a marker on a bar), 0..100. */
   at?: number;
+  /** A filled bar up to `at` instead of a marker (a tank's temperature). */
+  fill?: boolean;
+  /** Less important: left out on the tablet level and on narrow screens. */
+  minor?: boolean;
+}
+
+/** A small value with its label (a cell of a card's grid, a step of its chain). */
+export interface CardCell {
+  label: string;
+  value: string;
+  color?: string;
+  /** Less important: left out on the tablet level and on narrow screens. */
+  minor?: boolean;
 }
 
 export interface CardButton {
@@ -262,17 +306,27 @@ export interface ModuleCard {
   title: string;
   /** What is live now ("heizt", "Pumpe läuft"); shown in the head. */
   live?: string;
-  /** The big number and its colour, and a smaller line beside it. */
-  main?: { text: string; color?: string; sub?: string };
+  /** The live text's colour (a state in plain words: heating orange, a fault red). */
+  liveColor?: string;
+  /** A state line under the head, larger than the live text: an icon, the state in plain words, since when. */
+  status?: { icon?: string; text: string; since?: string; color?: string };
+  /** The big number and its colour, and a smaller line beside it; `side` a second value beside it (a COP and its grade). */
+  main?: { text: string; color?: string; sub?: string; side?: { text: string; sub?: string; color?: string } };
+  /** A chain of values with arrows between them (source → device → supply / return), and a note under it. */
+  chain?: { items: CardCell[]; note?: string; noteColor?: string };
   rows?: CardRow[];
+  /** Small values in a grid of cells (today's figures). */
+  cells?: CardCell[];
+  /** A highlighted hint (something worth a look). */
+  hint?: { text: string; color?: string };
   /** Plain lines under the rows. */
   lines?: string[];
   /** Groups of chips (ball valves, the six-way valve's positions). */
   chips?: { title: string; items: CardButton[] }[];
   /** The buttons at the bottom (−/+, on/off, open/close …). */
   buttons?: CardButton[];
-  /** A small curve under the rows (the last hours), oldest value first. */
-  spark?: { values: number[]; color?: string };
+  /** A small curve under the rows (the last hours), oldest value first, with a caption. */
+  spark?: { values: number[]; color?: string; label?: string; minor?: boolean };
 }
 
 /** A warning a module raises; the host shows it like its own (banner, pulsing rooms). */

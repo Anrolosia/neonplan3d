@@ -233,6 +233,10 @@ export interface FlowPiece {
   color: [number, number, number];
   /** Width against a cable's (1; a module's pipe may be wider). */
   width?: number;
+  /** A module's pipe: solid in its colour with a dark edge (readable on bright floors), a soft light running along it. */
+  pipe?: boolean;
+  /** Shown only in the house view (hidden while a floor is opened). */
+  house?: boolean;
 }
 
 /** A see-through surface over an area of a floor (floor coordinates): a module's tint on a room, soil under a lawn. */
@@ -242,6 +246,8 @@ export interface PatchPiece {
   y: number;
   color: [number, number, number];
   opacity: number;
+  /** Adds light instead of tinting (a heated floor glowing warm). */
+  glow?: boolean;
 }
 
 /** A lit TV or monitor screen: colour of the running app and brightness (0..1). */
@@ -358,6 +364,9 @@ const FLOW_FRAME_MS = 33;
 /** Cable core and the soft glow around it (m). */
 // thin cables with a faint halo: the moving light dots show the flow, not the cable
 const CABLE_WIDTH = 0.028;
+/** A module's pipe: the core's width (times the line's width) and its dark edge on either side (m). */
+const PIPE_CORE = 0.026;
+const PIPE_EDGE = 0.012;
 const CABLE_HALO = 0.09;
 const LAMP_BODY = 0x2a3a60;
 const FAN_BLADE = 0x22314f;
@@ -403,7 +412,11 @@ interface FloorMaterials {
   /** Pool water: see-through, so the basin shows below it. */
   water: MeshBasicMaterial;
   flow: MeshBasicMaterial;
+  /** A module's solid pipes (not added light: they keep their colour on a bright floor). */
+  pipeLine: MeshBasicMaterial;
   patch: MeshBasicMaterial;
+  /** A module's surfaces that add light (a heated floor glowing warm). */
+  patchGlow: MeshBasicMaterial;
   /** Energie Pro: the living overlay of the solar fields on this floor (garden, walls). */
   solarLive: MeshBasicMaterial;
   lamps: MeshBasicMaterial;
@@ -434,6 +447,10 @@ interface FloorView {
   glassMesh: Mesh;
   blindsMesh: Mesh;
   flowMesh: Mesh;
+  /** A module's solid pipes: always, and those shown only in the house view. */
+  pipeLineMesh: Mesh;
+  pipeHouseMesh: Mesh;
+  pipeLineSig: string;
   /** The living solar overlay of this floor's fields, if it has any. */
   solarMesh: Mesh | null;
   solarLive: SolarLive | null;
@@ -453,6 +470,7 @@ interface FloorView {
   pipeSig: string;
   /** A module's see-through surfaces (see PatchPiece). */
   patchMesh: Mesh;
+  patchGlowMesh: Mesh;
   patchSig: string;
   /** Triangle ranges of lamps (entity ids), furniture walls mesh and openings, for tapping. */
   lampTris: { id: string; start: number; end: number }[];
@@ -867,6 +885,7 @@ export class FloorplanViewer {
     this.floorId = floorId;
     this.roomId = null;
     this.labelsDirty = true;
+    this.applyHouseLines();
     this.applyTargets(!animate);
     this.applyHighlight();
     this.fit(animate ? 700 : 0);
@@ -1179,24 +1198,29 @@ export class FloorplanViewer {
     const sig = JSON.stringify(mine);
     if (sig === fv.patchSig) return;
     fv.patchSig = sig;
-    const p: number[] = [];
-    const c: number[] = [];
-    for (const t of mine) {
-      const a = Math.min(1, t.opacity);
-      for (const tri of triangulate(t.points)) {
-        for (const i of tri) {
-          p.push(t.points[i][0], t.y, t.points[i][1]);
-          c.push(t.color[0], t.color[1], t.color[2], a);
+    for (const glow of [false, true]) {
+      const p: number[] = [];
+      const c: number[] = [];
+      for (const t of mine) {
+        if (!!t.glow !== glow) continue;
+        const a = Math.min(1, t.opacity);
+        for (const tri of triangulate(t.points)) {
+          for (const i of tri) {
+            p.push(t.points[i][0], t.y, t.points[i][1]);
+            c.push(t.color[0], t.color[1], t.color[2], a);
+          }
         }
       }
+      const mesh = glow ? fv.patchGlowMesh : fv.patchMesh;
+      const g = new Geometry();
+      g.setAttribute("position", new Float32BufferAttribute(p, 3));
+      g.setAttribute("color", new Float32BufferAttribute(c, 4));
+      mesh.geometry.dispose();
+      mesh.geometry = g;
+      mesh.visible = p.length > 0;
     }
-    const g = new Geometry();
-    g.setAttribute("position", new Float32BufferAttribute(p, 3));
-    g.setAttribute("color", new Float32BufferAttribute(c, 4));
-    fv.patchMesh.geometry.dispose();
-    fv.patchMesh.geometry = g;
-    fv.patchMesh.visible = p.length > 0;
   }
+
 
   private buildPipes(fv: FloorView): void {
     const mine = this.pipes.filter((t) => t.floorId === fv.floor.id);
@@ -2134,8 +2158,10 @@ export class FloorplanViewer {
       blinds: themed(makeFoldable(new MeshBasicMaterial({ map: this.blindTexture, vertexColors: true, side: DoubleSide }), mask), this.themeUniform),
       water: themed(new MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false, side: DoubleSide }), this.themeUniform),
       flow: flowMaterial(this.flowTime),
+      pipeLine: pipeLineMaterial(this.flowTime),
       // a module's surfaces: colour and opacity per vertex, over the floor without hiding what stands on it
       patch: new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
+      patchGlow: new MeshBasicMaterial({ vertexColors: true, transparent: true, blending: AdditiveBlending, depthWrite: false, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
       solarLive: solarLiveMaterial(this.flowTime),
       lamps: themed(new MeshBasicMaterial({ vertexColors: true }), this.themeUniform),
       halos: new PointsMaterial({
@@ -2221,12 +2247,22 @@ export class FloorplanViewer {
       const patchMesh = new Mesh(new Geometry(), materials.patch);
       patchMesh.visible = false;
       patchMesh.renderOrder = 3;
+      const patchGlowMesh = new Mesh(new Geometry(), materials.patchGlow);
+      patchGlowMesh.visible = false;
+      patchGlowMesh.renderOrder = 3;
       const screenMesh = new Mesh(new Geometry(), materials.screens);
       screenMesh.visible = false;
       screenMesh.renderOrder = 5;
       const flowMesh = new Mesh(new Geometry(), materials.flow);
       flowMesh.renderOrder = 5;
       flowMesh.frustumCulled = false;
+      const pipeLineMesh = new Mesh(new Geometry(), materials.pipeLine);
+      const pipeHouseMesh = new Mesh(new Geometry(), materials.pipeLine);
+      for (const m of [pipeLineMesh, pipeHouseMesh]) {
+        m.renderOrder = 4;
+        m.frustumCulled = false;
+        m.visible = false;
+      }
       // the living overlay of the garden and wall fields
       const solarLive = buildSolarLive(garden, floor.elevation);
       const solarMesh = solarLive ? new Mesh(solarLive.geometry, materials.solarLive) : null;
@@ -2262,6 +2298,8 @@ export class FloorplanViewer {
         blindsMesh,
         glassMesh,
         flowMesh,
+        pipeLineMesh,
+        pipeHouseMesh,
         lampMesh,
         sunMesh,
         haloMesh,
@@ -2270,6 +2308,7 @@ export class FloorplanViewer {
         fridgeMesh,
         pipeMesh,
         patchMesh,
+        patchGlowMesh,
         screenMesh,
         glassWalls,
         ...(solarMesh ? [solarMesh] : []),
@@ -2326,6 +2365,9 @@ export class FloorplanViewer {
         glassMesh,
         blindsMesh,
         flowMesh,
+        pipeLineMesh,
+        pipeHouseMesh,
+        pipeLineSig: "",
         solarMesh,
         solarLive,
         lampMesh,
@@ -2338,6 +2380,7 @@ export class FloorplanViewer {
         pipeMesh,
         pipeSig: "",
         patchMesh,
+        patchGlowMesh,
         patchSig: "",
         lampTris: [],
         coneTris: [],
@@ -3433,8 +3476,9 @@ export class FloorplanViewer {
 
   /** Energy cables of a floor as flat glowing ribbons (vertical pieces as two crossed ribbons). */
   private buildFlows(fv: FloorView): void {
+    this.buildPipeLines(fv);
     const layout = this.flows
-      .filter((f) => f.floorId === fv.floor.id)
+      .filter((f) => f.floorId === fv.floor.id && !f.pipe)
       .map(flowKey)
       .join(";");
     const p: number[] = [];
@@ -3443,7 +3487,7 @@ export class FloorplanViewer {
     const sp: number[] = [];
     const off: number[] = [];
     for (const f of this.flows) {
-      if (f.floorId !== fv.floor.id) continue;
+      if (f.floorId !== fv.floor.id || f.pipe) continue;
       const phase = this.flowPhase.get(flowKey(f)) ?? { speed: flowSpeed(f.power), offset: 0 };
       const level = f.power > 0.5 ? Math.min(1, 0.5 + f.power / 2500) : 0.22;
       const col = f.color.map((v) => v * level);
@@ -3509,6 +3553,85 @@ export class FloorplanViewer {
     fv.flowMesh.geometry.dispose();
     fv.flowMesh.geometry = g;
     fv.flowMesh.visible = p.length > 0;
+  }
+
+  /**
+   * A module's pipes: a dark edge under a solid core in the pipe's colour (normal blending, so a bright floor does not
+   * wash them out); the light running along them is a soft brightening of the core. Pipes shown only in the house
+   * view go into a mesh of their own, hidden while a floor is opened.
+   */
+  private buildPipeLines(fv: FloorView): void {
+    const mine = this.flows.filter((f) => f.floorId === fv.floor.id && f.pipe);
+    const sig = JSON.stringify(mine.map((f) => [f.a, f.b, f.dist, f.color, f.width, f.house, Math.round(f.power / 50), this.flowPhase.get(flowKey(f))?.speed ?? 0]));
+    if (sig === fv.pipeLineSig) return;
+    fv.pipeLineSig = sig;
+    for (const house of [false, true]) {
+      const p: number[] = [];
+      const c: number[] = [];
+      const uv: number[] = [];
+      const sp: number[] = [];
+      const off: number[] = [];
+      for (const f of mine) {
+        if (!!f.house !== house) continue;
+        const len = Math.hypot(f.b[0] - f.a[0], f.b[1] - f.a[1], f.b[2] - f.a[2]);
+        if (len < 1e-4) continue;
+        const phase = this.flowPhase.get(flowKey(f)) ?? { speed: flowSpeed(f.power), offset: 0 };
+        const dir = [(f.b[0] - f.a[0]) / len, (f.b[1] - f.a[1]) / len, (f.b[2] - f.a[2]) / len];
+        const sides: number[][] = [];
+        if (Math.abs(dir[1]) < 0.5) {
+          const l = Math.hypot(dir[0], dir[2]) || 1;
+          sides.push([-dir[2] / l, 0, dir[0] / l]);
+        } else sides.push([1, 0, 0], [0, 0, 1]);
+        const core = PIPE_CORE * (f.width ?? 1);
+        // resting: the pipe stays in its colour, a little darker
+        const level = f.power > 0.5 ? 1 : 0.62;
+        const layers: [number, number[], number, number][] = [
+          // the dark edge (uv.y 2..3 marks it: no light runs on it)
+          [core + PIPE_EDGE * 2, [0.02, 0.025, 0.05], 0.78, 2],
+          [core, f.color.map((v) => v * level), 1, 0],
+        ];
+        for (const [width, col, alpha, v0] of layers) {
+          for (const n of sides) {
+            const h = width / 2;
+            const lift = v0 === 0 ? 0.002 : 0;
+            const v = (q: number[], k: number) => [q[0] + n[0] * h * k, q[1] + n[1] * h * k + lift, q[2] + n[2] * h * k];
+            const quad = [
+              [v(f.a, -1), f.dist, v0],
+              [v(f.b, -1), f.dist + len, v0],
+              [v(f.b, 1), f.dist + len, v0 + 1],
+              [v(f.a, 1), f.dist, v0 + 1],
+            ] as const;
+            for (const i of [0, 1, 2, 0, 2, 3]) {
+              const [pos, u, w] = quad[i];
+              p.push(pos[0], pos[1], pos[2]);
+              c.push(col[0], col[1], col[2], alpha);
+              uv.push(u, w);
+              sp.push(phase.speed);
+              off.push(phase.offset);
+            }
+          }
+        }
+      }
+      const mesh = house ? fv.pipeHouseMesh : fv.pipeLineMesh;
+      const g = new Geometry();
+      g.setAttribute("position", new Float32BufferAttribute(p, 3));
+      g.setAttribute("color", new Float32BufferAttribute(c, 4));
+      g.setAttribute("uv", new Float32BufferAttribute(uv, 2));
+      g.setAttribute("flowSpeed", new Float32BufferAttribute(sp, 1));
+      g.setAttribute("flowOffset", new Float32BufferAttribute(off, 1));
+      mesh.geometry.dispose();
+      mesh.geometry = g;
+      mesh.userData.filled = p.length > 0;
+    }
+    this.applyHouseLines(fv);
+  }
+
+  /** Pipes shown only in the house view: hidden while a floor is opened. */
+  private applyHouseLines(only?: FloorView): void {
+    for (const fv of only ? [only] : this.floors) {
+      fv.pipeLineMesh.visible = !!fv.pipeLineMesh.userData.filled;
+      fv.pipeHouseMesh.visible = !!fv.pipeHouseMesh.userData.filled && this.floorId === null;
+    }
   }
 
   private buildOpenings(fv: FloorView): void {
@@ -4918,6 +5041,36 @@ function flowKey(f: FlowPiece): string {
 /** Stripe speed (m/s): still at 0 W, faster with more power (square root, so 2 kW is not 20 × 100 W). */
 function flowSpeed(power: number): number {
   return power > 0.5 ? Math.min(2.4, 0.3 + Math.sqrt(power) / 28) : 0;
+}
+
+/**
+ * A module's solid pipe (uv.x = metres along it, uv.y = across: 0..1 the core, 2..3 its dark edge): shaded like a
+ * tube, a soft brightening running along the core while it flows (the direction from a to b).
+ */
+function pipeLineMaterial(time: { value: number }): MeshBasicMaterial {
+  const m = new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+  m.onBeforeCompile = (shader) => {
+    shader.uniforms.uFlowTime = time;
+    shader.vertexShader = shader.vertexShader
+      .replace("#include <common>", "#include <common>\nattribute float flowSpeed;\nattribute float flowOffset;\nvarying float vFlowSpeed;\nvarying float vFlowOffset;\nvarying vec2 vFlowUv;")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvFlowSpeed = flowSpeed;\nvFlowOffset = flowOffset;\nvFlowUv = uv;");
+    shader.fragmentShader = shader.fragmentShader
+      .replace("#include <common>", "#include <common>\nuniform float uFlowTime;\nvarying float vFlowSpeed;\nvarying float vFlowOffset;\nvarying vec2 vFlowUv;")
+      .replace(
+        "#include <color_fragment>",
+        `#include <color_fragment>
+        float fp3dCore = step(vFlowUv.y, 1.5);
+        float fp3dAcross = 1.0 - abs(fract(vFlowUv.y) * 2.0 - 1.0);
+        float fp3dMoving = step(0.001, abs(vFlowSpeed));
+        // one soft swell of light every 0.8 m, rising slowly and falling fast: the way the water goes
+        float fp3dPhase = fract((vFlowUv.x - uFlowTime * abs(vFlowSpeed) - vFlowOffset) * 1.25);
+        float fp3dSwell = pow(fp3dPhase, 3.0) * fp3dMoving * fp3dCore;
+        diffuseColor.rgb *= mix(1.0, 0.72 + 0.4 * fp3dAcross, fp3dCore);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0, 0.97, 0.9), 0.38 * fp3dSwell * fp3dAcross);`,
+      );
+  };
+  m.customProgramCacheKey = () => "fp3d-pipe-line";
+  return m;
 }
 
 /** Glowing cable with stripes running along it (uv.x = metres along the cable, uv.y = across). */

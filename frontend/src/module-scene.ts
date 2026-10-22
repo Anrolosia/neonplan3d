@@ -16,6 +16,10 @@ export interface LineFlow {
   power: number;
   color: Rgb;
   width?: number;
+  /** Drawn as a solid pipe with a dark edge instead of a glowing cable. */
+  pipe?: boolean;
+  /** Shown only in the house view (hidden while a floor is opened). */
+  house?: boolean;
 }
 
 /** The points of a small curve through the values in a box of w × h (SVG coordinates, the lowest value at the bottom). */
@@ -63,9 +67,29 @@ export function lineFlows(lines: readonly Line[]): LineFlow[] {
       const len = lens[i - 1];
       if (len < 0.005) continue;
       const color = perPoint ? colorAt([l.colors[i - 1], l.colors[i]], 0.5) : colorAt(l.colors, (dist + len / 2) / total);
-      out.push({ floorId: l.floorId, a: [...pts[i - 1]], b: [...pts[i]], dist, power: Math.max(0, l.flow), color, ...(l.width ? { width: Math.min(3, Math.max(0.5, l.width)) } : {}) });
+      out.push({
+        floorId: l.floorId,
+        a: [...pts[i - 1]],
+        b: [...pts[i]],
+        dist,
+        power: Math.max(0, l.flow),
+        color,
+        ...(l.width ? { width: Math.min(3, Math.max(0.5, l.width)) } : {}),
+        ...(l.look === "pipe" ? { pipe: true } : {}),
+        ...(l.views === "house" ? { house: true } : {}),
+      });
       dist += len;
     }
   }
   return out;
+}
+
+/** A module marker's icon: its path when it is a plain SVG path (letters, digits, signs), else none. */
+export function markerPath(path: string | undefined): string | null {
+  return path && path.length < 2000 && /^[MmLlHhVvCcSsQqTtAaZz0-9 .,-]+$/.test(path) ? path : null;
+}
+
+/** A card's parts without the minor ones (the tablet level, a narrow screen). */
+export function majorOnly<T extends { minor?: boolean }>(items: readonly T[] | undefined, compact: boolean): T[] {
+  return (items ?? []).filter((i) => !compact || !i.minor);
 }

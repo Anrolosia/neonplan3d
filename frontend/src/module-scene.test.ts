@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { lineFlows, sparkPoints } from "./module-scene.ts";
+import { lineFlows, majorOnly, markerPath, sparkPoints } from "./module-scene.ts";
 
 const red: [number, number, number] = [1, 0, 0];
 const blue: [number, number, number] = [0, 0, 1];
@@ -42,4 +42,26 @@ test("a line may be wider than a cable (kept within 0.5 … 3)", () => {
   const [huge] = lineFlows([{ kind: "line", floorId: "eg", points: [[0, 0, 0], [1, 0, 0]], colors: [red], flow: 0, width: 9 }]);
   assert.equal(huge.width, 3);
   assert.equal("width" in lineFlows([{ kind: "line", floorId: "eg", points: [[0, 0, 0], [1, 0, 0]], colors: [red], flow: 0 }])[0], false);
+});
+
+test("a pipe keeps its look and its views; a cable has neither", () => {
+  const [pipe] = lineFlows([{ kind: "line", floorId: "eg", points: [[0, 0, 0], [1, 0, 0]], colors: [red], flow: 300, look: "pipe", views: "house" }]);
+  assert.equal(pipe.pipe, true);
+  assert.equal(pipe.house, true);
+  const [cable] = lineFlows([{ kind: "line", floorId: "eg", points: [[0, 0, 0], [1, 0, 0]], colors: [red], flow: 300 }]);
+  assert.equal(cable.pipe, undefined);
+  assert.equal(cable.house, undefined);
+});
+
+test("a marker's path is taken only when it is a plain SVG path", () => {
+  assert.equal(markerPath("M4 4h16v16H4z"), "M4 4h16v16H4z");
+  assert.equal(markerPath('M4 4"/><script>'), null);
+  assert.equal(markerPath(undefined), null);
+});
+
+test("compact cards leave the minor parts out", () => {
+  const rows = [{ label: "a" }, { label: "b", minor: true }];
+  assert.deepEqual(majorOnly(rows, false).map((r) => r.label), ["a", "b"]);
+  assert.deepEqual(majorOnly(rows, true).map((r) => r.label), ["a"]);
+  assert.deepEqual(majorOnly(undefined, true), []);
 });

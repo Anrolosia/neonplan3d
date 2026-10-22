@@ -107,7 +107,7 @@ import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../f
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { anyModule, moduleAlerts, moduleCards, modulePools, moduleScene, moduleVoice, moduleWatched, syncModules, type ModuleCard, type ModuleHost, type ScenePiece, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
-import { lineFlows, sparkPoints } from "../module-scene.ts";
+import { lineFlows, majorOnly, markerPath, sparkPoints } from "../module-scene.ts";
 import { generateWalls, openingHost, placeWallPlate, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { signedArea } from "../model.ts";
 import { coverPositionable, lightAbilities } from "./quick-menu.ts";
@@ -374,6 +374,9 @@ export class Fp3dView3d extends LitElement {
   private holoFolded = new Set<number>();
   /** Media cards folded by the user, by player (positions shift as players start and stop). */
   private mediaFolded = new Set<string>();
+  /** A module card just opened from its marker (it lights up for a moment). */
+  private cardPing: string | null = null;
+  private cardPingTimer: ReturnType<typeof setTimeout> | undefined;
   /** Klang & Kino: the last card of each player and until when it may stand in for a short dropout. */
   private mediaGrace = new Map<string, { until: number; card: HoloCard; source: SoundSource; anchor: Parameters<FloorplanViewer["setAnchors"]>[0][number] }>();
   private mediaGraceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -1080,7 +1083,11 @@ export class Fp3dView3d extends LitElement {
         glow: null,
         pin: true,
       })),
+      // a module's symbol on its furniture (a technical device it shows); a tap opens the module's card
+      ...this.moduleMarkers(b),
     ]);
+    // a tap on the item itself does what a tap on its module marker does
+    for (const m of this.scene) if (m.kind === "marker" && m.card && !furniture.targets.has(m.furnitureId)) furniture.targets.set(m.furnitureId, `module:${m.id}`);
     v.setTrail(trail, this.replay ? this.robotPaths(hass, b) : []);
     v.setPickTargets(furniture.targets, this.openingTargets());
     v.setScreens(furniture.screens);
@@ -1448,7 +1455,7 @@ export class Fp3dView3d extends LitElement {
     const lines = this.scene.filter((p): p is Extract<ScenePiece, { kind: "line" }> => p.kind === "line");
     v.setFlows(this.dimmed ? energyFlows : [...energyFlows, ...pool.flows, ...lineFlows(lines)]);
     v.setPipes(pool.tubes);
-    v.setPatches(this.scene.filter((p): p is Extract<ScenePiece, { kind: "patch" }> => p.kind === "patch").map((p) => ({ floorId: p.floorId, points: p.points, y: p.y, color: p.color, opacity: this.dimmed ? p.opacity * 0.4 : p.opacity })));
+    v.setPatches(this.scene.filter((p): p is Extract<ScenePiece, { kind: "patch" }> => p.kind === "patch").map((p) => ({ floorId: p.floorId, points: p.points, y: p.y, color: p.color, opacity: this.dimmed ? p.opacity * 0.4 : p.opacity, ...(p.glow ? { glow: true } : {}) })));
     const persons = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
     v.setPersons(persons);
     const counts = floorCounts(hass, b, this.openingLinks!, persons);
@@ -1988,21 +1995,50 @@ export class Fp3dView3d extends LitElement {
       this.requestUpdate();
     };
     const styled = (color?: string) => (color ? `color:${color}` : "");
+    // the tablet level and narrow screens leave the minor parts out
+    const compact = this._low || this.clientWidth < 600;
+    const rows = majorOnly(m.rows, compact);
+    const cells = majorOnly(m.cells, compact);
+    const chain = m.chain ? majorOnly(m.chain.items, compact) : [];
+    const spark = m.spark && m.spark.values.length > 1 && !(compact && m.spark.minor) ? m.spark : null;
+    const wide = !!(m.chain || m.cells?.length || m.status);
     return html`<svg class="fp3d-holo-link" data-holo=${index} hidden aria-hidden="true"><line x1="0" y1="0" x2="0" y2="0" /><circle cx="0" cy="0" r="3" /></svg>
-      <div class="fp3d-holo fp3d-holo-dev fp3d-holo-mod ${open ? "" : "fp3d-holo-min"} ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="group" aria-label=${m.title}>
+      <div class="fp3d-holo fp3d-holo-dev fp3d-holo-mod ${wide ? "fp3d-holo-mod-wide" : ""} ${this.cardPing === m.id ? "fp3d-holo-ping" : ""} ${open ? "" : "fp3d-holo-min"} ${this._low ? "fp3d-holo-plain" : ""}" data-holo=${index} hidden role="group" aria-label=${m.title}>
         <div class="fp3d-holo-sheen"></div>
         <div class="fp3d-holo-scan"></div>
         <div class="fp3d-holo-body">
-          <div class="fp3d-holo-head" role="button" tabindex="0" @click=${toggle}><span>${m.icon} ${m.title}</span><span class="fp3d-holo-live">${m.live ?? ""}</span></div>
-          ${m.main ? html`<div class="fp3d-holo-car-main"><b style=${styled(m.main.color)}>${m.main.text}</b><span>${m.main.sub ?? ""}</span></div>` : nothing}
+          <div class="fp3d-holo-head" role="button" tabindex="0" @click=${toggle}><span>${m.icon} ${m.title}</span><span class="fp3d-holo-live" style=${styled(m.liveColor)}>${m.live ?? ""}</span></div>
+          ${m.status
+            ? html`<div class="fp3d-holo-status" style=${m.status.color ? `--st:${m.status.color}` : ""}>
+                ${m.status.icon ? html`<i>${m.status.icon}</i>` : nothing}<b>${m.status.text}</b>${m.status.since ? html`<span>${m.status.since}</span>` : nothing}
+              </div>`
+            : nothing}
+          ${m.main
+            ? html`<div class="fp3d-holo-car-main fp3d-holo-mod-main">
+                <b style=${styled(m.main.color)}>${m.main.text}</b><span>${m.main.sub ?? ""}</span>
+                ${m.main.side ? html`<em style=${styled(m.main.side.color)}><b>${m.main.side.text}</b>${m.main.side.sub ? html`<small>${m.main.side.sub}</small>` : nothing}</em>` : nothing}
+              </div>`
+            : nothing}
+          ${open && chain.length
+            ? html`<div class="fp3d-holo-chain">
+                  ${chain.map((c, i) => html`${i ? html`<s>→</s>` : nothing}<div><small>${c.label}</small><b style=${styled(c.color)}>${c.value}</b></div>`)}
+                </div>
+                ${m.chain!.note ? html`<div class="fp3d-holo-chain-note" style=${styled(m.chain!.noteColor)}>${m.chain!.note}</div>` : nothing}`
+            : nothing}
           ${open
-            ? (m.rows ?? []).map(
+            ? rows.map(
                 (r) =>
-                  html`<div class="fp3d-holo-mrow"><span>${r.label}</span><b style=${styled(r.color)}>${r.value}</b>${r.at !== undefined ? html`<i><em style="left:${r.at}%;background:${r.color ?? "#37e0ff"};color:${r.color ?? "#37e0ff"}"></em></i>` : html`<i class="fp3d-holo-mrow-none"></i>`}</div>`,
+                  html`<div class="fp3d-holo-mrow"><span>${r.label}</span><b style=${styled(r.color)}>${r.value}</b>${r.at !== undefined
+                      ? r.fill
+                        ? html`<i class="fp3d-holo-mrow-fill"><s style="width:${r.at}%;background:${r.color ?? "#37e0ff"}"></s></i>`
+                        : html`<i><em style="left:${r.at}%;background:${r.color ?? "#37e0ff"};color:${r.color ?? "#37e0ff"}"></em></i>`
+                      : html`<i class="fp3d-holo-mrow-none"></i>`}</div>`,
               )
             : nothing}
+          ${open && cells.length ? html`<div class="fp3d-holo-cells">${cells.map((c) => html`<div><small>${c.label}</small><b style=${styled(c.color)}>${c.value}</b></div>`)}</div>` : nothing}
+          ${open && m.hint ? html`<div class="fp3d-holo-hint" style=${m.hint.color ? `--hint:${m.hint.color}` : ""}>${m.hint.text}</div>` : nothing}
           ${open ? (m.lines ?? []).map((l) => html`<div class="fp3d-holo-mline">${l}</div>`) : nothing}
-          ${open && (m.spark?.values.length ?? 0) > 1 ? sparkLine(m.spark!.values, m.spark!.color ?? "#ffb347") : nothing}
+          ${open && spark ? html`${spark.label ? html`<div class="fp3d-holo-spark-label">${spark.label}</div>` : nothing}${sparkLine(spark.values, spark.color ?? "#ffb347")}` : nothing}
           ${open && m.chips?.length
             ? html`<div class="fp3d-holo-chips">
                 ${m.chips.map(
@@ -2684,7 +2720,7 @@ export class Fp3dView3d extends LitElement {
           if (heating) {
             const gap = a && typeof a.temperature === "number" && typeof a.current_temperature === "number" ? a.temperature - a.current_temperature : 1;
             screens.set(f.id, { color: [1, 0.42, 0.1], level: Math.min(1, 0.45 + 0.25 * Math.max(0, gap)) });
-          }
+          } else if (glows.has(f.id)) screens.delete(f.id); // its own thermostat says it does not heat: a module's glow does not overrule it
         } else if (f.type === "ac_unit" && st && kindOf(st.entity_id) === "climate") {
           const glow = climateModeGlow(st);
           if (glow) screens.set(f.id, glow);
@@ -4720,9 +4756,59 @@ export class Fp3dView3d extends LitElement {
       ></fp3d-quick-menu>`;
   }
 
+  /** A module's markers as device pins: its symbol on the item, its state under it. */
+  private moduleMarkers(b: Building): DeviceMarker[] {
+    const out: DeviceMarker[] = [];
+    for (const m of this.scene) {
+      if (m.kind !== "marker") continue;
+      const floor = b.floors.find((f) => f.id === m.floorId);
+      const f = floor?.furniture.find((x) => x.id === m.furnitureId);
+      if (!floor || !f) continue;
+      const path = markerPath(m.path);
+      out.push({
+        id: `module:${m.id}`,
+        floorId: floor.id,
+        roomId: floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points))?.id ?? null,
+        x: f.x,
+        z: f.z,
+        y: m.y ?? mountBase(floor, f) + f.h * 0.6,
+        icon: path ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"/></svg>` : "",
+        name: m.name,
+        text: m.text ?? "",
+        active: !!m.active && !this.dimmed,
+        unavailable: false,
+        glow: m.color && m.active && !this.dimmed ? { color: m.color, level: 1 } : null,
+        pin: true,
+        full: true,
+        furnitureId: f.id,
+      });
+    }
+    return out;
+  }
+
+  /** A module marker tapped: its card unfolds and lights up for a moment, the view flies to the item. */
+  private openModuleCard(markerId: string): void {
+    const m = this.scene.find((p): p is Extract<ScenePiece, { kind: "marker" }> => p.kind === "marker" && p.id === markerId);
+    if (!m) return;
+    if (m.card) {
+      this.mediaFolded.delete(m.card);
+      this.cardPing = m.card;
+      clearTimeout(this.cardPingTimer);
+      this.cardPingTimer = setTimeout(() => {
+        this.cardPing = null;
+        this.requestUpdate();
+      }, 2600);
+      this.requestUpdate();
+    }
+    const floor = this.building?.floors.find((f) => f.id === m.floorId);
+    const f = floor?.furniture.find((x) => x.id === m.furnitureId);
+    if (floor && f) this.viewer?.focus(floor.id, f.x, f.z, mountBase(floor, f) + f.h * 0.6, `module:${m.id}`);
+  }
+
   private onDeviceTap(entityId: string, x = 0, y = 0): void {
     // trail pins and lamps without a light are drawn, but nothing of Home Assistant stands behind them
     if (entityId.startsWith("trail:") || entityId.startsWith("lamp:")) return;
+    if (entityId.startsWith("module:")) return this.openModuleCard(entityId.slice(7));
     if (entityId.startsWith("opening:")) return this.onOpeningTap(entityId.slice(8), x, y, false);
     // a wall switch or socket: one entity is switched right away, several open the frame's menu
     if (entityId.startsWith("gangs:")) {
@@ -6361,6 +6447,133 @@ export class Fp3dView3d extends LitElement {
         margin-top: 5px;
         font-size: 12px;
         opacity: 0.85;
+      }
+      /* a module's richer card: a state line, a second big value, a chain, cells, a hint */
+      .fp3d-holo.fp3d-holo-mod-wide {
+        width: 236px;
+        /* a denser card: darker glass, so its many small values stay readable over a bright room */
+        background: linear-gradient(140deg, rgba(40, 80, 130, 0.62) 0%, rgba(12, 28, 58, 0.78) 55%, rgba(8, 18, 40, 0.82) 100%);
+      }
+      .fp3d-holo-mod-wide .fp3d-holo-mrow {
+        grid-template-columns: 74px 78px 1fr;
+      }
+      .fp3d-holo-ping {
+        box-shadow:
+          0 0 0 2px var(--fp3d-accent, #37e0ff),
+          0 0 26px rgba(55, 224, 255, 0.55);
+      }
+      .fp3d-holo-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 6px;
+        padding: 4px 8px;
+        border-radius: 9px;
+        font-size: 13.5px;
+        color: var(--st, #37e0ff);
+        background: color-mix(in srgb, var(--st, #37e0ff) 14%, transparent);
+        border: 1px solid color-mix(in srgb, var(--st, #37e0ff) 45%, transparent);
+      }
+      .fp3d-holo-status i {
+        font-style: normal;
+      }
+      .fp3d-holo-status span {
+        margin-left: auto;
+        font-size: 11px;
+        color: inherit;
+        opacity: 0.8;
+        white-space: nowrap;
+      }
+      .fp3d-holo-mod-main em {
+        margin-left: auto;
+        display: grid;
+        justify-items: end;
+        font-style: normal;
+        line-height: 1.1;
+      }
+      .fp3d-holo-mod-main em b {
+        font-size: 18px;
+      }
+      .fp3d-holo-mod-main em small {
+        font-size: 10.5px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .fp3d-holo-chain {
+        display: flex;
+        align-items: stretch;
+        gap: 3px;
+        margin-top: 7px;
+      }
+      .fp3d-holo-chain > div,
+      .fp3d-holo-cells > div {
+        flex: 1;
+        min-width: 0;
+        display: grid;
+        padding: 3px 5px;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(160, 240, 255, 0.16);
+      }
+      .fp3d-holo-chain small,
+      .fp3d-holo-cells small {
+        font-size: 10px;
+        opacity: 0.75;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .fp3d-holo-chain b,
+      .fp3d-holo-cells b {
+        font-size: 12.5px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .fp3d-holo-chain s {
+        align-self: center;
+        text-decoration: none;
+        opacity: 0.6;
+        font-size: 11px;
+      }
+      .fp3d-holo-chain-note {
+        margin-top: 3px;
+        font-size: 11px;
+        text-align: right;
+        opacity: 0.9;
+      }
+      .fp3d-holo-cells {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        margin-top: 7px;
+      }
+      .fp3d-holo-hint {
+        margin-top: 6px;
+        padding: 4px 7px;
+        border-radius: 7px;
+        font-size: 11.5px;
+        color: var(--hint, #ffc04d);
+        background: color-mix(in srgb, var(--hint, #ffc04d) 13%, transparent);
+        border-left: 3px solid var(--hint, #ffc04d);
+      }
+      .fp3d-holo-mrow-fill {
+        background: rgba(160, 240, 255, 0.14) !important;
+        overflow: hidden;
+      }
+      .fp3d-holo-mrow-fill s {
+        display: block;
+        height: 100%;
+        border-radius: 2px;
+        box-shadow: 0 0 6px currentColor;
+      }
+      .fp3d-holo-spark-label {
+        margin-top: 6px;
+        font-size: 10.5px;
+        opacity: 0.7;
+      }
+      .fp3d-holo-spark-label + .fp3d-holo-spark {
+        margin-top: 1px;
       }
       .fp3d-holo-spark {
         display: block;
