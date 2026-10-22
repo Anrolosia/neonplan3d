@@ -20,7 +20,7 @@ import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts
 import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
 import { hasFeature, labOn, registerUrl, released, UNRELEASED } from "./features.ts";
-import { personsShown, setPersonsShown } from "./presence.ts";
+import { personLook, setPersonLook } from "./presence.ts";
 import { mountLocateLab } from "./locate-lab.ts";
 import { directorOnHere } from "./director.ts";
 import { loadVoice, micProbeDone, screenName, voiceOnHere } from "./load-voice.ts";
@@ -599,15 +599,15 @@ export class Floorplan3dPanel extends LitElement {
               ${released("locate")
                 ? html`<div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("persons")}>
                     <span class="fp3d-seg-label">${this.t("persons")}</span>
-                    ${[true, false].map(
-                      (on) => html`<button
-                        aria-pressed=${personsShown() === on}
+                    ${(["figure", "pin", "off"] as const).map(
+                      (look) => html`<button
+                        aria-pressed=${personLook() === look}
                         @click=${() => {
-                          setPersonsShown(on);
+                          setPersonLook(look);
                           this.requestUpdate();
                         }}
                       >
-                        ${this.t(on ? "persons_on" : "persons_off")}
+                        ${this.t(`persons_${look}`)}
                       </button>`,
                     )}
                   </div>`

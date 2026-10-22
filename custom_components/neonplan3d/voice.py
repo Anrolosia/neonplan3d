@@ -275,6 +275,25 @@ class VoiceSettings:
                 out[language] = _sha(text)
         return out
 
+    async def async_refresh(self) -> None:
+        """After an update: the sentence files an admin picked get the sentences of this version (a file the user
+        changed stays as it is). Nothing happens while the sentences are off."""
+        if self.sentences == "off" or not self.written:
+            return
+        try:
+            hashes, _kept, changed = await self.hass.async_add_executor_job(
+                write_sentences, Path(self.hass.config.config_dir), self.sentences, self.written
+            )
+        except OSError:
+            _LOGGER.warning("Could not refresh the Assist sentences", exc_info=True)
+            return
+        if not changed:
+            return
+        self.written = hashes
+        await self._store.async_save({"sentences": self.sentences, "written": hashes})
+        if self.hass.services.has_service("conversation", "reload"):
+            await self.hass.services.async_call("conversation", "reload", {}, blocking=False)
+
     async def async_set_sentences(self, mode: str) -> list[str]:
         """An admin picked the sentences: writes (or removes) the files, Assist reloads them. Returns the
         languages whose file was left alone because the user changed it."""
@@ -394,6 +413,7 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
     settings = VoiceSettings(hass)
     await settings.async_load()
     hass.data[DATA_VOICE] = settings
+    await settings.async_refresh()
 
 
 def async_unload_voice(hass: HomeAssistant) -> None:

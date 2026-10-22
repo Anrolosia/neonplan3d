@@ -763,6 +763,65 @@ data:
 - Die Erkennung übernimmt **deine** Assist-Pipeline. Wie schnell und genau sie ist, hängt von ihr ab. Mit Speech-to-Phrase oder der Cloud dauert ein Satz meist ein bis zwei Sekunden.
 - Hast du die Live-Regie an, unterbricht sie dich nicht, während du sprichst.
 
+### 5.11 Ortung (neu)
+
+> **Neu in 1.27, kostenlos.** Wer und was ist wo im Haus – ohne Bermuda, ohne ESPresense, ohne neue Hardware. NeonPlan nutzt die Bluetooth-Empfänger, die Home Assistant schon kennt.
+
+NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein Schlüsselbund liegt. Personen stehen als leuchtende Figur im Raum und gleiten beim Raumwechsel hinüber. Für jedes Gerät gibt es einen Sensor in Home Assistant („Torstens Uhr Raum: Küche“), und per Sprache fragst du „Wo ist mein iPhone?“.
+
+**Was du brauchst:**
+
+- **Bluetooth-Empfänger in Home Assistant** – was du schon hast, reicht:
+  - **Shelly** der 2. und 3. Generation (Steckdosen, Unterputz). Im Shelly-Gerät unter **Konfigurieren → Bluetooth-Scan** auf **passiv** stellen.
+  - **ESPHome-Bluetooth-Proxys** (ein ESP32 für ein paar Euro). Sie melden häufiger als Shellys, Raumwechsel kommen damit schneller an.
+  - den Bluetooth-Stick am Home-Assistant-Rechner.
+
+  Ideal ist ungefähr ein Empfänger pro Raum. Räume ohne eigenen Empfänger (Flur, Gäste-WC) erkennt NeonPlan trotzdem: Das Einlernen merkt sich, wie sie für die Empfänger in den Nachbarräumen aussehen.
+- **Etwas, das du dabei hast:**
+  - **Apple Watch und iPhone** mit ihrem Schlüssel (IRK) als „Private BLE Device“ in Home Assistant. Die Uhr am Handgelenk ist ideal: Ein iPhone in der Tasche wird bei dunklem Bildschirm nach etwa einer Minute still.
+  - **Android-Handys:** In der Home-Assistant-App unter **Einstellungen → Companion-App → Sensoren verwalten → BLE-Sender** einschalten. Kein Schlüssel nötig.
+  - **Schlüsselanhänger** mit fester Adresse oder als iBeacon (z. B. Nut, Tile, iBeacon-Tags). **AirTags gehen nicht** – sie wechseln ihre Adresse, und Apple gibt keinen Schlüssel heraus.
+
+**Einrichten** (Editor → ganz unten **📡 Ortung → Ortung einrichten**, nur Admins):
+
+1. **Empfänger:** NeonPlan listet alle Bluetooth-Empfänger von Home Assistant und schlägt ihren Raum vor – aus dem Home-Assistant-Bereich des Geräts, aus einem Pin oder Möbel im Plan (die Waschmaschine mit dem Strommesser der Shelly-Steckdose) oder aus dem Namen („PC Büro Steckdose“). Nach dem Einlernen weiß NeonPlan aus den Signalen selbst, wo jeder Empfänger steht, und bietet bei Abweichungen **„Signal sagt: … – übernehmen“** an.
+2. **Geräte:** Uhr und iPhone mit einem Tipp aus „Private BLE Device“ übernehmen, Android-Handys und Anhänger über **Gerät in der Nähe suchen** (das Gerät direkt an einen Empfänger halten). Gib jedem Gerät einen Namen, ordne es einer Person zu und – für „Lass mein iPhone klingeln“ – die Home-Assistant-App des Handys.
+3. **Einlernen:** Geh in jeden Raum, tippe ihn an und lauf **90 Sekunden** langsam herum, auch in die Ecken und an den Wänden entlang. Nimm alle Geräte mit. Der Countdown läuft mit, bei 0 ist der Raum fertig (✓). Danach zeigt **Trefferquote prüfen**, wie sicher jeder Raum erkannt wird. Einen schwachen Raum lernst du einfach noch einmal ein.
+4. **Live:** Ortung einschalten und durchs Haus gehen – die Liste zeigt sofort, wo NeonPlan dich sieht.
+
+**In der 3D-Ansicht:**
+
+- Personen stehen als **leuchtende Figur** in ihrer Farbe im Raum, mit dem Namen darüber. Dinge (Schlüssel, ein iPhone ohne Person) sind kleine runde Symbole. Antippen zeigt Raum, Sicherheit und seit wann.
+- Im **⚙-Menü** der Ansicht: **Personen → Figur, Pin oder aus** – pro Gerät, ein Wandtablet im Flur kann sie also ausblenden.
+- Das **Raumfenster** zeigt unter dem Namen, wer gerade hier ist, und die Etagen zählen die Personen mit.
+- **Personen nur für Admins zeigen** (im Schritt Live) blendet sie für alle anderen Benutzer aus.
+
+**Schneller mit Präsenzmeldern:** Bewegungs- und Präsenzmelder (auch Radar wie Aqara FP2), die in Home Assistant einem Bereich zugeordnet sind, beschleunigen die Ortung von selbst: Bluetooth sagt, **wer** es ist, der Melder sagt, **wann** jemand den Raum betritt. Ohne Melder dauert ein Raumwechsel zwei bis fünf Sekunden – mit Melder oft nur einen Augenblick.
+
+**Sprache** (mit den Assist-Sätzen unter **⚙ Einstellungen → Sprachsteuerung**): „Wo ist mein iPhone?“, „Wo ist Torsten?“, „Wer ist zu Hause?“, „Lass mein iPhone klingeln“. Die Antwort kommt direkt aus Home Assistant – auch ohne offenen NeonPlan-Bildschirm. Klingeln schickt eine laute Mitteilung an die Home-Assistant-App (auf dem iPhone als kritische Mitteilung, die auch im Lautlos-Modus klingelt).
+
+**Für Automationen:** Jedes Gerät hat einen Sensor, z. B. `sensor.torstens_uhr_raum`. Sein Zustand ist der Raumname; die Attribute sind `room_id`, `area_id` (der Home-Assistant-Bereich des Raums), `floor`, `probability` (Sicherheit 0–1), `since` und `last_seen`. Beispiel – Licht folgt dir:
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: sensor.torstens_uhr_raum
+    to: Küche
+actions:
+  - action: light.turn_on
+    target:
+      area_id: kueche
+```
+
+**Gut zu wissen:**
+
+- **Raumgenau, nicht zentimetergenau.** Bluetooth schwankt (schon der eigene Körper dämpft das Signal). NeonPlan sagt zuverlässig den Raum, nicht die Stelle im Raum.
+- **Alles bleibt im Haus.** Die Signale werden nur in Home Assistant ausgewertet, nichts geht ins Internet.
+- **Neu einlernen**, wenn du Empfänger umstellst oder neue dazukommen.
+- **Von Bermuda umsteigen:** Beide können parallel laufen, sie stören sich nicht. Deine Schlüssel aus „Private BLE Device“ übernimmt NeonPlan direkt. Wenn NeonPlan bei dir sicher läuft, stellst du deine Automationen auf die neuen Sensoren um und kannst Bermuda entfernen.
+
+**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** Wer Bermuda oder „Private BLE Device“ schon nutzt, hat ihn und ist fertig. Sonst gibt es zwei einfache Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein), oder mit einem **ESP32**, auf den man kurz ein kleines Programm zum Auslesen spielt (z. B. „irk-capture“), mit dem sich das iPhone koppelt. Den Schlüssel trägst du dann in Home Assistant unter **Einstellungen → Geräte & Dienste → Integration hinzufügen → Private BLE Device** ein – NeonPlan zeigt das Gerät danach im Schritt Geräte an.
+
 ---
 
 ## 6. Pro-Erweiterungen

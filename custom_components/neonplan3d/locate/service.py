@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
 
-from .engine import STEP, Fingerprints, RoomTracker, nearest_scores
+from .engine import AWAY_AFTER, STEP, THING_AWAY_AFTER, Fingerprints, RoomTracker, nearest_scores
 from .identity import Identity, ibeacon_key
 from .scanners import ScanReader, scanner_list
 
@@ -121,7 +121,10 @@ class LocateService:
         self._identity = Identity(self.devices)
         self._sensor_rooms = {}
         room_ids = [r["id"] for r in self.rooms]
-        self._trackers = {d["id"]: RoomTracker(room_ids, self.doors) for d in self.devices}
+        self._trackers = {
+            d["id"]: RoomTracker(room_ids, self.doors, AWAY_AFTER if d.get("person") else THING_AWAY_AFTER)
+            for d in self.devices
+        }
         self.state = {k: v for k, v in self.state.items() if k in self._trackers}
 
     # ------------------------------------------------------------------ config

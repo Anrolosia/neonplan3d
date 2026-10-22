@@ -103,3 +103,14 @@ def test_presence_sensor_moves_to_a_plausible_room_at_once() -> None:
     # the hall is the neighbour: its sensor moves the device at once
     assert tracker.confirm("hall", t)
     assert tracker.shown == "hall"
+
+
+def test_a_quiet_device_keeps_its_last_room() -> None:
+    rng = random.Random(5)
+    fp = calibrated(rng)
+    tracker = engine.RoomTracker(list(PROFILE), DOORS, away_after=engine.THING_AWAY_AFTER)
+    _shown, t = walk(tracker, fp, [("living", 15)], rng)
+    later = t + 600  # a phone in a drawer for ten minutes
+    est = tracker.step(later, fp.scores(tracker.window(later)))
+    assert est.room == "living"
+    assert est.last_seen == t or est.last_seen <= t

@@ -126,7 +126,7 @@ import { pipePieces, poolAreas, poolNodeAt, poolWallNormal, underBasin, PIPE_IDL
 import type { PipeTube } from "../viewer/viewer3d.ts";
 import type { PoolPiece } from "../viewer/pool-water.ts";
 import { lowSyncDelay } from "../viewer/pace.ts";
-import { floorCounts, floorInfoText, locatedPersons, personsInRooms, personsShown } from "../presence.ts";
+import { floorCounts, floorInfoText, locatedPersons, personLook, personsInRooms, personsShown } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HassEntity, HomeAssistant } from "../types.ts";
 import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../diagnostics.ts";
@@ -1463,6 +1463,7 @@ export class Fp3dView3d extends LitElement {
     v.setPatches(this.scene.filter((p): p is Extract<ScenePiece, { kind: "patch" }> => p.kind === "patch").map((p) => ({ floorId: p.floorId, points: p.points, y: p.y, color: p.color, opacity: this.dimmed ? p.opacity * 0.4 : p.opacity, ...(p.glow ? { glow: true } : {}) })));
     const roomSensors = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
     const persons = released("locate") && personsShown() ? [...roomSensors, ...locatedPersons(hass, b, new Set(roomSensors.map((p) => p.id)))] : roomSensors;
+    v.setPersonLook(personLook() === "pin" ? "pin" : "figure");
     v.setPersons(persons);
     const counts = floorCounts(hass, b, this.openingLinks!, persons);
     v.setFloorInfo(new Map([...counts].map(([id, c]) => [id, floorInfoText(hass, c)])));
@@ -5590,6 +5591,18 @@ export class Fp3dView3d extends LitElement {
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+      .fp3d-person-figure {
+        width: auto;
+        height: auto;
+      }
+      .fp3d-person-figure .fp3d-person-face {
+        display: none;
+      }
+      .fp3d-person-figure .fp3d-person-tag {
+        position: static;
+        display: block;
+        transform: none;
       }
       .fp3d-person-tag {
         position: absolute;

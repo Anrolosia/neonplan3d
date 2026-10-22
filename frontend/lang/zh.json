@@ -2065,5 +2065,9 @@
  "voice_sentences_kept": "{langs} 的句子文件是你自己修改的——NeonPlan 不会动它。",
  "voice_sentences_failed": "无法写入句子文件。",
  "voice_sentences_file": "只有当你在这里选择句子时，NeonPlan 才会创建文件 custom_sentences/<语言>/neonplan3d.yaml。你自己修改过的文件永远不会被覆盖；移除集成时会删除 NeonPlan 的文件。",
- "pin_standby": "待机"
+ "pin_standby": "待机",
+ "persons": "人员",
+ "persons_figure": "人形",
+ "persons_pin": "图钉",
+ "persons_off": "关"
 }

@@ -55,7 +55,9 @@ class LocateSensor(SensorEntity):
     @property
     def name(self) -> str:
         device = self._device()
-        return f"{device['name'] if device else self.device_id} Raum"
+        hass = getattr(self, "hass", None)
+        word = "Raum" if hass is not None and (hass.config.language or "").startswith("de") else "room"
+        return f"{device['name'] if device else self.device_id} {word}"
 
     @property
     def native_value(self) -> str | None:

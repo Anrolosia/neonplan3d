@@ -763,6 +763,65 @@ data:
 - Speech to text is done by **your** Assist pipeline, so how fast and accurate it is depends on that pipeline. With Speech-to-Phrase or the cloud a sentence usually takes one to two seconds.
 - If the live director is on, it does not interrupt you while you speak.
 
+### 5.11 Locating (new)
+
+> **New in 1.27, free.** Who and what is where in the house – without Bermuda, without ESPresense, without new hardware. NeonPlan uses the Bluetooth scanners Home Assistant already knows.
+
+NeonPlan shows which room you are in right now – and where your iPhone or your keys are. People stand as a glowing figure in the room and glide over when they change rooms. Every device gets a sensor in Home Assistant ("Torsten's watch room: Kitchen"), and by voice you ask "Where is my iPhone?".
+
+**What you need:**
+
+- **Bluetooth scanners in Home Assistant** – what you already have is enough:
+  - **Shelly** Gen2 and Gen3 (plugs, in-wall). In the Shelly device set **Configure → Bluetooth scanning** to **passive**.
+  - **ESPHome Bluetooth proxies** (an ESP32 for a few euros). They report more often than Shellys, so room changes arrive faster.
+  - the Bluetooth adapter of the Home Assistant machine.
+
+  About one scanner per room is ideal. Rooms without a scanner of their own (hall, guest toilet) are still recognised: learning remembers how they look to the scanners in the rooms next door.
+- **Something you carry:**
+  - **Apple Watch and iPhone** with their key (IRK) as a "Private BLE Device" in Home Assistant. The watch on the wrist is ideal: an iPhone in a pocket goes quiet about a minute after its screen turns off.
+  - **Android phones:** in the Home Assistant app switch on **Settings → Companion app → Manage sensors → BLE Transmitter**. No key needed.
+  - **Key tags** with a fixed address or as an iBeacon (e.g. Nut, Tile, iBeacon tags). **AirTags do not work** – they change their address, and Apple gives no key.
+
+**Setting up** (editor → at the bottom **📡 Locating → Set up locating**, admins only):
+
+1. **Scanners:** NeonPlan lists all Bluetooth scanners of Home Assistant and suggests their room – from the device's Home Assistant area, a pin or a piece of furniture in the plan (the washing machine with the Shelly plug's power sensor) or the name ("PC office plug"). After learning NeonPlan knows from the signals where each scanner stands and offers **"Signals say: … – use it"** when they disagree.
+2. **Devices:** take over the watch and the iPhone from "Private BLE Device" with one tap, Android phones and key tags with **Find a device nearby** (hold the device right next to a scanner). Give every device a name, a person and – for "ring my iPhone" – the phone's Home Assistant app.
+3. **Learning:** go into every room, tap it and walk around slowly for **90 seconds**, into the corners and along the walls. Carry all devices. The countdown runs; at 0 the room is done (✓). **Check accuracy** then shows how surely each room is recognised. Simply learn a weak room again.
+4. **Live:** switch locating on and walk through the house – the list shows at once where NeonPlan sees you.
+
+**In the 3D view:**
+
+- People stand as a **glowing figure** in their colour in the room, with the name above. Things (keys, an iPhone without a person) are small round symbols. A tap shows the room, the certainty and since when.
+- In the view's **⚙ menu**: **People → figure, pin or off** – per device, so a wall tablet in the hall can hide them.
+- The **room panel** shows under its name who is here now, and the floors count the people.
+- **Show people to admins only** (in the Live step) hides them from all other users.
+
+**Faster with presence sensors:** motion and presence sensors (radar like the Aqara FP2 too) that belong to an area in Home Assistant speed locating up by themselves: Bluetooth tells **who** it is, the sensor tells **when** someone enters the room. Without sensors a room change takes two to five seconds – with one often just a moment.
+
+**Voice** (with the Assist sentences under **⚙ Settings → Voice control**): "Where is my iPhone?", "Where is Torsten?", "Who is home?", "Ring my iPhone". The answer comes straight from Home Assistant – even without an open NeonPlan screen. Ringing sends a loud notification to the Home Assistant app (on an iPhone a critical alert that rings in silent mode too).
+
+**For automations:** every device has a sensor, e.g. `sensor.torstens_watch_room`. Its state is the room name; the attributes are `room_id`, `area_id` (the room's Home Assistant area), `floor`, `probability` (certainty 0–1), `since` and `last_seen`. Example – the light follows you:
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: sensor.torstens_watch_room
+    to: Kitchen
+actions:
+  - action: light.turn_on
+    target:
+      area_id: kitchen
+```
+
+**Good to know:**
+
+- **Room-level, not to the centimetre.** Bluetooth wavers (your own body damps the signal). NeonPlan reliably tells the room, not the spot in it.
+- **Everything stays in the house.** The signals are only evaluated in Home Assistant, nothing goes to the internet.
+- **Learn again** when you move scanners or add new ones.
+- **Moving from Bermuda:** both can run side by side, they do not disturb each other. NeonPlan takes your keys from "Private BLE Device" directly. Once NeonPlan works well for you, switch your automations to the new sensors and remove Bermuda.
+
+**Getting the key (IRK) of an iPhone or Apple Watch:** if you already use Bermuda or "Private BLE Device", you have it and are done. Otherwise there are two easy ways: with a **Mac** through Keychain Access (the Mac must be on the same iCloud account), or with an **ESP32** that briefly runs a small read-out program (e.g. "irk-capture") the iPhone pairs with. Then add the key in Home Assistant under **Settings → Devices & services → Add integration → Private BLE Device** – NeonPlan shows the device in the Devices step afterwards.
+
 ---
 
 ## 6. Pro add-ons

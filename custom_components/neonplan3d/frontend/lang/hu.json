@@ -2065,5 +2065,9 @@
  "voice_sentences_kept": "A(z) {langs} mondatfájlt te módosítottad – a NeonPlan nem nyúl hozzá.",
  "voice_sentences_failed": "A mondatfájlt nem sikerült írni.",
  "voice_sentences_file": "A NeonPlan csak akkor hozza létre a custom_sentences/<nyelv>/neonplan3d.yaml fájlt, ha itt mondatokat választasz. Az általad módosított fájlt sosem írja felül; az integráció eltávolításakor a NeonPlan fájlja törlődik.",
- "pin_standby": "Készenlét"
+ "pin_standby": "Készenlét",
+ "persons": "Személyek",
+ "persons_figure": "Alak",
+ "persons_pin": "Jelölő",
+ "persons_off": "ki"
 }

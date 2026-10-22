@@ -26,7 +26,8 @@ NEIGHBOUR_SHARE = 0.97  # of the moving mass that goes through doors
 FLOOR_EPS = 0.02
 SWITCH_PROB = 0.8
 SWITCH_HOLD = 3
-AWAY_AFTER = 60.0  # seconds without any reading
+AWAY_AFTER = 120.0  # seconds without any reading: a person is no longer placed
+THING_AWAY_AFTER = 6 * 3600.0  # a thing (keys, a phone lying somewhere) keeps its last room much longer
 CONFIRM_PLAUSIBLE = 0.1  # belief a room needs for a presence sensor to move the device there
 
 
@@ -96,8 +97,11 @@ class Estimate:
 class RoomTracker:
     """Readings in, a stable room out - one per tracked device."""
 
-    def __init__(self, rooms: list[str], doors: list[tuple[str, str]] | None = None) -> None:
+    def __init__(
+        self, rooms: list[str], doors: list[tuple[str, str]] | None = None, away_after: float = AWAY_AFTER
+    ) -> None:
         self.rooms = list(rooms)
+        self.away_after = away_after
         self.neighbours: dict[str, set[str]] = {r: set() for r in self.rooms}
         for a, b in doors or []:
             if a in self.neighbours and b in self.neighbours:
@@ -138,7 +142,7 @@ class RoomTracker:
         """A presence sensor of `room` turned on: move there at once if Bluetooth finds it plausible."""
         if room not in self.belief or room == self.shown or self.shown is None:
             return False
-        if self.last_seen is None or now - self.last_seen > AWAY_AFTER:
+        if self.last_seen is None or now - self.last_seen > self.away_after:
             return False
         if self.belief[room] < CONFIRM_PLAUSIBLE and room not in self.neighbours.get(self.shown, set()):
             return False
@@ -149,9 +153,12 @@ class RoomTracker:
         return True
 
     def step(self, now: float, evidence: dict[str, float]) -> Estimate:
-        if self.last_seen is None or now - self.last_seen > AWAY_AFTER:
+        if self.last_seen is None or now - self.last_seen > self.away_after:
             self.shown, self.since = None, None
             return Estimate(None, 0.0, None, self.last_seen)
+        if now - self.last_seen > WINDOW * 3 and self.shown is not None:
+            # nothing heard for a while: the last room stays (a phone in a pocket goes quiet), the belief does not move
+            return Estimate(self.shown, round(self.belief.get(self.shown, 0.0), 3), self.since, self.last_seen)
         if evidence and self.rooms:
             prior = {
                 r: self.belief[r] * STAY + sum(self.belief[o] * self._move(o, r) for o in self.rooms if o != r)

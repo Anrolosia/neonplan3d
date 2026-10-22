@@ -2065,5 +2065,9 @@
  "voice_sentences_kept": "Het zinnenbestand voor {langs} heb je zelf aangepast – NeonPlan laat het ongemoeid.",
  "voice_sentences_failed": "Het zinnenbestand kon niet worden geschreven.",
  "voice_sentences_file": "NeonPlan maakt het bestand custom_sentences/<taal>/neonplan3d.yaml pas aan als je hier zinnen kiest. Een bestand dat je zelf hebt aangepast wordt nooit overschreven; bij het verwijderen van de integratie wordt het bestand van NeonPlan gewist.",
- "pin_standby": "Stand-by"
+ "pin_standby": "Stand-by",
+ "persons": "Personen",
+ "persons_figure": "Figuur",
+ "persons_pin": "Speld",
+ "persons_off": "uit"
 }

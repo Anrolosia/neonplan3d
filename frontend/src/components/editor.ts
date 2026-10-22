@@ -11464,7 +11464,7 @@ export class Fp3dEditor extends LitElement {
   private renderLocate() {
     const de = this.hass?.language?.startsWith("de");
     return html`<section>
-      <h3>📡 ${de ? "Ortung" : "Locating"} <small class="fp3d-muted">${de ? "Labor" : "lab"}</small></h3>
+      <h3>📡 ${de ? "Ortung" : "Locating"} <small class="fp3d-muted">${de ? "neu" : "new"}</small></h3>
       <p class="fp3d-sub">${de ? "Wer und was ist wo – über die Bluetooth-Empfänger, die Home Assistant schon hat (Shelly, ESPHome)." : "Who and what is where – from the Bluetooth scanners Home Assistant already has (Shelly, ESPHome)."}</p>
       <button class="fp3d-btn" @click=${() => this.hass && void loadLocate().then((m) => m.openLocateSetup(this.hass!, this._doc))}>${de ? "Ortung einrichten" : "Set up locating"}</button>
     </section>`;

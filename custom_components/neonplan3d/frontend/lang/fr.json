@@ -2065,5 +2065,9 @@
  "voice_sentences_kept": "Tu as modifié toi-même le fichier de phrases pour {langs} – NeonPlan n'y touche pas.",
  "voice_sentences_failed": "Le fichier de phrases n'a pas pu être écrit.",
  "voice_sentences_file": "NeonPlan ne crée le fichier custom_sentences/<langue>/neonplan3d.yaml que si tu choisis des phrases ici. Un fichier que tu as modifié n'est jamais écrasé ; supprimer l'intégration efface le fichier de NeonPlan.",
- "pin_standby": "Veille"
+ "pin_standby": "Veille",
+ "persons": "Personnes",
+ "persons_figure": "Silhouette",
+ "persons_pin": "Repère",
+ "persons_off": "non"
 }

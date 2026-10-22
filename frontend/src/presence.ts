@@ -20,23 +20,31 @@ export interface PersonMarker {
   color?: string;
   entity?: string;
   tag?: string;
+  thing?: boolean;
 }
 
-/** Whether this device shows located people (⚙ menu, remembered per device; on unless switched off). */
-export function personsShown(): boolean {
+export type PersonLook = "figure" | "pin" | "off";
+
+/** How this device shows located people (⚙ menu, remembered per device): a neon figure (default), a pin, or not. */
+export function personLook(): PersonLook {
   try {
-    return localStorage.getItem("neonplan3d.persons") !== "0";
+    const v = localStorage.getItem("neonplan3d.persons");
+    return v === "pin" || v === "off" ? v : "figure";
   } catch {
-    return true;
+    return "figure";
   }
 }
 
-export function setPersonsShown(on: boolean): void {
+export function setPersonLook(look: PersonLook): void {
   try {
-    localStorage.setItem("neonplan3d.persons", on ? "1" : "0");
+    localStorage.setItem("neonplan3d.persons", look);
   } catch {
     // storage unavailable: the choice is not remembered
   }
+}
+
+export function personsShown(): boolean {
+  return personLook() !== "off";
 }
 
 /** Colours of located people: stable per person (by id), bright on the dark neon and the light looks. */
@@ -135,7 +143,7 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
     out.push({
       id,
       name,
-      initials: initials(name),
+      initials: person ? initials(name) : name.slice(0, 1).toUpperCase(),
       picture: (person?.attributes.entity_picture as string | undefined) ?? null,
       floorId: hit.floorId,
       roomId: hit.room.id,
@@ -143,7 +151,8 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
       z: cz + Math.sin(angle) * 0.75,
       color: personColor(id),
       entity: entityId,
-      tag: name.split(/\s+/)[0],
+      tag: person ? name.split(/\s+/)[0] : name,
+      thing: !person,
     });
   }
   return out;
