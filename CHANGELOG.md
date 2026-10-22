@@ -15,6 +15,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Fire tablets found more reliably:** "Auto" now also picks the Tablet level on the Fire HD 10 Plus (model codes with five letters, such as KFTRPWI).
 - The glowing link lines of the holograms drop their blur filter on the Tablet level, like the other glows.
 
+### For modules
+
+- Modules can show more in the house: lines and glowing areas on the floor, round markers, richer glass cards (state line, a second value, a row of values, small cells, filled bars, a hint), fields in a piece of furniture's form and a section of their own in the editor's module dialog. Without a module nothing changes.
+
 ### Fixed
 
 - **Awnings without a marker** (#688, thanks @fammastrodaiuto): a copied awning keeps its pin (two pieces of furniture on one entity each get one, like lamps), and a new awning over a terrace or garden area finds that area's awning cover by itself (never a roller blind).
