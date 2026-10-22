@@ -308,6 +308,12 @@ export interface PersonPin {
   roomId: string;
   x: number;
   z: number;
+  /** Ring colour of the person (default pink). */
+  color?: string;
+  /** Entity whose details a tap opens (the locating sensor: room, certainty, since when). */
+  entity?: string;
+  /** Short name under the pin (located people), none without. */
+  tag?: string;
 }
 
 export interface ViewerStats {
@@ -575,6 +581,8 @@ export class FloorplanViewer {
   private flowTimer: ReturnType<typeof setTimeout> | undefined;
   private persons: PersonPin[] = [];
   private readonly personPins = new Map<string, HTMLDivElement>();
+  /** Where each person pin is drawn now: it glides to its room instead of jumping (floor id, x, z). */
+  private readonly personAt = new Map<string, { floorId: string; x: number; z: number }>();
   private floorInfo = new Map<string, string>();
   /** Text behind the room names (the "values" heat mode: temperature, humidity, CO₂ per room). */
   private roomInfo = new Map<string, string>();
@@ -1249,28 +1257,51 @@ export class FloorplanViewer {
         pin = document.createElement("div");
         pin.className = "fp3d-person";
         pin.dataset.entity = p.id;
+        const id = p.id;
+        pin.addEventListener("pointerdown", (e) => e.stopPropagation());
+        pin.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const target = this.persons.find((x) => x.id === id);
+          if (!target?.entity) return;
+          const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+          const h = this.host.getBoundingClientRect();
+          this.options.onDeviceHold?.(target.entity, r.left + r.width / 2 - h.left, r.top + r.height / 2 - h.top);
+        });
         this.personPins.set(p.id, pin);
         this.labels.append(pin);
       }
       pin.title = p.name;
       pin.setAttribute("aria-label", p.name);
-      if (pin.dataset.picture !== (p.picture ?? "") || pin.dataset.initials !== p.initials) {
+      pin.style.setProperty("--fp3d-pc", p.color ?? "#ff5fd2");
+      pin.classList.toggle("fp3d-person-tap", !!p.entity);
+      if (pin.dataset.picture !== (p.picture ?? "") || pin.dataset.initials !== p.initials || pin.dataset.tag !== (p.tag ?? "")) {
         pin.dataset.picture = p.picture ?? "";
         pin.dataset.initials = p.initials;
+        pin.dataset.tag = p.tag ?? "";
         pin.replaceChildren();
+        const face = document.createElement("span");
+        face.className = "fp3d-person-face";
         if (p.picture) {
           const img = document.createElement("img");
           img.src = p.picture;
           img.alt = "";
           img.addEventListener("error", () => img.replaceWith(document.createTextNode(p.initials)));
-          pin.append(img);
-        } else pin.textContent = p.initials;
+          face.append(img);
+        } else face.textContent = p.initials;
+        pin.append(face);
+        if (p.tag) {
+          const tag = document.createElement("span");
+          tag.className = "fp3d-person-tag";
+          tag.textContent = p.tag;
+          pin.append(tag);
+        }
       }
     }
     for (const [id, pin] of this.personPins) {
       if (seen.has(id)) continue;
       pin.remove();
       this.personPins.delete(id);
+      this.personAt.delete(id);
     }
     this.invalidate();
   }
@@ -4846,7 +4877,19 @@ export class FloorplanViewer {
         this.place(pin, null);
         continue;
       }
-      v.set(p.x, fv.floor.elevation + fv.y + 0.9, p.z).project(this.camera);
+      // glide to the room (about a second), jump when the floor changes
+      let at = this.personAt.get(p.id);
+      if (!at || at.floorId !== p.floorId) at = { floorId: p.floorId, x: p.x, z: p.z };
+      else {
+        const dx = p.x - at.x;
+        const dz = p.z - at.z;
+        if (Math.hypot(dx, dz) > 0.02) {
+          at = { floorId: p.floorId, x: at.x + dx * 0.12, z: at.z + dz * 0.12 };
+          this.invalidate();
+        } else at = { floorId: p.floorId, x: p.x, z: p.z };
+      }
+      this.personAt.set(p.id, at);
+      v.set(at.x, fv.floor.elevation + fv.y + 0.9, at.z).project(this.camera);
       const off = v.z > 1 || Math.abs(v.x) > 1.05 || Math.abs(v.y) > 1.05;
       this.place(pin, off ? null : `translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px) translate(-50%, -50%)`);
     }

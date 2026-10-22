@@ -24,6 +24,8 @@ from homeassistant.helpers.storage import Store
 import voluptuous as vol
 
 from .const import DATA_ASK, DATA_VOICE, DOMAIN, SIGNAL_ASK, STORAGE_KEY_VOICE
+from .locate.answers import async_answer
+from .locate.service import DATA_LOCATE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,6 +67,10 @@ _DISTINCT = {
         "gute nacht",
         "guten morgen",
         "was kannst du [alles]",
+        "wo (ist|liegt|steckt) (mein|meine|meinen) {text}",
+        "wer ist [gerade] (zu hause|zuhause|daheim)",
+        "(lass|lasse) [mein|meine|meinen] {text} klingeln",
+        "finde [mein|meine|meinen] {text}",
     ],
     "en": [
         "show [me] {text}",
@@ -74,6 +80,10 @@ _DISTINCT = {
         "good night",
         "good morning",
         "what can you do",
+        "where is my {text}",
+        "who is home",
+        "ring my {text}",
+        "find my {text}",
     ],
 }
 
@@ -344,8 +354,13 @@ class AskIntentHandler(intent.IntentHandler):
         if not text:
             raise intent.InvalidSlotInfo("no sentence")
         language = (intent_obj.language or intent_obj.hass.config.language or "en").split("-")[0]
-        answer = await self.broker.ask(text, None, False)
         response = intent_obj.create_response()
+        # where people and things are: answered here, no screen needed
+        located = await async_answer(intent_obj.hass, intent_obj.hass.data.get(DATA_LOCATE), text, language)
+        if located is not None:
+            response.async_set_speech(located)
+            return response
+        answer = await self.broker.ask(text, None, False)
         if answer is None:
             response.async_set_speech(_NO_SCREEN.get(language, _NO_SCREEN["en"]))
         elif not answer["answered"]:
@@ -361,6 +376,10 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
     hass.data[DATA_ASK] = broker
 
     async def handle_ask(call: ServiceCall) -> ServiceResponse:
+        language = (hass.config.language or "en").split("-")[0]
+        located = await async_answer(hass, hass.data.get(DATA_LOCATE), call.data["text"], language)
+        if located is not None:
+            return {"answered": True, "answer": located, "screen_open": False}
         answer = await broker.ask(call.data["text"], call.data.get("screen"), call.data["speak"])
         if answer is None:
             return {"answered": False, "answer": "", "screen_open": False}

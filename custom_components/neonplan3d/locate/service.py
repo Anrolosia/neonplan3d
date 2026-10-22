@@ -48,6 +48,7 @@ def _clean_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "key": str(d.get("key", ""))[:64],
                 "person": d.get("person") if isinstance(d.get("person"), str) else None,
                 "icon": str(d.get("icon") or "")[:40] or None,
+                "notify": d.get("notify") if isinstance(d.get("notify"), str) else None,
             }
         )
     return out

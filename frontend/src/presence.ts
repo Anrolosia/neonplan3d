@@ -16,6 +16,36 @@ export interface PersonMarker {
   roomId: string;
   x: number;
   z: number;
+  /** Located people: their own colour, the sensor a tap opens, and the short name under the pin. */
+  color?: string;
+  entity?: string;
+  tag?: string;
+}
+
+/** Whether this device shows located people (⚙ menu, remembered per device; on unless switched off). */
+export function personsShown(): boolean {
+  try {
+    return localStorage.getItem("neonplan3d.persons") !== "0";
+  } catch {
+    return true;
+  }
+}
+
+export function setPersonsShown(on: boolean): void {
+  try {
+    localStorage.setItem("neonplan3d.persons", on ? "1" : "0");
+  } catch {
+    // storage unavailable: the choice is not remembered
+  }
+}
+
+/** Colours of located people: stable per person (by id), bright on the dark neon and the light looks. */
+const PERSON_COLORS = ["#ff5fd2", "#37e0ff", "#ffb84d", "#7dff8a", "#b18cff", "#ff7a6b", "#4dd2c0", "#f5e663"];
+
+export function personColor(id: string): string {
+  let h = 0;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return PERSON_COLORS[h % PERSON_COLORS.length];
 }
 
 const norm = (s: string) => s.toLowerCase().replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
@@ -111,6 +141,9 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
       roomId: hit.room.id,
       x: cx + Math.cos(angle) * 0.75,
       z: cz + Math.sin(angle) * 0.75,
+      color: personColor(id),
+      entity: entityId,
+      tag: name.split(/\s+/)[0],
     });
   }
   return out;
