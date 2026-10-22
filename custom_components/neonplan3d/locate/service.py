@@ -168,7 +168,26 @@ class LocateService:
             "bluetooth": self._bluetooth(),
             "private_ble": private,
             "samples": {dev: {room: len(v) for room, v in fp.samples.items()} for dev, fp in self.fingerprints.items()},
+            "scanner_hints": self.scanner_hints(),
         }
+
+    def scanner_hints(self) -> dict[str, str]:
+        """Where each scanner probably stands, from the calibration walk: the room in which it heard the devices
+        loudest (it must have heard them in at least half of that room's samples)."""
+        per: dict[str, dict[str, list[float]]] = {}
+        counts: dict[str, int] = {}
+        for fp in self.fingerprints.values():
+            for room, vectors in fp.samples.items():
+                counts[room] = counts.get(room, 0) + len(vectors)
+                for vec in vectors:
+                    for scanner, rssi in vec.items():
+                        per.setdefault(scanner, {}).setdefault(room, []).append(rssi)
+        hints: dict[str, str] = {}
+        for scanner, rooms in per.items():
+            heard = {r: v for r, v in rooms.items() if len(v) >= counts.get(r, 0) / 2}
+            if heard:
+                hints[scanner] = max(heard, key=lambda r: sum(heard[r]) / len(heard[r]))
+        return hints
 
     def _bluetooth(self) -> bool:
         return "bluetooth" in self.hass.config.components

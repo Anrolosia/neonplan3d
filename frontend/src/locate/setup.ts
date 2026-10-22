@@ -31,6 +31,7 @@ interface Config {
   bluetooth: boolean;
   private_ble: { title: string; key: string }[];
   samples: Record<string, Record<string, number>>;
+  scanner_hints: Record<string, string>;
 }
 interface Nearby {
   address: string;
@@ -58,6 +59,7 @@ const DE = {
   no_bt: "Home Assistant hat kein Bluetooth eingerichtet. Shelly (Gen2/3: Bluetooth-Scan passiv), ESPHome-Bluetooth-Proxys oder ein USB-Stick genügen.",
   scanners_intro: "Das sind alle Bluetooth-Empfänger, die Home Assistant kennt. Sag bei jedem, in welchem Raum er steht.",
   not_placed: "– Raum wählen –",
+  hint_room: "Signal sagt: {room} – übernehmen",
   coverage: "Räume ohne eigenen Empfänger – das Einlernen macht sie trotzdem erkennbar:",
   devices_intro: "Welche Geräte sollen geortet werden? Am besten das, was du immer dabei hast – die Uhr am Handgelenk ist ideal.",
   known_keys: "iPhone und Apple Watch mit Schlüssel (aus „Private BLE Device“ in Home Assistant):",
@@ -94,6 +96,7 @@ const EN: typeof DE = {
   no_bt: "Home Assistant has no Bluetooth set up. Shelly (Gen2/3: Bluetooth scanning passive), ESPHome Bluetooth proxies or a USB adapter will do.",
   scanners_intro: "These are all Bluetooth scanners Home Assistant knows. Tell NeonPlan which room each one is in.",
   not_placed: "– pick a room –",
+  hint_room: "Signals say: {room} – use it",
   coverage: "Rooms without a scanner of their own – learning makes them recognisable anyway:",
   devices_intro: "Which devices should be located? Best what you always carry – a watch on the wrist is ideal.",
   known_keys: "iPhone and Apple Watch with a key (from \"Private BLE Device\" in Home Assistant):",
@@ -200,7 +203,7 @@ export class LocateSetup extends LitElement {
     let guessed = false;
     for (const s of cfg.scanners) {
       if (rooms[s.source]) continue;
-      const guess = this.guessRoom(s);
+      const guess = this.guessRoom(s) ?? cfg.scanner_hints?.[s.source] ?? null;
       if (guess) {
         rooms[s.source] = guess;
         guessed = true;
@@ -210,18 +213,43 @@ export class LocateSetup extends LitElement {
     if (guessed) await this.save({ scanner_rooms: rooms });
   }
 
+  /**
+   * The room a scanner most likely stands in: a pin or a piece of furniture of its device in the plan (a Shelly's
+   * switch, the washing machine with the plug's power sensor), its Home Assistant area, or a room named in its name
+   * ("PC Büro Steckdose", "bluetooth-proxy-kueche"). After the calibration walk the signals tell as well (backend).
+   */
   private guessRoom(s: Scanner): string | null {
+    const ofDevice = (entity: unknown) => typeof entity === "string" && !!s.device_id && this.hass.entities?.[entity]?.device_id === s.device_id;
     if (s.device_id) {
       for (const f of this.building.floors) {
         for (const p of f.placements) {
-          if (this.hass.entities?.[p.entity_id]?.device_id === s.device_id) {
-            const room = roomAt(this.building, f.id, p.x, p.z);
-            if (room) return room;
-          }
+          const room = ofDevice(p.entity_id) ? roomAt(this.building, f.id, p.x, p.z) : null;
+          if (room) return room;
+        }
+        for (const m of f.furniture) {
+          if (!Object.values(m).some(ofDevice)) continue;
+          const room = roomAt(this.building, f.id, m.x, m.z);
+          if (room) return room;
         }
       }
     }
-    if (s.area_id) return this.rooms.find((r) => r.area_id === s.area_id)?.id ?? null;
+    if (s.area_id) {
+      const room = this.rooms.find((r) => r.area_id === s.area_id);
+      if (room) return room.id;
+    }
+    const plain = (text: string) =>
+      text
+        .toLowerCase()
+        .replace(/ä/g, "ae")
+        .replace(/ö/g, "oe")
+        .replace(/ü/g, "ue")
+        .replace(/ß/g, "ss")
+        .replace(/[^a-z0-9]+/g, " ");
+    const name = ` ${plain(s.name)} `;
+    const hits = this.rooms.filter((r) => plain(r.name).trim().length >= 3 && name.includes(plain(r.name).trim()));
+    // the longest name wins ("badezimmer" over "bad"); a name on two floors is no answer
+    hits.sort((a, b) => plain(b.name).length - plain(a.name).length);
+    if (hits.length && hits.filter((r) => plain(r.name) === plain(hits[0].name)).length === 1) return hits[0].id;
     return null;
   }
 
@@ -313,6 +341,11 @@ export class LocateSetup extends LitElement {
               else delete next[s.source];
               void this.save({ scanner_rooms: next });
             })}
+            ${cfg.scanner_hints?.[s.source] && cfg.scanner_hints[s.source] !== cfg.scanner_rooms[s.source]
+              ? html`<button class="ghost" @click=${() => void this.save({ scanner_rooms: { ...cfg.scanner_rooms, [s.source]: cfg.scanner_hints[s.source] } })}>
+                  ${this.tr(t.hint_room, { room: this.rooms.find((r) => r.id === cfg.scanner_hints[s.source])?.name ?? "" })}
+                </button>`
+              : nothing}
           </li>`,
         )}
       </ul>
