@@ -28,6 +28,7 @@ SWITCH_PROB = 0.8
 SWITCH_HOLD = 3
 AWAY_AFTER = 120.0  # seconds without any reading: a person is no longer placed
 THING_AWAY_AFTER = 6 * 3600.0  # a thing (keys, a phone lying somewhere) keeps its last room much longer
+UNLEARNED_DISTANCE = 9.5  # dB: farther than this from every learned sample, the device is in a room not learned yet
 CONFIRM_PLAUSIBLE = 0.1  # belief a room needs for a presence sensor to move the device there
 
 
@@ -61,6 +62,10 @@ class Fingerprints:
     def rooms(self) -> list[str]:
         return [r for r, s in self.samples.items() if s]
 
+    def nearest(self, vector: Vector) -> float:
+        """Distance to the closest learned sample (inf without samples)."""
+        return min((distance(vector, v) for vs in self.samples.values() for v in vs), default=math.inf)
+
     def scores(self, vector: Vector, k: int = K) -> dict[str, float]:
         """Room -> share of the weighted votes of the k nearest samples (empty without samples)."""
         best: list[tuple[float, str]] = []
@@ -84,6 +89,17 @@ def nearest_scores(vector: Vector, scanner_rooms: dict[str, str]) -> dict[str, f
         scores[room] = scores.get(room, 0.0) + (0.7, 0.2, 0.1)[rank]
     total = sum(scores.values())
     return {r: v / total for r, v in scores.items()}
+
+
+def evidence(fp: Fingerprints | None, vector: Vector, scanner_rooms: dict[str, str]) -> dict[str, float]:
+    """Room scores for a window: the learned fingerprints; where nothing learned is near (a room not learned yet,
+    upstairs say), the placed scanners of the rooms not learned; without any learning the nearest scanner."""
+    if fp is None or len(fp.rooms()) < 2:
+        return nearest_scores(vector, scanner_rooms)
+    if fp.nearest(vector) <= UNLEARNED_DISTANCE:
+        return fp.scores(vector)
+    learned = set(fp.rooms())
+    return nearest_scores(vector, {s: r for s, r in scanner_rooms.items() if r not in learned})
 
 
 @dataclass

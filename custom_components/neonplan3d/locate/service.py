@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
 
-from .engine import AWAY_AFTER, STEP, THING_AWAY_AFTER, Fingerprints, RoomTracker, nearest_scores
+from .engine import AWAY_AFTER, STEP, THING_AWAY_AFTER, Fingerprints, RoomTracker, evidence
 from .identity import Identity, ibeacon_key
 from .scanners import ScanReader, scanner_list
 
@@ -339,9 +339,7 @@ class LocateService:
         names = {r["id"]: r for r in self.rooms}
         for dev, tracker in self._trackers.items():
             window = tracker.window(now)
-            fp = self.fingerprints.get(dev)
-            evidence = fp.scores(window) if fp and len(fp.rooms()) >= 2 else nearest_scores(window, self.scanner_rooms)
-            est = tracker.step(now, evidence)
+            est = tracker.step(now, evidence(self.fingerprints.get(dev), window, self.scanner_rooms))
             room = names.get(est.room) if est.room else None
             new = {
                 "room": est.room,

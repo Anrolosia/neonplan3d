@@ -114,3 +114,17 @@ def test_a_quiet_device_keeps_its_last_room() -> None:
     est = tracker.step(later, fp.scores(tracker.window(later)))
     assert est.room == "living"
     assert est.last_seen == t or est.last_seen <= t
+
+
+def test_a_room_not_learned_yet_comes_from_its_scanner() -> None:
+    rng = random.Random(6)
+    fp = calibrated(rng)
+    del fp.samples["living"]  # the living room was never learned
+    rooms = {"s_kitchen": "kitchen", "s_living": "living"}
+    # far from every learned sample: the living room's own scanner speaks
+    far = {"s_kitchen": -95.0, "s_living": -55.0}
+    assert fp.nearest(far) > engine.UNLEARNED_DISTANCE
+    assert max(engine.evidence(fp, far, rooms).items(), key=lambda kv: kv[1])[0] == "living"
+    # close to the kitchen: the fingerprints decide
+    near = {"s_kitchen": -60.0, "s_living": -88.0}
+    assert max(engine.evidence(fp, near, rooms).items(), key=lambda kv: kv[1])[0] == "kitchen"
