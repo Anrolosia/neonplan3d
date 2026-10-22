@@ -154,6 +154,8 @@ export interface ModuleHost {
   newId?(prefix: string): string;
   /** Where a pool's water stands and where its floor lies (floor coordinates), null for an area that is no pool. */
   waterLevel?(floorId: string, areaId: string): { y: number; floorY: number | null } | null;
+  /** The height of the ground at a point outside (floor coordinates: a lawn's surface, the terrain), 0 without one. */
+  groundAt?(floorId: string, x: number, z: number): number;
   /** Something the view should show again (a module keeps state of its own, e.g. a target just set). */
   refresh?(): void;
   /** Lays pipes the way the editor's wall view does: walls, node positions, connections through holes (host geometry). */

@@ -4438,6 +4438,10 @@ export class Fp3dView3d extends LitElement {
         if (!floor || !area || area.type !== "pool") return null;
         return { y: poolWaterY(floor, area), floorY: poolFloorY(floor, area) };
       },
+      groundAt: (floorId, x, z) => {
+        const floor = this.building?.floors.find((f) => f.id === floorId);
+        return floor ? outdoorGround(floor, x, z) : 0;
+      },
       refresh: () => {
         this.requestUpdate();
         // the stage and the cards come from the module: ask it again (once, however often it asks)
