@@ -89,7 +89,7 @@ const MANUAL_FEATURE: Record<string, { de: string; en: string }> = {
   auto_pro: { de: "pro-erweiterungen/#66-auto-pro", en: "pro-add-ons/#66-auto-pro" },
   time_travel: { de: "pro-erweiterungen/#67-zeitreise", en: "pro-add-ons/#67-time-travel" },
   pool: { de: "pro-erweiterungen/#68-pool-pro", en: "pro-add-ons/#68-pool-pro" },
-  household: { de: "pro-erweiterungen/#68-haushalt-pro-beta", en: "pro-add-ons/#68-household-pro-beta" },
+  household: { de: "pro-erweiterungen/#68-haushalt-pro", en: "pro-add-ons/#68-household-pro" },
   extensions: { de: "erweiterungen-shop-moebel-packs/", en: "extensions-shop-furniture-packs/" },
 };
 

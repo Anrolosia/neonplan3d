@@ -51,7 +51,7 @@ import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { edgeReach, generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall } from "../geometry/walls.ts";
 import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
-import { moduleAreaFields, moduleHelp, modulePipeRules, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
+import { moduleAreaFields, moduleFurnitureFields, moduleHelp, modulePipeRules, moduleSettings, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
 import { pipePlanner } from "../pipe-planner.ts";
 import {
   bounds,
@@ -5583,7 +5583,10 @@ export class Fp3dEditor extends LitElement {
               ${p.module && moduleWaits(p)
                 ? html`<p class="fp3d-sub">${this.t(p.module.approved === true ? "module_update_waits" : "module_waits", { from: p.release ?? 1, to: p.pending?.release ?? 1 })} ${this.t("module_waits_where")}</p>`
                 : p.module
-                  ? html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>`
+                  ? (() => {
+                      const own = this.hass ? moduleSettings(p.id, this.editorHost()) : [];
+                      return own.length ? html`<div class="fp3d-form">${this.renderFields(own, false)}</div>` : html`<p class="fp3d-sub">${this.t("module_no_settings")}</p>`;
+                    })()
                   : nothing}
             </div>`,
           )
@@ -9593,7 +9596,17 @@ export class Fp3dEditor extends LitElement {
   /** Fields a module adds to an outdoor area's form (Pool Pro: the pool's entities, the assistant), rendered here. */
   private renderModuleFields(a: OutdoorArea) {
     if (!this.hass) return nothing;
-    const fields = moduleAreaFields(this.editorHost(), a);
+    return this.renderFields(moduleAreaFields(this.editorHost(), a));
+  }
+
+  /** Fields a module adds to a piece of furniture's form (a device's entities, a setup assistant). */
+  private renderModuleFurnitureFields(f: Furniture) {
+    if (!this.hass) return nothing;
+    return this.renderFields(moduleFurnitureFields(this.editorHost(), f));
+  }
+
+  /** A module's fields, drawn like the editor's own. */
+  private renderFields(fields: ModuleField[], wrap = true) {
     if (!fields.length) return nothing;
     const admin = this.isAdmin;
     const field = (f: ModuleField) => {
@@ -9617,6 +9630,7 @@ export class Fp3dEditor extends LitElement {
           return html`<button class="fp3d-btn ${f.primary ? "fp3d-primary" : ""} fp3d-wide" ?disabled=${!admin} title=${f.title ?? ""} @click=${() => f.onTap()}>${f.label}</button>`;
       }
     };
+    if (!wrap) return fields.map(field);
     return html`<section>
       <div class="fp3d-form fp3d-links">${fields.map(field)}</div>
     </section>`;
@@ -10933,6 +10947,7 @@ export class Fp3dEditor extends LitElement {
           </div>`
         : nothing}
       ${isElectric(f.type) ? this.renderFurnitureLinks(f) : !NO_STATE_TYPES.has(f.type) ? html`<div class="fp3d-form fp3d-links">${this.renderStateLinks(f)}</div>` : nothing} ${GANG_TYPES.has(f.type) ? this.renderGangsForm(f) : nothing} ${TECH_TYPES.has(f.type) ? this.renderTechForm(f) : nothing} ${f.type === "parking" ? this.renderParkingForm(f) : nothing} ${f.type === "waste_bin" || f.type === "mailbox" ? this.renderHouseholdForm(f) : this.renderHouseholdExtras(f)}
+      ${this.renderModuleFurnitureFields(f)}
       ${f.type.startsWith("pack:mastershort.vehicles:") && this.isAdmin
         ? html`<section>
             <p class="fp3d-sub">${this.t("vehicle_to_spot_hint")}</p>
@@ -11560,7 +11575,22 @@ export class Fp3dEditor extends LitElement {
                   @change=${(e: Event) => this.updateFurniture({ bin_match: (e.target as HTMLInputElement).value.trim() || null })} /></label>
               ${this.num(this.t("bin_from"), this._doc.settings.household?.bin_from ?? 14, (v) => this.setHousehold({ bin_from: Math.max(0, Math.min(24, v)) }), 0.5)}
               ${this.num(this.t("bin_until"), this._doc.settings.household?.bin_until ?? 12, (v) => this.setHousehold({ bin_until: Math.max(0, Math.min(24, v)) }), 0.5)}
-              <p class="fp3d-sub fp3d-wide">${this.t("bin_hint")}</p>`
+              <p class="fp3d-sub fp3d-wide">${this.t("bin_hint")}</p>
+              ${this.entitySelect(this.t("bin_out"), f.bin_out ?? null, undefined, this.entityOptions((id) => /^(input_boolean|switch|binary_sensor)\./.test(id)), (v) => this.updateFurniture({ bin_out: v === "none" ? null : v }))}
+              <p class="fp3d-sub fp3d-wide">${this.t("bin_out_hint")}</p>
+              <label class="fp3d-check fp3d-wide"
+                ><input type="checkbox" .checked=${!!this._doc.settings.household?.bin_next_only} ?disabled=${!admin} @change=${(e: Event) => this.setHousehold({ bin_next_only: (e.target as HTMLInputElement).checked || null })} />
+                ${this.t("bin_next_only")}</label
+              >
+              <label class="fp3d-field"
+                >${this.t("bin_days")}
+                <input type="number" inputmode="numeric" min="0" max="60" step="1" placeholder=${this.t("bin_days_always")} .value=${this._doc.settings.household?.bin_days == null ? "" : String(this._doc.settings.household.bin_days)} ?disabled=${!admin}
+                  @change=${(e: Event) => {
+                    const v = parseInt((e.target as HTMLInputElement).value, 10);
+                    this.setHousehold({ bin_days: Number.isFinite(v) ? Math.max(0, Math.min(60, v)) : null });
+                  }}
+              /></label>
+              <p class="fp3d-sub fp3d-wide">${this.t("bin_tags_hint")}</p>`
           : teaser}
       </div>`;
     }
@@ -11623,6 +11653,10 @@ export class Fp3dEditor extends LitElement {
       ${electric
         ? html`${this.entitySelect(this.t("hh_service_entity"), f.service ?? null, undefined, services, (v) => this.updateFurniture({ service: ref(v) }))}
             ${f.service && f.service !== "none" ? this.num(this.t("hh_service_min"), f.service_min ?? 10, (v) => this.updateFurniture({ service_min: Math.max(0, v) }), 1) : nothing}
+            ${(f.service && f.service !== "none") || (f.service2 && f.service2 !== "none")
+              ? this.entitySelect(this.t("hh_service2_entity"), f.service2 ?? null, undefined, services, (v) => this.updateFurniture({ service2: ref(v) }))
+              : nothing}
+            ${f.service2 && f.service2 !== "none" ? this.num(this.t("hh_service2_min"), f.service2_min ?? 10, (v) => this.updateFurniture({ service2_min: Math.max(0, v) }), 1) : nothing}
             <p class="fp3d-sub fp3d-wide">${this.t("hh_service_hint")}</p>`
         : nothing}
     </div>`;
