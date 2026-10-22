@@ -11560,7 +11560,22 @@ export class Fp3dEditor extends LitElement {
                   @change=${(e: Event) => this.updateFurniture({ bin_match: (e.target as HTMLInputElement).value.trim() || null })} /></label>
               ${this.num(this.t("bin_from"), this._doc.settings.household?.bin_from ?? 14, (v) => this.setHousehold({ bin_from: Math.max(0, Math.min(24, v)) }), 0.5)}
               ${this.num(this.t("bin_until"), this._doc.settings.household?.bin_until ?? 12, (v) => this.setHousehold({ bin_until: Math.max(0, Math.min(24, v)) }), 0.5)}
-              <p class="fp3d-sub fp3d-wide">${this.t("bin_hint")}</p>`
+              <p class="fp3d-sub fp3d-wide">${this.t("bin_hint")}</p>
+              ${this.entitySelect(this.t("bin_out"), f.bin_out ?? null, undefined, this.entityOptions((id) => /^(input_boolean|switch|binary_sensor)\./.test(id)), (v) => this.updateFurniture({ bin_out: v === "none" ? null : v }))}
+              <p class="fp3d-sub fp3d-wide">${this.t("bin_out_hint")}</p>
+              <label class="fp3d-check fp3d-wide"
+                ><input type="checkbox" .checked=${!!this._doc.settings.household?.bin_next_only} ?disabled=${!admin} @change=${(e: Event) => this.setHousehold({ bin_next_only: (e.target as HTMLInputElement).checked || null })} />
+                ${this.t("bin_next_only")}</label
+              >
+              <label class="fp3d-field"
+                >${this.t("bin_days")}
+                <input type="number" inputmode="numeric" min="0" max="60" step="1" placeholder=${this.t("bin_days_always")} .value=${this._doc.settings.household?.bin_days == null ? "" : String(this._doc.settings.household.bin_days)} ?disabled=${!admin}
+                  @change=${(e: Event) => {
+                    const v = parseInt((e.target as HTMLInputElement).value, 10);
+                    this.setHousehold({ bin_days: Number.isFinite(v) ? Math.max(0, Math.min(60, v)) : null });
+                  }}
+              /></label>
+              <p class="fp3d-sub fp3d-wide">${this.t("bin_tags_hint")}</p>`
           : teaser}
       </div>`;
     }
@@ -11623,6 +11638,10 @@ export class Fp3dEditor extends LitElement {
       ${electric
         ? html`${this.entitySelect(this.t("hh_service_entity"), f.service ?? null, undefined, services, (v) => this.updateFurniture({ service: ref(v) }))}
             ${f.service && f.service !== "none" ? this.num(this.t("hh_service_min"), f.service_min ?? 10, (v) => this.updateFurniture({ service_min: Math.max(0, v) }), 1) : nothing}
+            ${(f.service && f.service !== "none") || (f.service2 && f.service2 !== "none")
+              ? this.entitySelect(this.t("hh_service2_entity"), f.service2 ?? null, undefined, services, (v) => this.updateFurniture({ service2: ref(v) }))
+              : nothing}
+            ${f.service2 && f.service2 !== "none" ? this.num(this.t("hh_service2_min"), f.service2_min ?? 10, (v) => this.updateFurniture({ service2_min: Math.max(0, v) }), 1) : nothing}
             <p class="fp3d-sub fp3d-wide">${this.t("hh_service_hint")}</p>`
         : nothing}
     </div>`;

@@ -297,12 +297,17 @@ FURNITURE_SCHEMA = vol.Schema(
         vol.Optional("bin_source"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("bin_match"): vol.Any(None, vol.All(str, vol.Length(max=120))),
         vol.Optional("mailbox_door"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        # Haushalt Pro: on while the bin is out (an input_boolean a nightly automation resets)
+        vol.Optional("bin_out"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # Haushalt Pro: a plant's moisture, an appliance's time left, a service, a fridge's door alarm
         vol.Optional("moisture"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("moisture_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=100))),
         vol.Optional("remaining"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("service"): vol.Any(None, vol.All(str, vol.Length(max=255))),
         vol.Optional("service_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=1000))),
+        # a second service (a robot vacuum's dock) with its own threshold
+        vol.Optional("service2"): vol.Any(None, vol.All(str, vol.Length(max=255))),
+        vol.Optional("service2_min"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=1000))),
         vol.Optional("door_alarm"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0.5, max=120))),
         # LED strip: tilt about its length (degrees) and standing upright
         vol.Optional("tilt", default=0.0): vol.All(vol.Coerce(float), vol.Range(min=-90, max=90)),
@@ -781,6 +786,9 @@ SETTINGS_SCHEMA = vol.Schema(
                 {
                     vol.Optional("bin_from"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
                     vol.Optional("bin_until"): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=24))),
+                    # only the bins of the next pickup wear a tag; tags only from some days before (None = always)
+                    vol.Optional("bin_next_only"): vol.Any(None, bool),
+                    vol.Optional("bin_days"): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=0, max=60))),
                 },
                 extra=vol.ALLOW_EXTRA,
             ),

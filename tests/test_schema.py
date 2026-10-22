@@ -138,9 +138,24 @@ def test_household_fields_are_kept_and_checked() -> None:
         5,
         3,
     )
-    for bad in ({"bin_kind": "nuclear"}, {"bin_color": "blue"}, {"moisture_min": 150}, {"door_alarm": 0}):
+    out_bin = FURNITURE_SCHEMA({**base, "bin_out": "input_boolean.bin_out"})
+    assert out_bin["bin_out"] == "input_boolean.bin_out" and "bin_out" not in FURNITURE_SCHEMA(base)
+    robot = FURNITURE_SCHEMA({**base, "type": "robot", "service2": "sensor.dock_bag", "service2_min": 0})
+    assert (robot["service2"], robot["service2_min"]) == ("sensor.dock_bag", 0)
+    bads = ({"bin_kind": "nuclear"}, {"bin_color": "blue"}, {"moisture_min": 150}, {"door_alarm": 0})
+    for bad in (*bads, {"service2_min": -1}):
         with pytest.raises(vol.Invalid):
             FURNITURE_SCHEMA({**base, **bad})
+
+
+def test_household_tag_settings_are_optional() -> None:
+    """The bins' tag settings: missing in old plans, kept when set, a day count out of range is refused."""
+    base = {"wall_exterior": 0.3, "wall_interior": 0.12, "grid": 0.05}
+    assert SETTINGS_SCHEMA({**base, "household": {"bin_from": 14}})["household"] == {"bin_from": 14}
+    out = SETTINGS_SCHEMA({**base, "household": {"bin_next_only": True, "bin_days": 2}})["household"]
+    assert out["bin_next_only"] is True and out["bin_days"] == 2
+    with pytest.raises(vol.Invalid):
+        SETTINGS_SCHEMA({**base, "household": {"bin_days": 100}})
 
 
 def test_outdoor_area_keeps_its_name_and_area() -> None:
