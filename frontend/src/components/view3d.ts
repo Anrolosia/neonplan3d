@@ -1414,7 +1414,7 @@ export class Fp3dView3d extends LitElement {
         if (tag.kind !== "tag") continue;
         const floor = b.floors.find((f) => f.id === tag.floorId);
         if (!floor) continue;
-        anchors.push({ p: [tag.at[0], floor.elevation + tag.at[1], tag.at[2]], n: [0, 1, 0], floorId: floor.id, size: holoSize * 0.75, roof: false, views: "all" });
+        anchors.push({ p: [tag.at[0], floor.elevation + tag.at[1], tag.at[2]], n: [0, 1, 0], floorId: floor.id, size: holoSize * 0.75, roof: false, views: tag.views ?? "all" });
         cards.push({ kind: "bin", name: tag.sub ?? "", w: null, dayIds: [], battery: null, bin: { color: tag.color ?? "#37e0ff", when: tag.text, soon: true }, tag: true });
       }
     }

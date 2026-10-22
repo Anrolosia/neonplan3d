@@ -237,6 +237,8 @@ export interface FlowPiece {
   pipe?: boolean;
   /** Shown only in the house view (hidden while a floor is opened). */
   house?: boolean;
+  /** Shown only while a floor is opened (hidden in the house view). */
+  floor?: boolean;
 }
 
 /** A see-through surface over an area of a floor (floor coordinates): a module's tint on a room, soil under a lawn. */
@@ -447,9 +449,10 @@ interface FloorView {
   glassMesh: Mesh;
   blindsMesh: Mesh;
   flowMesh: Mesh;
-  /** A module's solid pipes: always, and those shown only in the house view. */
+  /** A module's solid pipes: always, those shown only in the house view, and those only on an opened floor. */
   pipeLineMesh: Mesh;
   pipeHouseMesh: Mesh;
+  pipeFloorMesh: Mesh;
   pipeLineSig: string;
   /** The living solar overlay of this floor's fields, if it has any. */
   solarMesh: Mesh | null;
@@ -2258,7 +2261,8 @@ export class FloorplanViewer {
       flowMesh.frustumCulled = false;
       const pipeLineMesh = new Mesh(new Geometry(), materials.pipeLine);
       const pipeHouseMesh = new Mesh(new Geometry(), materials.pipeLine);
-      for (const m of [pipeLineMesh, pipeHouseMesh]) {
+      const pipeFloorMesh = new Mesh(new Geometry(), materials.pipeLine);
+      for (const m of [pipeLineMesh, pipeHouseMesh, pipeFloorMesh]) {
         m.renderOrder = 4;
         m.frustumCulled = false;
         m.visible = false;
@@ -2300,6 +2304,7 @@ export class FloorplanViewer {
         flowMesh,
         pipeLineMesh,
         pipeHouseMesh,
+        pipeFloorMesh,
         lampMesh,
         sunMesh,
         haloMesh,
@@ -2367,6 +2372,7 @@ export class FloorplanViewer {
         flowMesh,
         pipeLineMesh,
         pipeHouseMesh,
+        pipeFloorMesh,
         pipeLineSig: "",
         solarMesh,
         solarLive,
@@ -3558,21 +3564,21 @@ export class FloorplanViewer {
   /**
    * A module's pipes: a dark edge under a solid core in the pipe's colour (normal blending, so a bright floor does not
    * wash them out); the light running along them is a soft brightening of the core. Pipes shown only in the house
-   * view go into a mesh of their own, hidden while a floor is opened.
+   * view go into a mesh of their own, hidden while a floor is opened; those shown only on an opened floor into another.
    */
   private buildPipeLines(fv: FloorView): void {
     const mine = this.flows.filter((f) => f.floorId === fv.floor.id && f.pipe);
-    const sig = JSON.stringify(mine.map((f) => [f.a, f.b, f.dist, f.color, f.width, f.house, Math.round(f.power / 50), this.flowPhase.get(flowKey(f))?.speed ?? 0]));
+    const sig = JSON.stringify(mine.map((f) => [f.a, f.b, f.dist, f.color, f.width, f.house, f.floor, Math.round(f.power / 50), this.flowPhase.get(flowKey(f))?.speed ?? 0]));
     if (sig === fv.pipeLineSig) return;
     fv.pipeLineSig = sig;
-    for (const house of [false, true]) {
+    for (const view of ["all", "house", "floor"] as const) {
       const p: number[] = [];
       const c: number[] = [];
       const uv: number[] = [];
       const sp: number[] = [];
       const off: number[] = [];
       for (const f of mine) {
-        if (!!f.house !== house) continue;
+        if ((f.house ? "house" : f.floor ? "floor" : "all") !== view) continue;
         const len = Math.hypot(f.b[0] - f.a[0], f.b[1] - f.a[1], f.b[2] - f.a[2]);
         if (len < 1e-4) continue;
         const phase = this.flowPhase.get(flowKey(f)) ?? { speed: flowSpeed(f.power), offset: 0 };
@@ -3612,7 +3618,7 @@ export class FloorplanViewer {
           }
         }
       }
-      const mesh = house ? fv.pipeHouseMesh : fv.pipeLineMesh;
+      const mesh = view === "house" ? fv.pipeHouseMesh : view === "floor" ? fv.pipeFloorMesh : fv.pipeLineMesh;
       const g = new Geometry();
       g.setAttribute("position", new Float32BufferAttribute(p, 3));
       g.setAttribute("color", new Float32BufferAttribute(c, 4));
@@ -3626,11 +3632,12 @@ export class FloorplanViewer {
     this.applyHouseLines(fv);
   }
 
-  /** Pipes shown only in the house view: hidden while a floor is opened. */
+  /** Pipes shown only in the house view: hidden while a floor is opened; those only on an opened floor the other way round. */
   private applyHouseLines(only?: FloorView): void {
     for (const fv of only ? [only] : this.floors) {
       fv.pipeLineMesh.visible = !!fv.pipeLineMesh.userData.filled;
       fv.pipeHouseMesh.visible = !!fv.pipeHouseMesh.userData.filled && this.floorId === null;
+      fv.pipeFloorMesh.visible = !!fv.pipeFloorMesh.userData.filled && this.floorId !== null;
     }
   }
 

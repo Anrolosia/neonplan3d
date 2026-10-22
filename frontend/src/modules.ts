@@ -210,8 +210,11 @@ export type ScenePiece =
        * a dark edge, readable on bright floors, with a soft light running along it while it flows.
        */
       look?: "flow" | "pipe";
-      /** "house": shown only in the house view (hidden while a floor is opened); "all" (default): always. */
-      views?: "all" | "house";
+      /**
+       * "house": shown only in the house view (hidden while a floor is opened); "floor": only while a floor is opened
+       * (hidden in the house view); "all" (default): always. Applies to the "pipe" look.
+       */
+      views?: "all" | "house" | "floor";
     }
   | {
       /**
@@ -257,6 +260,8 @@ export type ScenePiece =
       sub?: string;
       /** CSS colour of the value. */
       color?: string;
+      /** "house": only in the house view; "floor": only while a floor is opened; "all" (default): always. */
+      views?: "all" | "house" | "floor";
     }
   | {
       /** The water in an area's pipes: which pipe carries water now and in what colour (the host draws the pipes). */

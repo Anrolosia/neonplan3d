@@ -65,3 +65,13 @@ test("compact cards leave the minor parts out", () => {
   assert.deepEqual(majorOnly(rows, true).map((r) => r.label), ["a"]);
   assert.deepEqual(majorOnly(undefined, true), []);
 });
+
+test("a line shown only in one view carries its view: the house view, or an opened floor", () => {
+  const at = (views?: "all" | "house" | "floor") => lineFlows([{ kind: "line", floorId: "eg", points: [[0, 0, 0], [1, 0, 0]], colors: [red], flow: 0, look: "pipe", views }])[0];
+  assert.equal(at("house").house, true);
+  assert.equal(at("house").floor, undefined);
+  assert.equal(at("floor").floor, true);
+  assert.equal(at("floor").house, undefined);
+  assert.equal(at("all").house ?? at("all").floor, undefined);
+  assert.equal(at().floor, undefined);
+});

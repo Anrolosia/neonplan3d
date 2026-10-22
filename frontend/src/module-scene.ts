@@ -20,6 +20,8 @@ export interface LineFlow {
   pipe?: boolean;
   /** Shown only in the house view (hidden while a floor is opened). */
   house?: boolean;
+  /** Shown only while a floor is opened (hidden in the house view). */
+  floor?: boolean;
 }
 
 /** The points of a small curve through the values in a box of w × h (SVG coordinates, the lowest value at the bottom). */
@@ -76,7 +78,7 @@ export function lineFlows(lines: readonly Line[]): LineFlow[] {
         color,
         ...(l.width ? { width: Math.min(3, Math.max(0.5, l.width)) } : {}),
         ...(l.look === "pipe" ? { pipe: true } : {}),
-        ...(l.views === "house" ? { house: true } : {}),
+        ...(l.views === "house" ? { house: true } : l.views === "floor" ? { floor: true } : {}),
       });
       dist += len;
     }
