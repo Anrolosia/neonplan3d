@@ -106,7 +106,7 @@ import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from 
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, manualUrl, projectionOn, shopUrl, type Feature } from "../features.ts";
+import { hasFeature, manualUrl, projectionOn, released, shopUrl, type Feature } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { anyModule, moduleAlerts, moduleCards, modulePools, moduleScene, moduleVoice, moduleWatched, syncModules, type ModuleCard, type ModuleHost, type ScenePiece, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
@@ -126,7 +126,7 @@ import { pipePieces, poolAreas, poolNodeAt, poolWallNormal, underBasin, PIPE_IDL
 import type { PipeTube } from "../viewer/viewer3d.ts";
 import type { PoolPiece } from "../viewer/pool-water.ts";
 import { lowSyncDelay } from "../viewer/pace.ts";
-import { floorCounts, floorInfoText, personsInRooms } from "../presence.ts";
+import { floorCounts, floorInfoText, locatedPersons, personLook, personsInRooms, personsShown } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HassEntity, HomeAssistant } from "../types.ts";
 import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../diagnostics.ts";
@@ -1461,7 +1461,9 @@ export class Fp3dView3d extends LitElement {
     v.setFlows(this.dimmed ? energyFlows : [...energyFlows, ...pool.flows, ...lineFlows(lines)]);
     v.setPipes(pool.tubes);
     v.setPatches(this.scene.filter((p): p is Extract<ScenePiece, { kind: "patch" }> => p.kind === "patch").map((p) => ({ floorId: p.floorId, points: p.points, y: p.y, color: p.color, opacity: this.dimmed ? p.opacity * 0.4 : p.opacity, ...(p.glow ? { glow: true } : {}) })));
-    const persons = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
+    const roomSensors = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
+    const persons = released("locate") && personsShown(b) ? [...roomSensors, ...locatedPersons(hass, b, new Set(roomSensors.map((p) => p.id)))] : roomSensors;
+    v.setPersonLook(personLook(b) === "pin" ? "pin" : "figure");
     v.setPersons(persons);
     const counts = floorCounts(hass, b, this.openingLinks!, persons);
     v.setFloorInfo(new Map([...counts].map(([id, c]) => [id, floorInfoText(hass, c)])));
@@ -5564,24 +5566,56 @@ export class Fp3dView3d extends LitElement {
         position: absolute;
         left: 0;
         top: 0;
-        display: grid;
-        place-items: center;
         width: 30px;
         height: 30px;
+        pointer-events: auto;
+      }
+      .fp3d-person-tap {
+        cursor: pointer;
+      }
+      .fp3d-person-face {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
         border-radius: 50%;
         overflow: hidden;
-        background: #ff5fd2;
+        background: var(--fp3d-pc, #ff5fd2);
         color: #fff;
         font: 700 12px var(--fp3d-font);
         box-shadow:
-          0 0 0 2px rgba(255, 95, 210, 0.45),
-          0 0 18px #ff5fd2;
-        pointer-events: auto;
+          0 0 0 2px color-mix(in srgb, var(--fp3d-pc, #ff5fd2) 55%, transparent),
+          0 0 18px var(--fp3d-pc, #ff5fd2);
       }
       .fp3d-person img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+      .fp3d-person-figure {
+        width: auto;
+        height: auto;
+      }
+      .fp3d-person-figure .fp3d-person-face {
+        display: none;
+      }
+      .fp3d-person-figure .fp3d-person-tag {
+        position: static;
+        display: block;
+        transform: none;
+      }
+      .fp3d-person-tag {
+        position: absolute;
+        left: 50%;
+        top: calc(100% + 4px);
+        transform: translateX(-50%);
+        padding: 1px 7px;
+        border-radius: 8px;
+        background: rgba(8, 14, 28, 0.82);
+        border: 1px solid color-mix(in srgb, var(--fp3d-pc, #ff5fd2) 60%, transparent);
+        color: #fff;
+        font: 600 11px var(--fp3d-font);
+        white-space: nowrap;
       }
       .fp3d-person[hidden] {
         display: none;

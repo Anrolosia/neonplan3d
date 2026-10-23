@@ -18,6 +18,7 @@ import { holeInRoom } from "../geometry/holes.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
 import { hasFeature, labOn, manualUrl, released, shopUrl, UNRELEASED } from "../features.ts";
+import { loadLocate } from "../load-locate.ts";
 import { isBeta, supporterUrl } from "../beta.ts";
 import { BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlant, MAILBOX_SHAPES, MAILBOX_SIZE, mailboxShape, WASTE_KINDS, wasteColors } from "../household.ts";
 import { cameraMotionSensors, detectionKind } from "../markers.ts";
@@ -203,7 +204,7 @@ const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", 
 const HISTORY = 100;
 
 /** Topics of the ⚙ settings menu (everything that belongs to the whole plan). */
-type SettingsTopic = "house" | "weather" | "director" | "voice" | "favorites" | "backdrop" | "terrain" | "backup" | "modules";
+type SettingsTopic = "house" | "weather" | "director" | "voice" | "locate" | "favorites" | "backdrop" | "terrain" | "backup" | "modules";
 
 /** Wall view side bar: what stands or hangs at a wall, by kind. */
 const WALL_CATS: Record<string, string[]> = {
@@ -5486,6 +5487,7 @@ export class Fp3dEditor extends LitElement {
       { key: "weather", icon: "🌦", label: this.t("settings_weather"), admin: true },
       { key: "director", icon: "🎬", label: this.t("card_director"), admin: true },
       { key: "voice", icon: "🎙", label: this.t("voice"), admin: false },
+      ...(released("locate") ? [{ key: "locate" as const, icon: "📡", label: this.t("locate"), admin: true }] : []),
       { key: "favorites", icon: "⭐", label: this.t("favorites"), admin: true },
       { key: "backdrop", icon: "🖼", label: this.t("backdrop"), admin: true },
       { key: "terrain", icon: "⛰", label: this.t("terrain"), admin: true },
@@ -5510,8 +5512,13 @@ export class Fp3dEditor extends LitElement {
                     role="menuitem"
                     class="fp3d-menu-item"
                     @click=${() => {
-                      this._settingsDialog = t.key;
                       this._settingsMenu = false;
+                      // locating has its own assistant (a bundle of its own), not a dialog
+                      if (t.key === "locate") {
+                        if (this.hass) void loadLocate().then((m) => m.openLocateSetup(this.hass!, this._doc, () => this.hass, (look) => this.setSettings({ person_look: look === "figure" ? null : look })));
+                        return;
+                      }
+                      this._settingsDialog = t.key;
                       // the modules' sentences for the voice list: loaded here as well (the editor is its own bundle), once per opening
                       if (t.key === "voice" && this.hass) void syncModules(this.hass, this.packs ?? []).then(() => this.requestUpdate());
                     }}
@@ -5535,6 +5542,7 @@ export class Fp3dEditor extends LitElement {
       weather: this.t("settings_weather"),
       director: this.t("card_director"),
       voice: this.t("voice"),
+      locate: this.t("locate"),
       favorites: this.t("favorites"),
       backdrop: this.t("backdrop"),
       terrain: this.t("terrain"),

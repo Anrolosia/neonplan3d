@@ -2065,5 +2065,10 @@
  "voice_sentences_kept": "Has cambiado tú el archivo de frases de {langs} – NeonPlan no lo toca.",
  "voice_sentences_failed": "No se pudo escribir el archivo de frases.",
  "voice_sentences_file": "NeonPlan solo crea el archivo custom_sentences/<idioma>/neonplan3d.yaml cuando eliges frases aquí. Un archivo que hayas cambiado nunca se sobrescribe; al quitar la integración se borra el archivo de NeonPlan.",
- "pin_standby": "En espera"
+ "pin_standby": "En espera",
+ "persons": "Personas",
+ "persons_figure": "Figura",
+ "persons_pin": "Pin",
+ "persons_off": "no",
+ "locate": "Localización"
 }

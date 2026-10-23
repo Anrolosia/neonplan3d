@@ -14,7 +14,7 @@ export const FEATURES: readonly Feature[] = ["camera_cockpit", "weather", "scree
  */
 export const FUN: readonly Feature[] = ["fun_pets", "fun_halloween"];
 /** Free features built but not released yet (no pack unlocks them; only the lab switch shows them). */
-export type FreeFeature = "diagnostics";
+export type FreeFeature = "diagnostics" | "locate";
 export type Gated = Feature | FreeFeature;
 
 /**
@@ -50,7 +50,7 @@ export function projectionOn(): boolean {
 
 /** Whether an add-on may be shown and advertised: released, or unlocked, or the lab switch is on. */
 export function released(feature: Gated): boolean {
-  return !UNRELEASED.includes(feature) || (feature !== "diagnostics" && hasFeature(feature)) || labOn();
+  return !UNRELEASED.includes(feature) || (feature !== "diagnostics" && feature !== "locate" && hasFeature(feature)) || labOn();
 }
 
 /** Features unlocked by a pack but not listed anywhere (exclusive items). */

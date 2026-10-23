@@ -2065,5 +2065,10 @@
  "voice_sentences_kept": "Datoteko stavkov za {langs} si spremenil sam – NeonPlan se je ne dotakne.",
  "voice_sentences_failed": "Datoteke stavkov ni bilo mogoče zapisati.",
  "voice_sentences_file": "NeonPlan ustvari datoteko custom_sentences/<jezik>/neonplan3d.yaml šele, ko tukaj izbereš stavke. Datoteka, ki si jo spremenil sam, se nikoli ne prepiše; z odstranitvijo integracije se datoteka NeonPlana izbriše.",
- "pin_standby": "Pripravljenost"
+ "pin_standby": "Pripravljenost",
+ "persons": "Osebe",
+ "persons_figure": "Figura",
+ "persons_pin": "Žebljiček",
+ "persons_off": "izklop",
+ "locate": "Lociranje"
 }

@@ -2065,5 +2065,10 @@
  "voice_sentences_kept": "Fișierul de propoziții pentru {langs} l-ai modificat tu – NeonPlan nu îl atinge.",
  "voice_sentences_failed": "Fișierul de propoziții nu a putut fi scris.",
  "voice_sentences_file": "NeonPlan creează fișierul custom_sentences/<limbă>/neonplan3d.yaml doar când alegi propoziții aici. Un fișier modificat de tine nu este suprascris niciodată; la eliminarea integrării fișierul NeonPlan este șters.",
- "pin_standby": "Așteptare"
+ "pin_standby": "Așteptare",
+ "persons": "Persoane",
+ "persons_figure": "Siluetă",
+ "persons_pin": "Reper",
+ "persons_off": "oprit",
+ "locate": "Localizare"
 }

@@ -2065,5 +2065,10 @@
  "voice_sentences_kept": "Setningsfilen for {langs} har du endret selv – NeonPlan lar den være.",
  "voice_sentences_failed": "Setningsfilen kunne ikke skrives.",
  "voice_sentences_file": "NeonPlan lager filen custom_sentences/<språk>/neonplan3d.yaml først når du velger setninger her. En fil du har endret selv, blir aldri overskrevet; fjernes integrasjonen, slettes NeonPlans fil.",
- "pin_standby": "Hvilemodus"
+ "pin_standby": "Hvilemodus",
+ "persons": "Personer",
+ "persons_figure": "Figur",
+ "persons_pin": "Nål",
+ "persons_off": "av",
+ "locate": "Lokalisering"
 }

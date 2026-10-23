@@ -2065,5 +2065,10 @@
  "voice_sentences_kept": "Plik zdań dla {langs} zmieniłeś sam – NeonPlan go nie rusza.",
  "voice_sentences_failed": "Nie udało się zapisać pliku zdań.",
  "voice_sentences_file": "NeonPlan tworzy plik custom_sentences/<język>/neonplan3d.yaml dopiero, gdy wybierzesz tu zdania. Plik zmieniony przez Ciebie nigdy nie jest nadpisywany; usunięcie integracji kasuje plik NeonPlan.",
- "pin_standby": "Czuwanie"
+ "pin_standby": "Czuwanie",
+ "persons": "Osoby",
+ "persons_figure": "Postać",
+ "persons_pin": "Pinezka",
+ "persons_off": "wył.",
+ "locate": "Lokalizacja"
 }

@@ -719,6 +719,8 @@ export interface BuildingSettings {
   household?: { bin_from?: number | null; bin_until?: number | null; notes?: EntityRef; bin_next_only?: boolean | null; bin_days?: number | null } | null;
   /** The floor the editor opens with (null: the first of the list) (D418). */
   editor_floor?: string | null;
+  /** Located people in 3D: a neon figure (null = default), a pin, or not shown. */
+  person_look?: "figure" | "pin" | "off" | null;
   /** Fun pack "Halloween": the ghost that floats through the house now and then (on unless switched off). */
   halloween?: { ghost?: boolean } | null;
   /** Plan lock: rooms, walls, doors, windows and outdoor areas cannot be moved by accident. */

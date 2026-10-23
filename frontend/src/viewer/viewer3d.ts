@@ -308,6 +308,14 @@ export interface PersonPin {
   roomId: string;
   x: number;
   z: number;
+  /** Ring colour of the person (default pink). */
+  color?: string;
+  /** Entity whose details a tap opens (the locating sensor: room, certainty, since when). */
+  entity?: string;
+  /** A thing (keys, a phone without a person): a small pin even when people stand as figures. */
+  thing?: boolean;
+  /** Short name under the pin (located people), none without. */
+  tag?: string;
 }
 
 export interface ViewerStats {
@@ -575,6 +583,11 @@ export class FloorplanViewer {
   private flowTimer: ReturnType<typeof setTimeout> | undefined;
   private persons: PersonPin[] = [];
   private readonly personPins = new Map<string, HTMLDivElement>();
+  /** Where each person pin is drawn now: it glides to its room instead of jumping (floor id, x, z). */
+  private readonly personAt = new Map<string, { floorId: string; x: number; z: number }>();
+  /** Located people as a simple neon figure (default) or as a round pin. */
+  private personLook: "figure" | "pin" = "figure";
+  private readonly figures = new Map<string, Group>();
   private floorInfo = new Map<string, string>();
   /** Text behind the room names (the "values" heat mode: temperature, humidity, CO₂ per room). */
   private roomInfo = new Map<string, string>();
@@ -1238,6 +1251,66 @@ export class FloorplanViewer {
   }
 
   /** People in their rooms (pink markers in the floor and room views). */
+  /** How people stand in the house: a simple neon figure or a round pin (the ⚙ menu). */
+  setPersonLook(look: "figure" | "pin"): void {
+    if (look === this.personLook) return;
+    this.personLook = look;
+    this.setPersons(this.persons);
+  }
+
+  /**
+   * A person as a flat neon silhouette, 1.6 m tall, facing +z (turned to the camera each frame): limbs as strips,
+   * a round head, a ring on the floor; a wider, faint copy around it glows. Two meshes, a few hundred triangles.
+   */
+  private makeFigure(color: string): Group {
+    const build = (grow: number): Geometry => {
+      const p: number[] = [];
+      const strip = (ax: number, ay: number, bx: number, by: number, w: number) => {
+        const len = Math.hypot(bx - ax, by - ay) || 1;
+        const nx = (-(by - ay) / len) * (w / 2 + grow);
+        const ny = ((bx - ax) / len) * (w / 2 + grow);
+        p.push(ax + nx, ay + ny, 0, bx + nx, by + ny, 0, bx - nx, by - ny, 0, ax + nx, ay + ny, 0, bx - nx, by - ny, 0, ax - nx, ay - ny, 0);
+      };
+      const n = 18;
+      const r = 0.14 + grow;
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2;
+        const b = ((i + 1) / n) * Math.PI * 2;
+        p.push(0, 1.47, 0, Math.cos(a) * r, 1.47 + Math.sin(a) * r, 0, Math.cos(b) * r, 1.47 + Math.sin(b) * r, 0);
+      }
+      strip(0, 1.32, 0, 0.8, 0.13); // body
+      strip(0, 1.24, -0.28, 0.9, 0.07); // arms
+      strip(0, 1.24, 0.28, 0.9, 0.07);
+      strip(-0.02, 0.82, -0.15, 0.02, 0.08); // legs
+      strip(0.02, 0.82, 0.15, 0.02, 0.08);
+      const geo = new Geometry();
+      geo.setAttribute("position", new Float32BufferAttribute(p, 3));
+      return geo;
+    };
+    const core = new Mesh(build(0), new MeshBasicMaterial({ color, transparent: true, opacity: 0.9, depthWrite: false, side: DoubleSide }));
+    const glow = new Mesh(
+      build(0.05),
+      new MeshBasicMaterial({ color, transparent: true, opacity: 0.22, blending: AdditiveBlending, depthWrite: false, side: DoubleSide }),
+    );
+    core.renderOrder = 6;
+    glow.renderOrder = 5;
+    const fig = new Group();
+    fig.add(glow, core);
+    fig.visible = false;
+    return fig;
+  }
+
+  private dropFigure(id: string): void {
+    const fig = this.figures.get(id);
+    if (!fig) return;
+    this.scene.remove(fig);
+    for (const m of fig.children as Mesh[]) {
+      m.geometry.dispose();
+      (m.material as MeshBasicMaterial).dispose();
+    }
+    this.figures.delete(id);
+  }
+
   setPersons(persons: PersonPin[]): void {
     this.labelsDirty = true;
     this.persons = persons;
@@ -1249,28 +1322,63 @@ export class FloorplanViewer {
         pin = document.createElement("div");
         pin.className = "fp3d-person";
         pin.dataset.entity = p.id;
+        const id = p.id;
+        pin.addEventListener("pointerdown", (e) => e.stopPropagation());
+        pin.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const target = this.persons.find((x) => x.id === id);
+          if (!target?.entity) return;
+          const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+          const h = this.host.getBoundingClientRect();
+          this.options.onDeviceHold?.(target.entity, r.left + r.width / 2 - h.left, r.top + r.height / 2 - h.top);
+        });
         this.personPins.set(p.id, pin);
         this.labels.append(pin);
       }
       pin.title = p.name;
       pin.setAttribute("aria-label", p.name);
-      if (pin.dataset.picture !== (p.picture ?? "") || pin.dataset.initials !== p.initials) {
+      pin.style.setProperty("--fp3d-pc", p.color ?? "#ff5fd2");
+      // located people stand as a figure (the pin then only carries the name above its head)
+      const figure = this.personLook === "figure" && !!p.entity && !p.thing;
+      pin.classList.toggle("fp3d-person-figure", figure);
+      const fig = this.figures.get(p.id);
+      if (figure && (!fig || fig.userData.color !== (p.color ?? "#ff5fd2"))) {
+        this.dropFigure(p.id);
+        const made = this.makeFigure(p.color ?? "#ff5fd2");
+        made.userData.color = p.color ?? "#ff5fd2";
+        this.figures.set(p.id, made);
+        this.scene.add(made);
+      } else if (!figure && fig) this.dropFigure(p.id);
+      pin.classList.toggle("fp3d-person-tap", !!p.entity);
+      if (pin.dataset.picture !== (p.picture ?? "") || pin.dataset.initials !== p.initials || pin.dataset.tag !== (p.tag ?? "")) {
         pin.dataset.picture = p.picture ?? "";
         pin.dataset.initials = p.initials;
+        pin.dataset.tag = p.tag ?? "";
         pin.replaceChildren();
+        const face = document.createElement("span");
+        face.className = "fp3d-person-face";
         if (p.picture) {
           const img = document.createElement("img");
           img.src = p.picture;
           img.alt = "";
           img.addEventListener("error", () => img.replaceWith(document.createTextNode(p.initials)));
-          pin.append(img);
-        } else pin.textContent = p.initials;
+          face.append(img);
+        } else face.textContent = p.initials;
+        pin.append(face);
+        if (p.tag) {
+          const tag = document.createElement("span");
+          tag.className = "fp3d-person-tag";
+          tag.textContent = p.tag;
+          pin.append(tag);
+        }
       }
     }
     for (const [id, pin] of this.personPins) {
       if (seen.has(id)) continue;
       pin.remove();
       this.personPins.delete(id);
+      this.personAt.delete(id);
+      this.dropFigure(id);
     }
     this.invalidate();
   }
@@ -4841,12 +4949,42 @@ export class FloorplanViewer {
     for (const p of this.persons) {
       const pin = this.personPins.get(p.id);
       const fv = this.floorMap.get(p.floorId);
+      const fig = this.figures.get(p.id);
       if (!pin) continue;
       if (!fv || house || fv.to < 0.99 || fv.o < 0.9 || this.otherFloor(fv)) {
         this.place(pin, null);
+        if (fig?.visible) {
+          fig.visible = false;
+          this.invalidate();
+        }
         continue;
       }
-      v.set(p.x, fv.floor.elevation + fv.y + 0.9, p.z).project(this.camera);
+      // glide to the room (about a second), jump when the floor changes
+      let at = this.personAt.get(p.id);
+      if (!at || at.floorId !== p.floorId) at = { floorId: p.floorId, x: p.x, z: p.z };
+      else {
+        const dx = p.x - at.x;
+        const dz = p.z - at.z;
+        if (Math.hypot(dx, dz) > 0.02) {
+          at = { floorId: p.floorId, x: at.x + dx * 0.12, z: at.z + dz * 0.12 };
+          this.labelsDirty = true;
+          this.invalidate();
+        } else at = { floorId: p.floorId, x: p.x, z: p.z };
+      }
+      this.personAt.set(p.id, at);
+      const base = fv.floor.elevation + fv.y;
+      if (fig) {
+        // the figure faces the camera (turns around its own vertical axis only); labels are placed after a frame,
+        // so a figure that appears or moves asks for one more
+        const turn = Math.atan2(this.camera.position.x - at.x, this.camera.position.z - at.z);
+        if (!fig.visible || fig.position.x !== at.x || fig.position.y !== base || fig.position.z !== at.z || fig.rotation.y !== turn) {
+          fig.visible = true;
+          fig.position.set(at.x, base, at.z);
+          fig.rotation.y = turn;
+          this.invalidate();
+        }
+      }
+      v.set(at.x, base + (fig ? 1.85 : 0.9), at.z).project(this.camera);
       const off = v.z > 1 || Math.abs(v.x) > 1.05 || Math.abs(v.y) > 1.05;
       this.place(pin, off ? null : `translate(${((v.x + 1) / 2) * w}px, ${((1 - v.y) / 2) * h}px) translate(-50%, -50%)`);
     }

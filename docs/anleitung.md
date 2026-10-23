@@ -763,6 +763,83 @@ data:
 - Die Erkennung übernimmt **deine** Assist-Pipeline. Wie schnell und genau sie ist, hängt von ihr ab. Mit Speech-to-Phrase oder der Cloud dauert ein Satz meist ein bis zwei Sekunden.
 - Hast du die Live-Regie an, unterbricht sie dich nicht, während du sprichst.
 
+### 5.11 Ortung (neu)
+
+> **Neu in 2.0, kostenlos.** Wer und was ist wo im Haus – ohne Bermuda, ohne ESPresense, ohne neue Hardware. NeonPlan nutzt die Bluetooth-Empfänger, die Home Assistant schon kennt.
+
+NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein Schlüsselbund liegt. Personen stehen als leuchtende Figur im Raum und gleiten beim Raumwechsel hinüber. Für jedes Gerät gibt es einen Sensor in Home Assistant („Torstens Uhr Raum: Küche“), und per Sprache fragst du „Wo ist mein iPhone?“.
+
+**Was du brauchst:**
+
+- **Bluetooth-Empfänger in Home Assistant** – was du schon hast, reicht:
+  - **Shelly** der 2. und 3. Generation (Steckdosen, Unterputz). Im Shelly-Gerät unter **Konfigurieren → Bluetooth-Scan** auf **passiv** stellen.
+  - **ESPHome-Bluetooth-Proxys** (ein ESP32 für ein paar Euro). Sie melden häufiger als Shellys, Raumwechsel kommen damit schneller an.
+  - den Bluetooth-Stick am Home-Assistant-Rechner.
+
+  Ideal ist ungefähr ein Empfänger pro Raum. Räume ohne eigenen Empfänger (Flur, Gäste-WC) erkennt NeonPlan trotzdem: Das Einlernen merkt sich, wie sie für die Empfänger in den Nachbarräumen aussehen.
+- **Etwas, das du dabei hast:**
+  - **Apple Watch und iPhone** mit ihrem Schlüssel (IRK) – den liest der Schlüssel-Helfer in drei Minuten aus (siehe unten). Die Uhr am Handgelenk ist ideal: Ein iPhone in der Tasche wird bei dunklem Bildschirm nach etwa einer Minute still.
+  - **Android-Handys:** In der Home-Assistant-App unter **Einstellungen → Companion-App → Sensoren verwalten → BLE-Sender** einschalten. Kein Schlüssel nötig.
+  - **Schlüsselanhänger** mit fester Adresse oder als iBeacon (z. B. Nut, Tile, iBeacon-Tags). **AirTags gehen nicht** – sie wechseln ihre Adresse, und Apple gibt keinen Schlüssel heraus.
+
+**Einrichten** (Editor → **⚙ Einstellungen → 📡 Ortung**, nur Admins):
+
+1. **Empfänger:** NeonPlan listet alle Bluetooth-Empfänger von Home Assistant und schlägt ihren Raum vor – aus dem Home-Assistant-Bereich des Geräts, aus einem Pin oder Möbel im Plan (die Waschmaschine mit dem Strommesser der Shelly-Steckdose) oder aus dem Namen („PC Büro Steckdose“). Nach dem Einlernen weiß NeonPlan aus den Signalen selbst, wo jeder Empfänger steht, und bietet bei Abweichungen **„Signal sagt: … – übernehmen“** an.
+2. **Geräte:** Uhr und iPhone über den **🔑 Schlüssel-Helfer**, Android-Handys und Anhänger über **📱 Android-Handy oder Schlüsselanhänger hinzufügen** (das Gerät direkt an einen Empfänger halten); einen Schlüssel, den du schon hast, trägst du unter **🔑 Eigenen Schlüssel einfügen** ein. Gib jedem Gerät einen Namen, ordne es einer Person zu und – für „Lass mein iPhone klingeln“ – die Home-Assistant-App des Handys.
+3. **Einlernen:** Hake an, welche Geräte du gerade **dabei hast**. Geh in jeden Raum, tippe ihn an und lauf **90 Sekunden** langsam herum, auch in die Ecken und an den Wänden entlang. Ein Handy dabei in die **Tasche** (Bildschirm aus), so wie im Alltag – zum Antippen nimmst du am besten ein anderes Tablet oder Handy. **Einmal einlernen reicht:** Geräte ohne eigene Lerndaten nutzen die der anderen mit. Der Countdown läuft mit, bei 0 ist der Raum fertig (✓). Danach zeigt **Trefferquote prüfen**, wie sicher jeder Raum erkannt wird. Einen schwachen Raum lernst du einfach noch einmal ein.
+4. **Live:** Ortung einschalten und durchs Haus gehen – die Liste zeigt sofort, wo NeonPlan dich sieht.
+
+**In der 3D-Ansicht:**
+
+- **Uhr und Handy einer Person:** Was am Körper getragen wird (Uhr, Band – Haken **⌚ am Körper**, bei „Watch“ oder „Uhr“ im Namen schon gesetzt) bestimmt, wo die Person steht, solange es in den letzten zwei Minuten gehört wurde; sonst das zuletzt gehörte Gerät. Ein Handy, das in einem anderen Raum liegt, erscheint dort als eigenes kleines Symbol.
+- Personen stehen als **leuchtende Figur** in ihrer Farbe im Raum, mit dem Namen darüber. Dinge (Schlüssel, ein iPhone ohne Person) sind kleine runde Symbole. Antippen zeigt Raum, Sicherheit und seit wann.
+- Im Assistenten unter **4 · Live → Personen in 3D**: **Figur, Pin oder aus** – einmal fürs ganze Haus.
+- Das **Raumfenster** zeigt unter dem Namen, wer gerade hier ist, und die Etagen zählen die Personen mit.
+- **Personen nur für Admins zeigen** (im Schritt Live) blendet sie für alle anderen Benutzer aus.
+
+**Schneller mit Präsenzmeldern:** Bewegungs- und Präsenzmelder (auch Radar wie Aqara FP2), die in Home Assistant einem Bereich zugeordnet sind, beschleunigen die Ortung von selbst: Bluetooth sagt, **wer** es ist, der Melder sagt, **wann** jemand den Raum betritt. Ohne Melder dauert ein Raumwechsel zwei bis fünf Sekunden – mit Melder oft nur einen Augenblick.
+
+**Sprache** (mit den Assist-Sätzen unter **⚙ Einstellungen → Sprachsteuerung**): „Wo ist mein iPhone?“, „Wo ist Torsten?“, „Wer ist zu Hause?“, „Lass mein iPhone klingeln“. Die Antwort kommt direkt aus Home Assistant – auch ohne offenen NeonPlan-Bildschirm. Klingeln schickt eine laute Mitteilung an die Home-Assistant-App (auf dem iPhone als kritische Mitteilung, die auch im Lautlos-Modus klingelt).
+
+**Für Automationen:** Jedes Gerät hat einen Sensor, z. B. `sensor.torstens_uhr_raum`. Sein Zustand ist der Raumname; die Attribute sind `room_id`, `area_id` (der Home-Assistant-Bereich des Raums), `floor`, `probability` (Sicherheit 0–1), `since` und `last_seen`. Beispiel – Licht folgt dir:
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: sensor.torstens_uhr_raum
+    to: Küche
+actions:
+  - action: light.turn_on
+    target:
+      area_id: kueche
+```
+
+**Wie schnell ein Raumwechsel ankommt:** meist nach **zwei bis fünf Sekunden**. Das liegt an den Empfängern, nicht an NeonPlan: Ein **Shelly** meldet ein Gerät nur etwa **alle drei bis vier Sekunden** weiter, ein **ESP32-Bluetooth-Proxy etwa jede Sekunde**. Uhren senden ein- bis zweimal pro Sekunde, ein iPhone in der Tasche deutlich seltener. NeonPlan wartet zudem zwei, drei Messungen ab, damit die Anzeige nicht zwischen zwei Räumen hin- und herspringt. Schneller wird es mit **ESP32-Proxys** statt Shellys – und mit **Präsenzmeldern**, dann fast sofort.
+
+**Wo die Empfänger am besten stehen:**
+
+- **In einer Ecke oder an einer Außenwand des Raums – nicht an der Wand zum Nachbarraum.** Eine Steckdose direkt hinter der Wand hört dich im Nachbarraum fast genauso laut wie in ihrem eigenen Raum; dann springt die Anzeige zwischen beiden. (Beispiel: Du sitzt in der Küche, der Shelly des Wohnzimmers steckt direkt hinter dir in der gemeinsamen Wand.)
+- **Nicht Rücken an Rücken:** zwei Empfänger auf beiden Seiten derselben Wand machen die beiden Räume schwer zu unterscheiden.
+- **Frei statt verdeckt:** nicht hinter Kühlschrank, Heizkörper, Spiegel oder im Metall-Schaltschrank – Metall und Wasser schlucken Bluetooth.
+- **Ungefähr einer pro Raum.** Räume ohne eigenen Empfänger gehen trotzdem; große oder verwinkelte Räume profitieren von einem zweiten.
+- Wer einen Empfänger umsteckt, lernt die Räume daneben kurz neu ein.
+
+**Gut zu wissen:**
+
+- **Raumgenau, nicht zentimetergenau.** Bluetooth schwankt (schon der eigene Körper dämpft das Signal). NeonPlan sagt zuverlässig den Raum, nicht die Stelle im Raum.
+- **Alles bleibt im Haus.** Die Signale werden nur in Home Assistant ausgewertet, nichts geht ins Internet.
+- **Neu einlernen**, wenn du Empfänger umstellst oder neue dazukommen.
+- **Bermuda oder ESPresense im Einsatz?** NeonPlan läuft parallel und stört sie nicht. Richte deine Geräte einfach hier ein; wenn alles sicher läuft, stellst du deine Automationen auf die neuen Sensoren um und kannst die alten Werkzeuge entfernen.
+
+**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** am einfachsten mit dem **NeonPlan Schlüssel-Helfer** – ohne Mac, auch für die Apple Watch:
+
+1. Einen **ESP32** (ESP32, ESP32-C3 oder ESP32-S3, ca. 5 €) per USB an den Computer stecken und auf [neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/) mit Chrome oder Edge auf **Installieren** klicken. Danach das WLAN eintragen.
+2. Home Assistant findet **NeonPlan Key** als ESPHome-Gerät: **Einstellungen → Geräte & Dienste → Entdeckt → Hinzufügen**.
+3. Im Assistenten unter **Geräte → 🔑 Schlüssel-Helfer** „Für Apple Watch“ oder „Für iPhone / Android“ wählen und koppeln: auf der Uhr unter **Einstellungen → Bluetooth → Gesundheitsgeräte** „NeonPlan Key“ antippen, am Handy unter **Einstellungen → Bluetooth**. Der Schlüssel erscheint sofort – **Hinzufügen** tippen. Danach „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.
+4. **Weitere Geräte:** vorher **🔄 Nächstes Gerät** tippen – der Helfer bekommt eine neue Bluetooth-Kennung, damit sich das zuvor gekoppelte Gerät nicht wieder dazwischen verbindet.
+
+Den ESP32 kannst du danach weiterverwenden, am besten als ESPHome-Bluetooth-Proxy – dann macht er die Ortung sogar schneller. Der Helfer baut auf [irk-capture](https://github.com/DerekSeaman/irk-capture) von Derek Seaman auf (MIT-Lizenz) – danke! Andere Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein). Den Schlüssel fügst du dann im Assistenten unter **Geräte → Schlüssel einfügen** ein (als 32 Zeichen oder so, wie der Mac ihn zeigt).
+
 ---
 
 ## 6. Pro-Erweiterungen
