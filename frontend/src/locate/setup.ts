@@ -1372,22 +1372,29 @@ export class LocateSetup extends LitElement {
    * The NeonPlan key helper (an ESP32 with irk-capture, see site/keys): found by its profile select ("Heart Sensor" /
    * "Keyboard"); its IRK sensor shows the key of the device that paired last.
    */
-  private keyHelper(): { name: string; select: string; option: string; irk: string | null } | null {
+  private keyHelpers(): { name: string; select: string; option: string; irk: string | null; ours: boolean }[] {
+    const out = [];
     for (const [id, st] of Object.entries(this.hass.states)) {
       const options = st.attributes.options;
       if (!id.startsWith("select.") || !Array.isArray(options) || !options.includes("Heart Sensor") || !options.includes("Keyboard")) continue;
       const device = this.hass.entities?.[id]?.device_id;
       const irkEntity = Object.values(this.hass.entities ?? {}).find((e) => e.device_id === device && /_irk$/.test(e.entity_id))?.entity_id;
       const raw = irkEntity ? this.hass.states[irkEntity]?.state : undefined;
-      const name = (device && (this.hass.devices?.[device]?.name_by_user || this.hass.devices?.[device]?.name)) || String(st.attributes.friendly_name ?? id);
-      return { name, select: id, option: st.state, irk: raw ? irkHex(raw) : null };
+      const entry = device ? (this.hass.devices?.[device] as { name?: string | null; name_by_user?: string | null; model?: string | null } | undefined) : undefined;
+      const name = entry?.name_by_user || entry?.name || String(st.attributes.friendly_name ?? id);
+      out.push({ name, select: id, option: st.state, irk: raw ? irkHex(raw) : null, ours: entry?.model === "neonplan_key" || /neonplan[ _]key/i.test(id) });
     }
-    return null;
+    // NeonPlan's own helper first
+    return out.sort((x, y) => Number(y.ours) - Number(x.ours));
   }
+
+  /** The chosen key helper (several ESP32s with irk-capture can be in Home Assistant). */
+  private helperId: string | null = null;
 
   private renderKeyHelper(cfg: Config) {
     const t = this.t;
-    const helper = this.keyHelper();
+    const helpers = this.keyHelpers();
+    const helper = helpers.find((h) => h.select === this.helperId) ?? helpers[0];
     if (!helper) {
       return html`<h4>${t.helper_title}</h4>
         <p class="hint">${t.helper_none} <a href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">${t.helper_build} ↗</a></p>`;
@@ -1396,7 +1403,18 @@ export class LocateSetup extends LitElement {
     const pick = (option: string) => void this.hass.callService("select", "select_option", { entity_id: helper.select, option });
     const known = !!helper.irk && cfg.devices.some((d) => d.key === helper.irk);
     return html`<h4>${t.helper_title}</h4>
-      <p class="hint">${this.tr(t.helper_found, { name: helper.name })}</p>
+      ${helpers.length > 1
+        ? html`<p class="hint">
+            <select
+              @change=${(e: Event) => {
+                this.helperId = (e.target as HTMLSelectElement).value;
+                this.requestUpdate();
+              }}
+            >
+              ${helpers.map((h) => html`<option value=${h.select} ?selected=${h.select === helper.select}>${h.name}</option>`)}
+            </select>
+          </p>`
+        : html`<p class="hint">${this.tr(t.helper_found, { name: helper.name })}</p>`}
       <div class="row">
         <button class=${watch ? "on" : ""} @click=${() => pick("Heart Sensor")}>⌚ ${t.helper_watch}</button>
         <button class=${!watch ? "on" : ""} @click=${() => pick("Keyboard")}>📱 ${t.helper_phone}</button>
