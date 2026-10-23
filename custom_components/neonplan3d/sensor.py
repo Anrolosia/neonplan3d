@@ -88,6 +88,7 @@ class LocateSensor(SensorEntity):
             "last_seen": iso(state.get("last_seen")),
             "person": device.get("person"),
             "device_name": device.get("name"),
+            "wearable": bool(device.get("wearable")),
             "icon_name": device.get("icon"),
             "neonplan_locate": True,
         }

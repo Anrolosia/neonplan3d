@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
+import re
 import time
 from typing import Any
 
@@ -33,6 +34,12 @@ SAMPLE_EVERY = 2.0
 NEARBY_KEEP = 30.0
 MAX_SAMPLES_PER_ROOM = 120
 PRESENCE_CLASSES = {"motion", "occupancy", "presence"}
+# worn on the body: it tells where its person is (a phone may lie somewhere)
+WORN = re.compile(r"watch|uhr|band|ring|fit|garmin|wear", re.IGNORECASE)
+
+
+def worn_by_name(device: dict[str, Any]) -> bool:
+    return bool(WORN.search(str(device.get("name") or "")))
 
 
 def _clean_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -47,6 +54,7 @@ def _clean_devices(devices: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "kind": d["kind"],
                 "key": str(d.get("key", ""))[:64],
                 "person": d.get("person") if isinstance(d.get("person"), str) else None,
+                "wearable": d["wearable"] if isinstance(d.get("wearable"), bool) else worn_by_name(d),
                 "icon": str(d.get("icon") or "")[:40] or None,
                 "notify": d.get("notify") if isinstance(d.get("notify"), str) else None,
             }

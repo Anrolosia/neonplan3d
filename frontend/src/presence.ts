@@ -102,45 +102,73 @@ export function personsInRooms(hass: HomeAssistant, building: Building): PersonM
  * People and things NeonPlan's own locating puts in a room: its sensors (attribute neonplan_locate) name a room of
  * the plan. A device of a person who is away is left out; several in one room stand on a small circle.
  */
-export function locatedPersons(hass: HomeAssistant, building: Building, skip: ReadonlySet<string> = new Set()): PersonMarker[] {
-  const out: PersonMarker[] = [];
-  const perRoom = new Map<string, number>();
-  const shown = new Set<string>(skip);
+export function locatedPersons(hass: HomeAssistant, building: Building, skip: ReadonlySet<string> = new Set(), now = Date.now()): PersonMarker[] {
+  interface Found {
+    entityId: string;
+    name: string;
+    person: string | null;
+    floorId: string;
+    room: Room;
+    seen: number;
+    worn: boolean;
+  }
+  const found: Found[] = [];
   for (const [entityId, st] of Object.entries(hass.states)) {
     const a = st.attributes;
     if (!entityId.startsWith("sensor.") || a.neonplan_locate !== true || typeof a.room_id !== "string") continue;
-    const personId = typeof a.person === "string" ? a.person : null;
-    const person = personId ? hass.states[personId] : undefined;
-    if (person && person.state !== "home" && person.state !== "on") continue;
-    // a person with a watch and a phone stands once: the first sensor wins (the watch is listed first)
-    const id = personId ?? entityId;
-    if (shown.has(id)) continue;
     let hit: { floorId: string; room: Room } | null = null;
     for (const floor of building.floors) {
       const room = floor.rooms.find((r) => r.id === a.room_id);
       if (room) hit = { floorId: floor.id, room };
     }
     if (!hit) continue;
-    shown.add(id);
-    const i = perRoom.get(hit.room.id) ?? 0;
-    perRoom.set(hit.room.id, i + 1);
-    const [cx, cz] = centroid(hit.room.points);
-    const angle = -Math.PI / 2 + 0.9 + i * 1.15;
-    const name = (person?.attributes.friendly_name as string | undefined) ?? (typeof a.device_name === "string" ? a.device_name : entityId);
-    out.push({
-      id,
-      name,
-      initials: person ? initials(name) : name.slice(0, 1).toUpperCase(),
-      picture: (person?.attributes.entity_picture as string | undefined) ?? null,
+    const seen = typeof a.last_seen === "string" ? Date.parse(a.last_seen) : NaN;
+    found.push({
+      entityId,
+      name: typeof a.device_name === "string" ? a.device_name : entityId,
+      person: typeof a.person === "string" ? a.person : null,
       floorId: hit.floorId,
-      roomId: hit.room.id,
-      x: cx + Math.cos(angle) * 0.75,
-      z: cz + Math.sin(angle) * 0.75,
-      color: personColor(id),
-      entity: entityId,
-      tag: person ? name.split(/\s+/)[0] : name,
-      thing: !person,
+      room: hit.room,
+      seen: Number.isFinite(seen) ? seen : 0,
+      worn: a.wearable === true,
     });
+  }
+  const out: PersonMarker[] = [];
+  const perRoom = new Map<string, number>();
+  const place = (f: Found, marker: Omit<PersonMarker, "floorId" | "roomId" | "x" | "z">) => {
+    const i = perRoom.get(f.room.id) ?? 0;
+    perRoom.set(f.room.id, i + 1);
+    const [cx, cz] = centroid(f.room.points);
+    const angle = -Math.PI / 2 + 0.9 + i * 1.15;
+    out.push({ ...marker, floorId: f.floorId, roomId: f.room.id, x: cx + Math.cos(angle) * 0.75, z: cz + Math.sin(angle) * 0.75 });
+  };
+  const thing = (f: Found, color: string) =>
+    place(f, { id: f.entityId, name: f.name, initials: f.name.slice(0, 1).toUpperCase(), picture: null, color, entity: f.entityId, tag: f.name, thing: true });
+  const byPerson = new Map<string, Found[]>();
+  for (const f of found) {
+    if (!f.person) thing(f, personColor(f.entityId));
+    else byPerson.set(f.person, [...(byPerson.get(f.person) ?? []), f]);
+  }
+  for (const [personId, list] of byPerson) {
+    if (skip.has(personId)) continue;
+    const person = hass.states[personId];
+    // away: neither the person nor a device left at home is shown as the person
+    if (person && person.state !== "home" && person.state !== "on") continue;
+    // a worn device (watch) heard in the last two minutes tells where the person is; else the freshest device
+    const fresh = list.filter((f) => f.worn && now - f.seen < 120_000);
+    const main = (fresh.length ? fresh : list).reduce((a, b) => (b.seen > a.seen ? b : a));
+    const name = (person?.attributes.friendly_name as string | undefined) ?? main.name;
+    place(main, {
+      id: personId,
+      name,
+      initials: initials(name),
+      picture: (person?.attributes.entity_picture as string | undefined) ?? null,
+      color: personColor(personId),
+      entity: main.entityId,
+      tag: name.split(/\s+/)[0],
+    });
+    // a phone left in another room stands there as a thing ("where is my iPhone")
+    for (const f of list) if (f !== main && f.room.id !== main.room.id) thing(f, personColor(personId));
   }
   return out;
 }

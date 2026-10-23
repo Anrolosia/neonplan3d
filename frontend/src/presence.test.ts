@@ -69,24 +69,35 @@ test("floor labels count rooms, lights on, open windows and people", () => {
   assert.equal(floorInfoText(hass, counts), "2 Räume · 1 Licht an · 2 Pers.");
 });
 
-test("located people come from NeonPlan's own room sensors: a person once, away left out, things marked", () => {
+test("located people: a worn device places the person, a phone left elsewhere stands as a thing, away left out", () => {
   const { hass, building } = setup();
-  const loc = (room: string, person: string | null, name: string): HassEntity =>
-    st(`sensor.${name.toLowerCase()}_raum`, "x", { neonplan_locate: true, room_id: room, person, device_name: name });
-  for (const s of [loc("r1", "person.mia", "Uhr"), loc("r2", "person.mia", "iPhone"), loc("r2", "person.lea", "Leas Uhr"), loc("r2", null, "Schlüssel"), loc("nowhere", null, "Tag")]) {
+  const now = Date.parse("2026-10-23T12:00:00Z");
+  const iso = (agoS: number) => new Date(now - agoS * 1000).toISOString();
+  const loc = (room: string, person: string | null, name: string, worn: boolean, agoS: number): HassEntity =>
+    st(`sensor.${name.toLowerCase().replace(/\s+/g, "_")}_raum`, "x", { neonplan_locate: true, room_id: room, person, device_name: name, wearable: worn, last_seen: iso(agoS) });
+  for (const s of [
+    loc("r2", "person.mia", "Mia iPhone", false, 5), // fresher, but left in the kitchen
+    loc("r1", "person.mia", "Mia Watch", true, 20), // worn: Mia is in the living room
+    loc("r2", "person.lea", "Leas Uhr", true, 3), // Lea is away
+    loc("r2", null, "Schlüssel", false, 60),
+    loc("nowhere", null, "Tag", false, 1),
+  ]) {
     hass.states[s.entity_id] = s;
   }
-  const people = locatedPersons(hass, building);
-  // Mia once (her first sensor wins), Lea is away, the keys are a thing, a room outside the plan is skipped
+  const people = locatedPersons(hass, building, new Set(), now);
   assert.deepEqual(
     people.map((p) => [p.id, p.roomId, p.thing ?? false, p.tag]),
     [
-      ["person.mia", "r1", false, "Mia"],
       ["sensor.schlüssel_raum", "r2", true, "Schlüssel"],
+      ["person.mia", "r1", false, "Mia"],
+      ["sensor.mia_iphone_raum", "r2", true, "Mia iPhone"],
     ],
   );
-  assert.equal(people[0].entity, "sensor.uhr_raum");
-  assert.equal(people[0].color, personColor("person.mia"));
+  assert.equal(people[1].entity, "sensor.mia_watch_raum");
+  assert.equal(people[1].color, personColor("person.mia"));
+  // the watch silent for minutes: the freshest device places her
+  hass.states["sensor.mia_watch_raum"].attributes.last_seen = iso(600);
+  assert.equal(locatedPersons(hass, building, new Set(), now).find((p) => p.id === "person.mia")?.roomId, "r2");
   // the ones already shown by the room sensors are skipped
-  assert.equal(locatedPersons(hass, building, new Set(["person.mia"])).length, 1);
+  assert.equal(locatedPersons(hass, building, new Set(["person.mia"]), now).filter((p) => !p.thing).length, 0);
 });

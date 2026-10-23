@@ -82,12 +82,13 @@ def _where(hass: HomeAssistant, service: LocateService, who: str, devices: list[
     person = devices[0].get("person")
     if person and (state := hass.states.get(person)) and state.state not in ("home", "on"):
         return t["away"].format(who=who)
-    # the freshest device that sits in a room wins
-    best = None
-    for device in devices:
-        st = service.state.get(device["id"]) or {}
-        if st.get("room_name") and (best is None or (st.get("last_seen") or 0) > (best.get("last_seen") or 0)):
-            best = st
+    # a worn device heard in the last two minutes tells where the person is; else the freshest one
+    now = time.time()
+    placed = [(d, service.state.get(d["id"]) or {}) for d in devices]
+    placed = [(d, st) for d, st in placed if st.get("room_name")]
+    worn = [st for d, st in placed if d.get("wearable") and now - (st.get("last_seen") or 0) < 120]
+    pool = worn or [st for _d, st in placed]
+    best = max(pool, key=lambda st: st.get("last_seen") or 0, default=None)
     if best is None:
         return t["unheard"].format(who=who)
     ago = int((time.time() - (best.get("last_seen") or time.time())) // 60)

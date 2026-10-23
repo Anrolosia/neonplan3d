@@ -23,6 +23,7 @@ interface Device {
   person: string | null;
   icon: string | null;
   notify?: string | null;
+  wearable?: boolean;
 }
 interface Config {
   enabled: boolean;
@@ -103,6 +104,8 @@ const DE = {
   carry: "Ich habe gerade dabei:",
   offline: "gerade nicht erreichbar",
   pbd_summary: "Von Bermuda umsteigen? Schlüssel aus Home Assistant übernehmen",
+  worn: "am Körper",
+  worn_hint: "Am Körper getragen (Uhr, Band): zeigt, wo die Person ist – ein Handy kann irgendwo liegen.",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -172,6 +175,8 @@ const EN: typeof DE = {
   carry: "I am carrying:",
   offline: "not reachable right now",
   pbd_summary: "Moving from Bermuda? Take over keys from Home Assistant",
+  worn: "worn",
+  worn_hint: "Worn on the body (watch, band): tells where the person is – a phone may lie somewhere.",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -242,6 +247,8 @@ const CS: typeof DE = {
   carry: "Právě mám u sebe:",
   offline: "momentálně nedostupný",
   pbd_summary: "Přecházíte z Bermudy? Převzít klíče z Home Assistantu",
+  worn: "nošené",
+  worn_hint: "Nošené na těle (hodinky, náramek): ukazuje, kde osoba je – telefon může někde ležet.",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -311,6 +318,8 @@ const DA: typeof DE = {
   carry: "Jeg har med lige nu:",
   offline: "ikke tilgængelig lige nu",
   pbd_summary: "Skifter du fra Bermuda? Overtag nøgler fra Home Assistant",
+  worn: "båret",
+  worn_hint: "Båret på kroppen (ur, armbånd): viser, hvor personen er – en telefon kan ligge et sted.",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -380,6 +389,8 @@ const ES: typeof DE = {
   carry: "Llevo conmigo:",
   offline: "no disponible ahora",
   pbd_summary: "¿Vienes de Bermuda? Usar claves de Home Assistant",
+  worn: "llevado",
+  worn_hint: "Llevado encima (reloj, pulsera): indica dónde está la persona; un móvil puede estar en cualquier sitio.",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -449,6 +460,8 @@ const FI: typeof DE = {
   carry: "Minulla on mukana:",
   offline: "ei juuri nyt tavoitettavissa",
   pbd_summary: "Siirrytkö Bermudasta? Ota avaimet Home Assistantista",
+  worn: "päällä",
+  worn_hint: "Kehossa (kello, ranneke): kertoo, missä henkilö on – puhelin voi olla missä vain.",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -518,6 +531,8 @@ const FR: typeof DE = {
   carry: "J’ai sur moi :",
   offline: "injoignable pour le moment",
   pbd_summary: "Vous venez de Bermuda ? Reprendre les clés de Home Assistant",
+  worn: "porté",
+  worn_hint: "Porté sur soi (montre, bracelet) : indique où se trouve la personne – un téléphone peut traîner ailleurs.",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -587,6 +602,8 @@ const HU: typeof DE = {
   carry: "Most nálam van:",
   offline: "jelenleg nem érhető el",
   pbd_summary: "Bermudáról vált? Kulcsok átvétele a Home Assistantból",
+  worn: "viselt",
+  worn_hint: "Testen viselt (óra, karpánt): megmutatja, hol van a személy – a telefon bárhol heverhet.",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -656,6 +673,8 @@ const IT: typeof DE = {
   carry: "Ho con me:",
   offline: "non raggiungibile ora",
   pbd_summary: "Arrivi da Bermuda? Prendi le chiavi da Home Assistant",
+  worn: "indossato",
+  worn_hint: "Indossato (orologio, braccialetto): indica dove si trova la persona – un telefono può restare ovunque.",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -725,6 +744,8 @@ const NB: typeof DE = {
   carry: "Jeg har med meg:",
   offline: "ikke tilgjengelig nå",
   pbd_summary: "Bytter du fra Bermuda? Hent nøkler fra Home Assistant",
+  worn: "båret",
+  worn_hint: "Båret på kroppen (klokke, bånd): viser hvor personen er – en telefon kan ligge hvor som helst.",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -794,6 +815,8 @@ const NL: typeof DE = {
   carry: "Ik heb nu bij me:",
   offline: "nu niet bereikbaar",
   pbd_summary: "Kom je van Bermuda? Sleutels uit Home Assistant overnemen",
+  worn: "gedragen",
+  worn_hint: "Op het lichaam gedragen (horloge, band): bepaalt waar de persoon is – een telefoon kan ergens liggen.",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -863,6 +886,8 @@ const NN: typeof DE = {
   carry: "Eg har med meg:",
   offline: "ikkje tilgjengeleg no",
   pbd_summary: "Byter du frå Bermuda? Hent nøklar frå Home Assistant",
+  worn: "bore",
+  worn_hint: "Bore på kroppen (klokke, band): viser kvar personen er – ein telefon kan liggje kvar som helst.",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -932,6 +957,8 @@ const PL: typeof DE = {
   carry: "Mam teraz przy sobie:",
   offline: "chwilowo niedostępny",
   pbd_summary: "Przechodzisz z Bermudy? Przejmij klucze z Home Assistant",
+  worn: "noszone",
+  worn_hint: "Noszone na ciele (zegarek, opaska): pokazuje, gdzie jest osoba – telefon może gdzieś leżeć.",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -1001,6 +1028,8 @@ const PT: typeof DE = {
   carry: "Tenho comigo:",
   offline: "indisponível de momento",
   pbd_summary: "Vem do Bermuda? Usar as chaves do Home Assistant",
+  worn: "usado",
+  worn_hint: "Usado no corpo (relógio, pulseira): indica onde está a pessoa – um telemóvel pode estar pousado noutro sítio.",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -1070,6 +1099,8 @@ const RO: typeof DE = {
   carry: "Am la mine acum:",
   offline: "indisponibil momentan",
   pbd_summary: "Treci de la Bermuda? Preia cheile din Home Assistant",
+  worn: "purtat",
+  worn_hint: "Purtat pe corp (ceas, brățară): arată unde este persoana – un telefon poate sta oriunde.",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -1139,6 +1170,8 @@ const SL: typeof DE = {
   carry: "Trenutno imam pri sebi:",
   offline: "trenutno nedosegljiv",
   pbd_summary: "Prehajate z Bermude? Prevzemite ključe iz Home Assistanta",
+  worn: "nošeno",
+  worn_hint: "Nošeno na telesu (ura, zapestnica): pove, kje je oseba – telefon lahko leži kjerkoli.",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -1208,6 +1241,8 @@ const SV: typeof DE = {
   carry: "Jag har med mig:",
   offline: "inte nåbar just nu",
   pbd_summary: "Byter du från Bermuda? Hämta nycklar från Home Assistant",
+  worn: "buret",
+  worn_hint: "Bärs på kroppen (klocka, band): visar var personen är – en telefon kan ligga var som helst.",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -1277,6 +1312,8 @@ const ZH: typeof DE = {
   carry: "我现在随身带着：",
   offline: "暂时无法连接",
   pbd_summary: "从 Bermuda 迁移？从 Home Assistant 导入密钥",
+  worn: "随身佩戴",
+  worn_hint: "随身佩戴（手表、手环）：决定人在哪里——手机可能放在别处。",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1705,6 +1742,10 @@ export class LocateSetup extends LitElement {
                 <input .value=${d.name} @change=${(e: Event) => setDevice(d.id, { name: (e.target as HTMLInputElement).value })} />
                 ${this.personSelect(d.person, (p) => setDevice(d.id, { person: p }))}
                 ${this.notifySelect(d.notify ?? null, (n) => setDevice(d.id, { notify: n }))}
+                <label class="row" title=${t.worn_hint}
+                  ><input type="checkbox" .checked=${!!d.wearable} @change=${(e: Event) => setDevice(d.id, { wearable: (e.target as HTMLInputElement).checked })} />⌚
+                  ${t.worn}</label
+                >
                 <button @click=${() => void this.save({ devices: cfg.devices.filter((x) => x.id !== d.id) })}>${t.remove}</button>
               </li>`,
             )}
