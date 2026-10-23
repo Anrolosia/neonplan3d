@@ -106,6 +106,10 @@ const DE = {
   pbd_summary: "Von Bermuda umsteigen? Schlüssel aus Home Assistant übernehmen",
   worn: "am Körper",
   worn_hint: "Am Körper getragen (Uhr, Band): zeigt, wo die Person ist – ein Handy kann irgendwo liegen.",
+  look_title: "Personen in 3D",
+  look_figure: "Figur",
+  look_pin: "Pin",
+  look_off: "aus",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -177,6 +181,10 @@ const EN: typeof DE = {
   pbd_summary: "Moving from Bermuda? Take over keys from Home Assistant",
   worn: "worn",
   worn_hint: "Worn on the body (watch, band): tells where the person is – a phone may lie somewhere.",
+  look_title: "People in 3D",
+  look_figure: "Figure",
+  look_pin: "Pin",
+  look_off: "Off",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -249,6 +257,10 @@ const CS: typeof DE = {
   pbd_summary: "Přecházíte z Bermudy? Převzít klíče z Home Assistantu",
   worn: "nošené",
   worn_hint: "Nošené na těle (hodinky, náramek): ukazuje, kde osoba je – telefon může někde ležet.",
+  look_title: "Osoby ve 3D",
+  look_figure: "Postava",
+  look_pin: "Špendlík",
+  look_off: "Vyp.",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -320,6 +332,10 @@ const DA: typeof DE = {
   pbd_summary: "Skifter du fra Bermuda? Overtag nøgler fra Home Assistant",
   worn: "båret",
   worn_hint: "Båret på kroppen (ur, armbånd): viser, hvor personen er – en telefon kan ligge et sted.",
+  look_title: "Personer i 3D",
+  look_figure: "Figur",
+  look_pin: "Nål",
+  look_off: "Fra",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -391,6 +407,10 @@ const ES: typeof DE = {
   pbd_summary: "¿Vienes de Bermuda? Usar claves de Home Assistant",
   worn: "llevado",
   worn_hint: "Llevado encima (reloj, pulsera): indica dónde está la persona; un móvil puede estar en cualquier sitio.",
+  look_title: "Personas en 3D",
+  look_figure: "Figura",
+  look_pin: "Pin",
+  look_off: "No",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -462,6 +482,10 @@ const FI: typeof DE = {
   pbd_summary: "Siirrytkö Bermudasta? Ota avaimet Home Assistantista",
   worn: "päällä",
   worn_hint: "Kehossa (kello, ranneke): kertoo, missä henkilö on – puhelin voi olla missä vain.",
+  look_title: "Henkilöt 3D:ssä",
+  look_figure: "Hahmo",
+  look_pin: "Merkki",
+  look_off: "Pois",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -533,6 +557,10 @@ const FR: typeof DE = {
   pbd_summary: "Vous venez de Bermuda ? Reprendre les clés de Home Assistant",
   worn: "porté",
   worn_hint: "Porté sur soi (montre, bracelet) : indique où se trouve la personne – un téléphone peut traîner ailleurs.",
+  look_title: "Personnes en 3D",
+  look_figure: "Silhouette",
+  look_pin: "Repère",
+  look_off: "Non",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -604,6 +632,10 @@ const HU: typeof DE = {
   pbd_summary: "Bermudáról vált? Kulcsok átvétele a Home Assistantból",
   worn: "viselt",
   worn_hint: "Testen viselt (óra, karpánt): megmutatja, hol van a személy – a telefon bárhol heverhet.",
+  look_title: "Személyek 3D-ben",
+  look_figure: "Alak",
+  look_pin: "Jelölő",
+  look_off: "Ki",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -675,6 +707,10 @@ const IT: typeof DE = {
   pbd_summary: "Arrivi da Bermuda? Prendi le chiavi da Home Assistant",
   worn: "indossato",
   worn_hint: "Indossato (orologio, braccialetto): indica dove si trova la persona – un telefono può restare ovunque.",
+  look_title: "Persone in 3D",
+  look_figure: "Figura",
+  look_pin: "Segnaposto",
+  look_off: "No",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -746,6 +782,10 @@ const NB: typeof DE = {
   pbd_summary: "Bytter du fra Bermuda? Hent nøkler fra Home Assistant",
   worn: "båret",
   worn_hint: "Båret på kroppen (klokke, bånd): viser hvor personen er – en telefon kan ligge hvor som helst.",
+  look_title: "Personer i 3D",
+  look_figure: "Figur",
+  look_pin: "Nål",
+  look_off: "Av",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -817,6 +857,10 @@ const NL: typeof DE = {
   pbd_summary: "Kom je van Bermuda? Sleutels uit Home Assistant overnemen",
   worn: "gedragen",
   worn_hint: "Op het lichaam gedragen (horloge, band): bepaalt waar de persoon is – een telefoon kan ergens liggen.",
+  look_title: "Personen in 3D",
+  look_figure: "Figuur",
+  look_pin: "Speld",
+  look_off: "Uit",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -888,6 +932,10 @@ const NN: typeof DE = {
   pbd_summary: "Byter du frå Bermuda? Hent nøklar frå Home Assistant",
   worn: "bore",
   worn_hint: "Bore på kroppen (klokke, band): viser kvar personen er – ein telefon kan liggje kvar som helst.",
+  look_title: "Personar i 3D",
+  look_figure: "Figur",
+  look_pin: "Nål",
+  look_off: "Av",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -959,6 +1007,10 @@ const PL: typeof DE = {
   pbd_summary: "Przechodzisz z Bermudy? Przejmij klucze z Home Assistant",
   worn: "noszone",
   worn_hint: "Noszone na ciele (zegarek, opaska): pokazuje, gdzie jest osoba – telefon może gdzieś leżeć.",
+  look_title: "Osoby w 3D",
+  look_figure: "Postać",
+  look_pin: "Pinezka",
+  look_off: "Wył.",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -1030,6 +1082,10 @@ const PT: typeof DE = {
   pbd_summary: "Vem do Bermuda? Usar as chaves do Home Assistant",
   worn: "usado",
   worn_hint: "Usado no corpo (relógio, pulseira): indica onde está a pessoa – um telemóvel pode estar pousado noutro sítio.",
+  look_title: "Pessoas em 3D",
+  look_figure: "Figura",
+  look_pin: "Marcador",
+  look_off: "Não",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -1101,6 +1157,10 @@ const RO: typeof DE = {
   pbd_summary: "Treci de la Bermuda? Preia cheile din Home Assistant",
   worn: "purtat",
   worn_hint: "Purtat pe corp (ceas, brățară): arată unde este persoana – un telefon poate sta oriunde.",
+  look_title: "Persoane în 3D",
+  look_figure: "Siluetă",
+  look_pin: "Reper",
+  look_off: "Oprit",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -1172,6 +1232,10 @@ const SL: typeof DE = {
   pbd_summary: "Prehajate z Bermude? Prevzemite ključe iz Home Assistanta",
   worn: "nošeno",
   worn_hint: "Nošeno na telesu (ura, zapestnica): pove, kje je oseba – telefon lahko leži kjerkoli.",
+  look_title: "Osebe v 3D",
+  look_figure: "Figura",
+  look_pin: "Žebljiček",
+  look_off: "Izklop",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -1243,6 +1307,10 @@ const SV: typeof DE = {
   pbd_summary: "Byter du från Bermuda? Hämta nycklar från Home Assistant",
   worn: "buret",
   worn_hint: "Bärs på kroppen (klocka, band): visar var personen är – en telefon kan ligga var som helst.",
+  look_title: "Personer i 3D",
+  look_figure: "Figur",
+  look_pin: "Nål",
+  look_off: "Av",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -1314,6 +1382,10 @@ const ZH: typeof DE = {
   pbd_summary: "从 Bermuda 迁移？从 Home Assistant 导入密钥",
   worn: "随身佩戴",
   worn_hint: "随身佩戴（手表、手环）：决定人在哪里——手机可能放在别处。",
+  look_title: "3D 中的人员",
+  look_figure: "人形",
+  look_pin: "图钉",
+  look_off: "关",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1381,6 +1453,8 @@ export class LocateSetup extends LitElement {
   private timer = 0;
   /** Where the current Home Assistant state comes from (the panel's live hass): new devices and states show at once. */
   hassSource: (() => HomeAssistant | undefined) | null = null;
+  /** Writes how people show in 3D into the plan (the editor's setter; null when opened elsewhere). */
+  setLook: ((look: "figure" | "pin" | "off") => void) | null = null;
   private unsub: (() => void) | null = null;
 
   private get t(): typeof DE {
@@ -1886,6 +1960,22 @@ export class LocateSetup extends LitElement {
       ${this.voiceLanguage ? html`<p class="hint">${t.voice_hint}</p>` : nothing}
       <label class="row"><input type="checkbox" .checked=${cfg.enabled} @change=${(e: Event) => void this.save({ enabled: (e.target as HTMLInputElement).checked })} /> ${t.enabled}</label>
       <label class="row"><input type="checkbox" .checked=${cfg.admins_only} @change=${(e: Event) => void this.save({ admins_only: (e.target as HTMLInputElement).checked })} /> ${t.admins_only}</label>
+      ${this.setLook
+        ? html`<div class="row">
+            <b>${t.look_title}</b>
+            ${(["figure", "pin", "off"] as const).map(
+              (look) => html`<button
+                class=${(this.building.settings.person_look ?? "figure") === look ? "on" : ""}
+                @click=${() => {
+                  this.setLook?.(look);
+                  this.building = { ...this.building, settings: { ...this.building.settings, person_look: look === "figure" ? null : look } };
+                }}
+              >
+                ${look === "figure" ? t.look_figure : look === "pin" ? t.look_pin : t.look_off}
+              </button>`,
+            )}
+          </div>`
+        : nothing}
       <ul class="list big">
         ${(live?.devices ?? []).map(
           (d) => html`<li>

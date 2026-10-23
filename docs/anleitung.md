@@ -793,7 +793,7 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
 
 - **Uhr und Handy einer Person:** Was am Körper getragen wird (Uhr, Band – Haken **⌚ am Körper**, bei „Watch“ oder „Uhr“ im Namen schon gesetzt) bestimmt, wo die Person steht, solange es in den letzten zwei Minuten gehört wurde; sonst das zuletzt gehörte Gerät. Ein Handy, das in einem anderen Raum liegt, erscheint dort als eigenes kleines Symbol.
 - Personen stehen als **leuchtende Figur** in ihrer Farbe im Raum, mit dem Namen darüber. Dinge (Schlüssel, ein iPhone ohne Person) sind kleine runde Symbole. Antippen zeigt Raum, Sicherheit und seit wann.
-- Im Editor unter **⚙ Einstellungen → Haus → Personen**: **Figur, Pin oder aus** – einmal fürs ganze Haus.
+- Im Assistenten unter **4 · Live → Personen in 3D**: **Figur, Pin oder aus** – einmal fürs ganze Haus.
 - Das **Raumfenster** zeigt unter dem Namen, wer gerade hier ist, und die Etagen zählen die Personen mit.
 - **Personen nur für Admins zeigen** (im Schritt Live) blendet sie für alle anderen Benutzer aus.
 

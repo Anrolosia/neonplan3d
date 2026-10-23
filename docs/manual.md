@@ -793,7 +793,7 @@ NeonPlan shows which room you are in right now – and where your iPhone or your
 
 - **A person's watch and phone:** what is worn on the body (watch, band – tick **⌚ worn**, already set for "watch" in the name) tells where the person stands while it was heard in the last two minutes; otherwise the device heard last. A phone lying in another room shows there as a small symbol of its own.
 - People stand as a **glowing figure** in their colour in the room, with the name above. Things (keys, an iPhone without a person) are small round symbols. A tap shows the room, the certainty and since when.
-- In the editor under **⚙ Settings → House → People**: **figure, pin or off** – once for the whole house.
+- In the assistant under **4 · Live → People in 3D**: **figure, pin or off** – once for the whole house.
 - The **room panel** shows under its name who is here now, and the floors count the people.
 - **Show people to admins only** (in the Live step) hides them from all other users.
 
