@@ -38,9 +38,14 @@ class Identity:
                 self.by_beacon[key.lower()] = dev_id
             elif kind == "irk" and get_cipher_for_irk is not None:
                 try:
-                    self.ciphers.append((dev_id, get_cipher_for_irk(binascii.unhexlify(key))))
+                    irk = binascii.unhexlify(key)
                 except (ValueError, binascii.Error):
                     continue
+                if len(irk) != 16:
+                    continue
+                # some read-out tools show the key in reversed byte order: both are tried
+                self.ciphers.append((dev_id, get_cipher_for_irk(irk)))
+                self.ciphers.append((dev_id, get_cipher_for_irk(irk[::-1])))
 
     def resolve(self, address: str, adv: Any) -> str | None:
         if (dev := self.by_address.get(address)) is not None:

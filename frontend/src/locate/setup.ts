@@ -76,6 +76,10 @@ const DE = {
   ring: "Klingeln",
   ring_hint: "Die Home-Assistant-App auf diesem Handy – dann klappt „Lass mein iPhone klingeln“.",
   near_title: "Gerät in der Nähe suchen",
+  key_title: "Schlüssel einfügen",
+  key_name: "Name (z. B. Torstens iPhone)",
+  key_value: "Schlüssel (IRK, 32 Zeichen)",
+  key_bad: "Das ist kein gültiger Schlüssel (32 Hex-Zeichen oder Base64).",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -119,6 +123,10 @@ const EN: typeof DE = {
   ring: "Ring",
   ring_hint: "The Home Assistant app on this phone – then \"ring my iPhone\" works.",
   near_title: "Find a device nearby",
+  key_title: "Paste a key",
+  key_name: "Name (e.g. Torsten's iPhone)",
+  key_value: "Key (IRK, 32 characters)",
+  key_bad: "That is not a valid key (32 hex characters or Base64).",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -163,6 +171,10 @@ const CS: typeof DE = {
   ring: "Prozvonit",
   ring_hint: "Aplikace Home Assistant na tomto telefonu – pak funguje „Prozvoň můj iPhone“.",
   near_title: "Hledat zařízení poblíž",
+  key_title: "Vložit klíč",
+  key_name: "Název (např. Torstenův iPhone)",
+  key_value: "Klíč (IRK, 32 znaků)",
+  key_bad: "Toto není platný klíč (32 hex znaků nebo Base64).",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -206,6 +218,10 @@ const DA: typeof DE = {
   ring: "Ring",
   ring_hint: "Home Assistant-appen på denne telefon – så virker »Ring til min iPhone«.",
   near_title: "Find enhed i nærheden",
+  key_title: "Indsæt nøgle",
+  key_name: "Navn (f.eks. Torstens iPhone)",
+  key_value: "Nøgle (IRK, 32 tegn)",
+  key_bad: "Det er ikke en gyldig nøgle (32 hex-tegn eller Base64).",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -249,6 +265,10 @@ const ES: typeof DE = {
   ring: "Hacer sonar",
   ring_hint: "La app de Home Assistant en este móvil – así funciona “Haz sonar mi iPhone”.",
   near_title: "Buscar dispositivo cercano",
+  key_title: "Pegar clave",
+  key_name: "Nombre (p. ej. iPhone de Torsten)",
+  key_value: "Clave (IRK, 32 caracteres)",
+  key_bad: "No es una clave válida (32 caracteres hex o Base64).",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -292,6 +312,10 @@ const FI: typeof DE = {
   ring: "Soita",
   ring_hint: "Home Assistant -sovellus tässä puhelimessa – silloin ”Soita iPhoneani” toimii.",
   near_title: "Etsi laite läheltä",
+  key_title: "Liitä avain",
+  key_name: "Nimi (esim. Torstenin iPhone)",
+  key_value: "Avain (IRK, 32 merkkiä)",
+  key_bad: "Tämä ei ole kelvollinen avain (32 heksamerkkiä tai Base64).",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -335,6 +359,10 @@ const FR: typeof DE = {
   ring: "Faire sonner",
   ring_hint: "L’app Home Assistant sur ce téléphone – alors « Fais sonner mon iPhone » fonctionne.",
   near_title: "Trouver un appareil à proximité",
+  key_title: "Coller une clé",
+  key_name: "Nom (p. ex. iPhone de Torsten)",
+  key_value: "Clé (IRK, 32 caractères)",
+  key_bad: "Ce n'est pas une clé valide (32 caractères hex ou Base64).",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -378,6 +406,10 @@ const HU: typeof DE = {
   ring: "Csörgetés",
   ring_hint: "A Home Assistant alkalmazás ezen a telefonon – így működik a „Csörgesd meg az iPhone-omat”.",
   near_title: "Közeli eszköz keresése",
+  key_title: "Kulcs beillesztése",
+  key_name: "Név (pl. Torsten iPhone-ja)",
+  key_value: "Kulcs (IRK, 32 karakter)",
+  key_bad: "Ez nem érvényes kulcs (32 hex karakter vagy Base64).",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -421,6 +453,10 @@ const IT: typeof DE = {
   ring: "Fai squillare",
   ring_hint: "L’app Home Assistant su questo telefono – così funziona “Fai squillare il mio iPhone”.",
   near_title: "Cerca dispositivo vicino",
+  key_title: "Incolla chiave",
+  key_name: "Nome (es. iPhone di Torsten)",
+  key_value: "Chiave (IRK, 32 caratteri)",
+  key_bad: "Non è una chiave valida (32 caratteri hex o Base64).",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -464,6 +500,10 @@ const NB: typeof DE = {
   ring: "Ring",
   ring_hint: "Home Assistant-appen på denne telefonen – da virker «Ring iPhonen min».",
   near_title: "Finn enhet i nærheten",
+  key_title: "Lim inn nøkkel",
+  key_name: "Navn (f.eks. Torstens iPhone)",
+  key_value: "Nøkkel (IRK, 32 tegn)",
+  key_bad: "Dette er ikke en gyldig nøkkel (32 hex-tegn eller Base64).",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -507,6 +547,10 @@ const NL: typeof DE = {
   ring: "Laten overgaan",
   ring_hint: "De Home Assistant-app op deze telefoon – dan werkt “Laat mijn iPhone overgaan”.",
   near_title: "Apparaat in de buurt zoeken",
+  key_title: "Sleutel plakken",
+  key_name: "Naam (bijv. iPhone van Torsten)",
+  key_value: "Sleutel (IRK, 32 tekens)",
+  key_bad: "Dat is geen geldige sleutel (32 hex-tekens of Base64).",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -550,6 +594,10 @@ const NN: typeof DE = {
   ring: "Ring",
   ring_hint: "Home Assistant-appen på denne telefonen – då verkar «Ring iPhonen min».",
   near_title: "Finn eining i nærleiken",
+  key_title: "Lim inn nøkkel",
+  key_name: "Namn (t.d. iPhonen til Torsten)",
+  key_value: "Nøkkel (IRK, 32 teikn)",
+  key_bad: "Dette er ikkje ein gyldig nøkkel (32 hex-teikn eller Base64).",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -593,6 +641,10 @@ const PL: typeof DE = {
   ring: "Zadzwoń",
   ring_hint: "Aplikacja Home Assistant na tym telefonie – wtedy działa „Zadzwoń na mój iPhone”.",
   near_title: "Szukaj urządzenia w pobliżu",
+  key_title: "Wklej klucz",
+  key_name: "Nazwa (np. iPhone Torstena)",
+  key_value: "Klucz (IRK, 32 znaki)",
+  key_bad: "To nie jest prawidłowy klucz (32 znaki hex lub Base64).",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -636,6 +688,10 @@ const PT: typeof DE = {
   ring: "Fazer tocar",
   ring_hint: "A app Home Assistant neste telemóvel – assim funciona “Faz tocar o meu iPhone”.",
   near_title: "Procurar dispositivo próximo",
+  key_title: "Colar chave",
+  key_name: "Nome (ex.: iPhone do Torsten)",
+  key_value: "Chave (IRK, 32 caracteres)",
+  key_bad: "Esta não é uma chave válida (32 caracteres hex ou Base64).",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -679,6 +735,10 @@ const RO: typeof DE = {
   ring: "Sună",
   ring_hint: "Aplicația Home Assistant pe acest telefon – atunci merge „Sună-mi iPhone-ul”.",
   near_title: "Caută dispozitiv în apropiere",
+  key_title: "Lipește cheia",
+  key_name: "Nume (de ex. iPhone-ul lui Torsten)",
+  key_value: "Cheie (IRK, 32 de caractere)",
+  key_bad: "Aceasta nu este o cheie validă (32 de caractere hex sau Base64).",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -722,6 +782,10 @@ const SL: typeof DE = {
   ring: "Pozvoni",
   ring_hint: "Aplikacija Home Assistant na tem telefonu – potem deluje „Pozvoni moj iPhone“.",
   near_title: "Poišči napravo v bližini",
+  key_title: "Prilepi ključ",
+  key_name: "Ime (npr. Torstenov iPhone)",
+  key_value: "Ključ (IRK, 32 znakov)",
+  key_bad: "To ni veljaven ključ (32 šestnajstiških znakov ali Base64).",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -765,6 +829,10 @@ const SV: typeof DE = {
   ring: "Ring",
   ring_hint: "Home Assistant-appen på den här telefonen – då fungerar ”Ring min iPhone”.",
   near_title: "Hitta enhet i närheten",
+  key_title: "Klistra in nyckel",
+  key_name: "Namn (t.ex. Torstens iPhone)",
+  key_value: "Nyckel (IRK, 32 tecken)",
+  key_bad: "Det är ingen giltig nyckel (32 hex-tecken eller Base64).",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -808,6 +876,10 @@ const ZH: typeof DE = {
   ring: "响铃",
   ring_hint: "此手机上的 Home Assistant 应用 – 这样“让我的 iPhone 响铃”就能用了。",
   near_title: "查找附近的设备",
+  key_title: "粘贴密钥",
+  key_name: "名称（例如 Torsten 的 iPhone）",
+  key_value: "密钥（IRK，32 个字符）",
+  key_bad: "这不是有效的密钥（32 个十六进制字符或 Base64）。",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -824,6 +896,20 @@ const ZH: typeof DE = {
   next: "下一步",
   need_device: "请先添加设备。",
 };
+
+/** An IRK as 32 hex characters: pasted as hex (with or without separators) or as Base64 (as the Mac keychain shows it). */
+export function irkHex(raw: string): string | null {
+  const text = raw.trim().replace(/^irk:/i, "");
+  const hex = text.replace(/[\s:-]/g, "");
+  if (/^[0-9a-f]{32}$/i.test(hex)) return hex.toLowerCase();
+  try {
+    const bytes = atob(text.replace(/\s/g, ""));
+    if (bytes.length === 16) return [...bytes].map((c) => c.charCodeAt(0).toString(16).padStart(2, "0")).join("");
+  } catch {
+    // not Base64
+  }
+  return null;
+}
 
 const TEXTS: Record<string, typeof DE> = { de: DE, en: EN, cs: CS, da: DA, es: ES, fi: FI, fr: FR, hu: HU, it: IT, nb: NB, no: NB, nl: NL, nn: NN, pl: PL, pt: PT, ro: RO, sl: SL, sv: SV, zh: ZH };
 
@@ -1143,6 +1229,25 @@ export class LocateSetup extends LitElement {
               )
           : html`<li><small>${t.near_empty}</small></li>`}
       </ul>
+      <h4>${t.key_title}</h4>
+      <div class="row">
+        <input id="keyname" placeholder=${t.key_name} />
+        <input id="keyvalue" placeholder=${t.key_value} spellcheck="false" autocomplete="off" />
+        <button
+          @click=${() => {
+            const name = (this.renderRoot.querySelector("#keyname") as HTMLInputElement).value.trim();
+            const key = irkHex((this.renderRoot.querySelector("#keyvalue") as HTMLInputElement).value);
+            if (!key) {
+              this._error = t.key_bad;
+              return;
+            }
+            this._error = "";
+            this.addDevice(cfg, { name: name || "iPhone", kind: "irk", key });
+          }}
+        >
+          ${t.add}
+        </button>
+      </div>
       <p class="end"><button class="primary" ?disabled=${!cfg.devices.length} @click=${() => (this._step = "walk")}>${t.next} →</button></p>`;
   }
 

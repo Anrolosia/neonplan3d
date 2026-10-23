@@ -820,7 +820,7 @@ actions:
 - **Learn again** when you move scanners or add new ones.
 - **Moving from Bermuda:** both can run side by side, they do not disturb each other. NeonPlan takes your keys from "Private BLE Device" directly. Once NeonPlan works well for you, switch your automations to the new sensors and remove Bermuda.
 
-**Getting the key (IRK) of an iPhone or Apple Watch:** if you already use Bermuda or "Private BLE Device", you have it and are done. Otherwise there are two easy ways: with a **Mac** through Keychain Access (the Mac must be on the same iCloud account), or with an **ESP32** that briefly runs a small read-out program (e.g. "irk-capture") the iPhone pairs with. Then add the key in Home Assistant under **Settings → Devices & services → Add integration → Private BLE Device** – NeonPlan shows the device in the Devices step afterwards.
+**Getting the key (IRK) of an iPhone or Apple Watch:** if you already use Bermuda or "Private BLE Device", you have it and are done. Otherwise there are two easy ways: with a **Mac** through Keychain Access (the Mac must be on the same iCloud account), or with an **ESP32** that briefly runs a small read-out program (e.g. "irk-capture") the iPhone pairs with. Then paste the key in the assistant under **Devices → Paste a key** (as 32 characters or the way the Mac shows it) – or add it in Home Assistant under **Settings → Devices & services → Add integration → Private BLE Device**, and NeonPlan offers the device with one tap.
 
 ---
 
