@@ -26,17 +26,20 @@ class Identity:
         self.by_beacon: dict[str, str] = {}
         self.ciphers: list[tuple[str, Any]] = []
         self._cache: dict[str, str | None] = {}
+        cipher_for: Any = None
         try:
             from bluetooth_data_tools import get_cipher_for_irk
+
+            cipher_for = get_cipher_for_irk
         except ImportError:  # pragma: no cover - always there with Home Assistant's Bluetooth
-            get_cipher_for_irk = None
+            pass
         for device in devices:
             kind, key, dev_id = device.get("kind"), str(device.get("key", "")), device["id"]
             if kind == "mac":
                 self.by_address[key.upper()] = dev_id
             elif kind == "ibeacon":
                 self.by_beacon[key.lower()] = dev_id
-            elif kind == "irk" and get_cipher_for_irk is not None:
+            elif kind == "irk" and cipher_for is not None:
                 try:
                     irk = binascii.unhexlify(key)
                 except (ValueError, binascii.Error):
@@ -44,8 +47,8 @@ class Identity:
                 if len(irk) != 16:
                     continue
                 # some read-out tools show the key in reversed byte order: both are tried
-                self.ciphers.append((dev_id, get_cipher_for_irk(irk)))
-                self.ciphers.append((dev_id, get_cipher_for_irk(irk[::-1])))
+                self.ciphers.append((dev_id, cipher_for(irk)))
+                self.ciphers.append((dev_id, cipher_for(irk[::-1])))
 
     def resolve(self, address: str, adv: Any) -> str | None:
         if (dev := self.by_address.get(address)) is not None:

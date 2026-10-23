@@ -3,6 +3,7 @@ the calibration walk and tells the views and the sensors where everyone is. Runs
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import timedelta
 import logging
 import re
@@ -10,7 +11,7 @@ import time
 from typing import Any
 
 from homeassistant.const import EVENT_STATE_CHANGED
-from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -81,8 +82,8 @@ class LocateService:
         self._reader = ScanReader()
         self._identity = Identity([])
         self._trackers: dict[str, RoomTracker] = {}
-        self._unsub = None
-        self._unsub_sensors = None
+        self._unsub: Callable[[], None] | None = None
+        self._unsub_sensors: Callable[[], None] | None = None
         self._sensor_rooms: dict[str, str | None] = {}
         self._last_step = 0.0
         self._last_sample = 0.0
@@ -282,7 +283,7 @@ class LocateService:
         return room
 
     @callback
-    def _presence_changed(self, event: Event) -> None:
+    def _presence_changed(self, event: Event[EventStateChangedData]) -> None:
         """A motion/presence sensor turned on: Bluetooth says who, the sensor says when (see RoomTracker.confirm)."""
         entity_id: str = event.data["entity_id"]
         if not entity_id.startswith("binary_sensor."):

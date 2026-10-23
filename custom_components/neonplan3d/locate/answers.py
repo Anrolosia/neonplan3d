@@ -105,7 +105,7 @@ async def async_answer(hass: HomeAssistant, service: LocateService | None, text:
     sentence = _norm(text)
     t = _TEXT[lang]
     if _WHO[lang].match(sentence):
-        names = []
+        names: list[str] = []
         for device in service.devices:
             st = service.state.get(device["id"]) or {}
             if not st.get("room_name"):

@@ -19,7 +19,7 @@ from typing import Any
 
 from homeassistant.components import websocket_api
 from homeassistant.const import EVENT_STATE_CHANGED
-from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from homeassistant.helpers.event import async_track_time_interval
 import voluptuous as vol
 
@@ -170,7 +170,7 @@ class LocateRecorder:
         }
 
     @callback
-    def _state_changed(self, event: Event) -> None:
+    def _state_changed(self, event: Event[EventStateChangedData]) -> None:
         entity_id: str = event.data["entity_id"]
         if not entity_id.startswith("binary_sensor."):
             return
