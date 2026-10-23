@@ -1835,6 +1835,7 @@ export class LocateSetup extends LitElement {
       </ul>
       ${this.helperAdded ? html`<p class="hint">${this.tr(t.helper_added, { name: this.helperAdded })}</p>` : nothing}
       <p class="hint">${t.helper_after}</p>
+      <p class="hint"><a href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">${t.helper_build} ↗</a></p>
       ${helper.refresh
         ? html`<p class="end">
             <small>${t.helper_next_hint}</small>

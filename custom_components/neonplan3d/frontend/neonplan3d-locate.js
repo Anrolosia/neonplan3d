@@ -65,6 +65,7 @@ var ee=globalThis,te=ee.ShadowRoot&&(ee.ShadyCSS===void 0||ee.ShadyCSS.nativeSha
       </ul>
       ${this.helperAdded?m`<p class="hint">${this.tr(t.helper_added,{name:this.helperAdded})}</p>`:b}
       <p class="hint">${t.helper_after}</p>
+      <p class="hint"><a href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">${t.helper_build} ↗</a></p>
       ${o.refresh?m`<p class="end">
             <small>${t.helper_next_hint}</small>
             <button @click=${()=>{this.hass.callService("button","press",{entity_id:o.refresh})}}>${t.helper_next}</button>
