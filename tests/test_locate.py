@@ -12,6 +12,7 @@ from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.neonplan3d.const import DOMAIN
+from custom_components.neonplan3d.locate.engine import Fingerprints
 from custom_components.neonplan3d.locate.service import DATA_LOCATE, SIGNAL_LOCATE, LocateService
 
 ROOMS = [
@@ -153,3 +154,17 @@ async def test_removing_a_device_removes_its_sensor(hass: HomeAssistant) -> None
     await hass.async_block_till_done()
     assert registry.async_get_entity_id("sensor", DOMAIN, f"{DOMAIN}_locate_irk_watch") is None
     assert hass.states.get(entity_id) is None
+
+
+async def test_a_device_without_learning_uses_the_others(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    service: LocateService = hass.data[DATA_LOCATE]
+    second = {**WATCH, "id": "irk_second", "name": "Second", "key": "ffeeddccbbaa99887766554433221100"}
+    await service.async_configure({"devices": [WATCH, second], "rooms": ROOMS})
+    service.fingerprints["irk_watch"] = Fingerprints({"kitchen": [{"s1": -60.0}], "hall": [{"s1": -80.0}]})
+    pooled = service.pooled()
+    assert pooled.rooms() == ["kitchen", "hall"]
+    # an offline scanner keeps its row and room
+    await service.async_configure({"scanner_rooms": {"AA:BB:CC:DD:EE:09": "hall"}})
+    rows = service.config()["scanners"]
+    assert any(r["source"] == "AA:BB:CC:DD:EE:09" and r.get("offline") for r in rows)

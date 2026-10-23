@@ -62,6 +62,8 @@ class LocateService:
         self.admins_only = False
         self.devices: list[dict[str, Any]] = []
         self.scanner_rooms: dict[str, str] = {}
+        self.scanner_names: dict[str, str] = {}  # last known names (a scanner that is offline keeps its row)
+        self._pooled: tuple[int, Fingerprints] | None = None
         self.rooms: list[dict[str, Any]] = []  # {id, name, floor, area_id}
         self.doors: list[tuple[str, str]] = []
         self.fingerprints: dict[str, Fingerprints] = {}
@@ -86,6 +88,7 @@ class LocateService:
         self.admins_only = bool(data.get("admins_only"))
         self.devices = _clean_devices(data.get("devices") or [])
         self.scanner_rooms = {str(k): str(v) for k, v in (data.get("scanner_rooms") or {}).items()}
+        self.scanner_names = {str(k): str(v) for k, v in (data.get("scanner_names") or {}).items()}
         self.rooms = [r for r in data.get("rooms") or [] if isinstance(r, dict) and r.get("id")]
         self.doors = [(str(a), str(b)) for a, b in data.get("doors") or []]
         self.fingerprints = {
@@ -102,6 +105,7 @@ class LocateService:
             "admins_only": self.admins_only,
             "devices": self.devices,
             "scanner_rooms": self.scanner_rooms,
+            "scanner_names": self.scanner_names,
             "rooms": self.rooms,
             "doors": [list(d) for d in self.doors],
             "fingerprints": {
@@ -180,7 +184,7 @@ class LocateService:
             "admins_only": self.admins_only,
             "devices": self.devices,
             "scanner_rooms": self.scanner_rooms,
-            "scanners": scanner_list(self.hass) if self._bluetooth() else [],
+            "scanners": self._scanners(),
             "bluetooth": self._bluetooth(),
             "private_ble": private,
             "samples": {dev: {room: len(v) for room, v in fp.samples.items()} for dev, fp in self.fingerprints.items()},
@@ -204,6 +208,44 @@ class LocateService:
             if heard:
                 hints[scanner] = max(heard, key=lambda r: sum(heard[r]) / len(heard[r]))
         return hints
+
+    def _scanners(self) -> list[dict[str, Any]]:
+        """The scanners Home Assistant has now, plus placed ones that are offline (they keep their room)."""
+        live = scanner_list(self.hass) if self._bluetooth() else []
+        changed = False
+        for s in live:
+            if self.scanner_names.get(s["source"]) != s["name"]:
+                self.scanner_names[s["source"]] = s["name"]
+                changed = True
+        if changed:
+            self._save()
+        seen = {s["source"] for s in live}
+        offline = [
+            {
+                "source": src,
+                "name": self.scanner_names.get(src, src),
+                "kind": "other",
+                "device_id": None,
+                "area_id": None,
+                "scanning": False,
+                "offline": True,
+            }
+            for src in self.scanner_rooms
+            if src not in seen
+        ]
+        return live + offline
+
+    def pooled(self) -> Fingerprints:
+        """Every device's samples together: a device that was never walked with uses what the others learned
+        (two watches see the rooms alike). Cached until a sample changes."""
+        count = sum(len(v) for fp in self.fingerprints.values() for v in fp.samples.values())
+        if self._pooled is None or self._pooled[0] != count:
+            merged = Fingerprints()
+            for fp in self.fingerprints.values():
+                for room, vectors in fp.samples.items():
+                    merged.samples.setdefault(room, []).extend(vectors)
+            self._pooled = (count, merged)
+        return self._pooled[1]
 
     def _bluetooth(self) -> bool:
         return "bluetooth" in self.hass.config.components
@@ -344,7 +386,9 @@ class LocateService:
         names = {r["id"]: r for r in self.rooms}
         for dev, tracker in self._trackers.items():
             window = tracker.window(now)
-            est = tracker.step(now, evidence(self.fingerprints.get(dev), window, self.scanner_rooms))
+            own = self.fingerprints.get(dev)
+            learned = own if own is not None and len(own.rooms()) >= 2 else self.pooled()
+            est = tracker.step(now, evidence(learned, window, self.scanner_rooms))
             room = names.get(est.room) if est.room else None
             new = {
                 "room": est.room,
