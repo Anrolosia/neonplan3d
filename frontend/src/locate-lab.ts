@@ -96,7 +96,7 @@ export function mountLocateLab(source: Source): () => void {
     else if (a === "stop") void call("stop");
     else if (a === "setup") {
       const { hass, building } = source();
-      if (hass && building) void loadLocate().then((m) => m.openLocateSetup(hass, building));
+      if (hass && building) void loadLocate().then((m) => m.openLocateSetup(hass, building, () => source().hass));
     }
     else if (el.dataset.room !== undefined) void call("mark", el.dataset.room ? { room: el.dataset.room, name: el.dataset.name } : { room: null });
   });

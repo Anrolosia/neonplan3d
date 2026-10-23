@@ -1143,6 +1143,8 @@ export class LocateSetup extends LitElement {
     this._error = "";
   }
   private timer = 0;
+  /** Where the current Home Assistant state comes from (the panel's live hass): new devices and states show at once. */
+  hassSource: (() => HomeAssistant | undefined) | null = null;
   private unsub: (() => void) | null = null;
 
   private get t(): typeof DE {
@@ -1269,6 +1271,8 @@ export class LocateSetup extends LitElement {
   }
 
   private async tick(): Promise<void> {
+    const live = this.hassSource?.();
+    if (live && live !== this.hass) this.hass = live;
     if (this._step === "devices") {
       const res = await this.call<{ devices: Nearby[] }>({ type: "neonplan3d/locate/nearby" });
       if (res) this._near = res.devices;
