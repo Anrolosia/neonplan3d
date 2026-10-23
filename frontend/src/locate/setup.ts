@@ -110,6 +110,9 @@ const DE = {
   look_figure: "Figur",
   look_pin: "Pin",
   look_off: "aus",
+  near_summary: "Android-Handy oder Schlüsselanhänger hinzufügen",
+  android_label: "Android-Handy (HA-App)",
+  paste_summary: "Eigenen Schlüssel einfügen",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -185,6 +188,9 @@ const EN: typeof DE = {
   look_figure: "Figure",
   look_pin: "Pin",
   look_off: "Off",
+  near_summary: "Add an Android phone or a key tag",
+  android_label: "Android phone (HA app)",
+  paste_summary: "Paste a key you already have",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -261,6 +267,9 @@ const CS: typeof DE = {
   look_figure: "Postava",
   look_pin: "Špendlík",
   look_off: "Vyp.",
+  near_summary: "Přidat telefon s Androidem nebo přívěsek",
+  android_label: "Telefon s Androidem (aplikace HA)",
+  paste_summary: "Vložit klíč, který už máte",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -336,6 +345,9 @@ const DA: typeof DE = {
   look_figure: "Figur",
   look_pin: "Nål",
   look_off: "Fra",
+  near_summary: "Tilføj Android-telefon eller nøglevedhæng",
+  android_label: "Android-telefon (HA-app)",
+  paste_summary: "Indsæt en nøgle, du allerede har",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -411,6 +423,9 @@ const ES: typeof DE = {
   look_figure: "Figura",
   look_pin: "Pin",
   look_off: "No",
+  near_summary: "Añadir un móvil Android o un llavero",
+  android_label: "Móvil Android (app de HA)",
+  paste_summary: "Pegar una clave que ya tienes",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -486,6 +501,9 @@ const FI: typeof DE = {
   look_figure: "Hahmo",
   look_pin: "Merkki",
   look_off: "Pois",
+  near_summary: "Lisää Android-puhelin tai avaimenperä",
+  android_label: "Android-puhelin (HA-sovellus)",
+  paste_summary: "Liitä avain, joka sinulla jo on",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -561,6 +579,9 @@ const FR: typeof DE = {
   look_figure: "Silhouette",
   look_pin: "Repère",
   look_off: "Non",
+  near_summary: "Ajouter un téléphone Android ou un porte-clés",
+  android_label: "Téléphone Android (app HA)",
+  paste_summary: "Coller une clé que vous avez déjà",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -636,6 +657,9 @@ const HU: typeof DE = {
   look_figure: "Alak",
   look_pin: "Jelölő",
   look_off: "Ki",
+  near_summary: "Androidos telefon vagy kulcstartó hozzáadása",
+  android_label: "Androidos telefon (HA-alkalmazás)",
+  paste_summary: "Meglévő kulcs beillesztése",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -711,6 +735,9 @@ const IT: typeof DE = {
   look_figure: "Figura",
   look_pin: "Segnaposto",
   look_off: "No",
+  near_summary: "Aggiungi un telefono Android o un portachiavi",
+  android_label: "Telefono Android (app HA)",
+  paste_summary: "Incolla una chiave che hai già",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -786,6 +813,9 @@ const NB: typeof DE = {
   look_figure: "Figur",
   look_pin: "Nål",
   look_off: "Av",
+  near_summary: "Legg til Android-telefon eller nøkkelbrikke",
+  android_label: "Android-telefon (HA-appen)",
+  paste_summary: "Lim inn en nøkkel du allerede har",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -861,6 +891,9 @@ const NL: typeof DE = {
   look_figure: "Figuur",
   look_pin: "Speld",
   look_off: "Uit",
+  near_summary: "Android-telefoon of sleutelhanger toevoegen",
+  android_label: "Android-telefoon (HA-app)",
+  paste_summary: "Een sleutel plakken die je al hebt",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -936,6 +969,9 @@ const NN: typeof DE = {
   look_figure: "Figur",
   look_pin: "Nål",
   look_off: "Av",
+  near_summary: "Legg til Android-telefon eller nøkkelbrikke",
+  android_label: "Android-telefon (HA-appen)",
+  paste_summary: "Lim inn ein nøkkel du alt har",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -1011,6 +1047,9 @@ const PL: typeof DE = {
   look_figure: "Postać",
   look_pin: "Pinezka",
   look_off: "Wył.",
+  near_summary: "Dodaj telefon z Androidem lub brelok",
+  android_label: "Telefon z Androidem (aplikacja HA)",
+  paste_summary: "Wklej klucz, który już masz",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -1086,6 +1125,9 @@ const PT: typeof DE = {
   look_figure: "Figura",
   look_pin: "Marcador",
   look_off: "Não",
+  near_summary: "Adicionar um telemóvel Android ou um porta-chaves",
+  android_label: "Telemóvel Android (app HA)",
+  paste_summary: "Colar uma chave que já tem",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -1161,6 +1203,9 @@ const RO: typeof DE = {
   look_figure: "Siluetă",
   look_pin: "Reper",
   look_off: "Oprit",
+  near_summary: "Adaugă un telefon Android sau un breloc",
+  android_label: "Telefon Android (aplicația HA)",
+  paste_summary: "Lipește o cheie pe care o ai deja",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -1236,6 +1281,9 @@ const SL: typeof DE = {
   look_figure: "Figura",
   look_pin: "Žebljiček",
   look_off: "Izklop",
+  near_summary: "Dodaj telefon Android ali obesek za ključe",
+  android_label: "Telefon Android (aplikacija HA)",
+  paste_summary: "Prilepi ključ, ki ga že imaš",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -1311,6 +1359,9 @@ const SV: typeof DE = {
   look_figure: "Figur",
   look_pin: "Nål",
   look_off: "Av",
+  near_summary: "Lägg till Android-telefon eller nyckelbricka",
+  android_label: "Android-telefon (HA-appen)",
+  paste_summary: "Klistra in en nyckel du redan har",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -1386,6 +1437,9 @@ const ZH: typeof DE = {
   look_figure: "人形",
   look_pin: "图钉",
   look_off: "关",
+  near_summary: "添加安卓手机或钥匙扣",
+  android_label: "安卓手机（HA 应用）",
+  paste_summary: "粘贴已有的密钥",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1583,7 +1637,7 @@ export class LocateSetup extends LitElement {
   private async tick(): Promise<void> {
     const live = this.hassSource?.();
     if (live && live !== this.hass) this.hass = live;
-    if (this._step === "devices") {
+    if (this._step === "devices" && this.nearOpen) {
       const res = await this.call<{ devices: Nearby[] }>({ type: "neonplan3d/locate/nearby" });
       if (res) this._near = res.devices;
     }
@@ -1701,6 +1755,8 @@ export class LocateSetup extends LitElement {
 
   /** Devices left out of the next calibration (not carried right now). */
   private notCarried = new Set<string>();
+  /** The "Android phone or key tag" part is open: only then are nearby devices polled. */
+  private nearOpen = false;
 
   /** The chosen key helper (several ESP32s with irk-capture can be in Home Assistant). */
   private helperId: string | null = null;
@@ -1825,40 +1881,37 @@ export class LocateSetup extends LitElement {
             )}
           </ul>`
         : nothing}
-      ${cfg.private_ble.length
-        ? html`<details class="pbd">
-            <summary>${t.pbd_summary}</summary>
-            <p>${t.known_keys}</p>
-            <ul class="list">
-              ${cfg.private_ble.map(
-                (p) => html`<li>
-                  <span>${p.title}${p.named === false ? html`<small>${t.pbd_rename}</small>` : nothing}</span>
-                  ${has(p.key) ? html`<small>${t.added}</small>` : html`<button @click=${() => this.addDevice(cfg, { name: p.title, kind: "irk", key: p.key })}>${t.add}</button>`}
-                </li>`,
-              )}
-            </ul>
-          </details>`
-        : nothing}
-      <p class="hint">${t.irk_help} <a href=${this.manualLink()} target="_blank" rel="noopener">${t.manual} ↗</a></p>
-      <h4>${t.near_title}</h4>
-      <p class="hint">${t.near_intro}</p>
-      <ul class="list">
-        ${this._near.length
-          ? this._near
-              .filter((n) => n.ibeacon || !n.random)
-              .slice(0, 8)
-              .map(
-                (n) => html`<li>
-                  <span><b>${n.name ?? (n.ibeacon ? "iBeacon" : n.address)}</b><small>${n.rssi} dBm${n.ibeacon ? " · iBeacon" : ""}</small></span>
-                  ${has(n.ibeacon ?? n.address)
-                    ? html`<small>${t.added}</small>`
-                    : html`<button @click=${() => this.addDevice(cfg, n.ibeacon ? { name: n.name ?? "iBeacon", kind: "ibeacon", key: n.ibeacon } : { name: n.name ?? n.address, kind: "mac", key: n.address })}>${t.add}</button>`}
-                </li>`,
-              )
-          : html`<li><small>${t.near_empty}</small></li>`}
-      </ul>
       ${this.renderKeyHelper(cfg)}
-      <h4>${t.key_title}</h4>
+      <details
+        class="pbd"
+        @toggle=${(e: Event) => {
+          this.nearOpen = (e.target as HTMLDetailsElement).open;
+        }}
+      >
+        <summary>📱 ${t.near_summary}</summary>
+        <p class="hint">${t.near_intro}</p>
+        <ul class="list">
+          ${(() => {
+            // only what is held close to a scanner: beacons first (the Android app), then the strongest
+            const close = this._near
+              .filter((n) => (n.ibeacon || !n.random) && n.rssi >= -68)
+              .sort((x, y) => Number(!!y.ibeacon) - Number(!!x.ibeacon) || y.rssi - x.rssi)
+              .slice(0, 5);
+            return close.length
+              ? close.map(
+                  (n) => html`<li>
+                    <span><b>${n.ibeacon ? `📱 ${t.android_label}` : (n.name ?? n.address)}</b><small>${n.rssi} dBm</small></span>
+                    ${has(n.ibeacon ?? n.address)
+                      ? html`<small>${t.added}</small>`
+                      : html`<button @click=${() => this.addDevice(cfg, n.ibeacon ? { name: t.android_label, kind: "ibeacon", key: n.ibeacon } : { name: n.name ?? n.address, kind: "mac", key: n.address })}>${t.add}</button>`}
+                  </li>`,
+                )
+              : html`<li><small>${t.near_empty}</small></li>`;
+          })()}
+        </ul>
+      </details>
+      <details class="pbd">
+        <summary>🔑 ${t.paste_summary}</summary>
       <div class="row">
         <input id="keyname" placeholder=${t.key_name} />
         <input id="keyvalue" placeholder=${t.key_value} spellcheck="false" autocomplete="off" />
@@ -1877,6 +1930,22 @@ export class LocateSetup extends LitElement {
           ${t.add}
         </button>
       </div>
+      </details>
+      ${cfg.private_ble.length
+        ? html`<details class="pbd">
+            <summary>${t.pbd_summary}</summary>
+            <p>${t.known_keys}</p>
+            <ul class="list">
+              ${cfg.private_ble.map(
+                (p) => html`<li>
+                  <span>${p.title}${p.named === false ? html`<small>${t.pbd_rename}</small>` : nothing}</span>
+                  ${has(p.key) ? html`<small>${t.added}</small>` : html`<button @click=${() => this.addDevice(cfg, { name: p.title, kind: "irk", key: p.key })}>${t.add}</button>`}
+                </li>`,
+              )}
+            </ul>
+          </details>`
+        : nothing}
+      <p class="hint">${t.irk_help} <a href=${this.manualLink()} target="_blank" rel="noopener">${t.manual} ↗</a></p>
       <p class="end"><button class="primary" ?disabled=${!cfg.devices.length} @click=${() => (this._step = "walk")}>${t.next} →</button></p>`;
   }
 
