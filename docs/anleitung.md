@@ -778,14 +778,14 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
 
   Ideal ist ungefähr ein Empfänger pro Raum. Räume ohne eigenen Empfänger (Flur, Gäste-WC) erkennt NeonPlan trotzdem: Das Einlernen merkt sich, wie sie für die Empfänger in den Nachbarräumen aussehen.
 - **Etwas, das du dabei hast:**
-  - **Apple Watch und iPhone** mit ihrem Schlüssel (IRK) als „Private BLE Device“ in Home Assistant. Die Uhr am Handgelenk ist ideal: Ein iPhone in der Tasche wird bei dunklem Bildschirm nach etwa einer Minute still.
+  - **Apple Watch und iPhone** mit ihrem Schlüssel (IRK) – den liest der Schlüssel-Helfer in drei Minuten aus (siehe unten). Die Uhr am Handgelenk ist ideal: Ein iPhone in der Tasche wird bei dunklem Bildschirm nach etwa einer Minute still.
   - **Android-Handys:** In der Home-Assistant-App unter **Einstellungen → Companion-App → Sensoren verwalten → BLE-Sender** einschalten. Kein Schlüssel nötig.
   - **Schlüsselanhänger** mit fester Adresse oder als iBeacon (z. B. Nut, Tile, iBeacon-Tags). **AirTags gehen nicht** – sie wechseln ihre Adresse, und Apple gibt keinen Schlüssel heraus.
 
 **Einrichten** (Editor → **⚙ Einstellungen → 📡 Ortung**, nur Admins):
 
 1. **Empfänger:** NeonPlan listet alle Bluetooth-Empfänger von Home Assistant und schlägt ihren Raum vor – aus dem Home-Assistant-Bereich des Geräts, aus einem Pin oder Möbel im Plan (die Waschmaschine mit dem Strommesser der Shelly-Steckdose) oder aus dem Namen („PC Büro Steckdose“). Nach dem Einlernen weiß NeonPlan aus den Signalen selbst, wo jeder Empfänger steht, und bietet bei Abweichungen **„Signal sagt: … – übernehmen“** an.
-2. **Geräte:** Uhr und iPhone mit einem Tipp aus „Private BLE Device“ übernehmen, Android-Handys und Anhänger über **Gerät in der Nähe suchen** (das Gerät direkt an einen Empfänger halten). Gib jedem Gerät einen Namen, ordne es einer Person zu und – für „Lass mein iPhone klingeln“ – die Home-Assistant-App des Handys.
+2. **Geräte:** Uhr und iPhone über den **🔑 Schlüssel-Helfer**, Android-Handys und Anhänger über **📱 Android-Handy oder Schlüsselanhänger hinzufügen** (das Gerät direkt an einen Empfänger halten); einen Schlüssel, den du schon hast, trägst du unter **🔑 Eigenen Schlüssel einfügen** ein. Gib jedem Gerät einen Namen, ordne es einer Person zu und – für „Lass mein iPhone klingeln“ – die Home-Assistant-App des Handys.
 3. **Einlernen:** Hake an, welche Geräte du gerade **dabei hast**. Geh in jeden Raum, tippe ihn an und lauf **90 Sekunden** langsam herum, auch in die Ecken und an den Wänden entlang. Ein Handy dabei in die **Tasche** (Bildschirm aus), so wie im Alltag – zum Antippen nimmst du am besten ein anderes Tablet oder Handy. **Einmal einlernen reicht:** Geräte ohne eigene Lerndaten nutzen die der anderen mit. Der Countdown läuft mit, bei 0 ist der Raum fertig (✓). Danach zeigt **Trefferquote prüfen**, wie sicher jeder Raum erkannt wird. Einen schwachen Raum lernst du einfach noch einmal ein.
 4. **Live:** Ortung einschalten und durchs Haus gehen – die Liste zeigt sofort, wo NeonPlan dich sieht.
 
@@ -829,16 +829,16 @@ actions:
 - **Raumgenau, nicht zentimetergenau.** Bluetooth schwankt (schon der eigene Körper dämpft das Signal). NeonPlan sagt zuverlässig den Raum, nicht die Stelle im Raum.
 - **Alles bleibt im Haus.** Die Signale werden nur in Home Assistant ausgewertet, nichts geht ins Internet.
 - **Neu einlernen**, wenn du Empfänger umstellst oder neue dazukommen.
-- **Von Bermuda umsteigen:** Beide können parallel laufen, sie stören sich nicht. Deine Schlüssel aus „Private BLE Device“ übernimmt NeonPlan direkt. Wenn NeonPlan bei dir sicher läuft, stellst du deine Automationen auf die neuen Sensoren um und kannst Bermuda entfernen.
+- **Bermuda oder ESPresense im Einsatz?** NeonPlan läuft parallel und stört sie nicht. Richte deine Geräte einfach hier ein; wenn alles sicher läuft, stellst du deine Automationen auf die neuen Sensoren um und kannst die alten Werkzeuge entfernen.
 
-**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** Wer Bermuda oder „Private BLE Device“ schon nutzt, hat ihn und ist fertig. Sonst geht es am einfachsten mit dem **NeonPlan Schlüssel-Helfer** – ohne Mac, auch für die Apple Watch:
+**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** am einfachsten mit dem **NeonPlan Schlüssel-Helfer** – ohne Mac, auch für die Apple Watch:
 
 1. Einen **ESP32** (ESP32, ESP32-C3 oder ESP32-S3, ca. 5 €) per USB an den Computer stecken und auf [neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/) mit Chrome oder Edge auf **Installieren** klicken. Danach das WLAN eintragen.
 2. Home Assistant findet **NeonPlan Key** als ESPHome-Gerät: **Einstellungen → Geräte & Dienste → Entdeckt → Hinzufügen**.
 3. Im Assistenten unter **Geräte → 🔑 Schlüssel-Helfer** „Für Apple Watch“ oder „Für iPhone / Android“ wählen und koppeln: auf der Uhr unter **Einstellungen → Bluetooth → Gesundheitsgeräte** „NeonPlan Key“ antippen, am Handy unter **Einstellungen → Bluetooth**. Der Schlüssel erscheint sofort – **Hinzufügen** tippen. Danach „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.
 4. **Weitere Geräte:** vorher **🔄 Nächstes Gerät** tippen – der Helfer bekommt eine neue Bluetooth-Kennung, damit sich das zuvor gekoppelte Gerät nicht wieder dazwischen verbindet.
 
-Den ESP32 kannst du danach weiterverwenden, am besten als ESPHome-Bluetooth-Proxy – dann macht er die Ortung sogar schneller. Der Helfer baut auf [irk-capture](https://github.com/DerekSeaman/irk-capture) von Derek Seaman auf (MIT-Lizenz) – danke! Andere Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein). Den Schlüssel fügst du dann im Assistenten unter **Geräte → Schlüssel einfügen** ein (als 32 Zeichen oder so, wie der Mac ihn zeigt) – oder in Home Assistant unter **Einstellungen → Geräte & Dienste → Integration hinzufügen → Private BLE Device**, dann bietet NeonPlan das Gerät mit einem Tipp an.
+Den ESP32 kannst du danach weiterverwenden, am besten als ESPHome-Bluetooth-Proxy – dann macht er die Ortung sogar schneller. Der Helfer baut auf [irk-capture](https://github.com/DerekSeaman/irk-capture) von Derek Seaman auf (MIT-Lizenz) – danke! Andere Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein). Den Schlüssel fügst du dann im Assistenten unter **Geräte → Schlüssel einfügen** ein (als 32 Zeichen oder so, wie der Mac ihn zeigt).
 
 ---
 

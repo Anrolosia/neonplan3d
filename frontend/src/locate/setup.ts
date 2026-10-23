@@ -1932,20 +1932,6 @@ export class LocateSetup extends LitElement {
         </button>
       </div>
       </details>
-      ${cfg.private_ble.length
-        ? html`<details class="pbd">
-            <summary>${t.pbd_summary}</summary>
-            <p>${t.known_keys}</p>
-            <ul class="list">
-              ${cfg.private_ble.map(
-                (p) => html`<li>
-                  <span>${p.title}${p.named === false ? html`<small>${t.pbd_rename}</small>` : nothing}</span>
-                  ${has(p.key) ? html`<small>${t.added}</small>` : html`<button @click=${() => this.addDevice(cfg, { name: p.title, kind: "irk", key: p.key })}>${t.add}</button>`}
-                </li>`,
-              )}
-            </ul>
-          </details>`
-        : nothing}
       <p class="hint">${t.irk_help} <a href=${this.manualLink()} target="_blank" rel="noopener">${t.manual} ↗</a></p>
       <p class="end"><button class="primary" ?disabled=${!cfg.devices.length} @click=${() => (this._step = "walk")}>${t.next} →</button></p>`;
   }
