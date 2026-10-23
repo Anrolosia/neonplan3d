@@ -16,7 +16,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
 
-from .engine import AWAY_AFTER, STEP, THING_AWAY_AFTER, Fingerprints, RoomTracker, evidence
+from .engine import AWAY_AFTER, OWN_SHARE, STEP, THING_AWAY_AFTER, Fingerprints, RoomTracker, evidence
 from .identity import Identity, ibeacon_key
 from .scanners import ScanReader, scanner_list
 
@@ -373,7 +373,7 @@ class LocateService:
             tracker = self._trackers.get(dev)
             if tracker is None:
                 continue
-            vector = tracker.window(now)
+            vector = tracker.adaptive_window(now)
             if vector:
                 fp = self.fingerprints.setdefault(dev, Fingerprints())
                 samples = fp.samples.setdefault(cal["room"], [])
@@ -385,9 +385,12 @@ class LocateService:
         changed = False
         names = {r["id"]: r for r in self.rooms}
         for dev, tracker in self._trackers.items():
-            window = tracker.window(now)
+            window = tracker.adaptive_window(now)
             own = self.fingerprints.get(dev)
-            learned = own if own is not None and len(own.rooms()) >= 2 else self.pooled()
+            pooled = self.pooled()
+            # its own learning alone only when it covers most rooms (an iPhone in a pocket may have learned few)
+            full = own is not None and len(own.rooms()) >= max(2, OWN_SHARE * len(pooled.rooms()))
+            learned = own if full else pooled
             est = tracker.step(now, evidence(learned, window, self.scanner_rooms))
             room = names.get(est.room) if est.room else None
             new = {

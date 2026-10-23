@@ -18,6 +18,9 @@ from dataclasses import dataclass, field
 import math
 
 WINDOW = 4.0  # seconds of readings per estimate
+QUIET_WINDOW = 15.0  # a quiet device (an iPhone in a pocket) heard by fewer than QUIET_SCANNERS: look further back
+QUIET_SCANNERS = 3
+OWN_SHARE = 0.7  # a device's own learning is used alone once it covers this share of the learned rooms
 STEP = 1.0  # seconds between estimates
 K = 5
 MISS = 12.0  # dB penalty when only one side heard a scanner
@@ -143,6 +146,15 @@ class RoomTracker:
             if now - length <= t <= now:
                 sums.setdefault(scanner, []).append(rssi)
         return {s: sum(v) / len(v) for s, v in sums.items()}
+
+    def adaptive_window(self, now: float) -> Vector:
+        """The usual window; for a quiet device (few scanners heard) a longer one, so it is placed at all."""
+        vector = self.window(now)
+        if len(vector) < QUIET_SCANNERS:
+            longer = self.window(now, QUIET_WINDOW)
+            if len(longer) > len(vector):
+                return longer
+        return vector
 
     def _move(self, src: str, dst: str) -> float:
         """Probability mass share from src to dst for one step (dst != src)."""

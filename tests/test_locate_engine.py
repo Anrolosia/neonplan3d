@@ -128,3 +128,15 @@ def test_a_room_not_learned_yet_comes_from_its_scanner() -> None:
     # close to the kitchen: the fingerprints decide
     near = {"s_kitchen": -60.0, "s_living": -88.0}
     assert max(engine.evidence(fp, near, rooms).items(), key=lambda kv: kv[1])[0] == "kitchen"
+
+
+def test_a_quiet_device_gets_a_longer_window() -> None:
+    tracker = engine.RoomTracker(list(PROFILE), DOORS)
+    tracker.add(100.0, "s_kitchen", -60)
+    tracker.add(92.0, "s_living", -85)
+    tracker.add(90.0, "s_hall", -75)
+    assert set(tracker.adaptive_window(101.0)) == {"s_kitchen", "s_living", "s_hall"}
+    # a talkative device keeps the short window
+    for s in ("s_a", "s_b", "s_c"):
+        tracker.add(100.5, s, -70)
+    assert "s_hall" not in tracker.adaptive_window(101.0)
