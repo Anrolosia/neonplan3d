@@ -4,6 +4,17 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 2.0.1
+
+### New
+
+- **Help make NeonPlan better (opt-in, off by default):** under ⚙ Settings → 🛟 Help improve, anonymous usage counts and scrubbed error messages can be switched on – at most one report a day. No names, entities, areas, floor plan shapes, IP addresses or licence keys, nothing from locating; "View report" shows the exact next report, "Delete data" removes what was sent.
+
+### Live Presence
+
+- **Spoken names are matched tolerantly:** "Where is Thorsten's Apple Watch?" finds "Torsten Apple Watch"; "my iPhone" is the iPhone of the person who asks; a first name alone means the person.
+- The manual link of the assistant opens the locating chapter directly.
+
 ## 2.0.0
 
 ### Live Presence – who and what is where (new, free)
