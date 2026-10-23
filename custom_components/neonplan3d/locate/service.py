@@ -166,10 +166,15 @@ class LocateService:
     def config(self) -> dict[str, Any]:
         """Settings plus what the editor shows: scanners, known IRK devices, samples per device and room."""
         private = []
+        devices = dr.async_get(self.hass)
         for entry in self.hass.config_entries.async_entries("private_ble_device"):
             irk = entry.data.get("irk")
-            if isinstance(irk, str):
-                private.append({"title": entry.title, "key": irk})
+            if not isinstance(irk, str):
+                continue
+            # Home Assistant names these entries after the first address it saw: a name given to the device wins
+            own = dr.async_entries_for_config_entry(devices, entry.entry_id)
+            named = next((d.name_by_user for d in own if d.name_by_user), None)
+            private.append({"title": named or entry.title, "key": irk, "named": bool(named)})
         return {
             "enabled": self.enabled,
             "admins_only": self.admins_only,

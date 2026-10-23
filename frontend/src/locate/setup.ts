@@ -30,7 +30,7 @@ interface Config {
   scanner_rooms: Record<string, string>;
   scanners: Scanner[];
   bluetooth: boolean;
-  private_ble: { title: string; key: string }[];
+  private_ble: { title: string; key: string; named?: boolean }[];
   samples: Record<string, Record<string, number>>;
   scanner_hints: Record<string, string>;
 }
@@ -98,6 +98,7 @@ const DE = {
   helper_belongs: "Gehört zu: {name}",
   helper_add_as: "Als „{name}“ hinzufügen",
   helper_added: "✓ „{name}“ ist jetzt in der Liste oben.",
+  pbd_rename: "Tipp: in Home Assistant umbenennen (Geräte & Dienste → Private BLE Device), dann steht hier der Name.",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -163,6 +164,7 @@ const EN: typeof DE = {
   helper_belongs: "Belongs to: {name}",
   helper_add_as: "Add as “{name}”",
   helper_added: "✓ “{name}” is now in the list above.",
+  pbd_rename: "Tip: rename it in Home Assistant (Devices & services → Private BLE Device) to see its name here.",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -229,6 +231,7 @@ const CS: typeof DE = {
   helper_belongs: "Patří k: {name}",
   helper_add_as: "Přidat jako „{name}“",
   helper_added: "✓ „{name}“ je teď v seznamu nahoře.",
+  pbd_rename: "Tip: přejmenujte ho v Home Assistantu (Zařízení a služby → Private BLE Device), pak se zde zobrazí název.",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -294,6 +297,7 @@ const DA: typeof DE = {
   helper_belongs: "Tilhører: {name}",
   helper_add_as: "Tilføj som »{name}«",
   helper_added: "✓ »{name}« står nu i listen ovenfor.",
+  pbd_rename: "Tip: omdøb den i Home Assistant (Enheder og tjenester → Private BLE Device), så står navnet her.",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -359,6 +363,7 @@ const ES: typeof DE = {
   helper_belongs: "Pertenece a: {name}",
   helper_add_as: "Añadir como «{name}»",
   helper_added: "✓ «{name}» ya está en la lista de arriba.",
+  pbd_rename: "Consejo: cámbiale el nombre en Home Assistant (Dispositivos y servicios → Private BLE Device) y aparecerá aquí.",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -424,6 +429,7 @@ const FI: typeof DE = {
   helper_belongs: "Kuuluu: {name}",
   helper_add_as: "Lisää nimellä ”{name}”",
   helper_added: "✓ ”{name}” on nyt yllä olevassa luettelossa.",
+  pbd_rename: "Vinkki: nimeä se uudelleen Home Assistantissa (Laitteet ja palvelut → Private BLE Device), niin nimi näkyy tässä.",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -489,6 +495,7 @@ const FR: typeof DE = {
   helper_belongs: "Appartient à : {name}",
   helper_add_as: "Ajouter comme « {name} »",
   helper_added: "✓ « {name} » est maintenant dans la liste ci-dessus.",
+  pbd_rename: "Astuce : renommez-le dans Home Assistant (Appareils et services → Private BLE Device) pour voir son nom ici.",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -554,6 +561,7 @@ const HU: typeof DE = {
   helper_belongs: "Ehhez tartozik: {name}",
   helper_add_as: "Hozzáadás így: „{name}”",
   helper_added: "✓ „{name}” most már a fenti listában van.",
+  pbd_rename: "Tipp: nevezze át a Home Assistantban (Eszközök és szolgáltatások → Private BLE Device), és itt a név jelenik meg.",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -619,6 +627,7 @@ const IT: typeof DE = {
   helper_belongs: "Appartiene a: {name}",
   helper_add_as: "Aggiungi come «{name}»",
   helper_added: "✓ «{name}» ora è nell’elenco qui sopra.",
+  pbd_rename: "Suggerimento: rinominalo in Home Assistant (Dispositivi e servizi → Private BLE Device) per vedere qui il nome.",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -684,6 +693,7 @@ const NB: typeof DE = {
   helper_belongs: "Hører til: {name}",
   helper_add_as: "Legg til som «{name}»",
   helper_added: "✓ «{name}» står nå i listen over.",
+  pbd_rename: "Tips: gi den nytt navn i Home Assistant (Enheter og tjenester → Private BLE Device), så står navnet her.",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -749,6 +759,7 @@ const NL: typeof DE = {
   helper_belongs: "Hoort bij: {name}",
   helper_add_as: "Toevoegen als ‘{name}’",
   helper_added: "✓ ‘{name}’ staat nu in de lijst hierboven.",
+  pbd_rename: "Tip: geef het een naam in Home Assistant (Apparaten en diensten → Private BLE Device), dan staat die hier.",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -814,6 +825,7 @@ const NN: typeof DE = {
   helper_belongs: "Høyrer til: {name}",
   helper_add_as: "Legg til som «{name}»",
   helper_added: "✓ «{name}» står no i lista over.",
+  pbd_rename: "Tips: gje henne nytt namn i Home Assistant (Einingar og tenester → Private BLE Device), så står namnet her.",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -879,6 +891,7 @@ const PL: typeof DE = {
   helper_belongs: "Należy do: {name}",
   helper_add_as: "Dodaj jako „{name}”",
   helper_added: "✓ „{name}” jest teraz na liście powyżej.",
+  pbd_rename: "Wskazówka: zmień nazwę w Home Assistant (Urządzenia i usługi → Private BLE Device), a tu pojawi się nazwa.",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -944,6 +957,7 @@ const PT: typeof DE = {
   helper_belongs: "Pertence a: {name}",
   helper_add_as: "Adicionar como «{name}»",
   helper_added: "✓ «{name}» está agora na lista acima.",
+  pbd_rename: "Dica: mude-lhe o nome no Home Assistant (Dispositivos e serviços → Private BLE Device) para o ver aqui.",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -1009,6 +1023,7 @@ const RO: typeof DE = {
   helper_belongs: "Aparține de: {name}",
   helper_add_as: "Adaugă ca „{name}”",
   helper_added: "✓ „{name}” este acum în lista de mai sus.",
+  pbd_rename: "Sfat: redenumește-l în Home Assistant (Dispozitive și servicii → Private BLE Device) ca să-i vezi numele aici.",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -1074,6 +1089,7 @@ const SL: typeof DE = {
   helper_belongs: "Pripada: {name}",
   helper_add_as: "Dodaj kot »{name}«",
   helper_added: "✓ »{name}« je zdaj na seznamu zgoraj.",
+  pbd_rename: "Nasvet: preimenujte ga v Home Assistantu (Naprave in storitve → Private BLE Device), nato bo tukaj ime.",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -1139,6 +1155,7 @@ const SV: typeof DE = {
   helper_belongs: "Hör till: {name}",
   helper_add_as: "Lägg till som ”{name}”",
   helper_added: "✓ ”{name}” finns nu i listan ovan.",
+  pbd_rename: "Tips: byt namn i Home Assistant (Enheter och tjänster → Private BLE Device) så syns namnet här.",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -1204,6 +1221,7 @@ const ZH: typeof DE = {
   helper_belongs: "属于：{name}",
   helper_add_as: "添加为“{name}”",
   helper_added: "✓ “{name}”已在上方列表中。",
+  pbd_rename: "提示：在 Home Assistant 中重命名（设备与服务 → Private BLE Device），这里就会显示名称。",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1639,7 +1657,7 @@ export class LocateSetup extends LitElement {
             <ul class="list">
               ${cfg.private_ble.map(
                 (p) => html`<li>
-                  <span>${p.title}</span>
+                  <span>${p.title}${p.named === false ? html`<small>${t.pbd_rename}</small>` : nothing}</span>
                   ${has(p.key) ? html`<small>${t.added}</small>` : html`<button @click=${() => this.addDevice(cfg, { name: p.title, kind: "irk", key: p.key })}>${t.add}</button>`}
                 </li>`,
               )}
