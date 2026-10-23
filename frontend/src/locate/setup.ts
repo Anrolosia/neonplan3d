@@ -113,6 +113,8 @@ const DE = {
   near_summary: "Android-Handy oder Schlüsselanhänger hinzufügen",
   android_label: "Android-Handy (HA-App)",
   paste_summary: "Eigenen Schlüssel einfügen",
+  helper_install: "Auf ESP32 installieren",
+  helper_pitch: "Für iPhone und Apple Watch: Ein ESP32 für ca. 5 € wird in drei Minuten zum Schlüssel-Helfer – direkt im Browser installiert, ganz ohne Mac. Danach hier koppeln.",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -191,6 +193,8 @@ const EN: typeof DE = {
   near_summary: "Add an Android phone or a key tag",
   android_label: "Android phone (HA app)",
   paste_summary: "Paste a key you already have",
+  helper_install: "Install on an ESP32",
+  helper_pitch: "For iPhone and Apple Watch: an ESP32 for about 5 € becomes the key helper in three minutes – installed right from the browser, no Mac needed. Then pair it here.",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -270,6 +274,8 @@ const CS: typeof DE = {
   near_summary: "Přidat telefon s Androidem nebo přívěsek",
   android_label: "Telefon s Androidem (aplikace HA)",
   paste_summary: "Vložit klíč, který už máte",
+  helper_install: "Nainstalovat na ESP32",
+  helper_pitch: "Pro iPhone a Apple Watch: ESP32 za cca 5 € se za tři minuty stane pomocníkem pro klíče – instalace přímo z prohlížeče, bez Macu. Pak spárujte zde.",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -348,6 +354,8 @@ const DA: typeof DE = {
   near_summary: "Tilføj Android-telefon eller nøglevedhæng",
   android_label: "Android-telefon (HA-app)",
   paste_summary: "Indsæt en nøgle, du allerede har",
+  helper_install: "Installer på en ESP32",
+  helper_pitch: "Til iPhone og Apple Watch: En ESP32 til ca. 5 € bliver nøglehjælper på tre minutter – installeret direkte fra browseren, uden Mac. Par den derefter her.",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -426,6 +434,8 @@ const ES: typeof DE = {
   near_summary: "Añadir un móvil Android o un llavero",
   android_label: "Móvil Android (app de HA)",
   paste_summary: "Pegar una clave que ya tienes",
+  helper_install: "Instalar en un ESP32",
+  helper_pitch: "Para iPhone y Apple Watch: un ESP32 de unos 5 € se convierte en el asistente de claves en tres minutos, instalado desde el navegador, sin Mac. Luego empareja aquí.",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -504,6 +514,8 @@ const FI: typeof DE = {
   near_summary: "Lisää Android-puhelin tai avaimenperä",
   android_label: "Android-puhelin (HA-sovellus)",
   paste_summary: "Liitä avain, joka sinulla jo on",
+  helper_install: "Asenna ESP32:lle",
+  helper_pitch: "iPhonelle ja Apple Watchille: noin 5 €:n ESP32:sta tulee avainapuri kolmessa minuutissa – asennus suoraan selaimesta, ilman Macia. Paritus sitten täällä.",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -582,6 +594,8 @@ const FR: typeof DE = {
   near_summary: "Ajouter un téléphone Android ou un porte-clés",
   android_label: "Téléphone Android (app HA)",
   paste_summary: "Coller une clé que vous avez déjà",
+  helper_install: "Installer sur un ESP32",
+  helper_pitch: "Pour iPhone et Apple Watch : un ESP32 à environ 5 € devient l’assistant de clé en trois minutes – installé depuis le navigateur, sans Mac. Jumelez-le ensuite ici.",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -660,6 +674,8 @@ const HU: typeof DE = {
   near_summary: "Androidos telefon vagy kulcstartó hozzáadása",
   android_label: "Androidos telefon (HA-alkalmazás)",
   paste_summary: "Meglévő kulcs beillesztése",
+  helper_install: "Telepítés ESP32-re",
+  helper_pitch: "iPhone-hoz és Apple Watch-hoz: egy kb. 5 eurós ESP32 három perc alatt kulcssegéddé válik – közvetlenül a böngészőből telepítve, Mac nélkül. Utána itt párosítsa.",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -738,6 +754,8 @@ const IT: typeof DE = {
   near_summary: "Aggiungi un telefono Android o un portachiavi",
   android_label: "Telefono Android (app HA)",
   paste_summary: "Incolla una chiave che hai già",
+  helper_install: "Installa su un ESP32",
+  helper_pitch: "Per iPhone e Apple Watch: un ESP32 da circa 5 € diventa l’aiutante delle chiavi in tre minuti, installato dal browser, senza Mac. Poi associalo qui.",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -816,6 +834,8 @@ const NB: typeof DE = {
   near_summary: "Legg til Android-telefon eller nøkkelbrikke",
   android_label: "Android-telefon (HA-appen)",
   paste_summary: "Lim inn en nøkkel du allerede har",
+  helper_install: "Installer på en ESP32",
+  helper_pitch: "For iPhone og Apple Watch: En ESP32 til ca. 5 € blir nøkkelhjelper på tre minutter – installert rett fra nettleseren, uten Mac. Par den deretter her.",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -894,6 +914,8 @@ const NL: typeof DE = {
   near_summary: "Android-telefoon of sleutelhanger toevoegen",
   android_label: "Android-telefoon (HA-app)",
   paste_summary: "Een sleutel plakken die je al hebt",
+  helper_install: "Op een ESP32 installeren",
+  helper_pitch: "Voor iPhone en Apple Watch: een ESP32 van ca. 5 € wordt in drie minuten de sleutelhelper – direct vanuit de browser geïnstalleerd, zonder Mac. Daarna hier koppelen.",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -972,6 +994,8 @@ const NN: typeof DE = {
   near_summary: "Legg til Android-telefon eller nøkkelbrikke",
   android_label: "Android-telefon (HA-appen)",
   paste_summary: "Lim inn ein nøkkel du alt har",
+  helper_install: "Installer på ein ESP32",
+  helper_pitch: "For iPhone og Apple Watch: Ein ESP32 til ca. 5 € blir nøkkelhjelpar på tre minutt – installert rett frå nettlesaren, utan Mac. Par han så her.",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -1050,6 +1074,8 @@ const PL: typeof DE = {
   near_summary: "Dodaj telefon z Androidem lub brelok",
   android_label: "Telefon z Androidem (aplikacja HA)",
   paste_summary: "Wklej klucz, który już masz",
+  helper_install: "Zainstaluj na ESP32",
+  helper_pitch: "Dla iPhone’a i Apple Watch: ESP32 za ok. 5 € w trzy minuty staje się pomocnikiem kluczy – instalacja prosto z przeglądarki, bez Maca. Potem sparuj tutaj.",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -1128,6 +1154,8 @@ const PT: typeof DE = {
   near_summary: "Adicionar um telemóvel Android ou um porta-chaves",
   android_label: "Telemóvel Android (app HA)",
   paste_summary: "Colar uma chave que já tem",
+  helper_install: "Instalar num ESP32",
+  helper_pitch: "Para iPhone e Apple Watch: um ESP32 de cerca de 5 € torna-se o assistente de chaves em três minutos – instalado a partir do navegador, sem Mac. Depois emparelhe aqui.",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -1206,6 +1234,8 @@ const RO: typeof DE = {
   near_summary: "Adaugă un telefon Android sau un breloc",
   android_label: "Telefon Android (aplicația HA)",
   paste_summary: "Lipește o cheie pe care o ai deja",
+  helper_install: "Instalează pe un ESP32",
+  helper_pitch: "Pentru iPhone și Apple Watch: un ESP32 de circa 5 € devine în trei minute ajutorul pentru chei – instalat direct din browser, fără Mac. Apoi asociază-l aici.",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -1284,6 +1314,8 @@ const SL: typeof DE = {
   near_summary: "Dodaj telefon Android ali obesek za ključe",
   android_label: "Telefon Android (aplikacija HA)",
   paste_summary: "Prilepi ključ, ki ga že imaš",
+  helper_install: "Namesti na ESP32",
+  helper_pitch: "Za iPhone in Apple Watch: ESP32 za približno 5 € v treh minutah postane pomočnik za ključe – nameščen kar iz brskalnika, brez Maca. Nato ga seznanite tukaj.",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -1362,6 +1394,8 @@ const SV: typeof DE = {
   near_summary: "Lägg till Android-telefon eller nyckelbricka",
   android_label: "Android-telefon (HA-appen)",
   paste_summary: "Klistra in en nyckel du redan har",
+  helper_install: "Installera på en ESP32",
+  helper_pitch: "För iPhone och Apple Watch: En ESP32 för cirka 5 € blir nyckelhjälpare på tre minuter – installerad direkt från webbläsaren, utan Mac. Parkoppla den sedan här.",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -1440,6 +1474,8 @@ const ZH: typeof DE = {
   near_summary: "添加安卓手机或钥匙扣",
   android_label: "安卓手机（HA 应用）",
   paste_summary: "粘贴已有的密钥",
+  helper_install: "安装到 ESP32",
+  helper_pitch: "适用于 iPhone 和 Apple Watch：一块约 5 欧元的 ESP32 三分钟即可变成密钥助手——直接在浏览器中安装，无需 Mac。然后在这里配对。",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1769,10 +1805,12 @@ export class LocateSetup extends LitElement {
     const t = this.t;
     const helpers = this.keyHelpers();
     const helper = helpers.find((h) => h.select === this.helperId) ?? helpers[0];
-    if (!helper) {
-      return html`<h4>${t.helper_title}</h4>
-        <p class="hint">${t.helper_none} <a href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">${t.helper_build} ↗</a></p>`;
-    }
+    const head = html`<div class="helper-head">
+        <h4>${t.helper_title}</h4>
+        <a class="install" href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">⚡ ${t.helper_install} ↗</a>
+      </div>
+      <p class="hint">${t.helper_pitch}</p>`;
+    if (!helper) return head;
     const watch = helper.option === "Heart Sensor";
     const pick = (option: string) => void this.hass.callService("select", "select_option", { entity_id: helper.select, option });
     // the key in either byte order: whose is it? (a device of the list, or a Private BLE Device of Home Assistant)
@@ -1782,7 +1820,7 @@ export class LocateSetup extends LitElement {
     const privateOwner = cfg.private_ble.find((pb) => same(pb.key))?.title ?? null;
     const name = this.helperName || (watch ? "Apple Watch" : "iPhone");
     const short = (hex: string) => `${hex.slice(0, 4)}…${hex.slice(-4)}`;
-    return html`<h4>${t.helper_title}</h4>
+    return html`${head}
       ${helpers.length > 1
         ? html`<p class="hint">
             <select
@@ -1835,7 +1873,6 @@ export class LocateSetup extends LitElement {
       </ul>
       ${this.helperAdded ? html`<p class="hint">${this.tr(t.helper_added, { name: this.helperAdded })}</p>` : nothing}
       <p class="hint">${t.helper_after}</p>
-      <p class="hint"><a href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">${t.helper_build} ↗</a></p>
       ${helper.refresh
         ? html`<p class="end">
             <small>${t.helper_next_hint}</small>
@@ -2194,6 +2231,25 @@ export class LocateSetup extends LitElement {
     }
     a {
       color: #37e0ff;
+    }
+    .helper-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .helper-head h4 {
+      margin: 0;
+    }
+    a.install {
+      background: #37e0ff;
+      color: #04121c;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 8px 14px;
     }
     details.pbd summary {
       cursor: pointer;
