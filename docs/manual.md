@@ -765,7 +765,7 @@ data:
 
 ### 5.11 Locating (new)
 
-> **New in 1.27, free.** Who and what is where in the house – without Bermuda, without ESPresense, without new hardware. NeonPlan uses the Bluetooth scanners Home Assistant already knows.
+> **New in 2.0, free.** Who and what is where in the house – without Bermuda, without ESPresense, without new hardware. NeonPlan uses the Bluetooth scanners Home Assistant already knows.
 
 NeonPlan shows which room you are in right now – and where your iPhone or your keys are. People stand as a glowing figure in the room and glide over when they change rooms. Every device gets a sensor in Home Assistant ("Torsten's watch room: Kitchen"), and by voice you ask "Where is my iPhone?".
 
@@ -782,11 +782,11 @@ NeonPlan shows which room you are in right now – and where your iPhone or your
   - **Android phones:** in the Home Assistant app switch on **Settings → Companion app → Manage sensors → BLE Transmitter**. No key needed.
   - **Key tags** with a fixed address or as an iBeacon (e.g. Nut, Tile, iBeacon tags). **AirTags do not work** – they change their address, and Apple gives no key.
 
-**Setting up** (editor → at the bottom **📡 Locating → Set up locating**, admins only):
+**Setting up** (editor → **⚙ Settings → 📡 Locating**, admins only):
 
 1. **Scanners:** NeonPlan lists all Bluetooth scanners of Home Assistant and suggests their room – from the device's Home Assistant area, a pin or a piece of furniture in the plan (the washing machine with the Shelly plug's power sensor) or the name ("PC office plug"). After learning NeonPlan knows from the signals where each scanner stands and offers **"Signals say: … – use it"** when they disagree.
 2. **Devices:** take over the watch and the iPhone from "Private BLE Device" with one tap, Android phones and key tags with **Find a device nearby** (hold the device right next to a scanner). Give every device a name, a person and – for "ring my iPhone" – the phone's Home Assistant app.
-3. **Learning:** go into every room, tap it and walk around slowly for **90 seconds**, into the corners and along the walls. Carry all devices. The countdown runs; at 0 the room is done (✓). **Check accuracy** then shows how surely each room is recognised. Simply learn a weak room again.
+3. **Learning:** tick the devices you are **carrying**. Go into every room, tap it and walk around slowly for **90 seconds**, into the corners and along the walls. Keep a phone in your **pocket** (screen off), as in everyday life – best tap with another tablet or phone. **Learning once is enough:** devices without learning of their own use the others'. The countdown runs; at 0 the room is done (✓). **Check accuracy** then shows how surely each room is recognised. Simply learn a weak room again.
 4. **Live:** switch locating on and walk through the house – the list shows at once where NeonPlan sees you.
 
 **In the 3D view:**
@@ -813,6 +813,16 @@ actions:
     target:
       area_id: kitchen
 ```
+
+**How fast a room change shows:** usually after **two to five seconds**. That comes from the scanners, not from NeonPlan: a **Shelly** passes a device on only about **every three to four seconds**, an **ESP32 Bluetooth proxy about every second**. Watches send once or twice a second, an iPhone in a pocket much less often. NeonPlan also waits for two or three readings so the view does not jump between two rooms. It gets faster with **ESP32 proxies** instead of Shellys – and with **presence sensors**, then almost at once.
+
+**Where scanners work best:**
+
+- **In a corner or on an outside wall of the room – not on the wall to the next room.** A plug right behind the wall hears you in the next room almost as loudly as in its own; then the view jumps between the two. (Example: you sit in the kitchen, and the living room's Shelly is plugged in right behind you in the shared wall.)
+- **Not back to back:** two scanners on both sides of the same wall make the two rooms hard to tell apart.
+- **In the open, not hidden:** not behind a fridge, radiator or mirror or in a metal cabinet – metal and water swallow Bluetooth.
+- **About one per room.** Rooms without a scanner of their own still work; large or angled rooms gain from a second one.
+- After moving a scanner, learn the rooms around it again briefly.
 
 **Good to know:**
 

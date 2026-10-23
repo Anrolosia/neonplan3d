@@ -4,12 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
-## 1.27.0
+## 2.0.0
 
 ### Locating – who and what is where (new, free)
 
 - **Without Bermuda or ESPresense:** NeonPlan finds out which room a person, a phone or a key tag is in – from the Bluetooth scanners Home Assistant already has (Shelly Gen2/Gen3 with Bluetooth scanning, ESPHome Bluetooth proxies, the USB adapter). No new hardware, no YAML.
-- **Learning instead of guessing:** a setup assistant in the editor (📡 Locating) places the scanners (from the Home Assistant area of their device, a pin or piece of furniture in the plan, or their name), takes over iPhones and Apple Watches from "Private BLE Device", finds Android phones (the Home Assistant app's BLE transmitter) and key tags nearby, and learns every room in 90 seconds of walking. Rooms without a scanner of their own (hall, guest toilet) are recognised too, and the plan's doors keep the result from jumping through walls. An accuracy check per room; after learning NeonPlan also tells where each scanner really stands.
+- **Learning instead of guessing:** a setup assistant in the editor (⚙ Settings → 📡 Locating) places the scanners (from the Home Assistant area of their device, a pin or piece of furniture in the plan, or their name), takes over iPhones and Apple Watches from "Private BLE Device", finds Android phones (the Home Assistant app's BLE transmitter) and key tags nearby, and learns every room in 90 seconds of walking. Rooms without a scanner of their own (hall, guest toilet) are recognised too, and the plan's doors keep the result from jumping through walls. An accuracy check per room; after learning NeonPlan also tells where each scanner really stands.
 - **Faster with presence sensors:** motion and presence sensors of a room (radar like the Aqara FP2 too) move the right person there at once – Bluetooth tells who, the sensor tells when.
 - **In 3D:** people stand as a glowing figure in their own colour and glide from room to room; things are small symbols. Editor ⚙ Settings → House → People: figure, pin or off. The room panel shows who is here; an option shows people to admins only.
 - **A sensor per device** (`sensor.<device>_room`, state = room name, attributes `room_id`, `area_id`, `floor`, `probability`, `since`, `last_seen`) for automations.

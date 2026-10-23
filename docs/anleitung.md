@@ -765,7 +765,7 @@ data:
 
 ### 5.11 Ortung (neu)
 
-> **Neu in 1.27, kostenlos.** Wer und was ist wo im Haus – ohne Bermuda, ohne ESPresense, ohne neue Hardware. NeonPlan nutzt die Bluetooth-Empfänger, die Home Assistant schon kennt.
+> **Neu in 2.0, kostenlos.** Wer und was ist wo im Haus – ohne Bermuda, ohne ESPresense, ohne neue Hardware. NeonPlan nutzt die Bluetooth-Empfänger, die Home Assistant schon kennt.
 
 NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein Schlüsselbund liegt. Personen stehen als leuchtende Figur im Raum und gleiten beim Raumwechsel hinüber. Für jedes Gerät gibt es einen Sensor in Home Assistant („Torstens Uhr Raum: Küche“), und per Sprache fragst du „Wo ist mein iPhone?“.
 
@@ -782,11 +782,11 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
   - **Android-Handys:** In der Home-Assistant-App unter **Einstellungen → Companion-App → Sensoren verwalten → BLE-Sender** einschalten. Kein Schlüssel nötig.
   - **Schlüsselanhänger** mit fester Adresse oder als iBeacon (z. B. Nut, Tile, iBeacon-Tags). **AirTags gehen nicht** – sie wechseln ihre Adresse, und Apple gibt keinen Schlüssel heraus.
 
-**Einrichten** (Editor → ganz unten **📡 Ortung → Ortung einrichten**, nur Admins):
+**Einrichten** (Editor → **⚙ Einstellungen → 📡 Ortung**, nur Admins):
 
 1. **Empfänger:** NeonPlan listet alle Bluetooth-Empfänger von Home Assistant und schlägt ihren Raum vor – aus dem Home-Assistant-Bereich des Geräts, aus einem Pin oder Möbel im Plan (die Waschmaschine mit dem Strommesser der Shelly-Steckdose) oder aus dem Namen („PC Büro Steckdose“). Nach dem Einlernen weiß NeonPlan aus den Signalen selbst, wo jeder Empfänger steht, und bietet bei Abweichungen **„Signal sagt: … – übernehmen“** an.
 2. **Geräte:** Uhr und iPhone mit einem Tipp aus „Private BLE Device“ übernehmen, Android-Handys und Anhänger über **Gerät in der Nähe suchen** (das Gerät direkt an einen Empfänger halten). Gib jedem Gerät einen Namen, ordne es einer Person zu und – für „Lass mein iPhone klingeln“ – die Home-Assistant-App des Handys.
-3. **Einlernen:** Geh in jeden Raum, tippe ihn an und lauf **90 Sekunden** langsam herum, auch in die Ecken und an den Wänden entlang. Nimm alle Geräte mit. Der Countdown läuft mit, bei 0 ist der Raum fertig (✓). Danach zeigt **Trefferquote prüfen**, wie sicher jeder Raum erkannt wird. Einen schwachen Raum lernst du einfach noch einmal ein.
+3. **Einlernen:** Hake an, welche Geräte du gerade **dabei hast**. Geh in jeden Raum, tippe ihn an und lauf **90 Sekunden** langsam herum, auch in die Ecken und an den Wänden entlang. Ein Handy dabei in die **Tasche** (Bildschirm aus), so wie im Alltag – zum Antippen nimmst du am besten ein anderes Tablet oder Handy. **Einmal einlernen reicht:** Geräte ohne eigene Lerndaten nutzen die der anderen mit. Der Countdown läuft mit, bei 0 ist der Raum fertig (✓). Danach zeigt **Trefferquote prüfen**, wie sicher jeder Raum erkannt wird. Einen schwachen Raum lernst du einfach noch einmal ein.
 4. **Live:** Ortung einschalten und durchs Haus gehen – die Liste zeigt sofort, wo NeonPlan dich sieht.
 
 **In der 3D-Ansicht:**
@@ -813,6 +813,16 @@ actions:
     target:
       area_id: kueche
 ```
+
+**Wie schnell ein Raumwechsel ankommt:** meist nach **zwei bis fünf Sekunden**. Das liegt an den Empfängern, nicht an NeonPlan: Ein **Shelly** meldet ein Gerät nur etwa **alle drei bis vier Sekunden** weiter, ein **ESP32-Bluetooth-Proxy etwa jede Sekunde**. Uhren senden ein- bis zweimal pro Sekunde, ein iPhone in der Tasche deutlich seltener. NeonPlan wartet zudem zwei, drei Messungen ab, damit die Anzeige nicht zwischen zwei Räumen hin- und herspringt. Schneller wird es mit **ESP32-Proxys** statt Shellys – und mit **Präsenzmeldern**, dann fast sofort.
+
+**Wo die Empfänger am besten stehen:**
+
+- **In einer Ecke oder an einer Außenwand des Raums – nicht an der Wand zum Nachbarraum.** Eine Steckdose direkt hinter der Wand hört dich im Nachbarraum fast genauso laut wie in ihrem eigenen Raum; dann springt die Anzeige zwischen beiden. (Beispiel: Du sitzt in der Küche, der Shelly des Wohnzimmers steckt direkt hinter dir in der gemeinsamen Wand.)
+- **Nicht Rücken an Rücken:** zwei Empfänger auf beiden Seiten derselben Wand machen die beiden Räume schwer zu unterscheiden.
+- **Frei statt verdeckt:** nicht hinter Kühlschrank, Heizkörper, Spiegel oder im Metall-Schaltschrank – Metall und Wasser schlucken Bluetooth.
+- **Ungefähr einer pro Raum.** Räume ohne eigenen Empfänger gehen trotzdem; große oder verwinkelte Räume profitieren von einem zweiten.
+- Wer einen Empfänger umsteckt, lernt die Räume daneben kurz neu ein.
 
 **Gut zu wissen:**
 

@@ -6,9 +6,9 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 
 **Principle:** everything you need to draw and control your home stays free. Safety (smoke, water, alarm, rain warning, power outage) is always free. What costs money are extra furniture packs and Pro add-ons with special live effects – paid once, no subscription, and whatever is installed keeps working forever.
 
-## ✅ Recently done (1.13 – 1.27)
+## ✅ Recently done (1.13 – 2.0)
 
-- **Locating** (1.27, free): who and what is where – from the Shelly plugs and ESPHome proxies you already have, learned in 90 seconds per room, without Bermuda; people as glowing figures, a sensor per device, "Where is my iPhone?".
+- **Locating** (2.0, free): who and what is where – from the Shelly plugs and ESPHome proxies you already have, learned in 90 seconds per room, without Bermuda; people as glowing figures, a sensor per device, "Where is my iPhone?".
 
 - **Issue round** (1.25): roofs meeting at right angles and overlapping sections, a hip at one end only, sill per window, windows across open room transitions, faster editor with 3D beside, more contrast in the day look.
 - **Modules with admin approval** (1.24): module code and every update run only after an admin read and approved them; Assist sentence files only on request.
@@ -36,7 +36,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 - **Fun packs** Pets and Halloween, free with a customer account; taster packs for newsletter subscribers.
 - A tidied-up editor, furniture blocks and multi-select, 18 languages.
 
-## 🔨 Next up (1.28)
+## 🔨 Next up (2.1)
 
 | Topic | What it is about | Wish |
 |---|---|---|
@@ -118,9 +118,9 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 
 **Grundsatz:** Alles, was du brauchst, um dein Zuhause abzubilden und zu bedienen, bleibt kostenlos. Sicherheit (Rauch, Wasser, Alarm, Regenwarnung, Stromausfall) ist immer kostenlos. Bezahlt werden zusätzliche Möbel-Packs und Pro-Erweiterungen mit besonderen Live-Effekten – einmal, ohne Abo, und was installiert ist, läuft für immer.
 
-## ✅ Zuletzt erledigt (1.13 – 1.27)
+## ✅ Zuletzt erledigt (1.13 – 2.0)
 
-- **Ortung** (1.27, kostenlos): Wer und was ist wo – über die Shelly-Steckdosen und ESPHome-Proxys, die du schon hast, in 90 Sekunden pro Raum eingelernt, ohne Bermuda; Personen als leuchtende Figuren, ein Sensor pro Gerät, „Wo ist mein iPhone?“.
+- **Ortung** (2.0, kostenlos): Wer und was ist wo – über die Shelly-Steckdosen und ESPHome-Proxys, die du schon hast, in 90 Sekunden pro Raum eingelernt, ohne Bermuda; Personen als leuchtende Figuren, ein Sensor pro Gerät, „Wo ist mein iPhone?“.
 
 - **Fehler-Runde** (1.25): Dächer im rechten Winkel und überlappende Dachflächen, Walm nur an einem Ende, Fensterbank pro Fenster, Fenster über offene Raumübergänge, schnellerer Editor mit 3D daneben, mehr Kontrast im Tag-Look.
 - **Module mit Freigabe** (1.24): Modul-Code und jedes Update laufen erst, wenn ein Admin sie angesehen und freigegeben hat; Assist-Satzdateien nur auf Wunsch.
@@ -148,7 +148,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 - **Fun-Packs** Haustiere und Halloween, gratis mit Kundenkonto; Schnupper-Packs für Newsletter-Abonnenten.
 - Ein aufgeräumter Editor, Möbel-Blöcke und Mehrfachauswahl, 18 Sprachen.
 
-## 🔨 Als Nächstes (1.28)
+## 🔨 Als Nächstes (2.1)
 
 | Thema | Worum es geht | Wunsch |
 |---|---|---|

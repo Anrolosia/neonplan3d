@@ -204,7 +204,7 @@ const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", 
 const HISTORY = 100;
 
 /** Topics of the ⚙ settings menu (everything that belongs to the whole plan). */
-type SettingsTopic = "house" | "weather" | "director" | "voice" | "favorites" | "backdrop" | "terrain" | "backup" | "modules";
+type SettingsTopic = "house" | "weather" | "director" | "voice" | "locate" | "favorites" | "backdrop" | "terrain" | "backup" | "modules";
 
 /** Wall view side bar: what stands or hangs at a wall, by kind. */
 const WALL_CATS: Record<string, string[]> = {
@@ -5487,6 +5487,7 @@ export class Fp3dEditor extends LitElement {
       { key: "weather", icon: "🌦", label: this.t("settings_weather"), admin: true },
       { key: "director", icon: "🎬", label: this.t("card_director"), admin: true },
       { key: "voice", icon: "🎙", label: this.t("voice"), admin: false },
+      ...(released("locate") ? [{ key: "locate" as const, icon: "📡", label: this.t("locate"), admin: true }] : []),
       { key: "favorites", icon: "⭐", label: this.t("favorites"), admin: true },
       { key: "backdrop", icon: "🖼", label: this.t("backdrop"), admin: true },
       { key: "terrain", icon: "⛰", label: this.t("terrain"), admin: true },
@@ -5511,8 +5512,13 @@ export class Fp3dEditor extends LitElement {
                     role="menuitem"
                     class="fp3d-menu-item"
                     @click=${() => {
-                      this._settingsDialog = t.key;
                       this._settingsMenu = false;
+                      // locating has its own assistant (a bundle of its own), not a dialog
+                      if (t.key === "locate") {
+                        if (this.hass) void loadLocate().then((m) => m.openLocateSetup(this.hass!, this._doc, () => this.hass));
+                        return;
+                      }
+                      this._settingsDialog = t.key;
                       // the modules' sentences for the voice list: loaded here as well (the editor is its own bundle), once per opening
                       if (t.key === "voice" && this.hass) void syncModules(this.hass, this.packs ?? []).then(() => this.requestUpdate());
                     }}
@@ -5536,6 +5542,7 @@ export class Fp3dEditor extends LitElement {
       weather: this.t("settings_weather"),
       director: this.t("card_director"),
       voice: this.t("voice"),
+      locate: this.t("locate"),
       favorites: this.t("favorites"),
       backdrop: this.t("backdrop"),
       terrain: this.t("terrain"),
@@ -10313,7 +10320,6 @@ export class Fp3dEditor extends LitElement {
               : nothing}
       ${this.renderHelpLinks()}
       ${admin && SHOW_PRESENCE ? this.renderPresenceSettings() : nothing}
-      ${admin && released("locate") ? this.renderLocate() : nothing}
       ${floor && admin ? this.renderBackgroundForm(floor) : nothing}
       ${admin && released("diagnostics") ? this.renderDiagnostics() : nothing}
     `;
@@ -11458,16 +11464,6 @@ export class Fp3dEditor extends LitElement {
       </div>
       <p class="fp3d-sub">${this.t("director_mic_hint")}</p>
     </details>`;
-  }
-
-  /** Locating (lab): who and what is where, from the Bluetooth scanners – the setup opens as its own window. */
-  private renderLocate() {
-    const de = this.hass?.language?.startsWith("de");
-    return html`<section>
-      <h3>📡 ${de ? "Ortung" : "Locating"} <small class="fp3d-muted">${de ? "neu" : "new"}</small></h3>
-      <p class="fp3d-sub">${de ? "Wer und was ist wo – über die Bluetooth-Empfänger, die Home Assistant schon hat (Shelly, ESPHome)." : "Who and what is where – from the Bluetooth scanners Home Assistant already has (Shelly, ESPHome)."}</p>
-      <button class="fp3d-btn" @click=${() => this.hass && void loadLocate().then((m) => m.openLocateSetup(this.hass!, this._doc, () => this.hass))}>${de ? "Ortung einrichten" : "Set up locating"}</button>
-    </section>`;
   }
 
   private renderPresenceSettings() {
