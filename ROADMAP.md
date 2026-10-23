@@ -42,7 +42,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 |---|---|---|
 | Modules, round 2 | Pro add-ons move into modules; the voice module leaves its beta | your feedback on Discord |
 | Roofs | Rotated roof sections, two roofs meeting at 90°, the floor edge under the roof | discussions #634, #605, #632 |
-| Desk with height | A standing desk whose top moves with its height from Home Assistant (IKEA Idasen and others) | discussion #610 |
+| Desk with height | A standing desk whose top moves with its height from Home Assistant | discussion #610 |
 | Air quality | VOC, CO₂ and particulate values in the room card and as a colour in the room | discussion #485 |
 | Buttons per room | Own buttons (a scene, a script) in a room or on a floor | discussion #603 |
 
@@ -100,8 +100,8 @@ Available: **Camera Cockpit**, **Weather outside**, **Live screens**, **Energy P
 
 - **Season & Decoration** – Christmas tree with fairy lights, Advent wreath, outdoor light chains, Easter (before Christmas).
 - **Stairs & railings** – the open U-stair with two quarter turns as wished (#547).
-- **Smart Home & Tech** – server rack with status LEDs (idea from the CasaNeon fork).
-- **Office & Gaming** – 3D printer workstation (idea from the CasaNeon fork), office container with drawers, gaming PC with LED fans.
+- **Smart Home & Tech** – server rack with status LEDs.
+- **Office & Gaming** – 3D printer workstation, office container with drawers, gaming PC with LED fans.
 - **Building services** – air conditioner outdoor unit, water tank with fill level (discussions #118, #138).
 - **Wellness** – infrared cabin, sauna and hot tub with temperature (discussion #176).
 - **Garden** – water feature with light, garden swing, concrete wall and gabions (discussion #170, Discord).
@@ -154,7 +154,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 |---|---|---|
 | Module, Runde 2 | Die Pro-Erweiterungen ziehen in Module um; das Sprach-Modul verlässt die Beta | euer Feedback im Discord |
 | Dächer | Gedrehte Dachabschnitte, zwei Dächer im 90°-Winkel, die Etagenkante unterm Dach | Diskussionen #634, #605, #632 |
-| Schreibtisch mit Höhe | Ein Steh-Schreibtisch, dessen Platte mit der Höhe aus Home Assistant hoch- und runterfährt (IKEA Idasen u. a.) | Diskussion #610 |
+| Schreibtisch mit Höhe | Ein Steh-Schreibtisch, dessen Platte mit der Höhe aus Home Assistant hoch- und runterfährt | Diskussion #610 |
 | Luftqualität | VOC-, CO₂- und Feinstaubwerte in der Raumkarte und als Farbe im Raum | Diskussion #485 |
 | Knöpfe pro Raum | Eigene Knöpfe (eine Szene, ein Skript) in einem Raum oder auf einer Etage | Diskussion #603 |
 
@@ -212,8 +212,8 @@ Erhältlich: **Kamera-Cockpit**, **Wetter draußen**, **Bildschirme live**, **En
 
 - **Saison & Deko** – Weihnachtsbaum mit Lichterkette, Adventskranz, Lichterketten außen, Ostern (vor Weihnachten).
 - **Treppen & Geländer** – die offene U-Treppe mit zwei Viertelwendelungen wie gewünscht (#547).
-- **Smart Home & Technik** – Server-Rack mit Status-LEDs (Idee aus dem Fork CasaNeon).
-- **Büro & Gaming** – 3D-Drucker-Arbeitsplatz (Idee aus dem Fork CasaNeon), Rollcontainer mit Schubladen, Gaming-PC mit LED-Lüftern.
+- **Smart Home & Technik** – Server-Rack mit Status-LEDs.
+- **Büro & Gaming** – 3D-Drucker-Arbeitsplatz, Rollcontainer mit Schubladen, Gaming-PC mit LED-Lüftern.
 - **Haustechnik** – Klima-Außengerät, Wassertank mit Füllstand (Diskussionen #118, #138).
 - **Wellness** – Infrarotkabine, Sauna und Whirlpool mit Temperatur (Diskussion #176).
 - **Garten** – Wasserspiel mit Licht, Hollywoodschaukel, Betonmauer und Gabionen (Diskussion #170, Discord).
