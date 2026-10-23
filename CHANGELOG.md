@@ -6,7 +6,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## 2.0.0
 
-### Locating – who and what is where (new, free)
+### Live Presence – who and what is where (new, free)
 
 - **Without Bermuda or ESPresense:** NeonPlan finds out which room a person, a phone or a key tag is in – from the Bluetooth scanners Home Assistant already has (Shelly Gen2/Gen3 with Bluetooth scanning, ESPHome Bluetooth proxies, the USB adapter). No new hardware, no YAML.
 - **Learning instead of guessing:** a setup assistant in the editor (⚙ Settings → 📡 Locating) places the scanners (from the Home Assistant area of their device, a pin or piece of furniture in the plan, or their name), finds Android phones (the Home Assistant app's BLE transmitter) and key tags nearby, and learns every room in 90 seconds of walking. Rooms without a scanner of their own (hall, guest toilet) are recognised too, and the plan's doors keep the result from jumping through walls. An accuracy check per room; after learning NeonPlan also tells where each scanner really stands.
