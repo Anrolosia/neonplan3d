@@ -1462,8 +1462,8 @@ export class Fp3dView3d extends LitElement {
     v.setPipes(pool.tubes);
     v.setPatches(this.scene.filter((p): p is Extract<ScenePiece, { kind: "patch" }> => p.kind === "patch").map((p) => ({ floorId: p.floorId, points: p.points, y: p.y, color: p.color, opacity: this.dimmed ? p.opacity * 0.4 : p.opacity, ...(p.glow ? { glow: true } : {}) })));
     const roomSensors = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
-    const persons = released("locate") && personsShown() ? [...roomSensors, ...locatedPersons(hass, b, new Set(roomSensors.map((p) => p.id)))] : roomSensors;
-    v.setPersonLook(personLook() === "pin" ? "pin" : "figure");
+    const persons = released("locate") && personsShown(b) ? [...roomSensors, ...locatedPersons(hass, b, new Set(roomSensors.map((p) => p.id)))] : roomSensors;
+    v.setPersonLook(personLook(b) === "pin" ? "pin" : "figure");
     v.setPersons(persons);
     const counts = floorCounts(hass, b, this.openingLinks!, persons);
     v.setFloorInfo(new Map([...counts].map(([id, c]) => [id, floorInfoText(hass, c)])));

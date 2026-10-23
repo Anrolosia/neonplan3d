@@ -139,7 +139,7 @@ export class Fp3dRoomPanel extends LitElement {
 
   /** Who is in the room now (locating), as a short line under the name. */
   private renderHere(room: Room) {
-    if (!this.building || !released("locate") || !personsShown()) return nothing;
+    if (!this.building || !released("locate") || !personsShown(this.building)) return nothing;
     const here = locatedPersons(this.hass, this.building).filter((p) => p.roomId === room.id);
     if (!here.length) return nothing;
     return html`<p class="fp3d-rp-facts fp3d-rp-here">

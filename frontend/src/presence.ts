@@ -25,26 +25,13 @@ export interface PersonMarker {
 
 export type PersonLook = "figure" | "pin" | "off";
 
-/** How this device shows located people (⚙ menu, remembered per device): a neon figure (default), a pin, or not. */
-export function personLook(): PersonLook {
-  try {
-    const v = localStorage.getItem("neonplan3d.persons");
-    return v === "pin" || v === "off" ? v : "figure";
-  } catch {
-    return "figure";
-  }
+/** How the house shows located people (editor ⚙ Settings → House): a neon figure (default), a pin, or not at all. */
+export function personLook(building: Building | null | undefined): PersonLook {
+  return building?.settings.person_look ?? "figure";
 }
 
-export function setPersonLook(look: PersonLook): void {
-  try {
-    localStorage.setItem("neonplan3d.persons", look);
-  } catch {
-    // storage unavailable: the choice is not remembered
-  }
-}
-
-export function personsShown(): boolean {
-  return personLook() !== "off";
+export function personsShown(building: Building | null | undefined): boolean {
+  return personLook(building) !== "off";
 }
 
 /** Colours of located people: stable per person (by id), bright on the dark neon and the light looks. */

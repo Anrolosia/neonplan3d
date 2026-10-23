@@ -792,7 +792,7 @@ NeonPlan shows which room you are in right now – and where your iPhone or your
 **In the 3D view:**
 
 - People stand as a **glowing figure** in their colour in the room, with the name above. Things (keys, an iPhone without a person) are small round symbols. A tap shows the room, the certainty and since when.
-- In the view's **⚙ menu**: **People → figure, pin or off** – per device, so a wall tablet in the hall can hide them.
+- In the editor under **⚙ Settings → House → People**: **figure, pin or off** – once for the whole house.
 - The **room panel** shows under its name who is here now, and the floors count the people.
 - **Show people to admins only** (in the Live step) hides them from all other users.
 

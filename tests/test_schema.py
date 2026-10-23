@@ -74,6 +74,8 @@ def test_length_units_follow_home_assistant_unless_set() -> None:
     base = {"wall_exterior": 0.3, "wall_interior": 0.12, "grid": 0.05}
     assert SETTINGS_SCHEMA(base)["units"] is None
     assert SETTINGS_SCHEMA({**base, "units": "imperial"})["units"] == "imperial"
+    assert SETTINGS_SCHEMA(base)["person_look"] is None
+    assert SETTINGS_SCHEMA({**base, "person_look": "pin"})["person_look"] == "pin"
 
 
 def test_furniture_block() -> None:

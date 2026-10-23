@@ -13063,6 +13063,17 @@ export class Fp3dEditor extends LitElement {
           </select></label
         >
         ${this.num(this.t("north"), s.north, (v) => set({ north: ((Math.round(v) % 360) + 360) % 360 }), 1)}
+        ${released("locate")
+          ? html`<label class="fp3d-field"
+              >${this.t("persons")}
+              <select @change=${(e: Event) => {
+                const v = (e.target as HTMLSelectElement).value;
+                set({ person_look: v === "pin" || v === "off" ? v : null });
+              }}>
+                ${(["figure", "pin", "off"] as const).map((look) => html`<option value=${look} ?selected=${(s.person_look ?? "figure") === look}>${this.t(`persons_${look}`)}</option>`)}
+              </select></label
+            >`
+          : nothing}
         <label class="fp3d-field fp3d-wide" title=${this.t("editor_floor_hint")}
           >${this.t("editor_floor")}
           <select @change=${(e: Event) => set({ editor_floor: (e.target as HTMLSelectElement).value || null })}>

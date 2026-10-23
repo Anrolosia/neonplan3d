@@ -792,7 +792,7 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
 **In der 3D-Ansicht:**
 
 - Personen stehen als **leuchtende Figur** in ihrer Farbe im Raum, mit dem Namen darüber. Dinge (Schlüssel, ein iPhone ohne Person) sind kleine runde Symbole. Antippen zeigt Raum, Sicherheit und seit wann.
-- Im **⚙-Menü** der Ansicht: **Personen → Figur, Pin oder aus** – pro Gerät, ein Wandtablet im Flur kann sie also ausblenden.
+- Im Editor unter **⚙ Einstellungen → Haus → Personen**: **Figur, Pin oder aus** – einmal fürs ganze Haus.
 - Das **Raumfenster** zeigt unter dem Namen, wer gerade hier ist, und die Etagen zählen die Personen mit.
 - **Personen nur für Admins zeigen** (im Schritt Live) blendet sie für alle anderen Benutzer aus.
 

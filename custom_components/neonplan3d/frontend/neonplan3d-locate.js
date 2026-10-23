@@ -101,7 +101,6 @@ var ee=globalThis,te=ee.ShadowRoot&&(ee.ShadyCSS===void 0||ee.ShadyCSS.nativeSha
       </p>
       <p class="end"><button class="ghost" @click=${()=>{this.call({type:"neonplan3d/locate/calibrate",action:"clear"}).then(()=>this.load())}}>${t.relearn_all}</button></p>`}renderLive(e){let t=this.t,n=this._live,o=i=>this.rooms.find(a=>a.id===i)?.name;return _`<p>${t.live_intro}</p>
       ${this.voiceLanguage?_`<p class="hint">${t.voice_hint}</p>`:b}
-      <p class="hint">${t.look_hint}</p>
       <label class="row"><input type="checkbox" .checked=${e.enabled} @change=${i=>{this.save({enabled:i.target.checked})}} /> ${t.enabled}</label>
       <label class="row"><input type="checkbox" .checked=${e.admins_only} @change=${i=>{this.save({admins_only:i.target.checked})}} /> ${t.admins_only}</label>
       <ul class="list big">

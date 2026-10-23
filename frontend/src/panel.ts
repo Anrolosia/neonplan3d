@@ -19,8 +19,7 @@ import { furnitureName } from "./furniture-names.ts";
 import { confirmEntities, defaultHeight, entityName, kindOf } from "./devices.ts";
 import { canLift, zonesOf, type LampMount } from "./model.ts";
 import { mountBase, packsVersion } from "./packs.ts";
-import { hasFeature, labOn, registerUrl, released, UNRELEASED } from "./features.ts";
-import { personLook, setPersonLook } from "./presence.ts";
+import { hasFeature, labOn, registerUrl, UNRELEASED } from "./features.ts";
 import { mountLocateLab } from "./locate-lab.ts";
 import { directorOnHere } from "./director.ts";
 import { loadVoice, micProbeDone, screenName, voiceOnHere } from "./load-voice.ts";
@@ -596,22 +595,6 @@ export class Floorplan3dPanel extends LitElement {
                   (q) => html`<button aria-pressed=${this._quality === q} @click=${() => this.setQuality(q)}>${this.t(`quality_${q}`)}</button>`,
                 )}
               </div>
-              ${released("locate")
-                ? html`<div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("persons")}>
-                    <span class="fp3d-seg-label">${this.t("persons")}</span>
-                    ${(["figure", "pin", "off"] as const).map(
-                      (look) => html`<button
-                        aria-pressed=${personLook() === look}
-                        @click=${() => {
-                          setPersonLook(look);
-                          this.requestUpdate();
-                        }}
-                      >
-                        ${this.t(`persons_${look}`)}
-                      </button>`,
-                    )}
-                  </div>`
-                : nothing}
               <div class="fp3d-seg fp3d-quality" role="group" aria-label=${this.t("theme")}>
                 ${[...THEMES, "auto" as const].map(
                   (t) =>

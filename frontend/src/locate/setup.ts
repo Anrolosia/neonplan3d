@@ -1554,7 +1554,6 @@ export class LocateSetup extends LitElement {
     const name = (id: string | null | undefined) => this.rooms.find((r) => r.id === id)?.name;
     return html`<p>${t.live_intro}</p>
       ${this.voiceLanguage ? html`<p class="hint">${t.voice_hint}</p>` : nothing}
-      <p class="hint">${t.look_hint}</p>
       <label class="row"><input type="checkbox" .checked=${cfg.enabled} @change=${(e: Event) => void this.save({ enabled: (e.target as HTMLInputElement).checked })} /> ${t.enabled}</label>
       <label class="row"><input type="checkbox" .checked=${cfg.admins_only} @change=${(e: Event) => void this.save({ admins_only: (e.target as HTMLInputElement).checked })} /> ${t.admins_only}</label>
       <ul class="list big">
