@@ -8,6 +8,7 @@ from typing import Any
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -28,6 +29,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             known[sensor.device_id] = sensor
         if new:
             async_add_entities(new)
+        # a removed device takes its sensor along (no "unavailable" leftovers in Home Assistant)
+        ids = {d["id"] for d in service.devices}
+        registry = er.async_get(hass)
+        for device_id in [k for k in known if k not in ids]:
+            sensor = known.pop(device_id)
+            if sensor.entity_id and registry.async_get(sensor.entity_id):
+                registry.async_remove(sensor.entity_id)
 
     sync()
     entry.async_on_unload(async_dispatcher_connect(hass, SIGNAL_LOCATE_DEVICES, sync))

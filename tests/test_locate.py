@@ -139,3 +139,17 @@ async def test_spoken_answers_come_from_the_service(hass: HomeAssistant) -> None
     assert (await ask("ring my watch"))["answer"] == "No app to ring is set for Watch."
     # anything else still goes to the screens (none open here)
     assert (await ask("show the kitchen"))["screen_open"] is False
+
+
+async def test_removing_a_device_removes_its_sensor(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    service: LocateService = hass.data[DATA_LOCATE]
+    await service.async_configure({"devices": [WATCH], "rooms": ROOMS})
+    await hass.async_block_till_done()
+    registry = er.async_get(hass)
+    entity_id = registry.async_get_entity_id("sensor", DOMAIN, f"{DOMAIN}_locate_irk_watch")
+    assert entity_id is not None
+    await service.async_configure({"devices": []})
+    await hass.async_block_till_done()
+    assert registry.async_get_entity_id("sensor", DOMAIN, f"{DOMAIN}_locate_irk_watch") is None
+    assert hass.states.get(entity_id) is None
