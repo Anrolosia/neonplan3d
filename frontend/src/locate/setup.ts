@@ -91,6 +91,8 @@ const DE = {
   helper_key: "Gelesener Schlüssel:",
   helper_wait: "Warte auf das Koppeln …",
   helper_after: "Danach das Gerät „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.",
+  helper_next: "🔄 Nächstes Gerät",
+  helper_next_hint: "Vor jedem weiteren Gerät antippen: Der Helfer bekommt eine neue Bluetooth-Kennung, ein schon gekoppeltes Gerät verbindet sich dann nicht mehr dazwischen.",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -149,6 +151,8 @@ const EN: typeof DE = {
   helper_key: "Key read:",
   helper_wait: "Waiting for the pairing …",
   helper_after: "Afterwards remove the device \"NeonPlan Key\" from the Bluetooth settings again.",
+  helper_next: "🔄 Next device",
+  helper_next_hint: "Tap before every further device: the helper gets a new Bluetooth identity, so a device paired before no longer connects in between.",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -208,6 +212,8 @@ const CS: typeof DE = {
   helper_key: "Přečtený klíč:",
   helper_wait: "Čekám na spárování …",
   helper_after: "Poté zařízení „NeonPlan Key“ v nastavení Bluetooth opět odeberte.",
+  helper_next: "🔄 Další zařízení",
+  helper_next_hint: "Klepněte před každým dalším zařízením: pomocník dostane novou Bluetooth identitu, takže se dříve spárované zařízení už nepřipojí.",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -266,6 +272,8 @@ const DA: typeof DE = {
   helper_key: "Aflæst nøgle:",
   helper_wait: "Venter på parring …",
   helper_after: "Fjern derefter enheden »NeonPlan Key« fra Bluetooth-indstillingerne igen.",
+  helper_next: "🔄 Næste enhed",
+  helper_next_hint: "Tryk før hver ny enhed: hjælperen får en ny Bluetooth-identitet, så en tidligere parret enhed ikke længere forbinder imellem.",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -324,6 +332,8 @@ const ES: typeof DE = {
   helper_key: "Clave leída:",
   helper_wait: "Esperando el enlace …",
   helper_after: "Después, elimina el dispositivo «NeonPlan Key» de los ajustes de Bluetooth.",
+  helper_next: "🔄 Siguiente dispositivo",
+  helper_next_hint: "Toca antes de cada dispositivo nuevo: el asistente recibe una nueva identidad Bluetooth y un dispositivo ya emparejado deja de conectarse.",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -382,6 +392,8 @@ const FI: typeof DE = {
   helper_key: "Luettu avain:",
   helper_wait: "Odotetaan pariliitosta …",
   helper_after: "Poista sen jälkeen laite ”NeonPlan Key” Bluetooth-asetuksista.",
+  helper_next: "🔄 Seuraava laite",
+  helper_next_hint: "Napauta ennen jokaista uutta laitetta: apuri saa uuden Bluetooth-tunnisteen, eikä aiemmin yhdistetty laite enää yhdisty väliin.",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -440,6 +452,8 @@ const FR: typeof DE = {
   helper_key: "Clé lue :",
   helper_wait: "En attente du jumelage …",
   helper_after: "Ensuite, supprimez l’appareil « NeonPlan Key » des réglages Bluetooth.",
+  helper_next: "🔄 Appareil suivant",
+  helper_next_hint: "Touchez avant chaque nouvel appareil : l'assistant reçoit une nouvelle identité Bluetooth, un appareil déjà jumelé ne se reconnecte plus.",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -498,6 +512,8 @@ const HU: typeof DE = {
   helper_key: "Kiolvasott kulcs:",
   helper_wait: "Várakozás a párosításra …",
   helper_after: "Ezután távolítsa el a „NeonPlan Key” eszközt a Bluetooth-beállításokból.",
+  helper_next: "🔄 Következő eszköz",
+  helper_next_hint: "Minden további eszköz előtt koppintson: a segéd új Bluetooth-azonosítót kap, így a korábban párosított eszköz nem kapcsolódik közbe.",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -556,6 +572,8 @@ const IT: typeof DE = {
   helper_key: "Chiave letta:",
   helper_wait: "In attesa dell’abbinamento …",
   helper_after: "Poi rimuovi il dispositivo «NeonPlan Key» dalle impostazioni Bluetooth.",
+  helper_next: "🔄 Dispositivo successivo",
+  helper_next_hint: "Tocca prima di ogni nuovo dispositivo: l'aiutante riceve una nuova identità Bluetooth, così un dispositivo già associato non si ricollega.",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -614,6 +632,8 @@ const NB: typeof DE = {
   helper_key: "Lest nøkkel:",
   helper_wait: "Venter på paring …",
   helper_after: "Fjern deretter enheten «NeonPlan Key» fra Bluetooth-innstillingene igjen.",
+  helper_next: "🔄 Neste enhet",
+  helper_next_hint: "Trykk før hver ny enhet: hjelperen får en ny Bluetooth-identitet, så en enhet som var paret før, ikke kobler seg til imellom.",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -672,6 +692,8 @@ const NL: typeof DE = {
   helper_key: "Uitgelezen sleutel:",
   helper_wait: "Wachten op koppelen …",
   helper_after: "Verwijder daarna het apparaat ‘NeonPlan Key’ weer uit de Bluetooth-instellingen.",
+  helper_next: "🔄 Volgend apparaat",
+  helper_next_hint: "Tik vóór elk volgend apparaat: de helper krijgt een nieuwe Bluetooth-identiteit, zodat een eerder gekoppeld apparaat niet meer tussendoor verbindt.",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -730,6 +752,8 @@ const NN: typeof DE = {
   helper_key: "Lesen nøkkel:",
   helper_wait: "Ventar på paring …",
   helper_after: "Fjern deretter eininga «NeonPlan Key» frå Bluetooth-innstillingane igjen.",
+  helper_next: "🔄 Neste eining",
+  helper_next_hint: "Trykk før kvar ny eining: hjelparen får ein ny Bluetooth-identitet, så ei eining som var para før, ikkje koplar seg til i mellomtida.",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -788,6 +812,8 @@ const PL: typeof DE = {
   helper_key: "Odczytany klucz:",
   helper_wait: "Czekam na parowanie …",
   helper_after: "Następnie usuń urządzenie „NeonPlan Key” z ustawień Bluetooth.",
+  helper_next: "🔄 Następne urządzenie",
+  helper_next_hint: "Dotknij przed każdym kolejnym urządzeniem: pomocnik dostaje nową tożsamość Bluetooth, więc wcześniej sparowane urządzenie już się nie wtrąca.",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -846,6 +872,8 @@ const PT: typeof DE = {
   helper_key: "Chave lida:",
   helper_wait: "A aguardar o emparelhamento …",
   helper_after: "Depois, remova o dispositivo «NeonPlan Key» das definições de Bluetooth.",
+  helper_next: "🔄 Dispositivo seguinte",
+  helper_next_hint: "Toque antes de cada novo dispositivo: o assistente recebe uma nova identidade Bluetooth e um dispositivo já emparelhado deixa de se ligar.",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -904,6 +932,8 @@ const RO: typeof DE = {
   helper_key: "Cheie citită:",
   helper_wait: "Se așteaptă asocierea …",
   helper_after: "Apoi elimină dispozitivul „NeonPlan Key” din configurările Bluetooth.",
+  helper_next: "🔄 Dispozitivul următor",
+  helper_next_hint: "Atinge înainte de fiecare dispozitiv nou: ajutorul primește o nouă identitate Bluetooth, iar un dispozitiv asociat înainte nu se mai conectează.",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -962,6 +992,8 @@ const SL: typeof DE = {
   helper_key: "Prebrani ključ:",
   helper_wait: "Čakam na seznanitev …",
   helper_after: "Nato napravo »NeonPlan Key« znova odstranite iz nastavitev Bluetooth.",
+  helper_next: "🔄 Naslednja naprava",
+  helper_next_hint: "Tapnite pred vsako novo napravo: pomočnik dobi novo Bluetooth identiteto, zato se prej seznanjena naprava ne poveže več vmes.",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -1020,6 +1052,8 @@ const SV: typeof DE = {
   helper_key: "Avläst nyckel:",
   helper_wait: "Väntar på parkoppling …",
   helper_after: "Ta sedan bort enheten ”NeonPlan Key” från Bluetooth-inställningarna igen.",
+  helper_next: "🔄 Nästa enhet",
+  helper_next_hint: "Tryck före varje ny enhet: hjälparen får en ny Bluetooth-identitet, så att en tidigare parkopplad enhet inte ansluter emellan.",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -1078,6 +1112,8 @@ const ZH: typeof DE = {
   helper_key: "读取到的密钥：",
   helper_wait: "正在等待配对 …",
   helper_after: "之后请在 Bluetooth 设置中移除设备“NeonPlan Key”。",
+  helper_next: "🔄 下一个设备",
+  helper_next_hint: "每添加一台新设备前点一下：助手会换一个新的蓝牙身份，之前配对过的设备就不会再抢先连接。",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1372,7 +1408,7 @@ export class LocateSetup extends LitElement {
    * The NeonPlan key helper (an ESP32 with irk-capture, see site/keys): found by its profile select ("Heart Sensor" /
    * "Keyboard"); its IRK sensor shows the key of the device that paired last.
    */
-  private keyHelpers(): { name: string; select: string; option: string; irk: string | null; ours: boolean }[] {
+  private keyHelpers(): { name: string; select: string; option: string; irk: string | null; ours: boolean; refresh: string | null }[] {
     const out = [];
     for (const [id, st] of Object.entries(this.hass.states)) {
       const options = st.attributes.options;
@@ -1382,7 +1418,8 @@ export class LocateSetup extends LitElement {
       const raw = irkEntity ? this.hass.states[irkEntity]?.state : undefined;
       const entry = device ? (this.hass.devices?.[device] as { name?: string | null; name_by_user?: string | null; model?: string | null } | undefined) : undefined;
       const name = entry?.name_by_user || entry?.name || String(st.attributes.friendly_name ?? id);
-      out.push({ name, select: id, option: st.state, irk: raw ? irkHex(raw) : null, ours: entry?.model === "neonplan_key" || /neonplan[ _]key/i.test(id) });
+      const refresh = Object.values(this.hass.entities ?? {}).find((e) => e.device_id === device && /_refresh_ble_identity$/.test(e.entity_id))?.entity_id ?? null;
+      out.push({ name, select: id, option: st.state, irk: raw ? irkHex(raw) : null, ours: entry?.model === "neonplan_key" || /neonplan[ _]key/i.test(id), refresh });
     }
     // NeonPlan's own helper first
     return out.sort((x, y) => Number(y.ours) - Number(x.ours));
@@ -1430,7 +1467,13 @@ export class LocateSetup extends LitElement {
             : nothing}
         </li>
       </ul>
-      <p class="hint">${t.helper_after}</p>`;
+      <p class="hint">${t.helper_after}</p>
+      ${helper.refresh
+        ? html`<p class="end">
+            <small>${t.helper_next_hint}</small>
+            <button @click=${() => void this.hass.callService("button", "press", { entity_id: helper.refresh })}>${t.helper_next}</button>
+          </p>`
+        : nothing}`;
   }
 
   /** The Home Assistant app on a phone, to ring it ("Lass mein iPhone klingeln"). */
