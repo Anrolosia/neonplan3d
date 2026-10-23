@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NeonPlan Key Helper</title>
+    <meta name="description" content="Read the Bluetooth key (IRK) of an iPhone, Apple Watch or Android phone with an ESP32 – for NeonPlan 3D's locating. Flashed right from the browser, no Mac needed." />
+    <script type="module" src="https://unpkg.com/esp-web-tools@10.4.0/dist/web/install-button.js?module"></script>
+    <style>
+      :root { color-scheme: dark; --ink: #e6f7ff; --muted: #9fb8c8; --neon: #37e0ff; --card: #0f1a2e; }
+      body { margin: 0; background: #070b14; color: var(--ink); font: 16px/1.55 system-ui, Roboto, sans-serif; }
+      main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; }
+      h1 { margin: 0 0 4px; font-size: 28px; }
+      h1 span { color: var(--neon); }
+      .sub { color: var(--muted); margin: 0 0 24px; }
+      .card { background: var(--card); border: 1px solid #37e0ff33; border-radius: 14px; padding: 18px 20px; margin: 16px 0; }
+      ol { padding-left: 22px; margin: 8px 0; }
+      li { margin: 8px 0; }
+      b { color: #fff; }
+      a { color: var(--neon); }
+      .lang { float: right; font-size: 14px; }
+      .lang button { background: none; border: 1px solid #37e0ff55; color: var(--ink); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+      .lang button[aria-pressed="true"] { background: var(--neon); color: #04121c; }
+      esp-web-install-button button[slot="activate"] { font: 600 17px system-ui, sans-serif; background: var(--neon); color: #04121c; border: 0; border-radius: 10px; padding: 12px 22px; cursor: pointer; }
+      .warn { color: #ffb86b; }
+      footer { color: var(--muted); font-size: 13px; margin-top: 28px; }
+      [data-lang] { display: none; }
+      body.de [data-lang="de"], body.en [data-lang="en"] { display: block; }
+      li[data-lang], span[data-lang] { display: none; }
+      body.de li[data-lang="de"], body.en li[data-lang="en"] { display: list-item; }
+      body.de span[data-lang="de"], body.en span[data-lang="en"] { display: inline; }
+    </style>
+  </head>
+  <body class="en">
+    <main>
+      <div class="lang"><button data-set="de">Deutsch</button> <button data-set="en">English</button></div>
+      <h1>🔑 NeonPlan <span>Key Helper</span></h1>
+      <p class="sub" data-lang="en">Reads the Bluetooth key (IRK) of your iPhone, Apple Watch or Android phone with an ESP32 – so NeonPlan 3D can tell which room it is in. No Mac needed.</p>
+      <p class="sub" data-lang="de">Liest mit einem ESP32 den Bluetooth-Schlüssel (IRK) deines iPhones, deiner Apple Watch oder deines Android-Handys aus – damit NeonPlan 3D erkennt, in welchem Raum es ist. Ganz ohne Mac.</p>
+
+      <div class="card">
+        <div data-lang="en"><b>You need:</b> an ESP32 board (ESP32, ESP32-C3 or ESP32-S3, about 5 €), a USB cable, and Chrome or Edge on a computer.</div>
+        <div data-lang="de"><b>Du brauchst:</b> ein ESP32-Board (ESP32, ESP32-C3 oder ESP32-S3, ca. 5 €), ein USB-Kabel und Chrome oder Edge am Computer.</div>
+      </div>
+
+      <div class="card">
+        <ol>
+          <li data-lang="en"><b>Plug the ESP32 into the computer</b> and click <b>Install</b>. Pick the USB port, confirm – it takes about a minute.</li>
+          <li data-lang="de"><b>ESP32 per USB an den Computer stecken</b> und auf <b>Installieren</b> klicken. Den USB-Anschluss wählen, bestätigen – das dauert etwa eine Minute.</li>
+          <li data-lang="en"><b>Enter your Wi-Fi</b> when asked. Home Assistant then finds <b>NeonPlan Key</b> by itself: Settings → Devices &amp; services → Discovered → ESPHome → Add.</li>
+          <li data-lang="de"><b>WLAN eintragen</b>, wenn danach gefragt wird. Home Assistant findet <b>NeonPlan Key</b> dann von selbst: Einstellungen → Geräte &amp; Dienste → Entdeckt → ESPHome → Hinzufügen.</li>
+          <li data-lang="en">In NeonPlan: <b>Editor → 📡 Locating → Devices → 🔑 Key helper</b>. Pick <b>Apple Watch</b> or <b>iPhone / Android</b> and pair:
+            <br />⌚ on the watch: Settings → Bluetooth → under “Health devices” tap “NeonPlan Key”.
+            <br />📱 on the phone: Settings → Bluetooth → pair “NeonPlan Key” (it shows as a keyboard).</li>
+          <li data-lang="de">In NeonPlan: <b>Editor → 📡 Ortung → Geräte → 🔑 Schlüssel-Helfer</b>. <b>Apple Watch</b> oder <b>iPhone / Android</b> wählen und koppeln:
+            <br />⌚ auf der Uhr: Einstellungen → Bluetooth → unter „Gesundheitsgeräte“ auf „NeonPlan Key“ tippen.
+            <br />📱 am Handy: Einstellungen → Bluetooth → „NeonPlan Key“ koppeln (erscheint als Tastatur).</li>
+          <li data-lang="en">The key appears in NeonPlan – tap <b>Add</b>. Then remove “NeonPlan Key” from the Bluetooth settings of the watch or phone again.</li>
+          <li data-lang="de">Der Schlüssel erscheint in NeonPlan – auf <b>Hinzufügen</b> tippen. Danach „NeonPlan Key“ in den Bluetooth-Einstellungen der Uhr bzw. des Handys wieder entfernen.</li>
+        </ol>
+        <p>
+          <esp-web-install-button manifest="manifest.json">
+            <button slot="activate"><span data-lang="en">Install</span><span data-lang="de">Installieren</span></button>
+            <span slot="unsupported" class="warn"><span data-lang="en">Your browser cannot flash devices – please use Chrome or Edge on a computer.</span><span data-lang="de">Dein Browser kann keine Geräte flashen – bitte Chrome oder Edge am Computer nehmen.</span></span>
+            <span slot="not-allowed" class="warn"><span data-lang="en">Please open this page over https.</span><span data-lang="de">Bitte diese Seite über https öffnen.</span></span>
+          </esp-web-install-button>
+        </p>
+        <p data-lang="en" class="sub">Several devices? Pair them one after the other – the helper reads one key each time. Afterwards you can reuse the ESP32 for anything else, e.g. flash it as an ESPHome Bluetooth proxy: it then even makes locating faster.</p>
+        <p data-lang="de" class="sub">Mehrere Geräte? Einfach nacheinander koppeln – der Helfer liest jedes Mal einen Schlüssel. Danach kannst du den ESP32 weiterverwenden, z. B. als ESPHome-Bluetooth-Proxy flashen: Dann macht er die Ortung sogar schneller.</p>
+      </div>
+
+      <footer>
+        <span data-lang="en">Everything stays at home: the key goes from the ESP32 to your Home Assistant only. The firmware is built on</span>
+        <span data-lang="de">Alles bleibt zu Hause: Der Schlüssel geht vom ESP32 nur in dein Home Assistant. Die Firmware baut auf</span>
+        <a href="https://github.com/DerekSeaman/irk-capture">irk-capture</a>
+        <span data-lang="en">by Derek Seaman (MIT licence), based on KyleTeal/irk-capture and ESPresense – thank you! Part of</span>
+        <span data-lang="de">von Derek Seaman auf (MIT-Lizenz), das auf KyleTeal/irk-capture und ESPresense beruht – danke! Teil von</span>
+        <a href="https://github.com/Mastershort/neonplan3d">NeonPlan 3D</a>.
+      </footer>
+    </main>
+    <script>
+      const set = (lang) => {
+        document.body.className = lang;
+        document.documentElement.lang = lang;
+        document.querySelectorAll("[data-set]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.set === lang)));
+      };
+      document.querySelectorAll("[data-set]").forEach((b) => b.addEventListener("click", () => set(b.dataset.set)));
+      const wanted = new URLSearchParams(location.search).get("lang");
+      set(wanted === "de" || wanted === "en" ? wanted : (navigator.language || "en").toLowerCase().startsWith("de") ? "de" : "en");
+    </script>
+  </body>
+</html>

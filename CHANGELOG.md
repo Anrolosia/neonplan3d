@@ -14,6 +14,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **In 3D:** people stand as a glowing figure in their own colour and glide from room to room; things are small symbols. ⚙ → People: figure, pin or off, per device. The room panel shows who is here; an option shows people to admins only.
 - **A sensor per device** (`sensor.<device>_room`, state = room name, attributes `room_id`, `area_id`, `floor`, `probability`, `since`, `last_seen`) for automations.
 - **Voice:** "Where is my iPhone?", "Where is Torsten?", "Who is home?", "Ring my iPhone" (a loud notification through the Home Assistant app) – answered by Home Assistant itself, no screen needed. Picked Assist sentence files get new sentences after an update by themselves (a file you changed stays as it is).
+- **Key helper for iPhone and Apple Watch, no Mac needed:** an ESP32 (about 5 €) flashed right from the browser ([neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/)) reads the Bluetooth key while the watch or phone pairs with it; the assistant shows the key and adds it with one tap. Keys can also be pasted (hex or Base64). Built on irk-capture by Derek Seaman (MIT) – thank you!
 - Everything is evaluated in Home Assistant; nothing leaves the house.
 
 ## 1.26.0

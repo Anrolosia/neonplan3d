@@ -80,6 +80,17 @@ const DE = {
   key_name: "Name (z. B. Torstens iPhone)",
   key_value: "Schlüssel (IRK, 32 Zeichen)",
   key_bad: "Das ist kein gültiger Schlüssel (32 Hex-Zeichen oder Base64).",
+  helper_title: "🔑 Schlüssel-Helfer",
+  helper_none: "Noch kein Schlüssel? Mit einem ESP32 (ca. 5 €) liest NeonPlan ihn in drei Minuten aus – iPhone, Apple Watch und Android, ohne Mac.",
+  helper_build: "Schlüssel-Helfer einrichten",
+  helper_found: "Schlüssel-Helfer gefunden: {name}",
+  helper_watch: "Für Apple Watch",
+  helper_phone: "Für iPhone / Android",
+  helper_watch_steps: "Auf der Uhr: Einstellungen → Bluetooth → unter „Gesundheitsgeräte“ auf „NeonPlan Key“ tippen und koppeln.",
+  helper_phone_steps: "Am Handy: Einstellungen → Bluetooth → „NeonPlan Key“ (erscheint als Tastatur) koppeln.",
+  helper_key: "Gelesener Schlüssel:",
+  helper_wait: "Warte auf das Koppeln …",
+  helper_after: "Danach das Gerät „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.",
   near_intro: "Halte das Gerät direkt an einen Empfänger. Android: in der Home-Assistant-App „BLE-Sender“ einschalten. Schlüsselanhänger: kurz drücken.",
   near_empty: "Noch nichts Starkes in der Nähe …",
   walk_intro: "Geh in jeden Raum, tippe ihn an und lauf 90 Sekunden langsam herum – auch in die Ecken. Nimm alle Geräte mit.",
@@ -127,6 +138,17 @@ const EN: typeof DE = {
   key_name: "Name (e.g. Torsten's iPhone)",
   key_value: "Key (IRK, 32 characters)",
   key_bad: "That is not a valid key (32 hex characters or Base64).",
+  helper_title: "🔑 Key helper",
+  helper_none: "No key yet? With an ESP32 (about 5 €) NeonPlan reads it in three minutes – iPhone, Apple Watch and Android, no Mac needed.",
+  helper_build: "Set up the key helper",
+  helper_found: "Key helper found: {name}",
+  helper_watch: "For an Apple Watch",
+  helper_phone: "For an iPhone / Android",
+  helper_watch_steps: "On the watch: Settings → Bluetooth → under \"Health devices\" tap \"NeonPlan Key\" and pair.",
+  helper_phone_steps: "On the phone: Settings → Bluetooth → pair \"NeonPlan Key\" (it shows as a keyboard).",
+  helper_key: "Key read:",
+  helper_wait: "Waiting for the pairing …",
+  helper_after: "Afterwards remove the device \"NeonPlan Key\" from the Bluetooth settings again.",
   near_intro: "Hold the device right next to a scanner. Android: switch on \"BLE Transmitter\" in the Home Assistant app. Key tags: press once.",
   near_empty: "Nothing strong nearby yet …",
   walk_intro: "Go into every room, tap it and walk around slowly for 90 seconds – into the corners too. Carry all devices.",
@@ -175,6 +197,17 @@ const CS: typeof DE = {
   key_name: "Název (např. Torstenův iPhone)",
   key_value: "Klíč (IRK, 32 znaků)",
   key_bad: "Toto není platný klíč (32 hex znaků nebo Base64).",
+  helper_title: "🔑 Pomocník pro klíč",
+  helper_none: "Ještě nemáte klíč? S ESP32 (asi 5 €) ho NeonPlan přečte za tři minuty – iPhone, Apple Watch i Android, bez počítače Mac.",
+  helper_build: "Nastavit pomocníka pro klíč",
+  helper_found: "Pomocník pro klíč nalezen: {name}",
+  helper_watch: "Pro Apple Watch",
+  helper_phone: "Pro iPhone / Android",
+  helper_watch_steps: "Na hodinkách: Nastavení → Bluetooth → v části „Zdravotní zařízení“ klepněte na „NeonPlan Key“ a spárujte.",
+  helper_phone_steps: "V telefonu: Nastavení → Bluetooth → spárujte „NeonPlan Key“ (zobrazí se jako klávesnice).",
+  helper_key: "Přečtený klíč:",
+  helper_wait: "Čekám na spárování …",
+  helper_after: "Poté zařízení „NeonPlan Key“ v nastavení Bluetooth opět odeberte.",
   near_intro: "Podrž zařízení přímo u přijímače. Android: v aplikaci Home Assistant zapni „BLE Transmitter“. Přívěsky na klíče: krátce stiskni.",
   near_empty: "Zatím nic silného poblíž …",
   walk_intro: "Projdi každou místnost, klepni na ni a 90 sekund pomalu choď kolem – i do rohů. Vezmi s sebou všechna zařízení.",
@@ -222,6 +255,17 @@ const DA: typeof DE = {
   key_name: "Navn (f.eks. Torstens iPhone)",
   key_value: "Nøgle (IRK, 32 tegn)",
   key_bad: "Det er ikke en gyldig nøgle (32 hex-tegn eller Base64).",
+  helper_title: "🔑 Nøglehjælper",
+  helper_none: "Ingen nøgle endnu? Med en ESP32 (ca. 5 €) læser NeonPlan den på tre minutter – iPhone, Apple Watch og Android, uden Mac.",
+  helper_build: "Konfigurer nøglehjælperen",
+  helper_found: "Nøglehjælper fundet: {name}",
+  helper_watch: "Til Apple Watch",
+  helper_phone: "Til iPhone / Android",
+  helper_watch_steps: "På uret: Indstillinger → Bluetooth → under »Sundhedsenheder« tryk på »NeonPlan Key«, og par.",
+  helper_phone_steps: "På telefonen: Indstillinger → Bluetooth → par »NeonPlan Key« (vises som tastatur).",
+  helper_key: "Aflæst nøgle:",
+  helper_wait: "Venter på parring …",
+  helper_after: "Fjern derefter enheden »NeonPlan Key« fra Bluetooth-indstillingerne igen.",
   near_intro: "Hold enheden helt tæt på en modtager. Android: slå »BLE Transmitter« til i Home Assistant-appen. Nøglevedhæng: tryk kort.",
   near_empty: "Endnu intet stærkt i nærheden …",
   walk_intro: "Gå ind i hvert rum, tryk på det og gå langsomt rundt i 90 sekunder – også ud i hjørnerne. Tag alle enheder med.",
@@ -269,6 +313,17 @@ const ES: typeof DE = {
   key_name: "Nombre (p. ej. iPhone de Torsten)",
   key_value: "Clave (IRK, 32 caracteres)",
   key_bad: "No es una clave válida (32 caracteres hex o Base64).",
+  helper_title: "🔑 Asistente de clave",
+  helper_none: "¿Aún no tienes clave? Con un ESP32 (unos 5 €) NeonPlan la lee en tres minutos: iPhone, Apple Watch y Android, sin Mac.",
+  helper_build: "Configurar el asistente de clave",
+  helper_found: "Asistente de clave encontrado: {name}",
+  helper_watch: "Para un Apple Watch",
+  helper_phone: "Para un iPhone / Android",
+  helper_watch_steps: "En el reloj: Ajustes → Bluetooth → en «Dispositivos de salud» toca «NeonPlan Key» y enlázalo.",
+  helper_phone_steps: "En el móvil: Ajustes → Bluetooth → enlaza «NeonPlan Key» (aparece como teclado).",
+  helper_key: "Clave leída:",
+  helper_wait: "Esperando el enlace …",
+  helper_after: "Después, elimina el dispositivo «NeonPlan Key» de los ajustes de Bluetooth.",
   near_intro: "Acerca el dispositivo a un receptor. Android: activa “BLE Transmitter” en la app de Home Assistant. Llaveros: pulsa una vez.",
   near_empty: "Aún nada fuerte cerca …",
   walk_intro: "Entra en cada habitación, tócala y camina despacio durante 90 segundos – también por las esquinas. Lleva todos los dispositivos.",
@@ -316,6 +371,17 @@ const FI: typeof DE = {
   key_name: "Nimi (esim. Torstenin iPhone)",
   key_value: "Avain (IRK, 32 merkkiä)",
   key_bad: "Tämä ei ole kelvollinen avain (32 heksamerkkiä tai Base64).",
+  helper_title: "🔑 Avainapuri",
+  helper_none: "Eikö avainta vielä ole? ESP32:n (noin 5 €) avulla NeonPlan lukee sen kolmessa minuutissa – iPhone, Apple Watch ja Android, ilman Mac-tietokonetta.",
+  helper_build: "Ota avainapuri käyttöön",
+  helper_found: "Avainapuri löytyi: {name}",
+  helper_watch: "Apple Watch -kellolle",
+  helper_phone: "iPhone- / Android-puhelimelle",
+  helper_watch_steps: "Kellossa: Asetukset → Bluetooth → valitse kohdassa ”Terveyslaitteet” ”NeonPlan Key” ja muodosta pari.",
+  helper_phone_steps: "Puhelimessa: Asetukset → Bluetooth → muodosta pari laitteen ”NeonPlan Key” kanssa (näkyy näppäimistönä).",
+  helper_key: "Luettu avain:",
+  helper_wait: "Odotetaan pariliitosta …",
+  helper_after: "Poista sen jälkeen laite ”NeonPlan Key” Bluetooth-asetuksista.",
   near_intro: "Pidä laitetta aivan vastaanottimen vieressä. Android: kytke Home Assistant -sovelluksessa ”BLE Transmitter” päälle. Avaimenperät: paina kerran.",
   near_empty: "Ei vielä mitään vahvaa lähellä …",
   walk_intro: "Mene jokaiseen huoneeseen, napauta sitä ja kävele hitaasti ympäriinsä 90 sekuntia – myös nurkkiin. Ota kaikki laitteet mukaan.",
@@ -363,6 +429,17 @@ const FR: typeof DE = {
   key_name: "Nom (p. ex. iPhone de Torsten)",
   key_value: "Clé (IRK, 32 caractères)",
   key_bad: "Ce n'est pas une clé valide (32 caractères hex ou Base64).",
+  helper_title: "🔑 Assistant de clé",
+  helper_none: "Pas encore de clé ? Avec un ESP32 (environ 5 €), NeonPlan la lit en trois minutes – iPhone, Apple Watch et Android, sans Mac.",
+  helper_build: "Configurer l’assistant de clé",
+  helper_found: "Assistant de clé trouvé : {name}",
+  helper_watch: "Pour une Apple Watch",
+  helper_phone: "Pour un iPhone / Android",
+  helper_watch_steps: "Sur la montre : Réglages → Bluetooth → sous « Appareils de santé », touchez « NeonPlan Key » et jumelez.",
+  helper_phone_steps: "Sur le téléphone : Réglages → Bluetooth → jumelez « NeonPlan Key » (il apparaît comme clavier).",
+  helper_key: "Clé lue :",
+  helper_wait: "En attente du jumelage …",
+  helper_after: "Ensuite, supprimez l’appareil « NeonPlan Key » des réglages Bluetooth.",
   near_intro: "Tenez l’appareil tout près d’un récepteur. Android : activez « BLE Transmitter » dans l’app Home Assistant. Porte-clés : appuyez une fois.",
   near_empty: "Rien de fort à proximité pour l’instant …",
   walk_intro: "Allez dans chaque pièce, touchez-la et marchez lentement pendant 90 secondes – jusque dans les coins. Emportez tous les appareils.",
@@ -410,6 +487,17 @@ const HU: typeof DE = {
   key_name: "Név (pl. Torsten iPhone-ja)",
   key_value: "Kulcs (IRK, 32 karakter)",
   key_bad: "Ez nem érvényes kulcs (32 hex karakter vagy Base64).",
+  helper_title: "🔑 Kulcssegéd",
+  helper_none: "Még nincs kulcs? Egy ESP32-vel (kb. 5 €) a NeonPlan három perc alatt kiolvassa – iPhone, Apple Watch és Android, Mac nélkül.",
+  helper_build: "Kulcssegéd beállítása",
+  helper_found: "Kulcssegéd megtalálva: {name}",
+  helper_watch: "Apple Watch esetén",
+  helper_phone: "iPhone / Android esetén",
+  helper_watch_steps: "Az órán: Beállítások → Bluetooth → az „Egészségügyi eszközök” alatt koppintson a „NeonPlan Key” elemre, és párosítsa.",
+  helper_phone_steps: "A telefonon: Beállítások → Bluetooth → párosítsa a „NeonPlan Key” eszközt (billentyűzetként jelenik meg).",
+  helper_key: "Kiolvasott kulcs:",
+  helper_wait: "Várakozás a párosításra …",
+  helper_after: "Ezután távolítsa el a „NeonPlan Key” eszközt a Bluetooth-beállításokból.",
   near_intro: "Tartsd az eszközt közvetlenül egy vevő mellé. Android: kapcsold be a „BLE Transmitter” opciót a Home Assistant alkalmazásban. Kulcstartók: nyomd meg egyszer.",
   near_empty: "Még semmi erős a közelben …",
   walk_intro: "Menj be minden helyiségbe, koppints rá, és sétálj lassan 90 másodpercig – a sarkokba is. Vidd magaddal az összes eszközt.",
@@ -457,6 +545,17 @@ const IT: typeof DE = {
   key_name: "Nome (es. iPhone di Torsten)",
   key_value: "Chiave (IRK, 32 caratteri)",
   key_bad: "Non è una chiave valida (32 caratteri hex o Base64).",
+  helper_title: "🔑 Assistente chiave",
+  helper_none: "Nessuna chiave ancora? Con un ESP32 (circa 5 €) NeonPlan la legge in tre minuti – iPhone, Apple Watch e Android, senza Mac.",
+  helper_build: "Configura l’assistente chiave",
+  helper_found: "Assistente chiave trovato: {name}",
+  helper_watch: "Per Apple Watch",
+  helper_phone: "Per iPhone / Android",
+  helper_watch_steps: "Sull’orologio: Impostazioni → Bluetooth → in «Dispositivi per la salute» tocca «NeonPlan Key» e abbina.",
+  helper_phone_steps: "Sul telefono: Impostazioni → Bluetooth → abbina «NeonPlan Key» (appare come tastiera).",
+  helper_key: "Chiave letta:",
+  helper_wait: "In attesa dell’abbinamento …",
+  helper_after: "Poi rimuovi il dispositivo «NeonPlan Key» dalle impostazioni Bluetooth.",
   near_intro: "Tieni il dispositivo vicinissimo a un ricevitore. Android: attiva “BLE Transmitter” nell’app Home Assistant. Portachiavi: premi una volta.",
   near_empty: "Ancora niente di forte nelle vicinanze …",
   walk_intro: "Entra in ogni stanza, toccala e cammina lentamente per 90 secondi – anche negli angoli. Porta con te tutti i dispositivi.",
@@ -504,6 +603,17 @@ const NB: typeof DE = {
   key_name: "Navn (f.eks. Torstens iPhone)",
   key_value: "Nøkkel (IRK, 32 tegn)",
   key_bad: "Dette er ikke en gyldig nøkkel (32 hex-tegn eller Base64).",
+  helper_title: "🔑 Nøkkelhjelper",
+  helper_none: "Ingen nøkkel ennå? Med en ESP32 (ca. 5 €) leser NeonPlan den på tre minutter – iPhone, Apple Watch og Android, uten Mac.",
+  helper_build: "Konfigurer nøkkelhjelperen",
+  helper_found: "Nøkkelhjelper funnet: {name}",
+  helper_watch: "For Apple Watch",
+  helper_phone: "For iPhone / Android",
+  helper_watch_steps: "På klokken: Innstillinger → Bluetooth → under «Helseenheter» trykker du på «NeonPlan Key» og parer.",
+  helper_phone_steps: "På telefonen: Innstillinger → Bluetooth → par «NeonPlan Key» (vises som tastatur).",
+  helper_key: "Lest nøkkel:",
+  helper_wait: "Venter på paring …",
+  helper_after: "Fjern deretter enheten «NeonPlan Key» fra Bluetooth-innstillingene igjen.",
   near_intro: "Hold enheten helt inntil en mottaker. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk én gang.",
   near_empty: "Ingenting sterkt i nærheten ennå …",
   walk_intro: "Gå inn i hvert rom, trykk på det og gå sakte rundt i 90 sekunder – også inn i hjørnene. Ta med alle enhetene.",
@@ -551,6 +661,17 @@ const NL: typeof DE = {
   key_name: "Naam (bijv. iPhone van Torsten)",
   key_value: "Sleutel (IRK, 32 tekens)",
   key_bad: "Dat is geen geldige sleutel (32 hex-tekens of Base64).",
+  helper_title: "🔑 Sleutelhulp",
+  helper_none: "Nog geen sleutel? Met een ESP32 (ca. 5 €) leest NeonPlan hem in drie minuten uit – iPhone, Apple Watch en Android, zonder Mac.",
+  helper_build: "Sleutelhulp instellen",
+  helper_found: "Sleutelhulp gevonden: {name}",
+  helper_watch: "Voor een Apple Watch",
+  helper_phone: "Voor een iPhone / Android",
+  helper_watch_steps: "Op de watch: Instellingen → Bluetooth → onder ‘Gezondheidsapparaten’ op ‘NeonPlan Key’ tikken en koppelen.",
+  helper_phone_steps: "Op de telefoon: Instellingen → Bluetooth → ‘NeonPlan Key’ koppelen (verschijnt als toetsenbord).",
+  helper_key: "Uitgelezen sleutel:",
+  helper_wait: "Wachten op koppelen …",
+  helper_after: "Verwijder daarna het apparaat ‘NeonPlan Key’ weer uit de Bluetooth-instellingen.",
   near_intro: "Houd het apparaat vlak bij een ontvanger. Android: zet “BLE Transmitter” aan in de Home Assistant-app. Sleutelhangers: kort indrukken.",
   near_empty: "Nog niets sterks in de buurt …",
   walk_intro: "Ga elke ruimte in, tik erop en loop 90 seconden langzaam rond – ook in de hoeken. Neem alle apparaten mee.",
@@ -598,6 +719,17 @@ const NN: typeof DE = {
   key_name: "Namn (t.d. iPhonen til Torsten)",
   key_value: "Nøkkel (IRK, 32 teikn)",
   key_bad: "Dette er ikkje ein gyldig nøkkel (32 hex-teikn eller Base64).",
+  helper_title: "🔑 Nøkkelhjelpar",
+  helper_none: "Ingen nøkkel enno? Med ein ESP32 (ca. 5 €) les NeonPlan han av på tre minutt – iPhone, Apple Watch og Android, utan Mac.",
+  helper_build: "Set opp nøkkelhjelparen",
+  helper_found: "Nøkkelhjelpar funnen: {name}",
+  helper_watch: "For Apple Watch",
+  helper_phone: "For iPhone / Android",
+  helper_watch_steps: "På klokka: Innstillingar → Bluetooth → under «Helseeiningar» trykkjer du på «NeonPlan Key» og parar.",
+  helper_phone_steps: "På telefonen: Innstillingar → Bluetooth → par «NeonPlan Key» (blir vist som tastatur).",
+  helper_key: "Lesen nøkkel:",
+  helper_wait: "Ventar på paring …",
+  helper_after: "Fjern deretter eininga «NeonPlan Key» frå Bluetooth-innstillingane igjen.",
   near_intro: "Hald eininga heilt inntil ein mottakar. Android: slå på «BLE Transmitter» i Home Assistant-appen. Nøkkelbrikker: trykk éin gong.",
   near_empty: "Ikkje noko sterkt i nærleiken enno …",
   walk_intro: "Gå inn i kvart rom, trykk på det og gå sakte rundt i 90 sekund – òg inn i hjørna. Ta med alle einingane.",
@@ -645,6 +777,17 @@ const PL: typeof DE = {
   key_name: "Nazwa (np. iPhone Torstena)",
   key_value: "Klucz (IRK, 32 znaki)",
   key_bad: "To nie jest prawidłowy klucz (32 znaki hex lub Base64).",
+  helper_title: "🔑 Pomocnik klucza",
+  helper_none: "Nie masz jeszcze klucza? Z ESP32 (ok. 5 €) NeonPlan odczyta go w trzy minuty – iPhone, Apple Watch i Android, bez komputera Mac.",
+  helper_build: "Skonfiguruj pomocnika klucza",
+  helper_found: "Znaleziono pomocnika klucza: {name}",
+  helper_watch: "Dla Apple Watch",
+  helper_phone: "Dla telefonu iPhone / Android",
+  helper_watch_steps: "Na zegarku: Ustawienia → Bluetooth → w sekcji „Urządzenia zdrowotne” stuknij „NeonPlan Key” i sparuj.",
+  helper_phone_steps: "Na telefonie: Ustawienia → Bluetooth → sparuj „NeonPlan Key” (pojawia się jako klawiatura).",
+  helper_key: "Odczytany klucz:",
+  helper_wait: "Czekam na parowanie …",
+  helper_after: "Następnie usuń urządzenie „NeonPlan Key” z ustawień Bluetooth.",
   near_intro: "Przyłóż urządzenie tuż do odbiornika. Android: włącz „BLE Transmitter” w aplikacji Home Assistant. Breloki: naciśnij raz.",
   near_empty: "Jeszcze nic silnego w pobliżu …",
   walk_intro: "Wejdź do każdego pomieszczenia, dotknij go i chodź powoli przez 90 sekund – także po kątach. Weź ze sobą wszystkie urządzenia.",
@@ -692,6 +835,17 @@ const PT: typeof DE = {
   key_name: "Nome (ex.: iPhone do Torsten)",
   key_value: "Chave (IRK, 32 caracteres)",
   key_bad: "Esta não é uma chave válida (32 caracteres hex ou Base64).",
+  helper_title: "🔑 Assistente de chave",
+  helper_none: "Ainda sem chave? Com um ESP32 (cerca de 5 €), o NeonPlan lê-a em três minutos – iPhone, Apple Watch e Android, sem Mac.",
+  helper_build: "Configurar o assistente de chave",
+  helper_found: "Assistente de chave encontrado: {name}",
+  helper_watch: "Para um Apple Watch",
+  helper_phone: "Para um iPhone / Android",
+  helper_watch_steps: "No relógio: Definições → Bluetooth → em «Dispositivos de saúde», toque em «NeonPlan Key» e emparelhe.",
+  helper_phone_steps: "No telemóvel: Definições → Bluetooth → emparelhe «NeonPlan Key» (aparece como teclado).",
+  helper_key: "Chave lida:",
+  helper_wait: "A aguardar o emparelhamento …",
+  helper_after: "Depois, remova o dispositivo «NeonPlan Key» das definições de Bluetooth.",
   near_intro: "Segure o dispositivo mesmo junto a um recetor. Android: ative “BLE Transmitter” na app Home Assistant. Porta-chaves: prima uma vez.",
   near_empty: "Ainda nada forte por perto …",
   walk_intro: "Entre em cada divisão, toque nela e ande devagar durante 90 segundos – também pelos cantos. Leve todos os dispositivos.",
@@ -739,6 +893,17 @@ const RO: typeof DE = {
   key_name: "Nume (de ex. iPhone-ul lui Torsten)",
   key_value: "Cheie (IRK, 32 de caractere)",
   key_bad: "Aceasta nu este o cheie validă (32 de caractere hex sau Base64).",
+  helper_title: "🔑 Asistent pentru cheie",
+  helper_none: "Încă nu ai cheia? Cu un ESP32 (circa 5 €), NeonPlan o citește în trei minute – iPhone, Apple Watch și Android, fără Mac.",
+  helper_build: "Configurează asistentul pentru cheie",
+  helper_found: "Asistent pentru cheie găsit: {name}",
+  helper_watch: "Pentru Apple Watch",
+  helper_phone: "Pentru iPhone / Android",
+  helper_watch_steps: "Pe ceas: Configurări → Bluetooth → la „Dispozitive de sănătate” atinge „NeonPlan Key” și asociază.",
+  helper_phone_steps: "Pe telefon: Configurări → Bluetooth → asociază „NeonPlan Key” (apare ca tastatură).",
+  helper_key: "Cheie citită:",
+  helper_wait: "Se așteaptă asocierea …",
+  helper_after: "Apoi elimină dispozitivul „NeonPlan Key” din configurările Bluetooth.",
   near_intro: "Ține dispozitivul chiar lângă un receptor. Android: activează „BLE Transmitter” în aplicația Home Assistant. Brelocuri: apasă o dată.",
   near_empty: "Încă nimic puternic în apropiere …",
   walk_intro: "Intră în fiecare cameră, atinge-o și plimbă-te încet 90 de secunde – și prin colțuri. Ia toate dispozitivele cu tine.",
@@ -786,6 +951,17 @@ const SL: typeof DE = {
   key_name: "Ime (npr. Torstenov iPhone)",
   key_value: "Ključ (IRK, 32 znakov)",
   key_bad: "To ni veljaven ključ (32 šestnajstiških znakov ali Base64).",
+  helper_title: "🔑 Pomočnik za ključ",
+  helper_none: "Še nimate ključa? Z ESP32 (pribl. 5 €) ga NeonPlan prebere v treh minutah – iPhone, Apple Watch in Android, brez računalnika Mac.",
+  helper_build: "Nastavi pomočnika za ključ",
+  helper_found: "Najden pomočnik za ključ: {name}",
+  helper_watch: "Za Apple Watch",
+  helper_phone: "Za iPhone / Android",
+  helper_watch_steps: "Na uri: Nastavitve → Bluetooth → pod »Zdravstvene naprave« tapnite »NeonPlan Key« in seznanite.",
+  helper_phone_steps: "Na telefonu: Nastavitve → Bluetooth → seznanite »NeonPlan Key« (prikaže se kot tipkovnica).",
+  helper_key: "Prebrani ključ:",
+  helper_wait: "Čakam na seznanitev …",
+  helper_after: "Nato napravo »NeonPlan Key« znova odstranite iz nastavitev Bluetooth.",
   near_intro: "Drži napravo tik ob sprejemniku. Android: v aplikaciji Home Assistant vklopi „BLE Transmitter“. Obeski za ključe: pritisni enkrat.",
   near_empty: "V bližini še nič močnega …",
   walk_intro: "Pojdi v vsako sobo, tapni jo in 90 sekund počasi hodi naokrog – tudi v kote. Vzemi s sabo vse naprave.",
@@ -833,6 +1009,17 @@ const SV: typeof DE = {
   key_name: "Namn (t.ex. Torstens iPhone)",
   key_value: "Nyckel (IRK, 32 tecken)",
   key_bad: "Det är ingen giltig nyckel (32 hex-tecken eller Base64).",
+  helper_title: "🔑 Nyckelhjälpare",
+  helper_none: "Ingen nyckel än? Med en ESP32 (ca 5 €) läser NeonPlan av den på tre minuter – iPhone, Apple Watch och Android, utan Mac.",
+  helper_build: "Konfigurera nyckelhjälparen",
+  helper_found: "Nyckelhjälpare hittad: {name}",
+  helper_watch: "För Apple Watch",
+  helper_phone: "För iPhone / Android",
+  helper_watch_steps: "På klockan: Inställningar → Bluetooth → under ”Hälsoenheter” trycker du på ”NeonPlan Key” och parkopplar.",
+  helper_phone_steps: "På telefonen: Inställningar → Bluetooth → parkoppla ”NeonPlan Key” (visas som tangentbord).",
+  helper_key: "Avläst nyckel:",
+  helper_wait: "Väntar på parkoppling …",
+  helper_after: "Ta sedan bort enheten ”NeonPlan Key” från Bluetooth-inställningarna igen.",
   near_intro: "Håll enheten alldeles intill en mottagare. Android: slå på ”BLE Transmitter” i Home Assistant-appen. Nyckelbrickor: tryck en gång.",
   near_empty: "Inget starkt i närheten än …",
   walk_intro: "Gå in i varje rum, tryck på det och gå långsamt runt i 90 sekunder – även ut i hörnen. Ta med alla enheter.",
@@ -880,6 +1067,17 @@ const ZH: typeof DE = {
   key_name: "名称（例如 Torsten 的 iPhone）",
   key_value: "密钥（IRK，32 个字符）",
   key_bad: "这不是有效的密钥（32 个十六进制字符或 Base64）。",
+  helper_title: "🔑 密钥助手",
+  helper_none: "还没有密钥？借助一块 ESP32（约 5 €），NeonPlan 三分钟即可读取——支持 iPhone、Apple Watch 和 Android，无需 Mac。",
+  helper_build: "设置密钥助手",
+  helper_found: "已找到密钥助手：{name}",
+  helper_watch: "用于 Apple Watch",
+  helper_phone: "用于 iPhone / Android",
+  helper_watch_steps: "在手表上：设置 → Bluetooth → 在“健康设备”下轻点“NeonPlan Key”并配对。",
+  helper_phone_steps: "在手机上：设置 → Bluetooth → 配对“NeonPlan Key”（显示为键盘）。",
+  helper_key: "读取到的密钥：",
+  helper_wait: "正在等待配对 …",
+  helper_after: "之后请在 Bluetooth 设置中移除设备“NeonPlan Key”。",
   near_intro: "把设备紧贴接收器。Android：在 Home Assistant 应用中打开“BLE Transmitter”。钥匙扣：按一下。",
   near_empty: "附近暂无强信号 …",
   walk_intro: "进入每个房间，点击它，然后慢慢走动 90 秒 – 包括角落。带上所有设备。",
@@ -1166,6 +1364,53 @@ export class LocateSetup extends LitElement {
     </select>`;
   }
 
+  /**
+   * The NeonPlan key helper (an ESP32 with irk-capture, see site/keys): found by its profile select ("Heart Sensor" /
+   * "Keyboard"); its IRK sensor shows the key of the device that paired last.
+   */
+  private keyHelper(): { name: string; select: string; option: string; irk: string | null } | null {
+    for (const [id, st] of Object.entries(this.hass.states)) {
+      const options = st.attributes.options;
+      if (!id.startsWith("select.") || !Array.isArray(options) || !options.includes("Heart Sensor") || !options.includes("Keyboard")) continue;
+      const device = this.hass.entities?.[id]?.device_id;
+      const irkEntity = Object.values(this.hass.entities ?? {}).find((e) => e.device_id === device && /_irk$/.test(e.entity_id))?.entity_id;
+      const raw = irkEntity ? this.hass.states[irkEntity]?.state : undefined;
+      const name = (device && (this.hass.devices?.[device]?.name_by_user || this.hass.devices?.[device]?.name)) || String(st.attributes.friendly_name ?? id);
+      return { name, select: id, option: st.state, irk: raw ? irkHex(raw) : null };
+    }
+    return null;
+  }
+
+  private renderKeyHelper(cfg: Config) {
+    const t = this.t;
+    const helper = this.keyHelper();
+    if (!helper) {
+      return html`<h4>${t.helper_title}</h4>
+        <p class="hint">${t.helper_none} <a href="https://neonplan3d.mastershort.de/keys/" target="_blank" rel="noopener">${t.helper_build} ↗</a></p>`;
+    }
+    const watch = helper.option === "Heart Sensor";
+    const pick = (option: string) => void this.hass.callService("select", "select_option", { entity_id: helper.select, option });
+    const known = !!helper.irk && cfg.devices.some((d) => d.key === helper.irk);
+    return html`<h4>${t.helper_title}</h4>
+      <p class="hint">${this.tr(t.helper_found, { name: helper.name })}</p>
+      <div class="row">
+        <button class=${watch ? "on" : ""} @click=${() => pick("Heart Sensor")}>⌚ ${t.helper_watch}</button>
+        <button class=${!watch ? "on" : ""} @click=${() => pick("Keyboard")}>📱 ${t.helper_phone}</button>
+      </div>
+      <p class="hint">${watch ? t.helper_watch_steps : t.helper_phone_steps}</p>
+      <ul class="list">
+        <li>
+          <span><b>${t.helper_key}</b><small>${helper.irk ?? t.helper_wait}</small></span>
+          ${helper.irk
+            ? known
+              ? html`<small>${t.added}</small>`
+              : html`<button @click=${() => this.addDevice(cfg, { name: watch ? "Apple Watch" : "iPhone", kind: "irk", key: helper.irk! })}>${t.add}</button>`
+            : nothing}
+        </li>
+      </ul>
+      <p class="hint">${t.helper_after}</p>`;
+  }
+
   /** The Home Assistant app on a phone, to ring it ("Lass mein iPhone klingeln"). */
   private notifySelect(value: string | null, onPick: (n: string | null) => void) {
     const all = (this.hass as unknown as { services?: Record<string, Record<string, unknown>> }).services;
@@ -1229,6 +1474,7 @@ export class LocateSetup extends LitElement {
               )
           : html`<li><small>${t.near_empty}</small></li>`}
       </ul>
+      ${this.renderKeyHelper(cfg)}
       <h4>${t.key_title}</h4>
       <div class="row">
         <input id="keyname" placeholder=${t.key_name} />

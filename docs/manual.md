@@ -820,7 +820,13 @@ actions:
 - **Learn again** when you move scanners or add new ones.
 - **Moving from Bermuda:** both can run side by side, they do not disturb each other. NeonPlan takes your keys from "Private BLE Device" directly. Once NeonPlan works well for you, switch your automations to the new sensors and remove Bermuda.
 
-**Getting the key (IRK) of an iPhone or Apple Watch:** if you already use Bermuda or "Private BLE Device", you have it and are done. Otherwise there are two easy ways: with a **Mac** through Keychain Access (the Mac must be on the same iCloud account), or with an **ESP32** that briefly runs a small read-out program (e.g. "irk-capture") the iPhone pairs with. Then paste the key in the assistant under **Devices → Paste a key** (as 32 characters or the way the Mac shows it) – or add it in Home Assistant under **Settings → Devices & services → Add integration → Private BLE Device**, and NeonPlan offers the device with one tap.
+**Getting the key (IRK) of an iPhone or Apple Watch:** if you already use Bermuda or "Private BLE Device", you have it and are done. Otherwise the easiest way is the **NeonPlan key helper** – no Mac needed, the Apple Watch too:
+
+1. Plug an **ESP32** (ESP32, ESP32-C3 or ESP32-S3, about 5 €) into the computer and click **Install** on [neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/) with Chrome or Edge. Then enter your Wi-Fi.
+2. Home Assistant finds **NeonPlan Key** as an ESPHome device: **Settings → Devices & services → Discovered → Add**.
+3. In the assistant under **Devices → 🔑 Key helper** pick "For an Apple Watch" or "For an iPhone / Android" and pair: on the watch tap "NeonPlan Key" under **Settings → Bluetooth → Health devices**, on the phone under **Settings → Bluetooth**. The key appears at once – tap **Add**. Afterwards remove "NeonPlan Key" from the Bluetooth settings again.
+
+You can reuse the ESP32 afterwards, best as an ESPHome Bluetooth proxy – it then even makes locating faster. The helper is built on [irk-capture](https://github.com/DerekSeaman/irk-capture) by Derek Seaman (MIT licence) – thank you! Another way: with a **Mac** through Keychain Access (the Mac must be on the same iCloud account). Then paste the key in the assistant under **Devices → Paste a key** (as 32 characters or the way the Mac shows it) – or add it in Home Assistant under **Settings → Devices & services → Add integration → Private BLE Device**, and NeonPlan offers the device with one tap.
 
 ---
 

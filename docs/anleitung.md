@@ -820,7 +820,13 @@ actions:
 - **Neu einlernen**, wenn du Empfänger umstellst oder neue dazukommen.
 - **Von Bermuda umsteigen:** Beide können parallel laufen, sie stören sich nicht. Deine Schlüssel aus „Private BLE Device“ übernimmt NeonPlan direkt. Wenn NeonPlan bei dir sicher läuft, stellst du deine Automationen auf die neuen Sensoren um und kannst Bermuda entfernen.
 
-**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** Wer Bermuda oder „Private BLE Device“ schon nutzt, hat ihn und ist fertig. Sonst gibt es zwei einfache Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein), oder mit einem **ESP32**, auf den man kurz ein kleines Programm zum Auslesen spielt (z. B. „irk-capture“), mit dem sich das iPhone koppelt. Den Schlüssel fügst du dann im Assistenten unter **Geräte → Schlüssel einfügen** ein (als 32 Zeichen oder so, wie der Mac ihn zeigt) – oder in Home Assistant unter **Einstellungen → Geräte & Dienste → Integration hinzufügen → Private BLE Device**, dann bietet NeonPlan das Gerät mit einem Tipp an.
+**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** Wer Bermuda oder „Private BLE Device“ schon nutzt, hat ihn und ist fertig. Sonst geht es am einfachsten mit dem **NeonPlan Schlüssel-Helfer** – ohne Mac, auch für die Apple Watch:
+
+1. Einen **ESP32** (ESP32, ESP32-C3 oder ESP32-S3, ca. 5 €) per USB an den Computer stecken und auf [neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/) mit Chrome oder Edge auf **Installieren** klicken. Danach das WLAN eintragen.
+2. Home Assistant findet **NeonPlan Key** als ESPHome-Gerät: **Einstellungen → Geräte & Dienste → Entdeckt → Hinzufügen**.
+3. Im Assistenten unter **Geräte → 🔑 Schlüssel-Helfer** „Für Apple Watch“ oder „Für iPhone / Android“ wählen und koppeln: auf der Uhr unter **Einstellungen → Bluetooth → Gesundheitsgeräte** „NeonPlan Key“ antippen, am Handy unter **Einstellungen → Bluetooth**. Der Schlüssel erscheint sofort – **Hinzufügen** tippen. Danach „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.
+
+Den ESP32 kannst du danach weiterverwenden, am besten als ESPHome-Bluetooth-Proxy – dann macht er die Ortung sogar schneller. Der Helfer baut auf [irk-capture](https://github.com/DerekSeaman/irk-capture) von Derek Seaman auf (MIT-Lizenz) – danke! Andere Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein). Den Schlüssel fügst du dann im Assistenten unter **Geräte → Schlüssel einfügen** ein (als 32 Zeichen oder so, wie der Mac ihn zeigt) – oder in Home Assistant unter **Einstellungen → Geräte & Dienste → Integration hinzufügen → Private BLE Device**, dann bietet NeonPlan das Gerät mit einem Tipp an.
 
 ---
 

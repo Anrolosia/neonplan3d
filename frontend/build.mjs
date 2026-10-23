@@ -121,8 +121,8 @@ function copyFonts() {
 // editor 800 KB on 2026-10-14 for the awning (form, sensors) and the 1.18.2 fixes
 // main 570 KB, 3D 770 KB and card editor 230 KB on 2026-10-14 for the awnings (five kinds) and their texts
 // main 590 KB, editor 820 KB, card editor 235 KB on 2026-10-15 for the household (bins, mailboxes, Haushalt Pro) and its texts
-// locate 100 KB on 2026-10-23: the locating setup carries its texts in 18 languages (it only loads when an admin opens it)
-const BUDGET = { "neonplan3d.js": 688 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 100 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 812 * 1024, "neonplan3d-editor.js": 924 * 1024, "neonplan3d-card-editor.js": 267 * 1024 };
+// locate 120 KB on 2026-10-23: the locating setup carries its texts in 18 languages and the key helper (it only loads when an admin opens it)
+const BUDGET = { "neonplan3d.js": 688 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 120 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 812 * 1024, "neonplan3d-editor.js": 924 * 1024, "neonplan3d-card-editor.js": 267 * 1024 };
 
 copyFonts();
 if (watch) {
