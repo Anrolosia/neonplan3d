@@ -4,7 +4,7 @@
 import { areaEntities, kindOf, openingState, primaryEntities, type OpeningEntities } from "./devices.ts";
 import { translate } from "./i18n.ts";
 import type { Building, Room } from "./model.ts";
-import { centroid } from "./model.ts";
+import { centroid, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
 
 export interface PersonMarker {
@@ -140,9 +140,20 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
   }
   const out: PersonMarker[] = [];
   const perRoom = new Map<string, number>();
+  const spotsOf = new Map<string, [number, number][]>();
   const place = (f: Found, marker: Omit<PersonMarker, "floorId" | "roomId" | "x" | "z">) => {
     const i = perRoom.get(f.room.id) ?? 0;
     perRoom.set(f.room.id, i + 1);
+    // a person (not a thing) stands where an occupied zone of the room's presence sensor says: at the sofa
+    if (!marker.thing) {
+      let spots = spotsOf.get(f.room.id);
+      if (!spots) spotsOf.set(f.room.id, (spots = zoneSpots(hass, building, f.floorId, f.room)));
+      const spot = spots.shift();
+      if (spot) {
+        out.push({ ...marker, floorId: f.floorId, roomId: f.room.id, x: spot[0], z: spot[1] });
+        return;
+      }
+    }
     const [cx, cz] = centroid(f.room.points);
     const angle = -Math.PI / 2 + 0.9 + i * 1.15;
     out.push({ ...marker, floorId: f.floorId, roomId: f.room.id, x: cx + Math.cos(angle) * 0.75, z: cz + Math.sin(angle) * 0.75 });
@@ -196,6 +207,60 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
     }
   }
   return out;
+}
+
+// what a zone of a presence sensor may be called, per furniture kind – built-in or from a pack, by the kind's id
+// after the pack prefix ("pack:mastershort.living:corner_right"); an own furniture name always counts too
+const ZONE_WORDS: [RegExp, string[]][] = [
+  [/sofa|couch|corner|chesterfield|recamiere|chaise|^module_/, ["sofa", "couch", "wohnlandschaft", "ecksofa", "eckcouch"]],
+  [/armchair|club_chair|wingback|recliner|lounge_chair|cocktail_chair|rocking_chair|bean_bag/, ["sessel", "armchair", "ohrensessel", "relaxsessel", "chair"]],
+  [/bed/, ["bett", "bed"]],
+  [/^dining/, ["esstisch", "essen", "essbereich", "dining", "tisch", "table"]],
+  [/^coffee/, ["couchtisch"]],
+  [/desk/, ["schreibtisch", "desk", "arbeitsplatz", "office"]],
+];
+
+const ZONE_NOISE = ["praesenz", "presence", "occupancy", "anwesenheit", "belegt", "zone", "bereich", "raum", "room", "rest", "sensor", "fp2"];
+
+const words = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/ä/g, "ae")
+    .replace(/ö/g, "oe")
+    .replace(/ü/g, "ue")
+    .replace(/ß/g, "ss")
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 1);
+
+/**
+ * Where people in a room sit by the zones of its presence sensors (an Aqara FP2's "Sofa", "Sessel"): an occupied
+ * zone named like a piece of furniture in the room gives that furniture's spot. The sensor belongs to the room by
+ * its own or its device's Home Assistant area; zones without furniture ("Rest", "Eingang") give nothing.
+ */
+export function zoneSpots(hass: HomeAssistant, building: Building, floorId: string, room: Room): [number, number][] {
+  const floor = building.floors.find((f) => f.id === floorId);
+  if (!floor || !room.area_id) return [];
+  const inRoom = floor.furniture.filter((f) => pointInPolygon([f.x, f.z], room.points));
+  if (!inRoom.length) return [];
+  const spots: [number, number][] = [];
+  const skip = new Set([...words(room.name), ...words(hass.areas?.[room.area_id]?.name ?? ""), ...words(room.area_id), ...ZONE_NOISE]);
+  for (const [entityId, st] of Object.entries(hass.states)) {
+    if (!entityId.startsWith("binary_sensor.") || st.state !== "on") continue;
+    const cls = st.attributes.device_class;
+    if (cls !== "occupancy" && cls !== "presence") continue;
+    const entry = hass.entities?.[entityId];
+    const area = entry?.area_id ?? (entry?.device_id ? hass.devices?.[entry.device_id]?.area_id : null);
+    if (area !== room.area_id) continue;
+    // the zone's own words: not the room's name nor the sensor's ("Wohnzimmer Präsenz Sofa" → "sofa")
+    const said = new Set(words(String(st.attributes.friendly_name ?? entityId.slice(14))).filter((w) => !skip.has(w)));
+    const hit = inRoom.find(
+      (f) =>
+        (f.name && words(f.name).some((w) => said.has(w))) ||
+        ZONE_WORDS.some(([kind, names]) => kind.test(f.type.split(":").pop() ?? "") && names.some((n) => said.has(n))),
+    );
+    if (hit && !spots.some(([x, z]) => x === hit.x && z === hit.z)) spots.push([hit.x, hit.z]);
+  }
+  return spots;
 }
 
 export interface FloorCounts {

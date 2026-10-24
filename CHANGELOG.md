@@ -4,6 +4,12 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 2.0.3
+
+### Live Presence
+
+- **People stand where a presence zone says:** when a presence sensor of the room (such as an Aqara FP2 with zones) reports its "Sofa" or "Sessel" zone as occupied, the person's figure stands at that sofa or armchair instead of in the middle of the room. Zones are matched to furniture of the room by name – built-in and pack furniture, or the furniture's own name.
+
 ## 2.0.2
 
 ### Live Presence on Android

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Building, Room } from "./model.ts";
 import { emptyBuilding, newFloor } from "./model.ts";
-import { floorCounts, floorInfoText, initials, locatedPersons, personColor, personsInRooms, roomForState } from "./presence.ts";
+import { floorCounts, floorInfoText, initials, locatedPersons, personColor, personsInRooms, roomForState, zoneSpots } from "./presence.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
 const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}): HassEntity => ({ entity_id, state, attributes });
@@ -133,4 +133,41 @@ test("located people: a watch lying still while the phone walks on was taken off
     people.map((p) => [p.id, p.roomId, p.thing ?? false]).sort(),
     [["person.mia", "r2", false], ["sensor.watch_raum", "r1", true]],
   );
+});
+
+test("a person stands at the furniture an occupied presence zone names (an FP2's \"Sofa\")", () => {
+  const { hass, building } = setup();
+  const now = Date.parse("2026-10-23T12:00:00Z");
+  building.floors[0].furniture = [
+    { id: "s", type: "sofa_l", x: 1, z: 2.5, rotation: 0, w: 2.4, d: 1.6, h: 0.8, variant: null },
+    { id: "a", type: "armchair", x: 3.5, z: 0.5, rotation: 0, w: 0.8, d: 0.8, h: 0.9, variant: null },
+  ];
+  hass.entities = { ...hass.entities, "binary_sensor.wz_sofa": { entity_id: "binary_sensor.wz_sofa", area_id: "living_room" } };
+  hass.states["binary_sensor.wz_sofa"] = st("binary_sensor.wz_sofa", "on", { device_class: "occupancy", friendly_name: "Wohnzimmer Präsenz Sofa" });
+  hass.states["binary_sensor.wz_raum"] = st("binary_sensor.wz_raum", "on", { device_class: "occupancy", friendly_name: "Wohnzimmer Präsenz Raum" });
+  hass.states["sensor.tom_watch_raum"] = st("sensor.tom_watch_raum", "x", {
+    neonplan_locate: true,
+    room_id: "r1",
+    person: "person.tom",
+    device_name: "Tom Watch",
+    wearable: true,
+    last_seen: new Date(now - 5000).toISOString(),
+  });
+  const tom = locatedPersons(hass, building, new Set(), now).find((p) => p.id === "person.tom");
+  assert.deepEqual([tom?.x, tom?.z], [1, 2.5]);
+  // the zone empty: back to the room's middle
+  hass.states["binary_sensor.wz_sofa"] = st("binary_sensor.wz_sofa", "off", { device_class: "occupancy", friendly_name: "Wohnzimmer Präsenz Sofa" });
+  const again = locatedPersons(hass, building, new Set(), now).find((p) => p.id === "person.tom");
+  assert.notDeepEqual([again?.x, again?.z], [1, 2.5]);
+});
+
+test("pack furniture counts for presence zones by its kind (an Ecksofa from the Living pack is the \"Sofa\")", () => {
+  const { hass, building } = setup();
+  building.floors[0].furniture = [
+    { id: "s", type: "pack:mastershort.living:corner_right", x: 2, z: 1, rotation: 0, w: 2.4, d: 1.6, h: 0.8, variant: null },
+    { id: "a", type: "pack:mastershort.living:armchair", x: 3.5, z: 2.5, rotation: 0, w: 0.8, d: 0.8, h: 0.9, variant: null },
+  ];
+  hass.entities = { ...hass.entities, "binary_sensor.fp2_sessel": { entity_id: "binary_sensor.fp2_sessel", area_id: "living_room" } };
+  hass.states["binary_sensor.fp2_sessel"] = st("binary_sensor.fp2_sessel", "on", { device_class: "occupancy", friendly_name: "Wohnzimmer Präsenz Sessel" });
+  assert.deepEqual(zoneSpots(hass, building, "eg", building.floors[0].rooms[0]), [[3.5, 2.5]]);
 });
