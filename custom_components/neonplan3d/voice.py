@@ -24,7 +24,7 @@ from homeassistant.helpers.storage import Store
 import voluptuous as vol
 
 from .const import DATA_ASK, DATA_VOICE, DOMAIN, SIGNAL_ASK, STORAGE_KEY_VOICE
-from .locate.answers import async_answer
+from .locate.answers import Located, async_locate
 from .locate.service import DATA_LOCATE
 
 _LOGGER = logging.getLogger(__name__)
@@ -356,6 +356,18 @@ class AskBroker:
         return True
 
 
+def show_located(hass: HomeAssistant, located: Located, screen: str | None = None) -> None:
+    """The open views fly into the room of the answer ("Where is Torsten?"), or tour the rooms of everyone at home.
+    Nobody waits for them. Not when switched off in the locating settings, and people's rooms not when people are
+    shown to admins only (a wall tablet would show them to everyone)."""
+    service = hass.data.get(DATA_LOCATE)
+    if not located.rooms or service is None or not service.fly or (located.persons and service.admins_only):
+        return
+    async_dispatcher_send(
+        hass, SIGNAL_ASK, {"ask_id": "", "text": "", "screen": screen, "speak": False, "show_rooms": located.rooms}
+    )
+
+
 class AskIntentHandler(intent.IntentHandler):
     """Assist's "show me the living room" and the questions the modules answer."""
 
@@ -375,11 +387,12 @@ class AskIntentHandler(intent.IntentHandler):
         language = (intent_obj.language or intent_obj.hass.config.language or "en").split("-")[0]
         response = intent_obj.create_response()
         # where people and things are: answered here, no screen needed
-        located = await async_answer(
+        located = await async_locate(
             intent_obj.hass, intent_obj.hass.data.get(DATA_LOCATE), text, language, intent_obj.context.user_id
         )
         if located is not None:
-            response.async_set_speech(located)
+            show_located(intent_obj.hass, located)
+            response.async_set_speech(located.text)
             return response
         answer = await self.broker.ask(text, None, False)
         if answer is None:
@@ -399,9 +412,10 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
     async def handle_ask(call: ServiceCall) -> ServiceResponse:
         language = (hass.config.language or "en").split("-")[0]
         locate = hass.data.get(DATA_LOCATE)
-        located = await async_answer(hass, locate, call.data["text"], language, call.context.user_id)
+        located = await async_locate(hass, locate, call.data["text"], language, call.context.user_id)
         if located is not None:
-            return {"answered": True, "answer": located, "screen_open": False}
+            show_located(hass, located, call.data.get("screen"))
+            return {"answered": True, "answer": located.text, "screen_open": False}
         answer = await broker.ask(call.data["text"], call.data.get("screen"), call.data["speak"])
         if answer is None:
             return {"answered": False, "answer": "", "screen_open": False}

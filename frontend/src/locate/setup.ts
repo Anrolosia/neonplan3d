@@ -28,6 +28,8 @@ interface Device {
 interface Config {
   enabled: boolean;
   admins_only: boolean;
+  /** spoken questions fly the open views into the room (default on) */
+  fly?: boolean;
   devices: Device[];
   scanner_rooms: Record<string, string>;
   scanners: Scanner[];
@@ -137,6 +139,8 @@ const DE = {
   helper_android: "Android-Handys und -Tablets hier nicht koppeln: Sie senden diesen Schlüssel im Hintergrund nicht. Für Android den BLE-Sender der Home-Assistant-App nehmen (unten).",
   unheard: "⚠ nicht gehört",
   unheard_hint: "Gerade hört kein Empfänger dieses Gerät. Ist es an und sendet es? Android: BLE-Sender der Home-Assistant-App.",
+  fly: "Bei „Wo ist …?“ und „Wer ist zu Hause?“ in die Räume fliegen",
+  fly_hint: "Die offenen NeonPlan-Ansichten fliegen in den Raum der Antwort, bei „Wer ist zu Hause?“ nacheinander in alle Räume. Antippen stoppt. Personen nicht, wenn sie nur Admins gezeigt werden.",
 };
 const EN: typeof DE = {
   title: "Set up locating",
@@ -224,6 +228,8 @@ const EN: typeof DE = {
   helper_android: "Don't pair Android phones or tablets here: they don't send this key in the background. For Android use the Home Assistant app's BLE Transmitter (below).",
   unheard: "⚠ not heard",
   unheard_hint: "No receiver hears this device right now. Is it on and sending? Android: the Home Assistant app's BLE Transmitter.",
+  fly: "Fly into the rooms on “Where is …?” and “Who is home?”",
+  fly_hint: "The open NeonPlan views fly into the room of the answer, on “Who is home?” into every room in turn. A tap stops it. Not for people while they are shown to admins only.",
 };
 
 const CS: typeof DE = {
@@ -312,6 +318,8 @@ const CS: typeof DE = {
   helper_android: "Telefony a tablety s Androidem zde nepárujte: tento klíč na pozadí nevysílají. Pro Android použijte BLE Transmitter aplikace Home Assistant (níže).",
   unheard: "⚠ neslyšeno",
   unheard_hint: "Žádný přijímač toto zařízení právě neslyší. Je zapnuté a vysílá? Android: BLE Transmitter aplikace Home Assistant.",
+  fly: "Při „Kde je …?“ a „Kdo je doma?“ přeletět do místností",
+  fly_hint: "Otevřená zobrazení NeonPlan přeletí do místnosti z odpovědi, u „Kdo je doma?“ postupně do všech. Klepnutí to zastaví. U osob ne, pokud se zobrazují jen správcům.",
 };
 const DA: typeof DE = {
   title: "Opsæt lokalisering",
@@ -399,6 +407,8 @@ const DA: typeof DE = {
   helper_android: "Par ikke Android-telefoner eller -tablets her: de sender ikke denne nøgle i baggrunden. Brug Home Assistant-appens BLE Transmitter til Android (nedenfor).",
   unheard: "⚠ ikke hørt",
   unheard_hint: "Ingen modtager hører enheden lige nu. Er den tændt og sender? Android: Home Assistant-appens BLE Transmitter.",
+  fly: "Flyv ind i rummene ved „Hvor er …?“ og „Hvem er hjemme?“",
+  fly_hint: "De åbne NeonPlan-visninger flyver ind i svarets rum, ved „Hvem er hjemme?“ ind i alle rum efter tur. Et tryk stopper det. Ikke for personer, når de kun vises for administratorer.",
 };
 const ES: typeof DE = {
   title: "Configurar localización",
@@ -486,6 +496,8 @@ const ES: typeof DE = {
   helper_android: "No emparejes aquí móviles ni tabletas Android: no envían esta clave en segundo plano. Para Android usa el BLE Transmitter de la app de Home Assistant (abajo).",
   unheard: "⚠ sin señal",
   unheard_hint: "Ahora mismo ningún receptor oye este dispositivo. ¿Está encendido y emitiendo? Android: el BLE Transmitter de la app de Home Assistant.",
+  fly: "Volar a las habitaciones con «¿Dónde está …?» y «¿Quién está en casa?»",
+  fly_hint: "Las vistas abiertas de NeonPlan vuelan a la habitación de la respuesta y, con «¿Quién está en casa?», a todas por turno. Un toque lo detiene. No para personas mientras solo se muestren a administradores.",
 };
 const FI: typeof DE = {
   title: "Paikannuksen määritys",
@@ -573,6 +585,8 @@ const FI: typeof DE = {
   helper_android: "Älä yhdistä Android-puhelimia tai -tabletteja tässä: ne eivät lähetä tätä avainta taustalla. Käytä Androidille Home Assistant -sovelluksen BLE Transmitteria (alla).",
   unheard: "⚠ ei kuultu",
   unheard_hint: "Mikään vastaanotin ei kuule laitetta juuri nyt. Onko se päällä ja lähettääkö se? Android: Home Assistant -sovelluksen BLE Transmitter.",
+  fly: "Lennä huoneisiin kysymyksillä ”Missä on …?” ja ”Kuka on kotona?”",
+  fly_hint: "Avoimet NeonPlan-näkymät lentävät vastauksen huoneeseen, kysymyksellä ”Kuka on kotona?” vuorotellen kaikkiin. Napautus pysäyttää. Ei henkilöille, jos ne näytetään vain ylläpitäjille.",
 };
 const FR: typeof DE = {
   title: "Configurer la localisation",
@@ -660,6 +674,8 @@ const FR: typeof DE = {
   helper_android: "N'associez pas ici de téléphones ou tablettes Android : ils n'envoient pas cette clé en arrière-plan. Pour Android, utilisez le BLE Transmitter de l'app Home Assistant (ci-dessous).",
   unheard: "⚠ non capté",
   unheard_hint: "Aucun récepteur n'entend cet appareil en ce moment. Est-il allumé et émet-il ? Android : le BLE Transmitter de l'app Home Assistant.",
+  fly: "Voler dans les pièces avec « Où est … ? » et « Qui est à la maison ? »",
+  fly_hint: "Les vues NeonPlan ouvertes volent dans la pièce de la réponse et, avec « Qui est à la maison ? », dans chaque pièce tour à tour. Un toucher arrête. Pas pour les personnes tant qu'elles ne sont montrées qu'aux admins.",
 };
 const HU: typeof DE = {
   title: "Helymeghatározás beállítása",
@@ -747,6 +763,8 @@ const HU: typeof DE = {
   helper_android: "Androidos telefont vagy táblagépet ne itt párosíts: a háttérben nem küldik ezt a kulcsot. Androidhoz a Home Assistant alkalmazás BLE Transmitterét használd (lent).",
   unheard: "⚠ nem hallható",
   unheard_hint: "Most egyik vevő sem hallja ezt az eszközt. Be van kapcsolva és sugároz? Android: a Home Assistant alkalmazás BLE Transmittere.",
+  fly: "Repülés a szobákba a „Hol van …?” és „Ki van otthon?” kérdésekre",
+  fly_hint: "A nyitott NeonPlan-nézetek a válasz szobájába repülnek, „Ki van otthon?” esetén sorban minden szobába. Koppintás leállítja. Személyeknél nem, ha csak adminoknak látszanak.",
 };
 const IT: typeof DE = {
   title: "Configura localizzazione",
@@ -834,6 +852,8 @@ const IT: typeof DE = {
   helper_android: "Non associare qui telefoni o tablet Android: non inviano questa chiave in background. Per Android usa il BLE Transmitter dell'app Home Assistant (sotto).",
   unheard: "⚠ non rilevato",
   unheard_hint: "Nessun ricevitore sente questo dispositivo in questo momento. È acceso e trasmette? Android: il BLE Transmitter dell'app Home Assistant.",
+  fly: "Volare nelle stanze con «Dov'è …?» e «Chi è a casa?»",
+  fly_hint: "Le viste NeonPlan aperte volano nella stanza della risposta e, con «Chi è a casa?», in tutte a turno. Un tocco ferma. Non per le persone finché sono mostrate solo agli admin.",
 };
 const NB: typeof DE = {
   title: "Sett opp lokalisering",
@@ -921,6 +941,8 @@ const NB: typeof DE = {
   helper_android: "Ikke par Android-telefoner eller -nettbrett her: de sender ikke denne nøkkelen i bakgrunnen. Bruk Home Assistant-appens BLE Transmitter for Android (nedenfor).",
   unheard: "⚠ ikke hørt",
   unheard_hint: "Ingen mottaker hører enheten akkurat nå. Er den på og sender? Android: Home Assistant-appens BLE Transmitter.",
+  fly: "Fly inn i rommene ved «Hvor er …?» og «Hvem er hjemme?»",
+  fly_hint: "De åpne NeonPlan-visningene flyr inn i rommet i svaret, ved «Hvem er hjemme?» inn i alle rom etter tur. Et trykk stopper. Ikke for personer når de bare vises for administratorer.",
 };
 const NL: typeof DE = {
   title: "Locatiebepaling instellen",
@@ -1008,6 +1030,8 @@ const NL: typeof DE = {
   helper_android: "Koppel hier geen Android-telefoons of -tablets: ze sturen deze sleutel niet op de achtergrond. Gebruik voor Android de BLE Transmitter van de Home Assistant-app (hieronder).",
   unheard: "⚠ niet gehoord",
   unheard_hint: "Geen ontvanger hoort dit apparaat nu. Staat het aan en zendt het? Android: de BLE Transmitter van de Home Assistant-app.",
+  fly: "Bij „Waar is …?” en „Wie is er thuis?” de kamers in vliegen",
+  fly_hint: "De open NeonPlan-weergaven vliegen naar de kamer uit het antwoord, bij „Wie is er thuis?” om de beurt naar alle kamers. Tikken stopt het. Niet voor personen zolang ze alleen aan admins worden getoond.",
 };
 const NN: typeof DE = {
   title: "Set opp lokalisering",
@@ -1095,6 +1119,8 @@ const NN: typeof DE = {
   helper_android: "Ikkje par Android-telefonar eller -nettbrett her: dei sender ikkje denne nøkkelen i bakgrunnen. Bruk BLE Transmitter i Home Assistant-appen for Android (nedanfor).",
   unheard: "⚠ ikkje høyrt",
   unheard_hint: "Ingen mottakar høyrer eininga akkurat no. Er ho på og sender? Android: BLE Transmitter i Home Assistant-appen.",
+  fly: "Fly inn i romma ved «Kvar er …?» og «Kven er heime?»",
+  fly_hint: "Dei opne NeonPlan-visingane flyg inn i rommet i svaret, ved «Kven er heime?» inn i alle rom etter tur. Eit trykk stoppar. Ikkje for personar når dei berre blir viste for administratorar.",
 };
 const PL: typeof DE = {
   title: "Konfiguracja lokalizacji",
@@ -1182,6 +1208,8 @@ const PL: typeof DE = {
   helper_android: "Nie paruj tu telefonów ani tabletów z Androidem: nie wysyłają tego klucza w tle. Dla Androida użyj BLE Transmitter aplikacji Home Assistant (poniżej).",
   unheard: "⚠ brak sygnału",
   unheard_hint: "Żaden odbiornik nie słyszy teraz tego urządzenia. Czy jest włączone i nadaje? Android: BLE Transmitter aplikacji Home Assistant.",
+  fly: "Wlatuj do pomieszczeń przy „Gdzie jest …?” i „Kto jest w domu?”",
+  fly_hint: "Otwarte widoki NeonPlan wlatują do pomieszczenia z odpowiedzi, a przy „Kto jest w domu?” po kolei do wszystkich. Dotknięcie zatrzymuje. Nie dla osób, gdy są pokazywane tylko adminom.",
 };
 const PT: typeof DE = {
   title: "Configurar localização",
@@ -1269,6 +1297,8 @@ const PT: typeof DE = {
   helper_android: "Não emparelhes aqui telemóveis ou tablets Android: não enviam esta chave em segundo plano. Para Android usa o BLE Transmitter da app Home Assistant (abaixo).",
   unheard: "⚠ não detetado",
   unheard_hint: "Nenhum recetor ouve este dispositivo agora. Está ligado e a emitir? Android: o BLE Transmitter da app Home Assistant.",
+  fly: "Voar para as divisões com «Onde está …?» e «Quem está em casa?»",
+  fly_hint: "As vistas NeonPlan abertas voam para a divisão da resposta e, com «Quem está em casa?», para todas à vez. Um toque para. Não para pessoas enquanto só são mostradas a administradores.",
 };
 const RO: typeof DE = {
   title: "Configurează localizarea",
@@ -1356,6 +1386,8 @@ const RO: typeof DE = {
   helper_android: "Nu împerechea aici telefoane sau tablete Android: nu trimit această cheie în fundal. Pentru Android folosește BLE Transmitter din aplicația Home Assistant (mai jos).",
   unheard: "⚠ neauzit",
   unheard_hint: "Niciun receptor nu aude acum acest dispozitiv. Este pornit și emite? Android: BLE Transmitter din aplicația Home Assistant.",
+  fly: "Zbor în camere la „Unde este …?” și „Cine e acasă?”",
+  fly_hint: "Vederile NeonPlan deschise zboară în camera din răspuns, iar la „Cine e acasă?” pe rând în toate. O atingere oprește. Nu pentru persoane cât timp sunt arătate doar administratorilor.",
 };
 const SL: typeof DE = {
   title: "Nastavi lociranje",
@@ -1443,6 +1475,8 @@ const SL: typeof DE = {
   helper_android: "Telefonov in tablic z Androidom tu ne seznanjaj: tega ključa v ozadju ne pošiljajo. Za Android uporabi BLE Transmitter aplikacije Home Assistant (spodaj).",
   unheard: "⚠ ni slišano",
   unheard_hint: "Trenutno te naprave ne sliši noben sprejemnik. Je vklopljena in oddaja? Android: BLE Transmitter aplikacije Home Assistant.",
+  fly: "Pri »Kje je …?« in »Kdo je doma?« poleti v prostore",
+  fly_hint: "Odprti pogledi NeonPlan poletijo v prostor iz odgovora, pri »Kdo je doma?« po vrsti v vse. Dotik ustavi. Ne za osebe, dokler so prikazane samo skrbnikom.",
 };
 const SV: typeof DE = {
   title: "Ställ in positionering",
@@ -1530,6 +1564,8 @@ const SV: typeof DE = {
   helper_android: "Para inte Android-telefoner eller -surfplattor här: de skickar inte den här nyckeln i bakgrunden. Använd Home Assistant-appens BLE Transmitter för Android (nedan).",
   unheard: "⚠ inte hörd",
   unheard_hint: "Ingen mottagare hör enheten just nu. Är den på och sänder? Android: Home Assistant-appens BLE Transmitter.",
+  fly: "Flyg in i rummen vid ”Var är …?” och ”Vem är hemma?”",
+  fly_hint: "De öppna NeonPlan-vyerna flyger in i rummet i svaret, vid ”Vem är hemma?” in i alla rum i tur och ordning. Ett tryck stoppar. Inte för personer medan de bara visas för administratörer.",
 };
 const ZH: typeof DE = {
   title: "设置定位",
@@ -1617,6 +1653,8 @@ const ZH: typeof DE = {
   helper_android: "不要在这里配对安卓手机或平板：它们不会在后台发送这个密钥。安卓请使用 Home Assistant 应用的 BLE Transmitter（见下方）。",
   unheard: "⚠ 未检测到",
   unheard_hint: "目前没有接收器能听到这个设备。它是否开着并在发送？安卓：Home Assistant 应用的 BLE Transmitter。",
+  fly: "问“…在哪里？”和“谁在家？”时飞进房间",
+  fly_hint: "打开的 NeonPlan 视图会飞进答案所在的房间；问“谁在家？”时依次飞过所有房间。轻点即可停止。若人员仅对管理员显示，则不会飞向人员。",
 };
 
 /** An IRK as 32 hex characters: pasted as hex (with or without separators) or as Base64 (as the Mac keychain shows it). */
@@ -2269,6 +2307,9 @@ export class LocateSetup extends LitElement {
       ${this.voiceLanguage ? html`<p class="hint">${t.voice_hint}</p>` : nothing}
       <label class="row"><input type="checkbox" .checked=${cfg.enabled} @change=${(e: Event) => void this.save({ enabled: (e.target as HTMLInputElement).checked })} /> ${t.enabled}</label>
       <label class="row"><input type="checkbox" .checked=${cfg.admins_only} @change=${(e: Event) => void this.save({ admins_only: (e.target as HTMLInputElement).checked })} /> ${t.admins_only}</label>
+      <label class="row" title=${t.fly_hint}
+        ><input type="checkbox" .checked=${cfg.fly !== false} @change=${(e: Event) => void this.save({ fly: (e.target as HTMLInputElement).checked })} /> ${t.fly}</label
+      >
       ${this.setLook
         ? html`<div class="row">
             <b>${t.look_title}</b>

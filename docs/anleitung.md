@@ -792,7 +792,7 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
 
 **In der 3D-Ansicht:**
 
-- **Uhr und Handy einer Person:** Was am Körper getragen wird (Uhr, Band – Haken **⌚ am Körper**, bei „Watch“ oder „Uhr“ im Namen schon gesetzt) bestimmt, wo die Person steht, solange es in den letzten zwei Minuten gehört wurde; sonst das zuletzt gehörte Gerät. Ein Handy, das in einem anderen Raum liegt, erscheint dort als eigenes kleines Symbol.
+- **Uhr und Handy einer Person:** Was am Körper getragen wird (Uhr, Band – Haken **⌚ am Körper**, bei „Watch“ oder „Uhr“ im Namen schon gesetzt) bestimmt, wo die Person steht, solange es in den letzten zwei Minuten gehört wurde; sonst das zuletzt gehörte Gerät. Melden Uhr und Handy gleichzeitig verschiedene Räume (typisch an einer gemeinsamen Wand), gewinnt das Handy nur, wenn es sich deutlich sicherer ist (mehr als 15 Prozentpunkte). Ein Handy, das in einem anderen Raum liegen geblieben ist, während du mit der Uhr weitergegangen bist, erscheint dort als eigenes kleines Symbol.
 - Personen stehen als **leuchtende Figur** in ihrer Farbe im Raum, mit dem Namen darüber. Dinge (Schlüssel, ein iPhone ohne Person) sind kleine runde Symbole. Antippen zeigt Raum, Sicherheit und seit wann.
 - Im Assistenten unter **4 · Live → Personen in 3D**: **Figur, Pin oder aus** – einmal fürs ganze Haus.
 - Das **Raumfenster** zeigt unter dem Namen, wer gerade hier ist, und die Etagen zählen die Personen mit.
@@ -800,7 +800,7 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
 
 **Schneller mit Präsenzmeldern:** Bewegungs- und Präsenzmelder (auch Radar wie Aqara FP2), die in Home Assistant einem Bereich zugeordnet sind, beschleunigen die Ortung von selbst: Bluetooth sagt, **wer** es ist, der Melder sagt, **wann** jemand den Raum betritt. Ohne Melder dauert ein Raumwechsel zwei bis fünf Sekunden – mit Melder oft nur einen Augenblick.
 
-**Sprache** (mit den Assist-Sätzen unter **⚙ Einstellungen → Sprachsteuerung**): „Wo ist mein iPhone?“, „Wo ist Torsten?“, „Wer ist zu Hause?“, „Lass mein iPhone klingeln“. Die Antwort kommt direkt aus Home Assistant – auch ohne offenen NeonPlan-Bildschirm. Klingeln schickt eine laute Mitteilung an die Home-Assistant-App (auf dem iPhone als kritische Mitteilung, die auch im Lautlos-Modus klingelt).
+**Sprache** (mit den Assist-Sätzen unter **⚙ Einstellungen → Sprachsteuerung**): „Wo ist mein iPhone?“, „Wo ist Torsten?“, „Wer ist zu Hause?“, „Lass mein iPhone klingeln“. Die Antwort kommt direkt aus Home Assistant – auch ohne offenen NeonPlan-Bildschirm. Offene NeonPlan-Ansichten fliegen dabei in den Raum der Antwort, bei „Wer ist zu Hause?“ nacheinander in alle Räume, in denen jemand ist (Antippen stoppt). Ausschalten lässt sich das im Ortungs-Assistenten unter **Live**; Personen werden nicht angeflogen, solange sie nur Admins gezeigt werden. Klingeln schickt eine laute Mitteilung an die Home-Assistant-App (auf dem iPhone als kritische Mitteilung, die auch im Lautlos-Modus klingelt).
 
 **Für Automationen:** Jedes Gerät hat einen Sensor, z. B. `sensor.torstens_uhr_raum`. Sein Zustand ist der Raumname; die Attribute sind `room_id`, `area_id` (der Home-Assistant-Bereich des Raums), `floor`, `probability` (Sicherheit 0–1), `since` und `last_seen`. Beispiel – Licht folgt dir:
 

@@ -69,6 +69,7 @@ class LocateService:
         self._store: Store[dict[str, Any]] = Store(hass, 1, STORAGE_KEY_LOCATE)
         self.enabled = False
         self.admins_only = False
+        self.fly = True  # spoken questions fly the open views into the room
         self.devices: list[dict[str, Any]] = []
         self.scanner_rooms: dict[str, str] = {}
         self.scanner_names: dict[str, str] = {}  # last known names (a scanner that is offline keeps its row)
@@ -95,6 +96,7 @@ class LocateService:
         data = await self._store.async_load() or {}
         self.enabled = bool(data.get("enabled"))
         self.admins_only = bool(data.get("admins_only"))
+        self.fly = data.get("fly", True) is not False
         self.devices = _clean_devices(data.get("devices") or [])
         self.scanner_rooms = {str(k): str(v) for k, v in (data.get("scanner_rooms") or {}).items()}
         self.scanner_names = {str(k): str(v) for k, v in (data.get("scanner_names") or {}).items()}
@@ -112,6 +114,7 @@ class LocateService:
         return {
             "enabled": self.enabled,
             "admins_only": self.admins_only,
+            "fly": self.fly,
             "devices": self.devices,
             "scanner_rooms": self.scanner_rooms,
             "scanner_names": self.scanner_names,
@@ -166,6 +169,8 @@ class LocateService:
             self.doors = [(str(a), str(b)) for a, b in changes["doors"]]
         if "admins_only" in changes:
             self.admins_only = bool(changes["admins_only"])
+        if "fly" in changes:
+            self.fly = bool(changes["fly"])
         self._rebuild()
         if "enabled" in changes:
             self.enabled = bool(changes["enabled"])
@@ -191,6 +196,7 @@ class LocateService:
         return {
             "enabled": self.enabled,
             "admins_only": self.admins_only,
+            "fly": self.fly,
             "devices": self.devices,
             "scanner_rooms": self.scanner_rooms,
             "scanners": self._scanners(),

@@ -224,3 +224,72 @@ async def test_weak_beacons_show_among_nearby_devices(hass: HomeAssistant) -> No
     service.stop()
     assert [r["address"] for r in rows] == ["5B:00:00:00:00:03", "AA:00:00:00:00:01"]
     assert rows[0]["ibeacon"] == "280fa872f5254bccb7b42c2843e023e000649c44"
+
+
+def test_a_person_is_where_the_surer_device_says() -> None:
+    """Watch and phone heard together but in different rooms: the watch wins unless the phone is clearly surer;
+    a phone that stayed put while the watch walked on was left lying there."""
+    from types import SimpleNamespace
+
+    from custom_components.neonplan3d.locate.answers import person_state
+
+    now = 10_000.0
+    watch = {"id": "w", "wearable": True}
+    phone = {"id": "p"}
+
+    def state(w_room, w_p, w_since, p_room, p_p, p_since, p_seen=now - 5):
+        return SimpleNamespace(
+            state={
+                "w": {"room": w_room, "probability": w_p, "since": w_since, "last_seen": now - 5},
+                "p": {"room": p_room, "probability": p_p, "since": p_since, "last_seen": p_seen},
+            }
+        )
+
+    # sitting in the kitchen, the living-room plug behind the seat fools the watch: the surer phone wins
+    assert (
+        person_state(state("living", 0.6, now - 600, "kitchen", 0.85, now - 610), [watch, phone], now)["room"]
+        == "kitchen"
+    )
+    # only a little surer: the watch keeps it
+    assert (
+        person_state(state("living", 0.7, now - 600, "kitchen", 0.8, now - 610), [watch, phone], now)["room"]
+        == "living"
+    )
+    # the phone has lain in the kitchen for 20 minutes, the watch walked into the living room 2 minutes ago
+    assert (
+        person_state(state("living", 0.6, now - 120, "kitchen", 0.95, now - 1200), [watch, phone], now)["room"]
+        == "living"
+    )
+    # the phone not heard lately: the watch as before
+    assert (
+        person_state(state("living", 0.6, now - 600, "kitchen", 0.95, now - 610, now - 300), [watch, phone], now)[
+            "room"
+        ]
+        == "living"
+    )
+
+
+async def test_located_answers_fly_the_views_into_the_room(hass: HomeAssistant) -> None:
+    from homeassistant.helpers.dispatcher import async_dispatcher_connect
+
+    from custom_components.neonplan3d.const import SIGNAL_ASK
+    from custom_components.neonplan3d.locate.answers import Located
+    from custom_components.neonplan3d.voice import show_located
+
+    await _setup(hass)
+    service: LocateService = hass.data[DATA_LOCATE]
+    sent: list[dict] = []
+    async_dispatcher_connect(hass, SIGNAL_ASK, sent.append)
+    show_located(hass, Located("Torsten is in the Kitchen.", ["kitchen"], True))
+    show_located(hass, Located("I can't hear Torsten right now.", [], True))
+    await hass.async_block_till_done()
+    assert [m["show_rooms"] for m in sent] == [["kitchen"]]
+    # people shown to admins only: a wall tablet would show everyone where they are
+    service.admins_only = True
+    show_located(hass, Located("Torsten is in the Kitchen.", ["kitchen"], True))
+    show_located(hass, Located("The keys are in the Hall.", ["hall"], False))
+    service.admins_only = False
+    service.fly = False
+    show_located(hass, Located("The keys are in the Hall.", ["hall"], False))
+    await hass.async_block_till_done()
+    assert [m["show_rooms"] for m in sent] == [["kitchen"], ["hall"]]

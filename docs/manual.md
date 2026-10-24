@@ -792,7 +792,7 @@ NeonPlan shows which room you are in right now – and where your iPhone or your
 
 **In the 3D view:**
 
-- **A person's watch and phone:** what is worn on the body (watch, band – tick **⌚ worn**, already set for "watch" in the name) tells where the person stands while it was heard in the last two minutes; otherwise the device heard last. A phone lying in another room shows there as a small symbol of its own.
+- **A person's watch and phone:** what is worn on the body (watch, band – tick **⌚ worn**, already set for "watch" in the name) tells where the person stands while it was heard in the last two minutes; otherwise the device heard last. When the watch and the phone are heard at the same time in different rooms (typically at a shared wall), the phone only wins when it is clearly surer (by more than 15 percentage points). A phone left lying in another room while you walked on with the watch shows there as a small symbol of its own.
 - People stand as a **glowing figure** in their colour in the room, with the name above. Things (keys, an iPhone without a person) are small round symbols. A tap shows the room, the certainty and since when.
 - In the assistant under **4 · Live → People in 3D**: **figure, pin or off** – once for the whole house.
 - The **room panel** shows under its name who is here now, and the floors count the people.
@@ -800,7 +800,7 @@ NeonPlan shows which room you are in right now – and where your iPhone or your
 
 **Faster with presence sensors:** motion and presence sensors (radar like the Aqara FP2 too) that belong to an area in Home Assistant speed locating up by themselves: Bluetooth tells **who** it is, the sensor tells **when** someone enters the room. Without sensors a room change takes two to five seconds – with one often just a moment.
 
-**Voice** (with the Assist sentences under **⚙ Settings → Voice control**): "Where is my iPhone?", "Where is Torsten?", "Who is home?", "Ring my iPhone". The answer comes straight from Home Assistant – even without an open NeonPlan screen. Ringing sends a loud notification to the Home Assistant app (on an iPhone a critical alert that rings in silent mode too).
+**Voice** (with the Assist sentences under **⚙ Settings → Voice control**): "Where is my iPhone?", "Where is Torsten?", "Who is home?", "Ring my iPhone". The answer comes straight from Home Assistant – even without an open NeonPlan screen. Open NeonPlan views fly into the room of the answer, on "Who is home?" into every room with someone in it, one after another (a tap stops it). Switch it off in the locating assistant under **Live**; people are not flown to while they are shown to admins only. Ringing sends a loud notification to the Home Assistant app (on an iPhone a critical alert that rings in silent mode too).
 
 **For automations:** every device has a sensor, e.g. `sensor.torstens_watch_room`. Its state is the room name; the attributes are `room_id`, `area_id` (the room's Home Assistant area), `floor`, `probability` (certainty 0–1), `since` and `last_seen`. Example – the light follows you:
 

@@ -13,6 +13,11 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **"⚠ not heard"** next to a device that no receiver hears, in the device list and while learning – such as an Android tablet paired through the key helper, which does not send that key in the background (#727). The key helper button is now "For an iPhone", with a note to use the app's transmitter for Android. Thanks to @rolandarends!
 - Weak beacons now show among the devices nearby (from -90 dBm), each only once although its address changes.
 
+### Live Presence
+
+- **Watch and phone disagree about the room:** when both are heard at the same time in different rooms (a shared wall fools the watch), the phone now wins when it is clearly surer – and no extra phone symbol appears next to the person. A phone left lying while you walked on with the watch still shows where it lies. The 3D figure and the spoken answers follow the same rule.
+- **Voice questions fly the view there:** "Where is Torsten?" flies the open NeonPlan views into his room, "Who is home?" tours every room with someone in it. On by default, switch in the locating assistant under Live; people are not flown to while they are shown to admins only.
+
 ## 2.0.1
 
 ### New
