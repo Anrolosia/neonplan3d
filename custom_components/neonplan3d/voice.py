@@ -375,7 +375,9 @@ class AskIntentHandler(intent.IntentHandler):
         language = (intent_obj.language or intent_obj.hass.config.language or "en").split("-")[0]
         response = intent_obj.create_response()
         # where people and things are: answered here, no screen needed
-        located = await async_answer(intent_obj.hass, intent_obj.hass.data.get(DATA_LOCATE), text, language)
+        located = await async_answer(
+            intent_obj.hass, intent_obj.hass.data.get(DATA_LOCATE), text, language, intent_obj.context.user_id
+        )
         if located is not None:
             response.async_set_speech(located)
             return response
@@ -396,7 +398,8 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
 
     async def handle_ask(call: ServiceCall) -> ServiceResponse:
         language = (hass.config.language or "en").split("-")[0]
-        located = await async_answer(hass, hass.data.get(DATA_LOCATE), call.data["text"], language)
+        locate = hass.data.get(DATA_LOCATE)
+        located = await async_answer(hass, locate, call.data["text"], language, call.context.user_id)
         if located is not None:
             return {"answered": True, "answer": located, "screen_open": False}
         answer = await broker.ask(call.data["text"], call.data.get("screen"), call.data["speak"])

@@ -1312,6 +1312,11 @@ Das normale Backup von Home Assistant sichert NeonPlan 3D ebenfalls vollständig
 - NeonPlan 3D verbindet sich nur dann mit dem Internet, wenn du einen Lizenzschlüssel einträgst. Dann fragt es einmal am Tag bei mastershort.de nach Updates und sendet dabei den Schlüssel und die anonyme Installations-Kennung.
 - Kamerabilder, Verlaufsdaten und Zustände bleiben in Home Assistant und werden nur im Browser angezeigt.
 - Die Zeitreise liest den Verlauf aus dem Recorder von Home Assistant, nur für die Geräte des Plans. Personen und ihre Tracker liest sie nie.
+- Die **Ortung** wertet die Bluetooth-Signale nur in Home Assistant aus. Nichts darüber, wer wo ist, verlässt dein Haus.
+- **Hilf mit, NeonPlan besser zu machen (freiwillig, standardmäßig aus):** Unter **⚙ Einstellungen → 🛟 Hilf mit** kannst du anonyme Nutzungs- und Fehlerberichte einschalten. Dann geht höchstens einmal am Tag ein Bericht (und höchstens einmal pro Stunde ein Bündel Fehlermeldungen) an api.mastershort.de.
+  - **Gesendet wird:** eine zufällige Kennung (nicht die von Home Assistant, sie entsteht beim Einschalten), die Versionen von NeonPlan, Home Assistant und Python, die Sprache, die installierten Packs und Pro-Erweiterungen, Anzahlen aus dem Plan (Etagen, Räume, Möbel, verknüpfte Geräte, Kameras), Geräteart, Browser und System der Bildschirme mit Bildrate und Grafikklasse, wie oft welche Ansicht geöffnet wurde, und Fehlermeldungen von NeonPlan ohne Namen und Adressen.
+  - **Nie gesendet werden:** Namen, Entitäten, Bereiche, die Form deines Grundrisses, IP-Adressen, die Kennung deiner Home-Assistant-Installation, Benutzernamen, dein Lizenzschlüssel – und nichts aus der Ortung.
+  - **„Bericht ansehen“** zeigt genau den nächsten Bericht, bevor er gesendet wird. **„Daten löschen“** entfernt alles, was schon gesendet wurde. Ausschalten vergisst die Kennung.
 
 ---
 

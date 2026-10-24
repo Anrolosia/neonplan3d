@@ -168,3 +168,34 @@ async def test_a_device_without_learning_uses_the_others(hass: HomeAssistant) ->
     await service.async_configure({"scanner_rooms": {"AA:BB:CC:DD:EE:09": "hall"}})
     rows = service.config()["scanners"]
     assert any(r["source"] == "AA:BB:CC:DD:EE:09" and r.get("offline") for r in rows)
+
+
+async def test_spoken_names_are_matched_tolerantly(hass: HomeAssistant) -> None:
+    await _setup(hass)
+    service: LocateService = hass.data[DATA_LOCATE]
+    hass.states.async_set("person.torsten", "home", {"friendly_name": "Admin", "user_id": "u1"})
+    hass.states.async_set("person.frauke", "home", {"friendly_name": "Frauke", "user_id": "u2"})
+    devices = [
+        {**WATCH, "id": "w1", "name": "Torsten Apple Watch", "person": "person.torsten"},
+        {**WATCH, "id": "p1", "name": "Torsten Iphone", "person": "person.torsten", "key": "11" * 16},
+        {**WATCH, "id": "p2", "name": "Frauke Iphone", "person": "person.frauke", "key": "22" * 16},
+    ]
+    await service.async_configure({"devices": devices, "rooms": ROOMS})
+    now = time.time()
+    service.state["w1"] = {"room": "kitchen", "room_name": "Kitchen", "since": now, "last_seen": now}
+    service.state["p1"] = {"room": "hall", "room_name": "Hall", "since": now, "last_seen": now}
+    service.state["p2"] = {"room": "living", "room_name": "Living", "since": now, "last_seen": now}
+    from custom_components.neonplan3d.locate.answers import async_answer
+
+    async def ask(text: str, user: str | None = None) -> str | None:
+        return await async_answer(hass, service, text, "de", user)
+
+    # speech recognition writes "Thorstens" for "Torsten"
+    assert await ask("Wo ist Thorstens Apple Watch?") == "Torsten Apple Watch ist im Raum Kitchen."
+    # "my iPhone" is the iPhone of the person who asks
+    assert await ask("Wo ist mein iPhone?", "u2") == "Frauke Iphone ist im Raum Living."
+    assert await ask("Wo ist mein iPhone?", "u1") == "Torsten Iphone ist im Raum Hall."
+    # a first name alone means the person: the watch tells where
+    assert await ask("Wo ist Torsten?") == "Torsten ist im Raum Kitchen."
+    assert await ask("Wo ist Frauke?") == "Frauke Iphone ist im Raum Living."
+    assert await ask("Wo ist der Fernseher?") is None

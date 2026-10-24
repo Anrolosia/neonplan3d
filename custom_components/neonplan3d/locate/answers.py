@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from difflib import SequenceMatcher
 import re
 import time
 from typing import Any
@@ -11,10 +12,10 @@ from homeassistant.core import HomeAssistant
 
 from .service import LocateService
 
-_ART_DE = r"(?:mein|meine|meinen|der|die|das|den)?"
+_ART_DE = r"(?P<art>mein|meine|meinen|meins|der|die|das|den)?"
 _WHERE = {
     "de": re.compile(r"^(?:wo (?:ist|steckt|liegt|sind)|finde|such[e]?)\s+" + _ART_DE + r"\s*(?P<what>.+?)[?.!]*$"),
-    "en": re.compile(r"^(?:where(?:'s| is| are)|find)\s+(?:my|the)?\s*(?P<what>.+?)[?.!]*$"),
+    "en": re.compile(r"^(?:where(?:'s| is| are)|find)\s+(?P<art>my|the)?\s*(?P<what>.+?)[?.!]*$"),
 }
 _WHO = {
     "de": re.compile(r"^wer ist (?:gerade |denn )?(?:zu ?hause|daheim|da|im haus)[?.!]*$"),
@@ -22,7 +23,7 @@ _WHO = {
 }
 _RING = {
     "de": re.compile(r"^(?:lass|lasse)\s+" + _ART_DE + r"\s*(?P<what>.+?)\s+(?:klingeln|piepen|läuten)[?.!]*$"),
-    "en": re.compile(r"^(?:ring|beep)\s+(?:my|the)?\s*(?P<what>.+?)[?.!]*$"),
+    "en": re.compile(r"^(?:ring|beep)\s+(?P<art>my|the)?\s*(?P<what>.+?)[?.!]*$"),
 }
 _TEXT = {
     "de": {
@@ -57,24 +58,75 @@ def _person_name(hass: HomeAssistant, entity_id: str | None) -> str | None:
     return str(state.attributes.get("friendly_name") or entity_id) if state else None
 
 
-def _match(hass: HomeAssistant, service: LocateService, what: str) -> tuple[str, list[dict[str, Any]]] | None:
-    """The devices a name means: a device by its name, or every device of a person (watch first)."""
-    want = _norm(what)
-    for device in service.devices:
-        if _norm(device["name"]) == want or want in _norm(device["name"]).split(" "):
-            return device["name"], [device]
-    for device in service.devices:
-        if want and want in _norm(device["name"]):
-            return device["name"], [device]
-    by_person: dict[str, list[dict[str, Any]]] = {}
-    for device in service.devices:
-        if device.get("person"):
-            by_person.setdefault(device["person"], []).append(device)
-    for person, devices in by_person.items():
-        name = _person_name(hass, person) or ""
-        if want and (want == _norm(name) or want in _norm(name).split(" ")):
-            return name, devices
+MINE = {"mein", "meine", "meinen", "meins", "my"}
+
+
+def _tokens(text: str) -> list[str]:
+    """Words as speech recognition may write them: lower case, umlauts spelled out, "th" as "t", no punctuation."""
+    text = _norm(text).replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss").replace("th", "t")
+    return [w for w in re.split(r"[^a-z0-9]+", text) if w]
+
+
+def _same(spoken: str, name: str) -> bool:
+    """One spoken word against one word of a name: equal, a possessive ("Torstens"), or a small mishearing."""
+    if spoken == name or (spoken.endswith("s") and spoken[:-1] == name):
+        return True
+    return len(spoken) > 3 and len(name) > 3 and SequenceMatcher(None, spoken, name).ratio() >= 0.8
+
+
+def _score(spoken: list[str], name: str) -> float:
+    """Share of the spoken words found in the name (0 when none)."""
+    words = _tokens(name)
+    if not spoken or not words:
+        return 0.0
+    return sum(1 for w in spoken if any(_same(w, n) for n in words)) / len(spoken)
+
+
+def _speaker(hass: HomeAssistant, user_id: str | None) -> str | None:
+    """The person entity of the Home Assistant user who asked."""
+    if not user_id:
+        return None
+    for state in hass.states.async_all("person"):
+        if state.attributes.get("user_id") == user_id:
+            return state.entity_id
     return None
+
+
+def _match(
+    hass: HomeAssistant, service: LocateService, what: str, mine: bool = False, user_id: str | None = None
+) -> tuple[str, list[dict[str, Any]]] | None:
+    """The devices a spoken name means - tolerant of how speech recognition writes it ("Thorstens Apple Watch").
+    A person's name alone means all their devices; "my" prefers the devices of the person who asked."""
+    spoken = [w for w in _tokens(what) if w not in MINE]
+    if not spoken:
+        return None
+    speaker = _speaker(hass, user_id)
+    scored = [(_score(spoken, d["name"]), d) for d in service.devices]
+    best = max((sc for sc, _d in scored), default=0.0)
+    if best < 0.6:
+        # maybe a person's name from Home Assistant ("Wo ist Frauke?")
+        by_person: dict[str, list[dict[str, Any]]] = {}
+        for device in service.devices:
+            if device.get("person"):
+                by_person.setdefault(device["person"], []).append(device)
+        named = [(_score(spoken, _person_name(hass, p) or ""), p, devs) for p, devs in by_person.items()]
+        top = max(named, key=lambda x: x[0], default=None)
+        if top and top[0] >= 0.6:
+            return _person_name(hass, top[1]) or top[1], top[2]
+        return None
+    hits = [d for sc, d in scored if sc == best]
+    if len(hits) > 1 and speaker:
+        own = [d for d in hits if d.get("person") == speaker]
+        hits = own or hits
+    device = hits[0]
+    # only a person's name said ("Wo ist Torsten?"): the words sit in every device of that person -> the person
+    person = device.get("person")
+    if person:
+        theirs = [d for d in service.devices if d.get("person") == person]
+        if len(theirs) > 1 and all(_score(spoken, d["name"]) >= best for d in theirs):
+            who = " ".join(w.capitalize() for w in spoken)
+            return who, theirs
+    return device["name"], [device]
 
 
 def _where(hass: HomeAssistant, service: LocateService, who: str, devices: list[dict[str, Any]], lang: str) -> str:
@@ -97,7 +149,9 @@ def _where(hass: HomeAssistant, service: LocateService, who: str, devices: list[
     return t["in"].format(who=who, room=best["room_name"])
 
 
-async def async_answer(hass: HomeAssistant, service: LocateService | None, text: str, language: str) -> str | None:
+async def async_answer(
+    hass: HomeAssistant, service: LocateService | None, text: str, language: str, user_id: str | None = None
+) -> str | None:
     """The answer to a locating question, or None when the sentence is no such question."""
     if service is None or not service.devices:
         return None
@@ -115,7 +169,7 @@ async def async_answer(hass: HomeAssistant, service: LocateService | None, text:
                 names.append(f"{who} ({st['room_name']})")
         return t["home"].format(list=", ".join(names)) if names else t["nobody"]
     if m := _RING[lang].match(sentence):
-        found = _match(hass, service, m["what"])
+        found = _match(hass, service, m["what"], (m["art"] or "") in MINE, user_id)
         if found is None:
             return None
         who, devices = found
@@ -125,7 +179,7 @@ async def async_answer(hass: HomeAssistant, service: LocateService | None, text:
         await ring(hass, notify, lang)
         return t["ring"].format(who=who)
     if m := _WHERE[lang].match(sentence):
-        found = _match(hass, service, m["what"])
+        found = _match(hass, service, m["what"], (m["art"] or "") in MINE, user_id)
         if found is None:
             return None
         who, devices = found
