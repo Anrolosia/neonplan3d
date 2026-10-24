@@ -18,6 +18,7 @@
 - **"Where is Anna?"** flies the open NeonPlan views into her room. **"Who is home?"** tours every room with someone in it, one after another, and a tap stops it. It is on by default and can be switched off in the locating assistant under **Live**. While people are shown to admins only, only admins' views fly to them.
 - **It also works with an AI agent such as Gemini.** The Assist sentences now carry the names locating knows, so these questions are answered locally. Before, the agent only said "Anna is at home".
 - **The microphone in the NeonPlan panel** now asks locating first.
+- **To ask through Assist** (the Home Assistant app, a voice speaker): switch on NeonPlan's sentences under **⚙ Settings → Voice control → Sentences for Assist**. They are off by default. The microphone in the NeonPlan panel works without them.
 - **Older Assist sentence files are updated again.** A file an older NeonPlan had written was taken for your own, so newer questions like "Who is home?" never arrived.
 
 ### Fixed
@@ -52,6 +53,7 @@ Settings → System → Updates. HACS only checks for new versions every few hou
 - **„Wo ist Anna?“** lässt die offenen NeonPlan-Ansichten in ihren Raum fliegen. **„Wer ist zu Hause?“** fliegt nacheinander alle Räume ab, in denen jemand ist, und Antippen stoppt den Flug. Das ist standardmäßig an und lässt sich im Ortungs-Assistenten unter **Live** ausschalten. Solange Personen nur Admins gezeigt werden, fliegen nur die Ansichten von Admins zu ihnen.
 - **Das klappt auch mit einem KI-Agenten wie Gemini.** Die Assist-Sätze kennen jetzt die Namen aus der Ortung, deshalb werden diese Fragen lokal beantwortet. Bisher sagte der Agent nur „Anna ist zu Hause“.
 - **Das Mikrofon im NeonPlan-Panel** fragt jetzt zuerst die Ortung.
+- **Um über Assist zu fragen** (Home-Assistant-App, Sprachlautsprecher): Schalte die Sätze von NeonPlan unter **⚙ Einstellungen → Sprachsteuerung → Sätze für Assist** ein. Ab Werk sind sie aus. Das Mikrofon im NeonPlan-Panel braucht sie nicht.
 - **Ältere Assist-Satzdateien werden wieder aktualisiert.** Eine Datei, die ein älteres NeonPlan geschrieben hatte, galt als deine eigene. Neuere Fragen wie „Wer ist zu Hause?“ kamen deshalb nie an.
 
 ### Behoben
