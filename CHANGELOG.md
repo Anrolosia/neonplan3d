@@ -10,6 +10,8 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 - **Energie Pro: cables to the devices are back when rooms are drawn a little apart (#731).** The cables run from room to room through shared walls; rooms drawn with a small gap between them (a stairwell, a hallway) cut the way, and only the grid cable was left. Gaps up to about a metre are now bridged; a detached building further away is still not wired through the garden. Thanks to @netrunnercs!
 - **Gas and water meters from the Utilities pack take their reading (#730):** the "Gas meter with pulse reader" and "Water meter with reader" asked for a power sensor in W; they now offer a meter reading in m³ or litres, shown at the symbol. Thanks to @PetrMa!
+- **Window watch and roof windows (#712):** a roof window opened by its window motor counted as shut for the window watch and the spoken answers (the 3D view showed it open). Thanks to @frops83!
+- **The Deco pack's plants take a plant sensor (#712):** Monstera, fiddle-leaf fig, palms, bonsai and the other new plants have leaf colours of their own and were not taken for plants; plants are now also known by their name.
 - **Wärme Pro (release 4): "heating since" tells the real time (#735)** – a card opened while the heat pump was already heating said "since 0 min"; a target of 0 °C (none reported) is no longer shown. Thanks to @tomv79!
 
 ### Live Presence
