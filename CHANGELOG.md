@@ -4,6 +4,15 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 2.0.2
+
+### Live Presence on Android
+
+- **Android phones are found by themselves:** the assistant lists every phone whose Home Assistant app has the BLE Transmitter switched on, with its name and person – no need to hold it next to a receiver (#726). Thanks to @frops83!
+- **Hints for weak settings:** out of the box the app sends at the lowest power in power-saving mode, so the receivers barely hear it. The assistant now says when to set the transmit power to "High", the advertise mode to "Low latency", or to switch the transmitter on.
+- **"⚠ not heard"** next to a device that no receiver hears, in the device list and while learning – such as an Android tablet paired through the key helper, which does not send that key in the background (#727). The key helper button is now "For an iPhone", with a note to use the app's transmitter for Android. Thanks to @rolandarends!
+- Weak beacons now show among the devices nearby (from -90 dBm), each only once although its address changes.
+
 ## 2.0.1
 
 ### New

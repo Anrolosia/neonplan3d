@@ -330,7 +330,8 @@ class LocateService:
         self._nearby_until = time.time() + 60
         now = time.time()
         rows = [dict(v, address=a) for a, v in self.nearby.items() if now - v["t"] < NEARBY_KEEP]
-        rows.sort(key=lambda r: -r["rssi"])
+        # beacons first (an Android phone among many strong lamps and plugs), then the strongest
+        rows.sort(key=lambda r: (r["ibeacon"] is None, -r["rssi"]))
         return rows[:25]
 
     @callback
@@ -347,10 +348,13 @@ class LocateService:
                 tracker = self._trackers.get(dev)
                 if tracker is not None:
                     tracker.add(r.t, r.source, r.rssi)
-            elif watch_nearby and r.rssi > -75:
+            elif watch_nearby:
+                beacon = ibeacon_key(r.adv)
+                # beacons also when weak: the Android app sends at the lowest power unless changed
+                if r.rssi <= -75 and beacon is None:
+                    continue
                 prev = self.nearby.get(r.address)
                 if prev is None or now - prev["t"] > 3 or r.rssi > prev["rssi"]:
-                    beacon = ibeacon_key(r.adv)
                     self.nearby[r.address] = {
                         "t": now,
                         "rssi": r.rssi,

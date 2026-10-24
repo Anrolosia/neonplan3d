@@ -199,3 +199,28 @@ async def test_spoken_names_are_matched_tolerantly(hass: HomeAssistant) -> None:
     assert await ask("Wo ist Torsten?") == "Torsten ist im Raum Kitchen."
     assert await ask("Wo ist Frauke?") == "Frauke Iphone ist im Raum Living."
     assert await ask("Wo ist der Fernseher?") is None
+
+
+async def test_weak_beacons_show_among_nearby_devices(hass: HomeAssistant) -> None:
+    """The Android app sends its iBeacon at the lowest power by default: it is listed although weak, and first."""
+    from types import SimpleNamespace
+
+    from custom_components.neonplan3d.locate.scanners import Reading
+
+    await _setup(hass)
+    service: LocateService = hass.data[DATA_LOCATE]
+    beacon = bytes.fromhex("0215" + "280fa872f5254bccb7b42c2843e023e0" + "0064" + "9c44" + "c5")
+    phone = SimpleNamespace(local_name=None, manufacturer_data={0x004C: beacon})
+    now = time.time()
+    readings = [
+        Reading("shelly", "AA:00:00:00:00:01", -60, now, SimpleNamespace(local_name="Lamp", manufacturer_data={})),
+        Reading("shelly", "AA:00:00:00:00:02", -82, now, SimpleNamespace(local_name=None, manufacturer_data={})),
+        Reading("shelly", "5B:00:00:00:00:03", -84, now, phone),
+    ]
+    service._reader = SimpleNamespace(read=lambda _hass: readings)
+    service._nearby_until = now + 60
+    service._tick(None)
+    rows = service.watch_nearby()
+    service.stop()
+    assert [r["address"] for r in rows] == ["5B:00:00:00:00:03", "AA:00:00:00:00:01"]
+    assert rows[0]["ibeacon"] == "280fa872f5254bccb7b42c2843e023e000649c44"
