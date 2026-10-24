@@ -2071,5 +2071,6 @@
  "persons_pin": "Špendlík",
  "persons_off": "vyp.",
  "locate": "Lokalizace",
- "diag_menu": "Pomozte"
+ "diag_menu": "Pomozte",
+ "furn_meter_reading": "Stav měřidla (m³ nebo litry)"
 }

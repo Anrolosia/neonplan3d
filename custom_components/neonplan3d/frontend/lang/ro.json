@@ -2071,5 +2071,6 @@
  "persons_pin": "Reper",
  "persons_off": "oprit",
  "locate": "Localizare",
- "diag_menu": "Ajută"
+ "diag_menu": "Ajută",
+ "furn_meter_reading": "Index contor (m³ sau litri)"
 }

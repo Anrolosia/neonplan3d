@@ -2071,5 +2071,6 @@
  "persons_pin": "Repère",
  "persons_off": "non",
  "locate": "Localisation",
- "diag_menu": "Aider à améliorer"
+ "diag_menu": "Aider à améliorer",
+ "furn_meter_reading": "Relevé du compteur (m³ ou litres)"
 }

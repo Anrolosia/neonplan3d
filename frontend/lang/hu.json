@@ -2071,5 +2071,6 @@
  "persons_pin": "Jelölő",
  "persons_off": "ki",
  "locate": "Helymeghatározás",
- "diag_menu": "Segíts"
+ "diag_menu": "Segíts",
+ "furn_meter_reading": "Mérőállás (m³ vagy liter)"
 }

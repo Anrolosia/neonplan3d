@@ -2071,5 +2071,6 @@
  "persons_pin": "Speld",
  "persons_off": "uit",
  "locate": "Locatie",
- "diag_menu": "Help mee"
+ "diag_menu": "Help mee",
+ "furn_meter_reading": "Meterstand (m³ of liter)"
 }

@@ -2071,5 +2071,6 @@
  "persons_pin": "Žebljiček",
  "persons_off": "izklop",
  "locate": "Lociranje",
- "diag_menu": "Pomagaj"
+ "diag_menu": "Pomagaj",
+ "furn_meter_reading": "Stanje števca (m³ ali litri)"
 }
