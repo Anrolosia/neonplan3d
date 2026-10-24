@@ -118,3 +118,19 @@ test("located people: watch and phone heard together disagree about the room –
   people = locatedPersons(hass, building, new Set(), now);
   assert.deepEqual(people.map((p) => [p.id, p.roomId, p.thing ?? false]), [["person.tom", "r1", false]]);
 });
+
+test("located people: a watch lying still while the phone walks on was taken off – the phone places her, the watch stands as a thing", () => {
+  const { hass, building } = setup();
+  const now = Date.parse("2026-10-23T12:00:00Z");
+  const iso = (agoS: number) => new Date(now - agoS * 1000).toISOString();
+  const put = (name: string, room: string, worn: boolean, probability: number, sinceS: number) =>
+    (hass.states[`sensor.${name}_raum`] = st(`sensor.${name}_raum`, "x", { neonplan_locate: true, room_id: room, person: "person.mia", device_name: name, wearable: worn, last_seen: iso(5), since: iso(sinceS), probability }));
+  // the watch has lain in the living room for an hour, the phone came into the kitchen a minute ago
+  put("watch", "r1", true, 0.95, 3600);
+  put("iphone", "r2", false, 0.6, 60);
+  const people = locatedPersons(hass, building, new Set(), now);
+  assert.deepEqual(
+    people.map((p) => [p.id, p.roomId, p.thing ?? false]).sort(),
+    [["person.mia", "r2", false], ["sensor.watch_raum", "r1", true]],
+  );
+});

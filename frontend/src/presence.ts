@@ -161,15 +161,21 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
     if (person && person.state !== "home" && person.state !== "on") continue;
     // the same rule as the spoken answers (person_state in locate/answers.py): the worn device (watch) heard in the
     // last two minutes, unless a phone heard at the same time is clearly surer about another room (a shared wall
-    // fools the watch) – a phone that stayed put while the watch walked on was left lying; else the freshest device
+    // fools the watch) – a phone that stayed put while the watch walked on was left lying, a watch that lay still for
+    // ten minutes while the phone walked on was taken off; else the freshest device
     const freshest = (l: Found[]) => l.reduce((a, b) => (b.seen > a.seen ? b : a));
     const worn = list.filter((f) => f.worn && now - f.seen < 120_000);
     let main = freshest(worn.length ? worn : list);
     const together = (f: Found) => now - f.seen < 30_000 && now - main.seen < 30_000 && f.since >= main.since - 120_000;
+    let off: Found | null = null;
     if (main.worn) {
       const others = list.filter((f) => !f.worn && f.room.id !== main.room.id && together(f));
       const other = others.length ? others.reduce((a, b) => (b.probability > a.probability ? b : a)) : null;
-      if (other && other.probability > main.probability + 0.15) main = other;
+      // the watch lay still for ten minutes while the phone changed rooms after it: taken off, it stands as a thing
+      if (other && now - main.since >= 600_000 && other.since > main.since + 120_000) {
+        off = main;
+        main = other;
+      } else if (other && other.probability > main.probability + 0.15) main = other;
     }
     const name = (person?.attributes.friendly_name as string | undefined) ?? main.name;
     place(main, {
@@ -185,7 +191,7 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
     // about the room (heard together with the chosen one) and a worn one heard lately are with the person
     for (const f of list) {
       if (f === main || f.room.id === main.room.id) continue;
-      if ((f.worn && now - f.seen < 120_000) || together(f)) continue;
+      if (f !== off && ((f.worn && now - f.seen < 120_000) || together(f))) continue;
       thing(f, personColor(personId));
     }
   }

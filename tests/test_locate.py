@@ -260,6 +260,12 @@ def test_a_person_is_where_the_surer_device_says() -> None:
         person_state(state("living", 0.6, now - 120, "kitchen", 0.95, now - 1200), [watch, phone], now)["room"]
         == "living"
     )
+    # the watch has lain in the bathroom for an hour, the phone walked into the kitchen a minute ago: taken off
+    assert (
+        person_state(state("bath", 0.9, now - 3600, "kitchen", 0.5, now - 60), [watch, phone], now)["room"] == "kitchen"
+    )
+    # just put down five minutes ago: not yet
+    assert person_state(state("bath", 0.9, now - 300, "kitchen", 0.5, now - 60), [watch, phone], now)["room"] == "bath"
     # the phone not heard lately: the watch as before
     assert (
         person_state(state("living", 0.6, now - 600, "kitchen", 0.95, now - 610, now - 300), [watch, phone], now)[

@@ -16,6 +16,7 @@ WORN_FRESH = 120  # a worn device heard this recently tells where its person is
 BOTH_FRESH = 30  # worn and carried device both heard this recently: they may disagree
 WORN_BONUS = 0.15  # the worn device wins a disagreement unless the other is this much surer
 LEFT_BEHIND = 120  # the other device stayed in its room this much longer than the worn one: left lying there
+TAKEN_OFF = 600  # the worn device lay this long in one room while the phone walked on: taken off
 
 
 class Located(NamedTuple):
@@ -31,7 +32,8 @@ def person_state(
 ) -> dict[str, Any] | None:
     """Where a person is, from all their devices: the worn one heard lately, unless a phone heard at the same time
     is clearly surer about another room (a shared wall fools the watch); a phone that stayed put while the watch
-    walked on was left lying. Without a worn device heard lately: the freshest device."""
+    walked on was left lying; a watch that lay still while the phone walked on was taken off (the phone decides).
+    Without a worn device heard lately: the freshest device."""
     now = time.time() if now is None else now
 
     def seen(st: dict[str, Any]) -> float:
@@ -56,9 +58,17 @@ def person_state(
     other = max(others, key=lambda st: float(st.get("probability") or 0))
     if float(other.get("since") or 0) < float(main.get("since") or 0) - LEFT_BEHIND:
         return main
+    if taken_off(main, other, now):
+        return other
     if float(other.get("probability") or 0) > float(main.get("probability") or 0) + WORN_BONUS:
         return other
     return main
+
+
+def taken_off(worn: dict[str, Any], other: dict[str, Any], now: float) -> bool:
+    """The worn device lies in one room for ten minutes while the other one changed rooms after it: taken off."""
+    worn_since = float(worn.get("since") or now)
+    return now - worn_since >= TAKEN_OFF and float(other.get("since") or 0) > worn_since + LEFT_BEHIND
 
 
 _ART_DE = r"(?P<art>mein|meine|meinen|meins|der|die|das|den)?"
