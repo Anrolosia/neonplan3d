@@ -21,6 +21,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **The NeonPlan panel's own microphone asks locating first:** "Who is home?" there gave the rooms-free answer of the voice answers module; now it is the locating answer with the room tour.
 - **Old Assist sentence files are updated again:** a file an older NeonPlan wrote with fewer sentences was taken for the user's own and never replaced, so newer questions like "Who is home?" went unanswered.
 
+### Fixed
+
+- **The 3D view no longer jumps after a freeze:** turning or zooming while the view was still busy just after opening was replayed seconds later, and the view landed somewhere else in the house. Moves that waited out such a freeze are now dropped (#712). Thanks to @frops83!
+
 ## 2.0.1
 
 ### New

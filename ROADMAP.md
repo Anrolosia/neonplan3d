@@ -9,6 +9,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 ## ✅ Recently done (1.13 – 2.0)
 
 - **Locating** (2.0, free): who and what is where – from the Shelly plugs and ESPHome proxies you already have, learned in 90 seconds per room, without Bermuda; people as glowing figures, a sensor per device, "Where is my iPhone?".
+- **Locating on Android and by voice** (2.0.2): Android phones found through the Home Assistant app, watch and phone combined (a watch taken off is noticed), "Where is …?" flies the view into the room.
 - **Help improve** (2.0.1, opt-in): anonymous usage and error reports, off by default, every report visible before it is sent; HACS installs work again despite GitHub's download change.
 
 - **Issue round** (1.25): roofs meeting at right angles and overlapping sections, a hip at one end only, sill per window, windows across open room transitions, faster editor with 3D beside, more contrast in the day look.
@@ -122,6 +123,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 ## ✅ Zuletzt erledigt (1.13 – 2.0)
 
 - **Ortung** (2.0, kostenlos): Wer und was ist wo – über die Shelly-Steckdosen und ESPHome-Proxys, die du schon hast, in 90 Sekunden pro Raum eingelernt, ohne Bermuda; Personen als leuchtende Figuren, ein Sensor pro Gerät, „Wo ist mein iPhone?“.
+- **Ortung mit Android und per Sprache** (2.0.2): Android-Handys über die Home-Assistant-App gefunden, Uhr und Handy zusammen ausgewertet (eine abgelegte Uhr wird erkannt), „Wo ist …?“ fliegt in den Raum.
 - **Hilf mit** (2.0.1, freiwillig): anonyme Nutzungs- und Fehlerberichte, standardmäßig aus, jeder Bericht vor dem Senden einsehbar; HACS-Installationen klappen trotz der Download-Änderung bei GitHub wieder.
 
 - **Fehler-Runde** (1.25): Dächer im rechten Winkel und überlappende Dachflächen, Walm nur an einem Ende, Fensterbank pro Fenster, Fenster über offene Raumübergänge, schnellerer Editor mit 3D daneben, mehr Kontrast im Tag-Look.
