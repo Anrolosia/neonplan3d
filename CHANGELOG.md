@@ -15,6 +15,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Spoken names are matched tolerantly:** "Where is Thorsten's Apple Watch?" finds "Torsten Apple Watch"; "my iPhone" is the iPhone of the person who asks; a first name alone means the person.
 - The manual link of the assistant opens the locating chapter directly.
 
+### Installing
+
+- **HACS can install and update NeonPlan again.** Since 23 October, GitHub's release downloads carry a header that HACS cannot read, so HACS failed on every release zip, for all integrations (hacs/integration#5643). NeonPlan now lets HACS fetch its files one by one, which is not affected. The Home Assistant log may show one "Failed to download zipball" error during the update; it is harmless.
+
 ## 2.0.0
 
 ### Live Presence – who and what is where (new, free)
