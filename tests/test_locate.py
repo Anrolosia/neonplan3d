@@ -300,3 +300,22 @@ async def test_located_answers_fly_the_views_into_the_room(hass: HomeAssistant) 
         (["kitchen"], True),
         (["hall"], False),
     ]
+
+
+async def test_a_view_asks_locating_first(hass: HomeAssistant, hass_ws_client) -> None:
+    """The NeonPlan panel's own microphone gets the locating answer and its rooms (not the modules' guess)."""
+    await _setup(hass)
+    service: LocateService = hass.data[DATA_LOCATE]
+    client = await hass_ws_client(hass)
+    await client.send_json_auto_id({"type": "neonplan3d/locate/ask", "text": "Wer ist zu Hause?", "language": "de"})
+    assert (await client.receive_json())["result"] is None
+    service.devices = [dict(WATCH, name="Torsten Apple Watch")]
+    service.rooms = ROOMS
+    service.state = {
+        "irk_watch": {"room": "kitchen", "room_name": "Kitchen", "probability": 0.9, "last_seen": time.time()}
+    }
+    await client.send_json_auto_id({"type": "neonplan3d/locate/ask", "text": "Wer ist zu Hause?", "language": "de"})
+    res = (await client.receive_json())["result"]
+    assert res == {"text": "Zu Hause: Torsten Apple Watch (Kitchen).", "rooms": ["kitchen"], "admins_only": False}
+    await client.send_json_auto_id({"type": "neonplan3d/locate/ask", "text": "Zeig die Küche", "language": "de"})
+    assert (await client.receive_json())["result"] is None

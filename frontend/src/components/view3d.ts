@@ -4295,6 +4295,16 @@ export class Fp3dView3d extends LitElement {
         }
         return translate(hass, "voice_showing", { name });
       }
+      // who and what is where: locating answers first (the same answer Assist gets) and flies there
+      const located = await hass
+        .callWS<{ text: string; rooms: string[]; admins_only: boolean } | null>({ type: "neonplan3d/locate/ask", text, language: hass.language })
+        .catch(() => null);
+      if (located) {
+        say("done", `“${text}” – ${located.text}`);
+        if (located.rooms.length && (!located.admins_only || hass.user?.is_admin)) void this.showRooms(b, located.rooms);
+        if (speak) void v.speak(hass, located.text, voicePipeline());
+        return located.text;
+      }
       // a module of the house answers (installed from the shop): what to say and what to show
       const host = this.moduleHost(hass, b, v.SYNONYMS, (s) => v.showTarget(s, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null)));
       const own = await moduleVoice(text, host);
