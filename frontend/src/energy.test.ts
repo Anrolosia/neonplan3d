@@ -327,3 +327,21 @@ test("a consumer in a room's corner gets its cable square to the wall, not slant
   assert.ok(segs.length > 0);
   for (const s of segs) assert.ok(Math.abs(s.a[0] - s.b[0]) < 1e-6 || Math.abs(s.a[2] - s.b[2]) < 1e-6, `slant piece ${s.a} → ${s.b}`);
 });
+
+test("rooms drawn with a small gap between them still get their cables (#731)", () => {
+  const hass = hassForHouse();
+  const b = house();
+  // the second room drawn 30 cm apart, no shared wall
+  b.floors[0].rooms = [rect("a", 0, 0, 4, 3), rect("b", 4.3, 0, 8, 3)];
+  b.floors = [b.floors[0]];
+  const consumers = findConsumers(hass, b);
+  const segs = flowSegments({ building: b, consumers, summary: energySummary(hass, b, consumers) });
+  const inB = segs.filter((s) => s.floorId === "eg" && s.kind === "consumer" && Math.max(s.a[0], s.b[0]) > 4.3);
+  assert.ok(inB.length > 0, "a cable reaches the devices in the second room");
+  // rooms far apart (a detached garage) are not wired through the garden
+  b.floors[0].rooms = [rect("a", 0, 0, 4, 3), rect("b", 8, 0, 12, 3)];
+  b.floors[0].placements = [{ entity_id: "sensor.fridge_power", x: 10, z: 0.5, y: null }];
+  const far = findConsumers(hass, b);
+  const farSegs = flowSegments({ building: b, consumers: far, summary: energySummary(hass, b, far) });
+  assert.equal(farSegs.filter((s) => s.kind === "consumer").length, 0);
+});

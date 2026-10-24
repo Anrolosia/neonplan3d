@@ -6,6 +6,10 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ## 2.0.3
 
+### Fixed
+
+- **Energie Pro: cables to the devices are back when rooms are drawn a little apart (#731).** The cables run from room to room through shared walls; rooms drawn with a small gap between them (a stairwell, a hallway) cut the way, and only the grid cable was left. Gaps up to about a metre are now bridged; a detached building further away is still not wired through the garden. Thanks to @netrunnercs!
+
 ### Live Presence
 
 - **People stand where a presence zone says:** when a presence sensor of the room (such as an Aqara FP2 with zones) reports its "Sofa" or "Sessel" zone as occupied, the person's figure stands at that sofa or armchair instead of in the middle of the room. Zones are matched to furniture of the room by name – built-in and pack furniture, or the furniture's own name. A door zone ("Entrance hall", "Terrace door") places the figure just inside the room in front of the door to the room of that name, or of a door to the outside; "rest of the room" keeps the middle.
