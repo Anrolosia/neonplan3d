@@ -220,6 +220,41 @@ const ZONE_WORDS: [RegExp, string[]][] = [
   [/desk/, ["schreibtisch", "desk", "arbeitsplatz", "office"]],
 ];
 
+const OUTSIDE = ["terrasse", "garten", "balkon", "aussen", "draussen", "terrace", "garden", "patio", "balcony", "outside"];
+
+/**
+ * The doors of a room (and windows one can walk through, a French window) with the words of the room on the other
+ * side (null: outside) and a spot just inside the room in front of them.
+ */
+function roomDoors(floor: Building["floors"][number], room: Room): { to: string[] | null; spot: [number, number] }[] {
+  const out: { to: string[] | null; spot: [number, number] }[] = [];
+  const [cx, cz] = centroid(room.points);
+  const onEdge = (r: Room, p: [number, number]) =>
+    r.points.some((a, i) => {
+      const b = r.points[(i + 1) % r.points.length];
+      const [dx, dz] = [b[0] - a[0], b[1] - a[1]];
+      const len2 = dx * dx + dz * dz || 1;
+      const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dz) / len2));
+      return Math.hypot(a[0] + t * dx - p[0], a[1] + t * dz - p[1]) < 0.3;
+    });
+  for (const o of floor.openings) {
+    if (o.wall || (o.type === "window" && o.sill > 0.3) || o.type === "garage") continue;
+    const host = floor.rooms.find((r) => r.id === o.room_id);
+    if (!host) continue;
+    const a = host.points[o.edge];
+    const b = host.points[(o.edge + 1) % host.points.length];
+    if (!a || !b) continue;
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    const p: [number, number] = [a[0] + ((b[0] - a[0]) * o.offset) / len, a[1] + ((b[1] - a[1]) * o.offset) / len];
+    if (!onEdge(room, p)) continue;
+    const other = floor.rooms.find((r) => r.id !== room.id && onEdge(r, p));
+    // a step into the room, so the figure stands in front of the door, not in it
+    const k = 0.6 / (Math.hypot(cx - p[0], cz - p[1]) || 1);
+    out.push({ to: other ? words(other.name) : null, spot: [p[0] + (cx - p[0]) * k, p[1] + (cz - p[1]) * k] });
+  }
+  return out;
+}
+
 const ZONE_NOISE = ["praesenz", "presence", "occupancy", "anwesenheit", "belegt", "zone", "bereich", "raum", "room", "rest", "sensor", "fp2"];
 
 const words = (text: string) =>
@@ -241,7 +276,7 @@ export function zoneSpots(hass: HomeAssistant, building: Building, floorId: stri
   const floor = building.floors.find((f) => f.id === floorId);
   if (!floor || !room.area_id) return [];
   const inRoom = floor.furniture.filter((f) => pointInPolygon([f.x, f.z], room.points));
-  if (!inRoom.length) return [];
+  const doors = roomDoors(floor, room);
   const spots: [number, number][] = [];
   const skip = new Set([...words(room.name), ...words(hass.areas?.[room.area_id]?.name ?? ""), ...words(room.area_id), ...ZONE_NOISE]);
   for (const [entityId, st] of Object.entries(hass.states)) {
@@ -258,7 +293,12 @@ export function zoneSpots(hass: HomeAssistant, building: Building, floorId: stri
         (f.name && words(f.name).some((w) => said.has(w))) ||
         ZONE_WORDS.some(([kind, names]) => kind.test(f.type.split(":").pop() ?? "") && names.some((n) => said.has(n))),
     );
-    if (hit && !spots.some(([x, z]) => x === hit.x && z === hit.z)) spots.push([hit.x, hit.z]);
+    // "Eingang Flur", "Terrassentür": the door to the room of that name, or a door to the outside
+    const door = hit
+      ? null
+      : doors.find((d) => (d.to ? d.to.some((w) => said.has(w)) : [...said].some((w) => OUTSIDE.some((o) => w.includes(o)))));
+    const spot: [number, number] | null = hit ? [hit.x, hit.z] : door ? door.spot : null;
+    if (spot && !spots.some(([x, z]) => x === spot[0] && z === spot[1])) spots.push(spot);
   }
   return spots;
 }

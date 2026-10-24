@@ -171,3 +171,26 @@ test("pack furniture counts for presence zones by its kind (an Ecksofa from the 
   hass.states["binary_sensor.fp2_sessel"] = st("binary_sensor.fp2_sessel", "on", { device_class: "occupancy", friendly_name: "Wohnzimmer Präsenz Sessel" });
   assert.deepEqual(zoneSpots(hass, building, "eg", building.floors[0].rooms[0]), [[3.5, 2.5]]);
 });
+
+test("door zones (\"Eingang Küche\", \"Eingang Terrasse\") give a spot just inside the room in front of that door", () => {
+  const { hass, building } = setup();
+  const door = (id: string, edge: number, offset: number) =>
+    ({ id, room_id: "r1", edge, offset, width: 0.9, type: "door", sill: 0, height: 2.1, hinge: "left", leaves: 1, swing: "in" }) as Building["floors"][number]["openings"][number];
+  building.floors[0].openings = [door("to-kitchen", 1, 1.5), door("outside", 3, 1)];
+  const zone = (name: string) => {
+    const id = `binary_sensor.fp2_${name.toLowerCase().replace(/\s+/g, "_")}`;
+    hass.entities = { ...hass.entities, [id]: { entity_id: id, area_id: "living_room" } };
+    hass.states[id] = st(id, "on", { device_class: "occupancy", friendly_name: `Wohnzimmer Präsenz ${name}` });
+  };
+  zone("Eingang Küche");
+  const [k] = zoneSpots(hass, building, "eg", building.floors[0].rooms[0]);
+  assert.deepEqual(k.map((v) => Math.round(v * 100) / 100), [3.4, 1.5]);
+  delete hass.states["binary_sensor.fp2_eingang_küche"];
+  zone("Eingang Terrasse");
+  const [t] = zoneSpots(hass, building, "eg", building.floors[0].rooms[0]);
+  assert.ok(t[0] > 0.3 && t[0] < 1 && t[1] > 1.5, `in front of the outside door: ${t}`);
+  // "restlicher Raum": no spot, the room's middle as before
+  delete hass.states["binary_sensor.fp2_eingang_terrasse"];
+  zone("Restlicher Raum");
+  assert.deepEqual(zoneSpots(hass, building, "eg", building.floors[0].rooms[0]), []);
+});
