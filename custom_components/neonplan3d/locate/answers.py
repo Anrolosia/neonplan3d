@@ -6,11 +6,70 @@ from __future__ import annotations
 from difflib import SequenceMatcher
 import re
 import time
-from typing import Any
+from typing import Any, NamedTuple
 
 from homeassistant.core import HomeAssistant
 
 from .service import LocateService
+
+WORN_FRESH = 120  # a worn device heard this recently tells where its person is
+BOTH_FRESH = 30  # worn and carried device both heard this recently: they may disagree
+WORN_BONUS = 0.15  # the worn device wins a disagreement unless the other is this much surer
+LEFT_BEHIND = 120  # the other device stayed in its room this much longer than the worn one: left lying there
+TAKEN_OFF = 600  # the worn device lay this long in one room while the phone walked on: taken off
+
+
+class Located(NamedTuple):
+    """A spoken answer and the plan rooms it talks about (the open views fly there)."""
+
+    text: str
+    rooms: list[str]
+    persons: bool
+
+
+def person_state(
+    service: LocateService, devices: list[dict[str, Any]], now: float | None = None
+) -> dict[str, Any] | None:
+    """Where a person is, from all their devices: the worn one heard lately, unless a phone heard at the same time
+    is clearly surer about another room (a shared wall fools the watch); a phone that stayed put while the watch
+    walked on was left lying; a watch that lay still while the phone walked on was taken off (the phone decides).
+    Without a worn device heard lately: the freshest device."""
+    now = time.time() if now is None else now
+
+    def seen(st: dict[str, Any]) -> float:
+        return float(st.get("last_seen") or 0)
+
+    placed = [(d, st) for d in devices if (st := service.state.get(d["id"]) or {}).get("room")]
+    if not placed:
+        return None
+    worn = [st for d, st in placed if d.get("wearable") and now - seen(st) < WORN_FRESH]
+    if not worn:
+        return max((st for _d, st in placed), key=seen)
+    main = max(worn, key=seen)
+    if now - seen(main) >= BOTH_FRESH:
+        return main
+    others = [
+        st
+        for d, st in placed
+        if not d.get("wearable") and now - seen(st) < BOTH_FRESH and st.get("room") != main.get("room")
+    ]
+    if not others:
+        return main
+    other = max(others, key=lambda st: float(st.get("probability") or 0))
+    if float(other.get("since") or 0) < float(main.get("since") or 0) - LEFT_BEHIND:
+        return main
+    if taken_off(main, other, now):
+        return other
+    if float(other.get("probability") or 0) > float(main.get("probability") or 0) + WORN_BONUS:
+        return other
+    return main
+
+
+def taken_off(worn: dict[str, Any], other: dict[str, Any], now: float) -> bool:
+    """The worn device lies in one room for ten minutes while the other one changed rooms after it: taken off."""
+    worn_since = float(worn.get("since") or now)
+    return now - worn_since >= TAKEN_OFF and float(other.get("since") or 0) > worn_since + LEFT_BEHIND
+
 
 _ART_DE = r"(?P<art>mein|meine|meinen|meins|der|die|das|den)?"
 _WHERE = {
@@ -129,30 +188,33 @@ def _match(
     return device["name"], [device]
 
 
-def _where(hass: HomeAssistant, service: LocateService, who: str, devices: list[dict[str, Any]], lang: str) -> str:
+def _where(hass: HomeAssistant, service: LocateService, who: str, devices: list[dict[str, Any]], lang: str) -> Located:
     t = _TEXT[lang]
     person = devices[0].get("person")
+    persons = any(d.get("person") for d in devices)
     if person and (state := hass.states.get(person)) and state.state not in ("home", "on"):
-        return t["away"].format(who=who)
-    # a worn device heard in the last two minutes tells where the person is; else the freshest one
-    now = time.time()
-    placed = [(d, service.state.get(d["id"]) or {}) for d in devices]
-    placed = [(d, st) for d, st in placed if st.get("room_name")]
-    worn = [st for d, st in placed if d.get("wearable") and now - (st.get("last_seen") or 0) < 120]
-    pool = worn or [st for _d, st in placed]
-    best = max(pool, key=lambda st: st.get("last_seen") or 0, default=None)
+        return Located(t["away"].format(who=who), [], persons)
+    best = person_state(service, devices)
     if best is None:
-        return t["unheard"].format(who=who)
+        return Located(t["unheard"].format(who=who), [], persons)
     ago = int((time.time() - (best.get("last_seen") or time.time())) // 60)
     if ago >= 3:
-        return t["in_ago"].format(who=who, room=best["room_name"], min=ago)
-    return t["in"].format(who=who, room=best["room_name"])
+        return Located(t["in_ago"].format(who=who, room=best["room_name"], min=ago), [best["room"]], persons)
+    return Located(t["in"].format(who=who, room=best["room_name"]), [best["room"]], persons)
 
 
 async def async_answer(
     hass: HomeAssistant, service: LocateService | None, text: str, language: str, user_id: str | None = None
 ) -> str | None:
     """The answer to a locating question, or None when the sentence is no such question."""
+    located = await async_locate(hass, service, text, language, user_id)
+    return located.text if located else None
+
+
+async def async_locate(
+    hass: HomeAssistant, service: LocateService | None, text: str, language: str, user_id: str | None = None
+) -> Located | None:
+    """The answer to a locating question with the rooms it names, or None when the sentence is no such question."""
     if service is None or not service.devices:
         return None
     lang = language if language in _TEXT else "en"
@@ -160,14 +222,26 @@ async def async_answer(
     t = _TEXT[lang]
     if _WHO[lang].match(sentence):
         names: list[str] = []
+        rooms: list[str] = []
+        done: set[str] = set()
         for device in service.devices:
-            st = service.state.get(device["id"]) or {}
+            person = device.get("person")
+            if person:
+                if person in done:
+                    continue
+                done.add(person)
+                st = person_state(service, [d for d in service.devices if d.get("person") == person]) or {}
+            else:
+                st = service.state.get(device["id"]) or {}
             if not st.get("room_name"):
                 continue
-            who = _person_name(hass, device.get("person")) or device["name"]
-            if who not in [n.split(" (")[0] for n in names]:
-                names.append(f"{who} ({st['room_name']})")
-        return t["home"].format(list=", ".join(names)) if names else t["nobody"]
+            who = _person_name(hass, person) or device["name"]
+            names.append(f"{who} ({st['room_name']})")
+            if st["room"] not in rooms:
+                rooms.append(st["room"])
+        if not names:
+            return Located(t["nobody"], [], True)
+        return Located(t["home"].format(list=", ".join(names)), rooms, True)
     if m := _RING[lang].match(sentence):
         found = _match(hass, service, m["what"], (m["art"] or "") in MINE, user_id)
         if found is None:
@@ -175,9 +249,9 @@ async def async_answer(
         who, devices = found
         notify = next((d.get("notify") for d in devices if d.get("notify")), None)
         if not notify:
-            return t["no_ring"].format(who=who)
+            return Located(t["no_ring"].format(who=who), [], False)
         await ring(hass, notify, lang)
-        return t["ring"].format(who=who)
+        return Located(t["ring"].format(who=who), [], False)
     if m := _WHERE[lang].match(sentence):
         found = _match(hass, service, m["what"], (m["art"] or "") in MINE, user_id)
         if found is None:
