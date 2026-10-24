@@ -270,6 +270,7 @@ def test_a_person_is_where_the_surer_device_says() -> None:
 
 
 async def test_located_answers_fly_the_views_into_the_room(hass: HomeAssistant) -> None:
+    from homeassistant.core import callback
     from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
     from custom_components.neonplan3d.const import SIGNAL_ASK
@@ -279,17 +280,23 @@ async def test_located_answers_fly_the_views_into_the_room(hass: HomeAssistant) 
     await _setup(hass)
     service: LocateService = hass.data[DATA_LOCATE]
     sent: list[dict] = []
-    async_dispatcher_connect(hass, SIGNAL_ASK, sent.append)
+
+    @callback
+    def collect(msg: dict) -> None:
+        sent.append(msg)
+
+    async_dispatcher_connect(hass, SIGNAL_ASK, collect)
     show_located(hass, Located("Torsten is in the Kitchen.", ["kitchen"], True))
     show_located(hass, Located("I can't hear Torsten right now.", [], True))
-    await hass.async_block_till_done()
-    assert [m["show_rooms"] for m in sent] == [["kitchen"]]
-    # people shown to admins only: a wall tablet would show everyone where they are
+    # people shown to admins only: the views of others stay where they are (the message says so)
     service.admins_only = True
     show_located(hass, Located("Torsten is in the Kitchen.", ["kitchen"], True))
     show_located(hass, Located("The keys are in the Hall.", ["hall"], False))
-    service.admins_only = False
     service.fly = False
     show_located(hass, Located("The keys are in the Hall.", ["hall"], False))
     await hass.async_block_till_done()
-    assert [m["show_rooms"] for m in sent] == [["kitchen"], ["hall"]]
+    assert [(m["show_rooms"], m["admins_only"]) for m in sent] == [
+        (["kitchen"], False),
+        (["kitchen"], True),
+        (["hall"], False),
+    ]

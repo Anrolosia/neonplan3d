@@ -4204,7 +4204,7 @@ export class Fp3dView3d extends LitElement {
     if (ask.screen && ask.screen.trim().toLowerCase() !== mine) return;
     // a locating answer: fly into its room, or tour the rooms of everyone at home (nobody waits for an answer)
     if (ask.show_rooms) {
-      void this.showRooms(b, ask.show_rooms);
+      if (!ask.admins_only || hass.user?.is_admin) void this.showRooms(b, ask.show_rooms);
       return;
     }
     let answer: string | null = null;

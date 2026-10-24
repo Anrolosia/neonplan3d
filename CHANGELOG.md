@@ -16,7 +16,9 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 ### Live Presence
 
 - **Watch and phone disagree about the room:** when both are heard at the same time in different rooms (a shared wall fools the watch), the phone now wins when it is clearly surer – and no extra phone symbol appears next to the person. A phone left lying while you walked on with the watch still shows where it lies. The 3D figure and the spoken answers follow the same rule.
-- **Voice questions fly the view there:** "Where is Torsten?" flies the open NeonPlan views into his room, "Who is home?" tours every room with someone in it. On by default, switch in the locating assistant under Live; people are not flown to while they are shown to admins only.
+- **Voice questions fly the view there:** "Where is Torsten?" flies the open NeonPlan views into his room, "Who is home?" tours every room with someone in it. On by default, switch in the locating assistant under Live; while people are shown to admins only, only admins' views fly to them.
+- **"Where is Anna?" with an AI agent:** the Assist sentences now carry the names locating knows (people, first names, devices, "Annas iPhone"), so Assist answers them locally even when an AI agent such as Gemini handles everything else – before, the agent only said "Anna is at home". "Who is home?" works the same way.
+- **Old Assist sentence files are updated again:** a file an older NeonPlan wrote with fewer sentences was taken for the user's own and never replaced, so newer questions like "Who is home?" went unanswered.
 
 ## 2.0.1
 
