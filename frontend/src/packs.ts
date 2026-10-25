@@ -2,7 +2,7 @@
 // furniture has the type "pack:<pack id>:<item id>". Every bundle (main, editor, 3D) keeps its own
 // registry, filled with setPacks() from the packs the backend returns.
 
-import { builtinBase, techBase, ELECTRIC_FURNITURE, FURNITURE_SIZE, LIFT_SPOTS, spotDepth, surfaceHeight, WALL_LAMP_Y, type Floor, type Furniture } from "./model.ts";
+import { builtinBase, techBase, ELECTRIC_FURNITURE, FURNITURE_SIZE, LIFT_SPOTS, outdoorGround, pointInPolygon, spotDepth, surfaceHeight, WALL_LAMP_Y, type Floor, type Furniture } from "./model.ts";
 import type { LampModel } from "./viewer/viewer3d.ts";
 
 /** A cooking zone of a pack cooktop: a thin disc lying on the item's top. */
@@ -287,13 +287,25 @@ export function mountBase(floor: Floor, f: Pick<Furniture, "type" | "x" | "z" | 
   if (f.type === "led_strip") return Math.max(0, floor.height - 0.04 - Math.max(0.02, f.h));
   switch (item?.mount) {
     case "surface":
-      return surfaceHeight(floor, f.x, f.z, f.h);
+      return groundUnder(floor, f) + surfaceHeight(floor, f.x, f.z, f.h);
     case "wall":
       return item.wall_y ?? 1;
     case "ceiling":
       return Math.max(0, floor.height - f.h);
     default:
       // built-in models: where they are drawn by default (a wall cabinet at 1.45 m)
-      return item ? 0 : builtinBase(f);
+      if (item) return groundUnder(floor, f);
+      return builtinBase(f) || groundUnder(floor, f);
   }
+}
+
+/**
+ * Where an item standing on the ground stands: 0 in a room, outside on the lawn, terrace or lowered ground beneath
+ * it – a bin, a mower or outdoor steps no longer float above a garden lower than the floor (#708).
+ */
+export function groundUnder(floor: Floor, f: Pick<Furniture, "x" | "z">): number {
+  // a floor without rooms has no outside (a plan of free walls only)
+  const rooms = floor.rooms.filter((r) => r.points.length >= 3);
+  if (!rooms.length || rooms.some((r) => pointInPolygon([f.x, f.z], r.points))) return 0;
+  return outdoorGround(floor, f.x, f.z);
 }
