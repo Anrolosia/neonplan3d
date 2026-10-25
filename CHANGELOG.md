@@ -4,6 +4,22 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 2.0.4
+
+### Help make NeonPlan better
+
+- **A one-time invitation to the usage reports:** admins who have not switched on the anonymous reports see one note in the editor saying why they help. **Have a look** opens the setting, **Not now** hides it for good. Nothing is switched on by it.
+
+### Fixed
+
+- **Garden items stand on the ground (#708):** bins, mowers, garden furniture and outdoor steps outside the rooms stand on the lawn, the terrace or a lowered terrain beneath them instead of at the floor's level – by default the lawn lies 20 cm below the floor, so they floated a little for everyone. Heights set by hand stay. Thanks to @Anrolosia!
+- **Window boards on windows down to the floor (#702):** a board chosen by hand ("inside only" / "outside only") now shows on windows down to the floor and terrace doors, at the floor, and glass walls offer the setting too. By default nothing changes. Thanks to @daene85!
+- **Round shadows (#719):** round tables, plants, a trampoline, a parasol, a fire pit cast a round contact shadow, and in the garden it lies on the ground the item stands on. Thanks to @PetrMa!
+- **Slat buttons only with slats (#704):** roller shutters, garage doors and curtains that announce slat buttons (KNX does) no longer show them unless they report a slat position. Thanks to @daene85!
+- **Pets stay inside upstairs (#766):** an outer door or French window on an upper floor only lets pets (and the walk) out when a balcony or terrace is drawn behind it. Thanks to @twynne!
+- **Window contacts without a device class:** binary sensors without a class (KNX, enOcean, template sensors) are offered as contacts too.
+- **Editor:** a furniture field that reported its change after the item was deselected no longer throws (found through the usage reports).
+
 ## 2.0.3
 
 ### Fixed
