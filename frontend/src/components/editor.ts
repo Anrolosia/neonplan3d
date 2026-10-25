@@ -10682,9 +10682,12 @@ export class Fp3dEditor extends LitElement {
     const positions = this.entityOptions((id) => /^(sensor|number|input_number)\./.test(id) && Number.isFinite(Number(this.hass?.states[id]?.state)));
     // plain contacts, and handle sensors with three states (open / tilted / closed)
     // a garage door may also be a switch or toggle helper (a relay that drives the door): on = open, a tap switches it
+    // a contact: a binary sensor of the door/window kind, or one without any class (KNX, enOcean, templates often
+    // have none – they were missing from the list)
+    const isContact = (id: string) => id.startsWith("binary_sensor.") && ["door", "window", "opening", "garage_door", ""].includes(dc(id) ?? "");
     const contacts = this.entityOptions(
       (id) =>
-        (id.startsWith("binary_sensor.") && ["door", "window", "opening", "garage_door"].includes(dc(id) ?? "")) ||
+        isContact(id) ||
         (numberish(id) && windowPosition(this.hass?.states[id]) !== null) ||
         (garage && /^(switch|input_boolean)\./.test(id)),
     );
@@ -10694,7 +10697,7 @@ export class Fp3dEditor extends LitElement {
       if (id.startsWith("binary_sensor.")) return typeof st?.attributes.window_state === "string";
       return numberish(id) && (windowPosition(st) !== null || /griff|handle|fenster|window|drehgriff/i.test(`${id} ${entityName(this.hass, id)}`));
     });
-    const plainContacts = this.entityOptions((id) => id.startsWith("binary_sensor.") && ["door", "window", "opening", "garage_door"].includes(dc(id) ?? ""));
+    const plainContacts = this.entityOptions(isContact);
     type Kind = NonNullable<Opening["sensor"]>;
     const leafSensors = (leaf: 1 | 2) => {
       const main = leaf === 1;
