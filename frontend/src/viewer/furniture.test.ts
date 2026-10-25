@@ -258,3 +258,27 @@ test("a pack wall lamp's light sits in its glowing parts, turned and mirrored wi
   // no glowing part: null (the lamp keeps its old halo and light)
   assert.equal(packGlowCentre({ ...lantern, parts: [lantern.parts[0]] } as PackItem, f, 1.8), null);
 });
+
+test("round things cast a round shadow, lying on the ground they stand on (#719, #708)", async () => {
+  const { pushFurniture, roundFootprint } = await import("./furniture.ts");
+  const { GeoBuffer, LineBuffer } = await import("./geo.ts");
+  const part = { shape: "cyl" as const, x: 0, z: 0, w: 1, d: 1, y: 0, h: 0.2, color: "wood" };
+  setPacks([{ id: "g", name: "G", publisher: "G", licensee: null, items: [{ id: "trampoline", name: { en: "Trampoline" }, size: [3, 3, 0.9], parts: [part] }, { id: "box", name: { en: "Box" }, size: [1, 1, 1], parts: [{ ...part, shape: "box" }] }] } as FurniturePack]);
+  try {
+    assert.equal(roundFootprint({ type: "pack:g:trampoline" }), true);
+    assert.equal(roundFootprint({ type: "pack:g:box" }), false);
+    assert.equal(roundFootprint({ type: "table_round" }), true);
+    assert.equal(roundFootprint({ type: "sofa" }), false);
+    // the shadow of an item on a lawn 0.55 m below the floor lies on that lawn
+    const shadow = new GeoBuffer();
+    const f = { id: "t", type: "pack:g:trampoline", x: 0, z: 0, w: 3, d: 3, h: 0.9, rotation: 0, variant: null } as Furniture;
+    pushFurniture(new GeoBuffer(), new LineBuffer(), shadow, f, -0.55);
+    const ys = new Set<number>();
+    for (let i = 1; i < shadow.p.length; i += 3) ys.add(Math.round(shadow.p[i] * 1000) / 1000);
+    assert.deepEqual([...ys], [-0.547]);
+    // round: many more corners than a square's
+    assert.ok(shadow.p.length / 9 > 40);
+  } finally {
+    setPacks([]);
+  }
+});
