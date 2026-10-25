@@ -194,3 +194,21 @@ test("door zones (\"Eingang Küche\", \"Eingang Terrasse\") give a spot just ins
   zone("Restlicher Raum");
   assert.deepEqual(zoneSpots(hass, building, "eg", building.floors[0].rooms[0]), []);
 });
+
+test("a located person whose Home Assistant person has no tracker (state unknown) still shows (#744)", () => {
+  const { hass, building } = setup();
+  const now = Date.parse("2026-10-23T12:00:00Z");
+  hass.states["person.tom"] = st("person.tom", "unknown", { friendly_name: "Tom" });
+  hass.states["sensor.pixel_raum"] = st("sensor.pixel_raum", "x", {
+    neonplan_locate: true,
+    room_id: "r1",
+    person: "person.tom",
+    device_name: "Pixel",
+    wearable: false,
+    last_seen: new Date(now - 5000).toISOString(),
+  });
+  assert.ok(locatedPersons(hass, building, new Set(), now).some((p) => p.id === "person.tom"));
+  // really away: not shown
+  hass.states["person.tom"] = st("person.tom", "not_home", { friendly_name: "Tom" });
+  assert.ok(!locatedPersons(hass, building, new Set(), now).some((p) => p.id === "person.tom"));
+});

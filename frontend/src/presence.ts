@@ -65,6 +65,11 @@ export function initials(name: string): string {
 }
 
 /** People at home whose room sensor names a room of the plan, spread around the room centre. */
+/** A person's state that says away: not home and not on, and not merely unknown (a person without a tracker). */
+export function isAway(state: string): boolean {
+  return !["home", "on", "unknown", "unavailable", ""].includes(state);
+}
+
 export function personsInRooms(hass: HomeAssistant, building: Building): PersonMarker[] {
   const out: PersonMarker[] = [];
   const perRoom = new Map<string, number>();
@@ -168,8 +173,9 @@ export function locatedPersons(hass: HomeAssistant, building: Building, skip: Re
   for (const [personId, list] of byPerson) {
     if (skip.has(personId)) continue;
     const person = hass.states[personId];
-    // away: neither the person nor a device left at home is shown as the person
-    if (person && person.state !== "home" && person.state !== "on") continue;
+    // away: neither the person nor a device left at home is shown as the person – but a person without a tracker of
+    // their own ("unknown") is not away: located in a room, they are home (#744)
+    if (person && isAway(person.state)) continue;
     // the same rule as the spoken answers (person_state in locate/answers.py): the worn device (watch) heard in the
     // last two minutes, unless a phone heard at the same time is clearly surer about another room (a shared wall
     // fools the watch) – a phone that stayed put while the watch walked on was left lying, a watch that lay still for
