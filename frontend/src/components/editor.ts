@@ -4774,7 +4774,12 @@ export class Fp3dEditor extends LitElement {
 
   private updateFurniture(patch: Partial<Furniture>): void {
     const id = this._furnitureId;
-    this.change((_, floor) => Object.assign(floor.furniture.find((f) => f.id === id)!, patch));
+    // a field may report its change after the item was deselected or the floor changed (on blur): then nothing to do
+    if (!id || !this.floor?.furniture.some((f) => f.id === id)) return;
+    this.change((_, floor) => {
+      const item = floor.furniture.find((f) => f.id === id);
+      if (item) Object.assign(item, patch);
+    });
   }
 
   private mirrorFurniture(): void {
