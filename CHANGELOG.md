@@ -13,7 +13,11 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 - **Window watch and roof windows (#712):** a roof window opened by its window motor counted as shut for the window watch and the spoken answers (the 3D view showed it open). Thanks to @frops83!
 - **Front doors with glass show the pane from both sides (#712):** from outside the solid leaf hid it.
 - **The Deco pack's plants take a plant sensor (#712):** Monstera, fiddle-leaf fig, palms, bonsai and the other new plants have leaf colours of their own and were not taken for plants; plants are now also known by their name.
-- **Wärme Pro (release 4): "heating since" tells the real time (#735)** – a card opened while the heat pump was already heating said "since 0 min"; a target of 0 °C (none reported) is no longer shown. Thanks to @tomv79!
+- **Blinds outside again on walls drawn on their own (#542):** a single wall drawn as an outer wall (rooms on one side only) had its "inside" by the direction it was drawn in, so its blinds and sills could end up in the room, and it never turned to glass like the other outer walls. It now finds its outside by the rooms. Thanks to @Kodak1976 and @Deninho91!
+- **Located people show without a tracker of their own (#744):** a Home Assistant person with no tracker (state "unknown") counted as away, so the figure of a person located at home stayed hidden. Thanks to @marcus2k9!
+- **Pets walk smoothly again on phones and tablets (#752):** on the tablet level they moved at 5 frames a second and stood still after half a minute; now about 15, and they keep walking while the view rests. Thanks to @Deninho91!
+- **A light's power is its own (#743):** where one device carries several lights (an actuator, PowerCalc), every light got the device's first power sensor – a bathroom light's power showed in the office. Now PowerCalc's sensor named after the light comes first, else one in the light's room. Thanks to @daene85!
+- **Wärme Pro (release 5): "heating since" tells the real time (#735)** – a card opened while the heat pump was already heating said "since 0 min"; a target of 0 °C (none reported) is no longer shown. Thanks to @tomv79! **Towel radiators** of the bath pack now get their heating pipes like other radiators (the electric one stays without, #751). Thanks to @holle021272!
 
 ### Live Presence
 

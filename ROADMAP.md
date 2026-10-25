@@ -9,6 +9,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 ## ✅ Recently done (1.13 – 2.0)
 
 - **Locating** (2.0, free): who and what is where – from the Shelly plugs and ESPHome proxies you already have, learned in 90 seconds per room, without Bermuda; people as glowing figures, a sensor per device, "Where is my iPhone?".
+- **Presence zones and fixes** (2.0.3): people stand at the sofa or door their presence sensor's zone names; gas and water meter readings; blinds outside on single outer walls, smoother pets.
 - **Locating on Android and by voice** (2.0.2): Android phones found through the Home Assistant app, watch and phone combined (a watch taken off is noticed), "Where is …?" flies the view into the room.
 - **Help improve** (2.0.1, opt-in): anonymous usage and error reports, off by default, every report visible before it is sent; HACS installs work again despite GitHub's download change.
 
@@ -123,6 +124,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 ## ✅ Zuletzt erledigt (1.13 – 2.0)
 
 - **Ortung** (2.0, kostenlos): Wer und was ist wo – über die Shelly-Steckdosen und ESPHome-Proxys, die du schon hast, in 90 Sekunden pro Raum eingelernt, ohne Bermuda; Personen als leuchtende Figuren, ein Sensor pro Gerät, „Wo ist mein iPhone?“.
+- **Präsenzzonen und Korrekturen** (2.0.3): Personen stehen am Sofa oder an der Tür, die die Zone ihres Präsenzmelders nennt; Gas- und Wasserzählerstände; Rollläden außen an einzelnen Außenwänden, flüssigere Haustiere.
 - **Ortung mit Android und per Sprache** (2.0.2): Android-Handys über die Home-Assistant-App gefunden, Uhr und Handy zusammen ausgewertet (eine abgelegte Uhr wird erkannt), „Wo ist …?“ fliegt in den Raum.
 - **Hilf mit** (2.0.1, freiwillig): anonyme Nutzungs- und Fehlerberichte, standardmäßig aus, jeder Bericht vor dem Senden einsehbar; HACS-Installationen klappen trotz der Download-Änderung bei GitHub wieder.
 
