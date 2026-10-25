@@ -13,7 +13,7 @@
 import { Color, type BufferGeometry } from "three";
 import type { Floor, Opening, Room, SolarField, Vec2 } from "../model.ts";
 import { furnitureFootprint, GANG_TYPES, isLamp, pointInPolygon, polygonArea, STAIR_TYPES } from "../model.ts";
-import { generateWalls, locateOpening, openingHost, placeWallPlate, slopeTop, wallContinuation, type Wall } from "../geometry/walls.ts";
+import { freeWallRoomLeft, generateWalls, locateOpening, openingHost, placeWallPlate, slopeTop, wallContinuation, type Wall } from "../geometry/walls.ts";
 import { clipConvex, isConvex } from "../geometry/area.ts";
 import { holeInRoom, insetHole, mergeHoles } from "../geometry/holes.ts";
 import { pushFurniture } from "./furniture.ts";
@@ -211,14 +211,24 @@ export function buildFloorGeometry(
   const bucketIndex = new Map<string, number>();
   const buckets: (Vec2 | null)[] = [];
   const wallBucket = new Map<Wall, number>();
+  // free walls drawn as outer walls (rooms on one side only): their room side, so they turn to glass and carry
+  // blinds outside like the room's own outer walls (#542)
+  const freeOuter = new Map<Wall, boolean>();
+  for (const wall of walls) {
+    if (!wall.free) continue;
+    const left = freeWallRoomLeft(wall, floor.rooms);
+    if (left !== null) freeOuter.set(wall, left);
+  }
   for (const wall of walls) {
     let key = "interior";
     let normal: Vec2 | null = null;
-    if (wall.exterior) {
+    const freeLeft = freeOuter.get(wall);
+    if (wall.exterior || freeLeft !== undefined) {
       const dx = wall.b[0] - wall.a[0];
       const dz = wall.b[1] - wall.a[1];
       const l = Math.hypot(dx, dz) || 1;
-      const out: Vec2 = [dz / l, -dx / l]; // right normal: away from the room
+      const k = freeLeft === false ? -1 : 1;
+      const out: Vec2 = [(k * dz) / l, (-k * dx) / l]; // right normal: away from the room
       const sector = ((Math.round((Math.atan2(out[1], out[0]) / (2 * Math.PI)) * BUCKETS) % BUCKETS) + BUCKETS) % BUCKETS;
       key = `s${sector}`;
       const ang = (sector / BUCKETS) * 2 * Math.PI;
@@ -251,10 +261,13 @@ export function buildFloorGeometry(
     const hi = len + lenOf(next);
     const width = Math.min(o.width, hi - lo);
     const s0 = Math.max(lo, Math.min(hi - width, s - width / 2));
-    // in a free wall the "room" side is the left of the wall as drawn; an outer wall has its room on the left, whatever
+    // in a free wall the "room" side is the side with the rooms, else the left of the wall as drawn; an outer wall has its room on the left, whatever
     // room the opening was given (a window filed under the neighbouring room had its blind inside, #542)
     const hp = host.room.points;
-    const roomLeft = wall.free ? ax[0] * (hp[1][0] - hp[0][0]) + ax[1] * (hp[1][1] - hp[0][1]) > 0 : wall.exterior || wall.roomLeft === o.room_id;
+    const freeLeft = freeOuter.get(wall);
+    const roomLeft = wall.free
+      ? (freeLeft ?? ax[0] * (hp[1][0] - hp[0][0]) + ax[1] * (hp[1][1] - hp[0][1]) > 0)
+      : wall.exterior || wall.roomLeft === o.room_id;
     const nLeft: Vec2 = [-ax[1], ax[0]];
     const toRoom: Vec2 = roomLeft ? nLeft : [-nLeft[0], -nLeft[1]];
     const top = Math.min(lowestTop(wall.a, ax, s0, s0 + width, wallHeight(wall, floor.height), wall) - 0.02, o.sill + o.height);
@@ -274,7 +287,7 @@ export function buildFloorGeometry(
       sill,
       top,
       hingeAtStart: (o.hinge === "left") === startIsLeft,
-      exterior: wall.exterior,
+      exterior: wall.exterior || freeLeft !== undefined,
     };
     openings.push(info);
     let list = spans.get(wall);

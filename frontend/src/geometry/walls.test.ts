@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Room, Vec2 } from "../model.ts";
 import { polygonArea, signedArea } from "../model.ts";
-import { edgeReach, generateWalls, locateOnWalls, locateOpening, openingHost, placeWallPlate } from "./walls.ts";
+import { edgeReach, freeWallRoomLeft, generateWalls, locateOnWalls, locateOpening, openingHost, placeWallPlate } from "./walls.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -300,4 +300,15 @@ test("an opening may reach across a transition without a wall where the outer wa
   // with a wall between the rooms the opening stays on its own edge
   const closed = generateWalls([a, { ...b, wall_heights: undefined }], { exterior: 0.3, interior: 0.115 }, []).walls;
   assert.deepEqual(edgeReach(closed, a, 0), [0, 0]);
+});
+
+test("a free wall drawn as an outer wall knows its room side, whichever way it was drawn (#542)", () => {
+  const rooms = [rect("bath", 0, 0, 4, 3)];
+  const wall = (a: Vec2, b: Vec2) => ({ a, b, left: 0.12, right: 0.12 });
+  // along the room's top edge: the room lies at larger z
+  assert.equal(freeWallRoomLeft(wall([0, 0], [4, 0]), rooms), true);
+  assert.equal(freeWallRoomLeft(wall([4, 0], [0, 0]), rooms), false);
+  // standing in the room, or out in the open: no outer side
+  assert.equal(freeWallRoomLeft(wall([2, 0.5], [2, 2.5]), rooms), null);
+  assert.equal(freeWallRoomLeft(wall([10, 0], [12, 0]), rooms), null);
 });
