@@ -10777,7 +10777,7 @@ export class Fp3dEditor extends LitElement {
             </div>`
           : nothing}
         ${garage ? nothing : this.renderStyleSelect(o)}
-        ${window && o.style !== "glass_wall"
+        ${window
           ? html`<label class="fp3d-field fp3d-wide" title=${this.t("sill_board_hint")}
               >${this.t("sill_board")}
               <select ?disabled=${!admin} @change=${(e: Event) => this.updateOpening({ sill_board: ((e.target as HTMLSelectElement).value || "auto") as SillBoard })}>
