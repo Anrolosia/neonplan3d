@@ -78,7 +78,7 @@ import { ALWAYS, DEG, GeoBuffer, LineBuffer, pushPrism, triangulate } from "./ge
 import { buildLightSurface, lightColors, roomIndexAt, type LightKind, type LightSource, type LightSurface, zoneOf } from "./lighting.ts";
 import { buildOpeningParts, CLOSED, type OpeningState } from "./openings.ts";
 import { circlePath, cleaningPath, stepRobot, type RobotInfo, type RobotMotion } from "./robot.ts";
-import { decorDelay, lowEndDevice } from "./pace.ts";
+import { decorDelay, lowEndDevice, petDelay } from "./pace.ts";
 
 export type { RobotInfo } from "./robot.ts";
 
@@ -794,12 +794,12 @@ export class FloorplanViewer {
     if (resting) this.invalidate();
   }
 
-  /** A module's decoration moved (pets, ghost, fish): a frame now – on the tablet level at the decorative pace, none while resting. */
+  /** A module's decoration moved (pets, ghost, fish): a frame now – on the tablet level at the pets' own pace. */
   animate(): void {
     if (!this.lowQuality) return this.invalidate();
     if (this.decorTimer || this.frame) return;
-    const ms = this.decor(0);
-    if (ms === null) return;
+    // pets walk on: about 15 frames a second on the tablet level, 4 while the view rests (#752)
+    const ms = petDelay(true, performance.now() - this.lastWake);
     this.decorTimer = setTimeout(() => {
       this.decorTimer = undefined;
       this.invalidate();
