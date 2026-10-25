@@ -2071,5 +2071,6 @@
  "persons_pin": "Segnaposto",
  "persons_off": "no",
  "locate": "Localizzazione",
- "diag_menu": "Aiuta a migliorare"
+ "diag_menu": "Aiuta a migliorare",
+ "furn_meter_reading": "Lettura del contatore (m³ o litri)"
 }

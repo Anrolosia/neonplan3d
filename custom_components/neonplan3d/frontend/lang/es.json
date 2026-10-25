@@ -2071,5 +2071,6 @@
  "persons_pin": "Pin",
  "persons_off": "no",
  "locate": "Localización",
- "diag_menu": "Ayuda a mejorar"
+ "diag_menu": "Ayuda a mejorar",
+ "furn_meter_reading": "Lectura del contador (m³ o litros)"
 }

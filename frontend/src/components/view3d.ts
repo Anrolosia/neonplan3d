@@ -38,7 +38,7 @@ import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
 import { applianceIdle, binColors, binDue, binNext, binOut, binOutToggleable, binTagsShown, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, groupTags, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, servicesDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type HouseholdTag, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
 import { fieldFace, fieldSize } from "../solar.ts";
-import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, lockAlong, type PoolPipe, type SolarField, uid } from "../model.ts";
+import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, lockAlong, type PoolPipe, type RoofWindow, type SolarField, uid } from "../model.ts";
 
 /** A hologram card: the house's balance on the main plant, one plant (a balcony plant) on its own, or a device. */
 /** The unit a meter counts in (m³ when it does not say). */
@@ -176,6 +176,20 @@ function writeFlag(key: string, on: boolean): void {
   } catch {
     /* the switch is only not remembered */
   }
+}
+
+/** A roof window's sash and blind as the 3D view shows them: its contact and tilt sensors, or its window motor. */
+function roofWindowState(hass: HomeAssistant, w: RoofWindow): { open: number; tilt: number; cover: number } {
+  const ref = (e: string | null | undefined) => (e && e !== "none" ? e : null);
+  const s = openingState(hass, { cover: ref(w.cover), contact: ref(w.contact), tilt: ref(w.tilt) }, "window");
+  // a window motor: its position (0–100) opens the sash that far; a plain open/closed state fully
+  const motor = ref(w.window) ? hass.states[ref(w.window)!] : undefined;
+  let open = s.open;
+  if (motor && !isUnavailable(motor)) {
+    const pos = motor.attributes.current_position;
+    open = typeof pos === "number" ? Math.min(1, Math.max(0, pos / 100)) : motor.state === "open" || motor.state === "opening" ? 1 : 0;
+  }
+  return { open, tilt: s.tilt, cover: s.cover ?? 0 };
 }
 
 export class Fp3dView3d extends LitElement {
@@ -1100,18 +1114,7 @@ export class Fp3dView3d extends LitElement {
     v.setRobots(this.robotInfos(hass, b));
     // roof windows: sash and blind follow their contact and cover like windows do
     const roofWindows = new Map<string, { open: number; tilt: number; cover: number }>();
-    for (const w of b.settings.roof?.windows ?? []) {
-      const ref = (e: string | null | undefined) => (e && e !== "none" ? e : null);
-      const s = openingState(hass, { cover: ref(w.cover), contact: ref(w.contact), tilt: ref(w.tilt) }, "window");
-      // a window motor: its position (0–100) opens the sash that far; a plain open/closed state fully
-      const motor = ref(w.window) ? hass.states[ref(w.window)!] : undefined;
-      let open = s.open;
-      if (motor && !isUnavailable(motor)) {
-        const pos = motor.attributes.current_position;
-        open = typeof pos === "number" ? Math.min(1, Math.max(0, pos / 100)) : motor.state === "open" || motor.state === "opening" ? 1 : 0;
-      }
-      roofWindows.set(w.id, { open, tilt: s.tilt, cover: s.cover ?? 0 });
-    }
+    for (const w of b.settings.roof?.windows ?? []) roofWindows.set(w.id, roofWindowState(hass, w));
     v.setRoofWindows(roofWindows);
     v.setParked(parkedVehicles(hass, b));
     const types = new Map(b.floors.flatMap((f) => f.openings.map((o) => [o.id, o.type] as const)));
@@ -4544,11 +4547,11 @@ export class Fp3dView3d extends LitElement {
       }
     }
     for (const w of b.settings.roof?.windows ?? []) {
-      const ref = (v: string | null | undefined) => (v && v !== "none" ? v : null);
-      const s = openingState(hass, { cover: ref(w.cover), contact: ref(w.contact), tilt: ref(w.tilt) }, "window");
+      // the same state as the 3D view: a window motor opens it too (#712 – motor roof windows counted as shut)
+      const s = roofWindowState(hass, w);
       const open = s.open > 0.02;
       const tilted = !open && s.tilt > 0.02;
-      for (const id of [w.contact, w.cover, w.tilt]) {
+      for (const id of [w.window, w.contact, w.cover, w.tilt]) {
         if (id && id !== "none") out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null, open, tilted });
       }
     }

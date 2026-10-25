@@ -513,6 +513,26 @@ export function pointOnRoomEdge(room: Room, edge: number, offset: number): Vec2 
 }
 
 /**
+ * A free wall drawn as an outer wall: rooms on one side only, the other side open. Returns the side of the
+ * rooms as seen along a -> b (true = left), or null for a wall with rooms on both sides or on neither.
+ */
+export function freeWallRoomLeft(wall: Pick<Wall, "a" | "b" | "left" | "right">, rooms: readonly Room[]): boolean | null {
+  const d = sub(wall.b, wall.a);
+  const n = leftNormal(unit(d));
+  const inRoom = (p: Vec2) => rooms.some((r) => r.points.length >= 3 && pointInPolygon(p, r.points));
+  let left = 0;
+  let right = 0;
+  for (const t of [0.2, 0.5, 0.8]) {
+    const p = add(wall.a, mul(d, t));
+    if (inRoom(add(p, mul(n, wall.left + 0.2)))) left++;
+    if (inRoom(sub(p, mul(n, wall.right + 0.2)))) right++;
+  }
+  if (left >= 2 && right === 0) return true;
+  if (right >= 2 && left === 0) return false;
+  return null;
+}
+
+/**
  * The line an opening sits on, as a room and an edge: the edge of its room, or for an opening in a
  * free wall a virtual triangle room whose edge 0 is the free wall (the room side is its left).
  */

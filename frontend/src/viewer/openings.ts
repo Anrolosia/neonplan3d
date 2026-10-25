@@ -251,8 +251,11 @@ export function buildOpeningParts(infos: readonly OpeningInfo[], states: Readonl
         } else {
           splitBox(frames, leafTf, 0, lw, -thick, 0, 0.01, T - 0.01, leafC, leafTop, cut, leafBucket);
         }
-        if (style === "front_glass") panel(glass, leafTf, 0.12, lw - 0.12, 0.001, T * 0.55, T - 0.18, GLASS, cut, leafBucket);
-        else if (front) panel(glass, leafTf, 0.1, 0.18, 0.001, 0.3, T - 0.3, GLASS, cut, leafBucket);
+        // the pane on both faces of the solid leaf: from outside the leaf hid it (#712)
+        for (const n of [0.001, -thick - 0.001]) {
+          if (style === "front_glass") panel(glass, leafTf, 0.12, lw - 0.12, n, T * 0.55, T - 0.18, GLASS, cut, leafBucket);
+          else if (front) panel(glass, leafTf, 0.1, 0.18, n, 0.3, T - 0.3, GLASS, cut, leafBucket);
+        }
         // handle on both sides: a knob on a room door, a bar on a front door
         const hy = Math.min(1.05, T * 0.5);
         const hh = front ? 0.3 : 0.012;

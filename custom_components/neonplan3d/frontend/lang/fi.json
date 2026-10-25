@@ -2071,5 +2071,6 @@
  "persons_pin": "Merkki",
  "persons_off": "pois",
  "locate": "Paikannus",
- "diag_menu": "Auta parantamaan"
+ "diag_menu": "Auta parantamaan",
+ "furn_meter_reading": "Mittarilukema (m³ tai litraa)"
 }

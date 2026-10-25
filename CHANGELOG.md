@@ -4,6 +4,25 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 2.0.3
+
+### Fixed
+
+- **Energie Pro: cables to the devices are back when rooms are drawn a little apart (#731).** The cables run from room to room through shared walls; rooms drawn with a small gap between them (a stairwell, a hallway) cut the way, and only the grid cable was left. Gaps up to about a metre are now bridged; a detached building further away is still not wired through the garden. Thanks to @netrunnercs!
+- **Gas and water meters from the Utilities pack take their reading (#730):** the "Gas meter with pulse reader" and "Water meter with reader" asked for a power sensor in W; they now offer a meter reading in m³ or litres, shown at the symbol. Thanks to @PetrMa!
+- **Window watch and roof windows (#712):** a roof window opened by its window motor counted as shut for the window watch and the spoken answers (the 3D view showed it open). Thanks to @frops83!
+- **Front doors with glass show the pane from both sides (#712):** from outside the solid leaf hid it.
+- **The Deco pack's plants take a plant sensor (#712):** Monstera, fiddle-leaf fig, palms, bonsai and the other new plants have leaf colours of their own and were not taken for plants; plants are now also known by their name.
+- **Blinds outside again on walls drawn on their own (#542):** a single wall drawn as an outer wall (rooms on one side only) had its "inside" by the direction it was drawn in, so its blinds and sills could end up in the room, and it never turned to glass like the other outer walls. It now finds its outside by the rooms. Thanks to @Kodak1976 and @Deninho91!
+- **Located people show without a tracker of their own (#744):** a Home Assistant person with no tracker (state "unknown") counted as away, so the figure of a person located at home stayed hidden. Thanks to @marcus2k9!
+- **Pets walk smoothly again on phones and tablets (#752):** on the tablet level they moved at 5 frames a second and stood still after half a minute; now about 15, and they keep walking while the view rests. Thanks to @Deninho91!
+- **A light's power is its own (#743):** where one device carries several lights (an actuator, PowerCalc), every light got the device's first power sensor – a bathroom light's power showed in the office. Now PowerCalc's sensor named after the light comes first, else one in the light's room. Thanks to @daene85!
+- **Wärme Pro (release 5): "heating since" tells the real time (#735)** – a card opened while the heat pump was already heating said "since 0 min"; a target of 0 °C (none reported) is no longer shown. Thanks to @tomv79! **Towel radiators** of the bath pack now get their heating pipes like other radiators (the electric one stays without, #751). Thanks to @holle021272!
+
+### Live Presence
+
+- **People stand where a presence zone says:** when a presence sensor of the room (such as an Aqara FP2 with zones) reports its "Sofa" or "Sessel" zone as occupied, the person's figure stands at that sofa or armchair instead of in the middle of the room. Zones are matched to furniture of the room by name – built-in and pack furniture, or the furniture's own name. A door zone ("Entrance hall", "Terrace door") places the figure just inside the room in front of the door to the room of that name, or of a door to the outside; "rest of the room" keeps the middle.
+
 ## 2.0.2
 
 ### Live Presence on Android

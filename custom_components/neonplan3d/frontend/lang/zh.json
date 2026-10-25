@@ -2071,5 +2071,6 @@
  "persons_pin": "图钉",
  "persons_off": "关",
  "locate": "定位",
- "diag_menu": "帮助改进"
+ "diag_menu": "帮助改进",
+ "furn_meter_reading": "表读数（立方米或升）"
 }

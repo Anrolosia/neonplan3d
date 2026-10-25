@@ -322,6 +322,12 @@ const ARROWS: Record<string, [number, number]> = { ArrowLeft: [-1, 0], ArrowRigh
 // furniture without a top to light: no "State from" box
 const NO_STATE_TYPES = new Set(["parking", "stairwell", "rug", "grid_point", "waste_bin", "mailbox", "wall_switch", "wall_socket", "wifi_ap", "water_heater"]);
 
+/** A gas or water meter from a pack (its reading in m³ or litres, no power): family "meter" tagged gas or water. */
+function volumeMeter(type: string): boolean {
+  const item = packItem(type);
+  return item?.family === "meter" && (item.tags ?? []).some((t) => /^(gas|water|wasser)$/i.test(t));
+}
+
 export class Fp3dEditor extends LitElement {
   static properties = {
     _shiftX: { state: true },
@@ -11887,7 +11893,21 @@ export class Fp3dEditor extends LitElement {
                     <p class="fp3d-sub fp3d-wide">${this.t("furn_only_color_hint")}</p>`
                 : nothing}`
           : nothing}
-        ${lamp || f.type === "grid_point"
+        ${volumeMeter(f.type)
+          ? // a gas or water meter (#730): its reading in m³ or litres stands at the symbol, it draws no power
+            html`${this.entitySelect(
+                this.t("furn_meter_reading"),
+                f.extra ?? null,
+                undefined,
+                this.entityOptions(
+                  (id) =>
+                    id.startsWith("sensor.") &&
+                    (["gas", "water", "volume"].includes(String(hass.states[id]?.attributes.device_class ?? "")) || /^(m³|m3|L|l|ft³|gal|CCF)$/.test(String(hass.states[id]?.attributes.unit_of_measurement ?? ""))),
+                ),
+                (v) => this.updateFurniture({ extra: v === "none" ? null : v }),
+              )}`
+          : nothing}
+        ${lamp || f.type === "grid_point" || volumeMeter(f.type)
           ? nothing
           : this.entitySelect(
               this.t(f.type === "meter" ? "energy_grid" : f.type === "inverter" ? "energy_solar_sensor" : f.type === "home_battery" ? "energy_battery_sensor" : "furn_power"),
@@ -11966,7 +11986,7 @@ export class Fp3dEditor extends LitElement {
             )}
           </div>`
         : nothing}
-      ${!lamp
+      ${!lamp && !volumeMeter(f.type)
         ? this.entitySelect(this.t("furn_extra"), f.extra ?? null, undefined, this.entityOptions((id) => id.startsWith("sensor.")), (v) => this.updateFurniture({ extra: v === "none" ? null : v }))
         : nothing}
       ${!lamp || f.entity

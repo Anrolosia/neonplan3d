@@ -2071,5 +2071,6 @@
  "persons_pin": "Nål",
  "persons_off": "av",
  "locate": "Lokalisering",
- "diag_menu": "Hjälp till"
+ "diag_menu": "Hjälp till",
+ "furn_meter_reading": "Mätarställning (m³ eller liter)"
 }

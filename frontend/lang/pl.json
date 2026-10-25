@@ -2071,5 +2071,6 @@
  "persons_pin": "Pinezka",
  "persons_off": "wył.",
  "locate": "Lokalizacja",
- "diag_menu": "Pomóż"
+ "diag_menu": "Pomóż",
+ "furn_meter_reading": "Stan licznika (m³ lub litry)"
 }
