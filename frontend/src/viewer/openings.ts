@@ -137,11 +137,10 @@ export function stackedOnOpening(info: OpeningInfo, infos: readonly OpeningInfo[
 export function sillBoards(info: OpeningInfo, infos: readonly OpeningInfo[]): { inside: boolean; outside: boolean } {
   const mode = info.opening.sill_board ?? "auto";
   if (mode === "none") return { inside: false, outside: false };
-  if (mode === "inside" || mode === "outside") {
-    const room = info.sill > 0.05;
-    return { inside: room && mode === "inside", outside: room && mode === "outside" };
-  }
-  const auto = info.sill > 0.3 && !stackedOnOpening(info, infos);
+  // chosen by hand it is drawn on any window, a floor-to-ceiling one too (at the floor, #702)
+  if (mode === "inside" || mode === "outside") return { inside: mode === "inside", outside: mode === "outside" };
+  // a glass wall has none unless chosen
+  const auto = info.sill > 0.3 && !stackedOnOpening(info, infos) && openingStyle(info.opening, info.exterior) !== "glass_wall";
   return { inside: auto, outside: auto && info.exterior };
 }
 
@@ -153,6 +152,18 @@ export interface OpeningParts {
   frameTris: { id: string; start: number; end: number }[];
   glassTris: { id: string; start: number; end: number }[];
   blindTris: { id: string; start: number; end: number }[];
+}
+
+/**
+ * The window board inside and the sill outside, by the window's setting. On a window down to the floor they lie
+ * on the floor's level (a board chosen there was not drawn at all, #702).
+ */
+function boardsOf(info: OpeningInfo, infos: readonly OpeningInfo[], frames: GeoBuffer, tf: Tf, mid: number, fd: number, top: Color, cut: number, bucket: number): void {
+  const boards = sillBoards(info, infos);
+  const W = info.width;
+  const S = Math.max(info.sill, 0.03);
+  if (boards.inside) splitBox(frames, tf, -0.04, W + 0.04, mid + fd, info.faceRoom + 0.07, S - 0.03, S, new Color(SILL), top, cut, bucket);
+  if (boards.outside) splitBox(frames, tf, -0.03, W + 0.03, -info.faceOut - 0.06, mid - fd, S - 0.04, S - 0.02, new Color(SILL), top, cut, bucket);
 }
 
 export function buildOpeningParts(infos: readonly OpeningInfo[], states: ReadonlyMap<string, OpeningState>, cut: number): OpeningParts {
@@ -283,6 +294,7 @@ export function buildOpeningParts(infos: readonly OpeningInfo[], states: Readonl
       splitBox(frames, tf, W - fw, W, mid - fd, mid + fd, S, T, frameC, frameTop, cut, bucket);
       splitBox(frames, tf, fw, W - fw, mid - fd, mid + fd, S, S + 0.03, frameC, frameTop, cut, bucket);
       splitBox(frames, tf, fw, W - fw, mid - fd, mid + fd, T - fw, T, frameC, frameTop, cut, bucket);
+      boardsOf(info, infos, frames, tf, mid, fd, frameTop, cut, bucket);
       const n = Math.max(1, Math.round((W - 2 * fw) / 0.9));
       const pane = (W - 2 * fw) / n;
       for (let k = 1; k < n; k++) {
@@ -303,9 +315,7 @@ export function buildOpeningParts(infos: readonly OpeningInfo[], states: Readonl
       splitBox(frames, tf, fw, W - fw, mid - fd, mid + fd, S, S + (S > 0.05 ? fw : 0.03), frameC, frameTop, cut, bucket);
       splitBox(frames, tf, fw, W - fw, mid - fd, mid + fd, T - fw, T, frameC, frameTop, cut, bucket);
       // window board inside and sill outside (by the window's setting; none on a transom light, #655)
-      const boards = sillBoards(info, infos);
-      if (boards.inside) splitBox(frames, tf, -0.04, W + 0.04, mid + fd, info.faceRoom + 0.07, S - 0.03, S, new Color(SILL), frameTop, cut, bucket);
-      if (boards.outside) splitBox(frames, tf, -0.03, W + 0.03, -info.faceOut - 0.06, mid - fd, S - 0.04, S - 0.02, new Color(SILL), frameTop, cut, bucket);
+      boardsOf(info, infos, frames, tf, mid, fd, frameTop, cut, bucket);
       // sashes: each rotates into the room around its hinge, or tilts around its bottom edge; a
       // double window (or French door) has two sashes meeting in the middle, each tilting on its own
       const sw = 0.055;

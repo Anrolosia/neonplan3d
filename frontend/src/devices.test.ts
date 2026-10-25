@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { isPulseDrive, isRelevant, apOnline, fanSpeed, climateModeGlow, cooktopLevel, onlyColor, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
+import { coverTiltButtons, isPulseDrive, isRelevant, apOnline, fanSpeed, climateModeGlow, cooktopLevel, onlyColor, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -866,4 +866,14 @@ test("a garage door driven by a pulse switch or button shows its contact, not th
   assert.equal(isPulseDrive("switch.tor_impuls"), true);
   assert.equal(isPulseDrive("input_button.tor"), true);
   assert.equal(isPulseDrive("cover.tor"), false);
+});
+
+test("slat buttons only for covers with slats: a KNX roller shutter announcing tilt features gets none (#704)", () => {
+  const cover = (attributes: Record<string, unknown>) => ({ entity_id: "cover.x", state: "open", attributes, last_changed: "", last_updated: "" }) as Parameters<typeof coverTiltButtons>[0];
+  assert.equal(coverTiltButtons(cover({ device_class: "shutter", supported_features: 127, current_position: 100 })), false);
+  assert.equal(coverTiltButtons(cover({ device_class: "blind", supported_features: 255, current_tilt_position: 100 })), true);
+  // a shutter that really reports a tilt position keeps its buttons; a cover without a class keeps them too
+  assert.equal(coverTiltButtons(cover({ device_class: "shutter", supported_features: 127, current_tilt_position: 40 })), true);
+  assert.equal(coverTiltButtons(cover({ supported_features: 48 })), true);
+  assert.equal(coverTiltButtons(cover({ device_class: "blind", supported_features: 15 })), false);
 });

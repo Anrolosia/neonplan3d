@@ -2072,5 +2072,8 @@
  "persons_off": "wył.",
  "locate": "Lokalizacja",
  "diag_menu": "Pomóż",
- "furn_meter_reading": "Stan licznika (m³ lub litry)"
+ "furn_meter_reading": "Stan licznika (m³ lub litry)",
+ "diag_invite": "Anonimowe raporty pokazują, na jakich tabletach i przeglądarkach NeonPlan się zacina i jakie błędy występują u Ciebie – dzięki temu każda aktualizacja poprawia właśnie to. Dobrowolnie, bez nazw i planu mieszkania, a każdy raport możesz obejrzeć przed wysłaniem.",
+ "diag_invite_look": "Zobacz",
+ "diag_invite_later": "Nie teraz"
 }

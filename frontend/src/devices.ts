@@ -91,6 +91,20 @@ export function isPlaceable(kind: DeviceKind | null): boolean {
   return kind !== null && kind !== "scene" && kind !== "script";
 }
 
+/** Covers that have no slats, whatever their features say (KNX reports tilt buttons for roller shutters, #704). */
+const NO_SLATS = new Set(["shutter", "garage", "gate", "door", "curtain", "awning", "window", "shade"]);
+
+/**
+ * Open/close-tilt buttons for a cover: only when it has slats – it reports a tilt position, or it is no roller
+ * shutter, garage door, curtain … (those never have slats, even when an integration announces the features).
+ */
+export function coverTiltButtons(st: HassEntity | undefined): boolean {
+  if (!st) return false;
+  const features = ((st.attributes.supported_features as number) ?? 0) | 0;
+  if (!(features & 48)) return false;
+  return typeof st.attributes.current_tilt_position === "number" || !NO_SLATS.has(String(st.attributes.device_class ?? ""));
+}
+
 export function entityAreaId(hass: HomeAssistant, entityId: string): string | null {
   const entry = hass.entities?.[entityId];
   if (!entry) return null;

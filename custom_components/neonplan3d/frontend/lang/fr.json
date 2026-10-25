@@ -2072,5 +2072,8 @@
  "persons_off": "non",
  "locate": "Localisation",
  "diag_menu": "Aider à améliorer",
- "furn_meter_reading": "Relevé du compteur (m³ ou litres)"
+ "furn_meter_reading": "Relevé du compteur (m³ ou litres)",
+ "diag_invite": "Des rapports anonymes montrent sur quelles tablettes et quels navigateurs NeonPlan saccade et quelles erreurs surviennent chez vous – ainsi chaque mise à jour s'améliore exactement là. Facultatif, sans noms ni plan, et vous pouvez voir chaque rapport avant l'envoi.",
+ "diag_invite_look": "Voir",
+ "diag_invite_later": "Pas maintenant"
 }

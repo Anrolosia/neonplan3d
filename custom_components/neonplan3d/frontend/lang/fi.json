@@ -2072,5 +2072,8 @@
  "persons_off": "pois",
  "locate": "Paikannus",
  "diag_menu": "Auta parantamaan",
- "furn_meter_reading": "Mittarilukema (m³ tai litraa)"
+ "furn_meter_reading": "Mittarilukema (m³ tai litraa)",
+ "diag_invite": "Nimettömät raportit näyttävät, millä tableteilla ja selaimilla NeonPlan nykii ja mitä virheitä sinulla esiintyy – näin jokainen päivitys paranee juuri siellä. Vapaaehtoista, ilman nimiä tai pohjapiirrosta, ja voit katsoa jokaisen raportin ennen lähettämistä.",
+ "diag_invite_look": "Katso",
+ "diag_invite_later": "Ei nyt"
 }

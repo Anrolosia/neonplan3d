@@ -2072,5 +2072,8 @@
  "persons_off": "no",
  "locate": "Localización",
  "diag_menu": "Ayuda a mejorar",
- "furn_meter_reading": "Lectura del contador (m³ o litros)"
+ "furn_meter_reading": "Lectura del contador (m³ o litros)",
+ "diag_invite": "Los informes anónimos muestran en qué tabletas y navegadores NeonPlan va a tirones y qué errores ocurren en tu casa, para que cada actualización mejore justo ahí. Voluntario, sin nombres ni plano, y puedes ver cada informe antes de enviarlo.",
+ "diag_invite_look": "Ver",
+ "diag_invite_later": "Ahora no"
 }

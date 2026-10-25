@@ -2072,5 +2072,8 @@
  "persons_off": "oprit",
  "locate": "Localizare",
  "diag_menu": "Ajută",
- "furn_meter_reading": "Index contor (m³ sau litri)"
+ "furn_meter_reading": "Index contor (m³ sau litri)",
+ "diag_invite": "Rapoartele anonime arată pe ce tablete și browsere NeonPlan se mișcă greu și ce erori apar la tine – astfel fiecare actualizare se îmbunătățește exact acolo. Opțional, fără nume sau plan, și poți vedea fiecare raport înainte de trimitere.",
+ "diag_invite_look": "Vezi",
+ "diag_invite_later": "Nu acum"
 }

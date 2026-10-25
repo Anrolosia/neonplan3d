@@ -2072,5 +2072,8 @@
  "persons_off": "ki",
  "locate": "Helymeghatározás",
  "diag_menu": "Segíts",
- "furn_meter_reading": "Mérőállás (m³ vagy liter)"
+ "furn_meter_reading": "Mérőállás (m³ vagy liter)",
+ "diag_invite": "A névtelen jelentések megmutatják, mely tableteken és böngészőkben akad a NeonPlan, és milyen hibák fordulnak elő nálad – így minden frissítés pontosan ott javul. Önkéntes, nevek és alaprajz nélkül, és minden jelentést megnézhetsz küldés előtt.",
+ "diag_invite_look": "Megnézem",
+ "diag_invite_later": "Most nem"
 }
