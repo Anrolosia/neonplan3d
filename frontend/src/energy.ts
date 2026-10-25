@@ -209,8 +209,15 @@ export function powerSensorFor(hass: HomeAssistant, entityId: string): string | 
   const device = hass.entities?.[entityId]?.device_id;
   if (!device) return null;
   const hub = isHubDevice(hass, device);
-  const area = hub ? entityAreaId(hass, entityId) : null;
-  return powerSensorsOf(hass, device).find((e) => e !== entityId && (!hub || (area !== null && entityAreaId(hass, e) === area))) ?? null;
+  const area = entityAreaId(hass, entityId);
+  const list = powerSensorsOf(hass, device).filter((e) => e !== entityId);
+  // the entity's own meter first: PowerCalc names it after the entity (sensor.<light>_power); then one in the same
+  // area; a meter filed under another room belongs to another light of the device (#743)
+  const own = `sensor.${entityId.slice(entityId.indexOf(".") + 1)}_power`;
+  if (list.includes(own)) return own;
+  const same = list.find((e) => area !== null && entityAreaId(hass, e) === area);
+  if (same || hub) return same ?? null;
+  return list.find((e) => area === null || entityAreaId(hass, e) === null || entityAreaId(hass, e) === area) ?? null;
 }
 
 /** Placed entities that report power, with their position and current power. */

@@ -13,7 +13,7 @@ function rect(id: string, x0: number, z0: number, x1: number, z1: number): Room 
   return { id, name: id, area_id: null, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material: "wood" };
 }
 
-function hassWith(states: HassEntity[], entities: Record<string, { entity_id: string; device_id?: string }> = {}): HomeAssistant {
+function hassWith(states: HassEntity[], entities: Record<string, { entity_id: string; device_id?: string; area_id?: string }> = {}): HomeAssistant {
   return {
     language: "de",
     connection: {} as HomeAssistant["connection"],
@@ -344,4 +344,18 @@ test("rooms drawn with a small gap between them still get their cables (#731)", 
   const far = findConsumers(hass, b);
   const farSegs = flowSegments({ building: b, consumers: far, summary: energySummary(hass, b, far) });
   assert.equal(farSegs.filter((s) => s.kind === "consumer").length, 0);
+});
+
+test("two lights on one device each take their own meter: PowerCalc's by its name, else one of the light's room (#743)", () => {
+  const hass = hassWith(
+    [st("light.bad_decke", "on"), st("light.buero", "on"), power("sensor.buero_power_x", "9"), power("sensor.bad_decke_power", "12")],
+    {
+      "light.bad_decke": { entity_id: "light.bad_decke", device_id: "act", area_id: "bad" },
+      "light.buero": { entity_id: "light.buero", device_id: "act", area_id: "buero" },
+      "sensor.buero_power_x": { entity_id: "sensor.buero_power_x", device_id: "act", area_id: "buero" },
+      "sensor.bad_decke_power": { entity_id: "sensor.bad_decke_power", device_id: "act", area_id: "bad" },
+    },
+  );
+  assert.equal(powerSensorFor(hass, "light.bad_decke"), "sensor.bad_decke_power");
+  assert.equal(powerSensorFor(hass, "light.buero"), "sensor.buero_power_x");
 });
