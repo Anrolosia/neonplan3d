@@ -2072,5 +2072,8 @@
  "persons_off": "no",
  "locate": "Localizzazione",
  "diag_menu": "Aiuta a migliorare",
- "furn_meter_reading": "Lettura del contatore (m³ o litri)"
+ "furn_meter_reading": "Lettura del contatore (m³ o litri)",
+ "diag_invite": "I rapporti anonimi mostrano su quali tablet e browser NeonPlan scatta e quali errori capitano da te, così ogni aggiornamento migliora proprio lì. Facoltativo, senza nomi né planimetria, e puoi vedere ogni rapporto prima dell'invio.",
+ "diag_invite_look": "Vedi",
+ "diag_invite_later": "Non ora"
 }

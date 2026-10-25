@@ -2072,5 +2072,8 @@
  "persons_off": "av",
  "locate": "Lokalisering",
  "diag_menu": "Hjelp til",
- "furn_meter_reading": "Målarstand (m³ eller liter)"
+ "furn_meter_reading": "Målarstand (m³ eller liter)",
+ "diag_invite": "Anonyme rapportar viser på kva nettbrett og nettlesarar NeonPlan hakkar, og kva feil som oppstår hos deg – slik blir kvar oppdatering betre akkurat der. Frivillig, utan namn eller planteikning, og du kan sjå kvar rapport før han vert send.",
+ "diag_invite_look": "Sjå nærare",
+ "diag_invite_later": "Ikkje no"
 }

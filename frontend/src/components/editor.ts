@@ -404,6 +404,7 @@ export class Fp3dEditor extends LitElement {
     _ctx: { state: true },
     _fixedHint: { state: true },
     _phoneHint: { state: true },
+    _diagInvite: { state: true },
     _floorMenu: { state: true },
     _openingPreset: { state: true },
     _measureLen: { state: true },
@@ -605,6 +606,9 @@ export class Fp3dEditor extends LitElement {
   private declare _fixedHint: boolean;
   /** The one-time "draw on a PC or tablet" hint on phones (shown by CSS on narrow screens only). */
   private declare _phoneHint: boolean;
+  /** A one-time invitation for admins to switch on the usage reports (while they are off and it was not closed). */
+  private declare _diagInvite: boolean;
+  private diagInviteChecked = false;
   private fixedPan = false;
   /** Frame the 3D half again after the next render (the roof tool shows the whole house). */
   private reframe3d = false;
@@ -735,6 +739,7 @@ export class Fp3dEditor extends LitElement {
     this._floorMenu = false;
     this._openingPreset = "door";
     this._phoneHint = true;
+    this._diagInvite = false;
     try {
       this._phoneHint = localStorage.getItem("neonplan3d.phoneHint") !== "0";
     } catch {
@@ -1181,7 +1186,31 @@ export class Fp3dEditor extends LitElement {
     }
   }
 
+  /** Once per page: an admin with the usage reports off (and the invitation never closed) is invited. */
+  private checkDiagInvite(): void {
+    if (this.diagInviteChecked || !this.hass || !this.isAdmin || !released("diagnostics")) return;
+    this.diagInviteChecked = true;
+    try {
+      if (localStorage.getItem("neonplan3d.diagInvite") === "0") return;
+    } catch {
+      return;
+    }
+    void getDiagnostics(this.hass)
+      .then((d) => (this._diagInvite = !d.enabled))
+      .catch(() => undefined);
+  }
+
+  private closeDiagInvite(): void {
+    this._diagInvite = false;
+    try {
+      localStorage.setItem("neonplan3d.diagInvite", "0");
+    } catch {
+      // no storage: gone for this visit
+    }
+  }
+
   protected updated(): void {
+    this.checkDiagInvite();
     // the settings dialog shows its section unfolded (its summary is hidden there)
     if (this._settingsDialog) for (const d of this.renderRoot.querySelectorAll<HTMLDetailsElement>(".fp3d-dialog details")) d.open = true;
     // the item preview is placed in window coordinates; with the 3D view beside the plan an ancestor becomes its
@@ -5679,6 +5708,24 @@ export class Fp3dEditor extends LitElement {
                   >
                     ✕
                   </button>
+                </div>`
+              : nothing}
+            ${this._diagInvite
+              ? html`<div class="fp3d-diag-invite" role="note">
+                  <span><b>🛟 ${this.t("diag_title")}</b> ${this.t("diag_invite")}</span>
+                  <span class="fp3d-diag-invite-buttons">
+                    <button
+                      class="fp3d-btn primary"
+                      @click=${() => {
+                        this.closeDiagInvite();
+                        this._settingsDialog = "diagnostics";
+                        void this.loadDiagnostics();
+                      }}
+                    >
+                      ${this.t("diag_invite_look")}
+                    </button>
+                    <button class="fp3d-btn" @click=${() => this.closeDiagInvite()}>${this.t("diag_invite_later")}</button>
+                  </span>
                 </div>`
               : nothing}
             ${this.houseTool ? html`<div class="fp3d-tool-note">${this.t(this._tool === "energy" ? "energy_only_note" : "roof_only_note")}</div>` : nothing}
@@ -15267,6 +15314,32 @@ export class Fp3dEditor extends LitElement {
           border: 1px solid var(--fp3d-accent);
           font-size: 13px;
         }
+      }
+      .fp3d-diag-invite {
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 3;
+        width: min(560px, calc(100% - 24px));
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: var(--fp3d-chrome-solid);
+        border: 1px solid var(--fp3d-accent);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      .fp3d-diag-invite > span:first-child {
+        flex: 1 1 260px;
+      }
+      .fp3d-diag-invite-buttons {
+        display: flex;
+        gap: 6px;
       }
       .fp3d-tool-note {
         position: absolute;
