@@ -65,7 +65,7 @@ export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
 export const funLib = { Group, Mesh, MeshBasicMaterial, CanvasTexture, Color, PlaneGeometry, BufferGeometry: Geometry, Float32BufferAttribute, DoubleSide };
 
 export type { PipeTube };
-import { isCooktopZone, mountBase, packItem, packMotion, setPacks, type FurniturePack } from "../packs.ts";
+import { groundUnder, isCooktopZone, mountBase, packItem, packMotion, setPacks, type FurniturePack } from "../packs.ts";
 import { withVehicles } from "../parking.ts";
 import { buildRoof, type RoofWindowState } from "./roof.ts";
 import { GROUND, groundFace, groundFloor, roofFaces, roofWindowRoom, wallFaces } from "../solar.ts";
@@ -3161,12 +3161,19 @@ export class FloorplanViewer {
           }
           return best;
         };
+        // every point of the wedge lies on the ground it falls on: the floor in a room, the lawn or the terrain
+        // outside – a camera of a sunken floor (a basement half in the ground) no longer reaches down to that floor's
+        // level outdoors (#802); a camera just inside an outer wall starts on the ground in front of it
+        const groundAt = (x: number, z: number) => y + groundUnder(fv.floor, { x, z });
         const rim = (t: number) => {
           const r = reachAt(t);
-          return [d.x + (dir[0] * Math.cos(t) - dir[1] * Math.sin(t)) * r, y, d.z + (dir[1] * Math.cos(t) + dir[0] * Math.sin(t)) * r];
+          const x = d.x + (dir[0] * Math.cos(t) - dir[1] * Math.sin(t)) * r;
+          const z = d.z + (dir[1] * Math.cos(t) + dir[0] * Math.sin(t)) * r;
+          return [x, groundAt(x, z), z];
         };
+        const apex = [d.x, Math.max(groundAt(d.x, d.z), dome ? -Infinity : groundAt(d.x + dir[0] * 0.3, d.z + dir[1] * 0.3)), d.z];
         const start = cones.count;
-        for (let i = 0; i < n; i++) cones.tri([d.x, y, d.z], rim(-half + (2 * half * (i + 1)) / n), rim(-half + (2 * half * i) / n), near, far, far);
+        for (let i = 0; i < n; i++) cones.tri(apex, rim(-half + (2 * half * (i + 1)) / n), rim(-half + (2 * half * i) / n), near, far, far);
         coneTris.push({ id: d.id, start, end: cones.count });
         continue;
       }
