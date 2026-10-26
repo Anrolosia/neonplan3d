@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "Stanje števca (m³ ali litri)",
  "diag_invite": "Anonimna poročila pokažejo, na katerih tablicah in brskalnikih NeonPlan zatika in katere napake se pojavljajo pri vas – tako se vsaka posodobitev izboljša prav tam. Prostovoljno, brez imen ali tlorisa, in vsako poročilo si lahko ogledate pred pošiljanjem.",
  "diag_invite_look": "Poglej",
- "diag_invite_later": "Ne zdaj"
+ "diag_invite_later": "Ne zdaj",
+ "floor_order_hint": "Spremeni le vrstni red nadstropij na seznamu in na sličicah. Kje leži nadstropje v 3D-hiši, določa njegova »višina nad tlemi«."
 }

@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "Mittarilukema (m³ tai litraa)",
  "diag_invite": "Nimettömät raportit näyttävät, millä tableteilla ja selaimilla NeonPlan nykii ja mitä virheitä sinulla esiintyy – näin jokainen päivitys paranee juuri siellä. Vapaaehtoista, ilman nimiä tai pohjapiirrosta, ja voit katsoa jokaisen raportin ennen lähettämistä.",
  "diag_invite_look": "Katso",
- "diag_invite_later": "Ei nyt"
+ "diag_invite_later": "Ei nyt",
+ "floor_order_hint": "Muuttaa vain kerrosten järjestystä luettelossa ja kerroskuvissa. Kerroksen paikan 3D-talossa määrää sen ”korkeus maasta”."
 }

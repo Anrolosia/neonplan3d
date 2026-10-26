@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "Målerstand (m³ eller liter)",
  "diag_invite": "Anonyme rapporter viser på hvilke nettbrett og nettlesere NeonPlan hakker, og hvilke feil som oppstår hos deg – slik blir hver oppdatering bedre akkurat der. Frivillig, uten navn eller plantegning, og du kan se hver rapport før den sendes.",
  "diag_invite_look": "Se nærmere",
- "diag_invite_later": "Ikke nå"
+ "diag_invite_later": "Ikke nå",
+ "floor_order_hint": "Endrer bare rekkefølgen på etasjene i listen og på etasjebildene. Hvor en etasje ligger i 3D-huset, bestemmes av «høyde over bakken»."
 }

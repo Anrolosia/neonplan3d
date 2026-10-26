@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "Mätarställning (m³ eller liter)",
  "diag_invite": "Anonyma rapporter visar på vilka surfplattor och webbläsare NeonPlan hackar och vilka fel som uppstår hos dig – så blir varje uppdatering bättre precis där. Frivilligt, utan namn eller planritning, och du kan se varje rapport innan den skickas.",
  "diag_invite_look": "Visa",
- "diag_invite_later": "Inte nu"
+ "diag_invite_later": "Inte nu",
+ "floor_order_hint": "Ändrar bara våningarnas ordning i listan och på våningsbilderna. Var en våning ligger i 3D-huset bestäms av dess ”höjd över marken”."
 }

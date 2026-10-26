@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "表读数（立方米或升）",
  "diag_invite": "匿名报告会显示 NeonPlan 在哪些平板和浏览器上卡顿，以及你家里出现了哪些错误——这样每次更新都能有针对性地改进。完全自愿，不含名称或户型图，每份报告在发送前都可以查看。",
  "diag_invite_look": "查看",
- "diag_invite_later": "以后再说"
+ "diag_invite_later": "以后再说",
+ "floor_order_hint": "只改变楼层在列表和楼层缩略图中的顺序。楼层在 3D 房屋中的位置由它的“离地高度”决定。"
 }

@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "Lettura del contatore (m³ o litri)",
  "diag_invite": "I rapporti anonimi mostrano su quali tablet e browser NeonPlan scatta e quali errori capitano da te, così ogni aggiornamento migliora proprio lì. Facoltativo, senza nomi né planimetria, e puoi vedere ogni rapporto prima dell'invio.",
  "diag_invite_look": "Vedi",
- "diag_invite_later": "Non ora"
+ "diag_invite_later": "Non ora",
+ "floor_order_hint": "Cambia solo l'ordine dei piani nell'elenco e nelle miniature. La posizione di un piano nella casa 3D dipende dalla sua «altezza dal suolo»."
 }

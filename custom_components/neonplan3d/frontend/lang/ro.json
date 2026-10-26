@@ -2075,5 +2075,6 @@
  "furn_meter_reading": "Index contor (m³ sau litri)",
  "diag_invite": "Rapoartele anonime arată pe ce tablete și browsere NeonPlan se mișcă greu și ce erori apar la tine – astfel fiecare actualizare se îmbunătățește exact acolo. Opțional, fără nume sau plan, și poți vedea fiecare raport înainte de trimitere.",
  "diag_invite_look": "Vezi",
- "diag_invite_later": "Nu acum"
+ "diag_invite_later": "Nu acum",
+ "floor_order_hint": "Schimbă doar ordinea etajelor în listă și în miniaturi. Locul unui etaj în casa 3D vine din „înălțimea deasupra solului”."
 }
