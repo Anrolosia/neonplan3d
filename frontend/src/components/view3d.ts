@@ -5333,6 +5333,8 @@ export class Fp3dView3d extends LitElement {
         flex-direction: column;
         gap: 2px;
         cursor: pointer;
+        /* the info bubbles let taps through to the house; this one has a button (#793) */
+        pointer-events: auto;
       }
       .fp3d-bin-info small {
         opacity: 0.7;
