@@ -2076,5 +2076,7 @@
  "diag_invite": "Anonieme rapporten laten zien op welke tablets en browsers NeonPlan hapert en welke fouten bij jou optreden – zo wordt elke update precies daar beter. Vrijwillig, zonder namen of plattegrond, en je kunt elk rapport bekijken voordat het wordt verstuurd.",
  "diag_invite_look": "Bekijken",
  "diag_invite_later": "Niet nu",
- "floor_order_hint": "Verandert alleen de volgorde van de verdiepingen in de lijst en de verdiepingsplaatjes. Waar een verdieping in het 3D-huis ligt, bepaalt haar „hoogte boven de grond”."
+ "floor_order_hint": "Verandert alleen de volgorde van de verdiepingen in de lijst en de verdiepingsplaatjes. Waar een verdieping in het 3D-huis ligt, bepaalt haar „hoogte boven de grond”.",
+ "roof_turn": "Draaiing",
+ "roof_turn_hint": "Draait dit dakdeel in de plattegrond (met de klok mee), bijv. voor een aanbouw onder een hoek. Dakkapellen en dwarskappen erop draaien mee. 0° = zoals voorheen."
 }

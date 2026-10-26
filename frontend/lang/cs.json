@@ -2076,5 +2076,7 @@
  "diag_invite": "Anonymní hlášení ukazují, na kterých tabletech a prohlížečích NeonPlan trhá a jaké chyby se u vás objevují – tak se každá aktualizace zlepší přesně tam. Dobrovolné, bez jmen a půdorysu, a každé hlášení si můžete před odesláním prohlédnout.",
  "diag_invite_look": "Zobrazit",
  "diag_invite_later": "Teď ne",
- "floor_order_hint": "Mění jen pořadí podlaží v seznamu a v náhledech. Kde podlaží leží ve 3D domě, určuje jeho „výška nad terénem“."
+ "floor_order_hint": "Mění jen pořadí podlaží v seznamu a v náhledech. Kde podlaží leží ve 3D domě, určuje jeho „výška nad terénem“.",
+ "roof_turn": "Otočení",
+ "roof_turn_hint": "Otočí tuto část střechy v plánu (po směru hodinových ručiček), např. pro křídlo pod úhlem. Vikýře a příčné štíty na ní se otočí s ní. 0° = jako dosud."
 }

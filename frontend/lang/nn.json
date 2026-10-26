@@ -2076,5 +2076,7 @@
  "diag_invite": "Anonyme rapportar viser på kva nettbrett og nettlesarar NeonPlan hakkar, og kva feil som oppstår hos deg – slik blir kvar oppdatering betre akkurat der. Frivillig, utan namn eller planteikning, og du kan sjå kvar rapport før han vert send.",
  "diag_invite_look": "Sjå nærare",
  "diag_invite_later": "Ikkje no",
- "floor_order_hint": "Endrar berre rekkjefølgja på etasjane i lista og på etasjebileta. Kvar ein etasje ligg i 3D-huset, avgjer «høgd over bakken»."
+ "floor_order_hint": "Endrar berre rekkjefølgja på etasjane i lista og på etasjebileta. Kvar ein etasje ligg i 3D-huset, avgjer «høgd over bakken».",
+ "roof_turn": "Dreiing",
+ "roof_turn_hint": "Dreiar denne takdelen i planen (med klokka), t.d. for eit tilbygg i vinkel. Arkar og kryssgavlar på han dreiar med. 0° = som før."
 }

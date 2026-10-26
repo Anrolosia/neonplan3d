@@ -2076,5 +2076,7 @@
  "diag_invite": "Anonyme rapporter viser, på hvilke tablets og browsere NeonPlan hakker, og hvilke fejl der opstår hos dig – så hver opdatering bliver bedre præcis dér. Frivilligt, uden navne eller plantegning, og du kan se hver rapport, før den sendes.",
  "diag_invite_look": "Se nærmere",
  "diag_invite_later": "Ikke nu",
- "floor_order_hint": "Ændrer kun rækkefølgen af etagerne i listen og på etagebillederne. Hvor en etage ligger i 3D-huset, bestemmer dens \"højde over jorden\"."
+ "floor_order_hint": "Ændrer kun rækkefølgen af etagerne i listen og på etagebillederne. Hvor en etage ligger i 3D-huset, bestemmer dens \"højde over jorden\".",
+ "roof_turn": "Drejning",
+ "roof_turn_hint": "Drejer denne tagdel i planen (med uret), f.eks. til en tilbygning i vinkel. Kviste og tværgavle på den drejer med. 0° = som før."
 }

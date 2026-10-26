@@ -2076,5 +2076,7 @@
  "diag_invite": "Anonimowe raporty pokazują, na jakich tabletach i przeglądarkach NeonPlan się zacina i jakie błędy występują u Ciebie – dzięki temu każda aktualizacja poprawia właśnie to. Dobrowolnie, bez nazw i planu mieszkania, a każdy raport możesz obejrzeć przed wysłaniem.",
  "diag_invite_look": "Zobacz",
  "diag_invite_later": "Nie teraz",
- "floor_order_hint": "Zmienia tylko kolejność kondygnacji na liście i na miniaturach. Położenie kondygnacji w domu 3D wynika z jej „wysokości nad gruntem”."
+ "floor_order_hint": "Zmienia tylko kolejność kondygnacji na liście i na miniaturach. Położenie kondygnacji w domu 3D wynika z jej „wysokości nad gruntem”.",
+ "roof_turn": "Obrót",
+ "roof_turn_hint": "Obraca tę część dachu na planie (zgodnie z ruchem wskazówek zegara), np. dla skrzydła pod kątem. Lukarny i szczyty poprzeczne na niej obracają się razem. 0° = jak dotąd."
 }

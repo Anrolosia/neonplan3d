@@ -2076,5 +2076,7 @@
  "diag_invite": "Des rapports anonymes montrent sur quelles tablettes et quels navigateurs NeonPlan saccade et quelles erreurs surviennent chez vous – ainsi chaque mise à jour s'améliore exactement là. Facultatif, sans noms ni plan, et vous pouvez voir chaque rapport avant l'envoi.",
  "diag_invite_look": "Voir",
  "diag_invite_later": "Pas maintenant",
- "floor_order_hint": "Change seulement l'ordre des étages dans la liste et les vignettes. La place d'un étage dans la maison 3D vient de sa « hauteur au-dessus du sol »."
+ "floor_order_hint": "Change seulement l'ordre des étages dans la liste et les vignettes. La place d'un étage dans la maison 3D vient de sa « hauteur au-dessus du sol ».",
+ "roof_turn": "Rotation",
+ "roof_turn_hint": "Fait pivoter cette partie du toit dans le plan (sens horaire), p. ex. pour une aile en biais. Les lucarnes et pignons dessus suivent. 0° = comme avant."
 }

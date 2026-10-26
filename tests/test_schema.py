@@ -290,6 +290,17 @@ def test_roof_section_keeps_its_end_shapes() -> None:
         ROOF_SECTION_SCHEMA({**sec, "end_u0": "pyramid"})
 
 
+def test_roof_section_keeps_its_turn() -> None:
+    """A section turned about a pivot (#634, #724); not turned = None, as every roof drawn so far."""
+    sec = {"id": "s", "x0": 0, "z0": 0, "x1": 10, "z1": 8, "eave_a": 3, "eave_b": 3, "base": 3}
+    plain = ROOF_SECTION_SCHEMA(sec)
+    assert plain["rotation"] is None and plain["pivot"] is None
+    turned = ROOF_SECTION_SCHEMA({**sec, "rotation": 30, "pivot": [5, 4]})
+    assert (turned["rotation"], turned["pivot"]) == (30, [5, 4])
+    with pytest.raises(vol.Invalid):
+        ROOF_SECTION_SCHEMA({**sec, "rotation": 400})
+
+
 def test_module_data_on_furniture_and_areas() -> None:
     """A module keeps its own data on an item of the plan, by its id; anything else is refused."""
     item = {"id": "f1", "type": "radiator", "x": 0, "z": 0, "rotation": 0, "w": 1, "d": 0.1, "h": 0.6, "variant": None}

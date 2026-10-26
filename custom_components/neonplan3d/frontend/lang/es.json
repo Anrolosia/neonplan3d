@@ -2076,5 +2076,7 @@
  "diag_invite": "Los informes anónimos muestran en qué tabletas y navegadores NeonPlan va a tirones y qué errores ocurren en tu casa, para que cada actualización mejore justo ahí. Voluntario, sin nombres ni plano, y puedes ver cada informe antes de enviarlo.",
  "diag_invite_look": "Ver",
  "diag_invite_later": "Ahora no",
- "floor_order_hint": "Solo cambia el orden de las plantas en la lista y en las miniaturas. Dónde está una planta en la casa 3D lo decide su «altura sobre el suelo»."
+ "floor_order_hint": "Solo cambia el orden de las plantas en la lista y en las miniaturas. Dónde está una planta en la casa 3D lo decide su «altura sobre el suelo».",
+ "roof_turn": "Giro",
+ "roof_turn_hint": "Gira esta parte del tejado en el plano (sentido horario), p. ej. para un ala en ángulo. Las buhardillas y hastiales encima giran con ella. 0° = como antes."
 }

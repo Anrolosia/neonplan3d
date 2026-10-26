@@ -4,6 +4,21 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
+## 2.0.5
+
+### New
+
+- **Turn a roof part (#634, #724):** every roof part in the editor (Roof tool, select a part) has a **Turn** field with ↺ 15° / ↻ 15° buttons, for wings and extensions at an angle. The part turns clockwise in the plan; dormers and cross gables on it turn along, roof windows and solar fields on it stay on it. A turned part is moved by dragging and keeps its size; to change its size, turn it back to 0°, resize, turn again. Every roof drawn so far stays at 0° and looks exactly as before. Thanks to @s0undmaker and @goldrapper19872504!
+
+### Fixed
+
+- **Cameras shown as furniture keep their camera pin (#779):** the furniture item no longer takes over the camera, so tapping it opens the camera picture as before. Thanks to @EduK85!
+- **Roof windows find their floor and room (#783, #712):** for the window watch and the spoken answers a roof window is counted in the room of its sensor's area, or in the room beneath it, instead of always on the top floor without a room. Thanks to @sjess and @frops83!
+- **Jumping to a warning on slow tablets (#784):** the room of the warning now opens even when the floor takes a moment to draw. Thanks to @sjess!
+- **"Mark as put out" on bins (#793):** the button in a bin's bubble takes the tap again. Thanks to @246tbwpjzk-cell!
+- **Floor order (#777):** the floor's up/down buttons say that they only change the order in the list; where a floor sits in 3D comes from its height above the ground. Thanks to @liltoddy!
+- **The point the view turns about (#733):** the editor's 3D pane shows a small cross where the view turns about, and pointing at 📌 in the 3D view shows it too, so the house can be framed before saving a start view. Thanks to @PetrMa!
+
 ## 2.0.4
 
 ### Help make NeonPlan better

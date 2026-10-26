@@ -9,6 +9,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 ## ✅ Recently done (1.13 – 2.0)
 
 - **Locating** (2.0, free): who and what is where – from the Shelly plugs and ESPHome proxies you already have, learned in 90 seconds per room, without Bermuda; people as glowing figures, a sensor per device, "Where is my iPhone?".
+- **Turned roofs** (2.0.5): roof parts turn for wings at an angle, dormers turn along; cameras shown as furniture, roof windows in their room, bin button, the point the view turns about.
 - **Garden on the ground** (2.0.4): garden items stand on the lawn and lowered terrain, round shadows, window boards on floor-to-ceiling windows, KNX contacts and shutters.
 - **Presence zones and fixes** (2.0.3): people stand at the sofa or door their presence sensor's zone names; gas and water meter readings; blinds outside on single outer walls, smoother pets.
 - **Locating on Android and by voice** (2.0.2): Android phones found through the Home Assistant app, watch and phone combined (a watch taken off is noticed), "Where is …?" flies the view into the room.
@@ -45,7 +46,7 @@ What comes next. The order follows your wishes (issues, Discord and 👍 in [Dis
 | Topic | What it is about | Wish |
 |---|---|---|
 | Modules, round 2 | Pro add-ons move into modules; the voice module leaves its beta | your feedback on Discord |
-| Roofs | Rotated roof sections, two roofs meeting at 90°, the floor edge under the roof | discussions #634, #605, #632 |
+| Roofs | Two roofs meeting at 90°, the floor edge under the roof | discussions #605, #632 |
 | Desk with height | A standing desk whose top moves with its height from Home Assistant | discussion #610 |
 | Air quality | VOC, CO₂ and particulate values in the room card and as a colour in the room | discussion #485 |
 | Buttons per room | Own buttons (a scene, a script) in a room or on a floor | discussion #603 |
@@ -125,6 +126,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 ## ✅ Zuletzt erledigt (1.13 – 2.0)
 
 - **Ortung** (2.0, kostenlos): Wer und was ist wo – über die Shelly-Steckdosen und ESPHome-Proxys, die du schon hast, in 90 Sekunden pro Raum eingelernt, ohne Bermuda; Personen als leuchtende Figuren, ein Sensor pro Gerät, „Wo ist mein iPhone?“.
+- **Gedrehte Dächer** (2.0.5): Dachflächen drehen sich für schräge Anbauten, Gauben drehen mit; Kameras als Möbel, Dachfenster im richtigen Raum, Mülltonnen-Knopf, der Drehpunkt der Ansicht.
 - **Garten auf dem Boden** (2.0.4): Gartenmöbel stehen auf Rasen und abgesenktem Gelände, runde Schatten, Fensterbänke an bodentiefen Fenstern, KNX-Kontakte und -Rollläden.
 - **Präsenzzonen und Korrekturen** (2.0.3): Personen stehen am Sofa oder an der Tür, die die Zone ihres Präsenzmelders nennt; Gas- und Wasserzählerstände; Rollläden außen an einzelnen Außenwänden, flüssigere Haustiere.
 - **Ortung mit Android und per Sprache** (2.0.2): Android-Handys über die Home-Assistant-App gefunden, Uhr und Handy zusammen ausgewertet (eine abgelegte Uhr wird erkannt), „Wo ist …?“ fliegt in den Raum.
@@ -161,7 +163,7 @@ Was als Nächstes kommt. Die Reihenfolge richtet sich nach euren Wünschen (Issu
 | Thema | Worum es geht | Wunsch |
 |---|---|---|
 | Module, Runde 2 | Die Pro-Erweiterungen ziehen in Module um; das Sprach-Modul verlässt die Beta | euer Feedback im Discord |
-| Dächer | Gedrehte Dachabschnitte, zwei Dächer im 90°-Winkel, die Etagenkante unterm Dach | Diskussionen #634, #605, #632 |
+| Dächer | Zwei Dächer im 90°-Winkel, die Etagenkante unterm Dach | Diskussionen #605, #632 |
 | Schreibtisch mit Höhe | Ein Steh-Schreibtisch, dessen Platte mit der Höhe aus Home Assistant hoch- und runterfährt | Diskussion #610 |
 | Luftqualität | VOC-, CO₂- und Feinstaubwerte in der Raumkarte und als Farbe im Raum | Diskussion #485 |
 | Knöpfe pro Raum | Eigene Knöpfe (eine Szene, ein Skript) in einem Raum oder auf einer Etage | Diskussion #603 |

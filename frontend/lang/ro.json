@@ -2076,5 +2076,7 @@
  "diag_invite": "Rapoartele anonime arată pe ce tablete și browsere NeonPlan se mișcă greu și ce erori apar la tine – astfel fiecare actualizare se îmbunătățește exact acolo. Opțional, fără nume sau plan, și poți vedea fiecare raport înainte de trimitere.",
  "diag_invite_look": "Vezi",
  "diag_invite_later": "Nu acum",
- "floor_order_hint": "Schimbă doar ordinea etajelor în listă și în miniaturi. Locul unui etaj în casa 3D vine din „înălțimea deasupra solului”."
+ "floor_order_hint": "Schimbă doar ordinea etajelor în listă și în miniaturi. Locul unui etaj în casa 3D vine din „înălțimea deasupra solului”.",
+ "roof_turn": "Rotire",
+ "roof_turn_hint": "Rotește această parte a acoperișului în plan (în sens orar), de ex. pentru o aripă în unghi. Lucarnele și frontoanele de pe ea se rotesc odată cu ea. 0° = ca înainte."
 }
