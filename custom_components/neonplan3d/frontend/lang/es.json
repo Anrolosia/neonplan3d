@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Convertir en plaza de aparcamiento",
  "vehicle_to_spot_hint": "Como plaza aparece solo cuando un sensor detecta el coche; allí se configura Auto Pro.",
  "as_furniture": "Mostrar como mueble",
- "as_furniture_hint": "Sustituye el pin por un mueble vinculado en el mismo sitio. Ctrl+Z lo deshace.",
+ "as_furniture_hint": "Sustituye el pin por un mueble vinculado en el mismo sitio. Ctrl+Z lo deshace. Una cámara conserva su marcador con todos sus ajustes; el modelo solo se añade.",
  "as_furniture_pick": "Elegir mueble …",
  "as_device": "Volver a pin",
  "as_device_hint": "Sustituye el mueble por el pin de su dispositivo.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Lectura del contador (m³ o litros)",
  "diag_invite": "Los informes anónimos muestran en qué tabletas y navegadores NeonPlan va a tirones y qué errores ocurren en tu casa, para que cada actualización mejore justo ahí. Voluntario, sin nombres ni plano, y puedes ver cada informe antes de enviarlo.",
  "diag_invite_look": "Ver",
- "diag_invite_later": "Ahora no"
+ "diag_invite_later": "Ahora no",
+ "floor_order_hint": "Solo cambia el orden de las plantas en la lista y en las miniaturas. Dónde está una planta en la casa 3D lo decide su «altura sobre el suelo».",
+ "roof_turn": "Giro",
+ "roof_turn_hint": "Gira esta parte del tejado en el plano (sentido horario), p. ej. para un ala en ángulo. Las buhardillas y hastiales encima giran con ella. 0° = como antes."
 }

@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Transformar em lugar de estacionamento",
  "vehicle_to_spot_hint": "Um veículo como simples móvel está sempre lá. Como lugar de estacionamento só aparece enquanto um sensor indicar o carro, e é aí que se configura o Car Pro (carga, autonomia, fecho, climatização).",
  "as_furniture": "Mostrar como móvel",
- "as_furniture_hint": "Substitui o marcador por um móvel no mesmo lugar, ligado a este dispositivo – uma coluna para um leitor multimédia, um candeeiro para uma luz. Ctrl+Z desfaz.",
+ "as_furniture_hint": "Substitui o marcador por um móvel no mesmo lugar, ligado a este dispositivo – uma coluna para um leitor multimédia, um candeeiro para uma luz. Ctrl+Z desfaz. Uma câmara mantém o seu marcador com todas as definições; o modelo apenas se junta.",
  "as_furniture_pick": "Escolher móvel …",
  "as_device": "Voltar a marcador de dispositivo",
  "as_device_hint": "Substitui o móvel pelo marcador simples do seu dispositivo no mesmo lugar.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Leitura do contador (m³ ou litros)",
  "diag_invite": "Relatórios anónimos mostram em que tablets e navegadores o NeonPlan engasga e que erros acontecem na tua casa – assim cada atualização melhora exatamente aí. Voluntário, sem nomes nem planta, e podes ver cada relatório antes de ser enviado.",
  "diag_invite_look": "Ver",
- "diag_invite_later": "Agora não"
+ "diag_invite_later": "Agora não",
+ "floor_order_hint": "Só altera a ordem dos pisos na lista e nas miniaturas. A posição de um piso na casa 3D vem da sua «altura acima do solo».",
+ "roof_turn": "Rotação",
+ "roof_turn_hint": "Roda esta parte do telhado na planta (sentido horário), p. ex. para uma ala em ângulo. As trapeiras e empenas sobre ela rodam junto. 0° = como antes."
 }

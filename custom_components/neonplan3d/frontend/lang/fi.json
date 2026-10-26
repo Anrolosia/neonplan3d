@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Muuta pysäköintipaikaksi",
  "vehicle_to_spot_hint": "Ajoneuvo pelkkänä huonekaluna on aina paikalla. Pysäköintipaikkana se näkyy vain, kun anturi ilmoittaa auton, ja juuri siellä Auto Pro määritetään (lataustaso, toimintamatka, lukitus, ilmastointi).",
  "as_furniture": "Näytä huonekaluna",
- "as_furniture_hint": "Korvaa nastan huonekalulla samassa paikassa, linkitettynä tähän laitteeseen – kaiutin mediasoittimelle, valaisin valolle. Ctrl+Z peruu.",
+ "as_furniture_hint": "Korvaa nastan huonekalulla samassa paikassa, linkitettynä tähän laitteeseen – kaiutin mediasoittimelle, valaisin valolle. Ctrl+Z peruu. Kamera säilyttää merkkinsä kaikkine asetuksineen; malli vain lisätään.",
  "as_furniture_pick": "Valitse huonekalu …",
  "as_device": "Takaisin laitenastaksi",
  "as_device_hint": "Korvaa huonekalun sen laitteen pelkällä nastalla samassa paikassa.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Mittarilukema (m³ tai litraa)",
  "diag_invite": "Nimettömät raportit näyttävät, millä tableteilla ja selaimilla NeonPlan nykii ja mitä virheitä sinulla esiintyy – näin jokainen päivitys paranee juuri siellä. Vapaaehtoista, ilman nimiä tai pohjapiirrosta, ja voit katsoa jokaisen raportin ennen lähettämistä.",
  "diag_invite_look": "Katso",
- "diag_invite_later": "Ei nyt"
+ "diag_invite_later": "Ei nyt",
+ "floor_order_hint": "Muuttaa vain kerrosten järjestystä luettelossa ja kerroskuvissa. Kerroksen paikan 3D-talossa määrää sen ”korkeus maasta”.",
+ "roof_turn": "Kierto",
+ "roof_turn_hint": "Kääntää tätä katon osaa pohjapiirroksessa (myötäpäivään), esim. vinossa olevaa siipeä varten. Sen kattoikkunat ja poikkipäädyt kääntyvät mukana. 0° = kuten ennen."
 }

@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Gör om till parkeringsplats",
  "vehicle_to_spot_hint": "Ett fordon som vanlig möbel står alltid där. Som parkeringsplats visas det bara medan en sensor rapporterar bilen, och det är där Bil Pro ställs in (laddnivå, räckvidd, lås, klimat).",
  "as_furniture": "Visa som möbel",
- "as_furniture_hint": "Ersätter nålen med en möbel på samma plats, kopplad till den här enheten – en högtalare för en mediaspelare, en lampa för en lampa. Ctrl+Z tar tillbaka det.",
+ "as_furniture_hint": "Ersätter nålen med en möbel på samma plats, kopplad till den här enheten – en högtalare för en mediaspelare, en lampa för en lampa. Ctrl+Z tar tillbaka det. En kamera behåller sin markör med alla kamerainställningar; modellen läggs bara till.",
  "as_furniture_pick": "Välj möbel …",
  "as_device": "Tillbaka till en enhetsnål",
  "as_device_hint": "Ersätter möbeln med enhetens enkla nål på samma plats.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Mätarställning (m³ eller liter)",
  "diag_invite": "Anonyma rapporter visar på vilka surfplattor och webbläsare NeonPlan hackar och vilka fel som uppstår hos dig – så blir varje uppdatering bättre precis där. Frivilligt, utan namn eller planritning, och du kan se varje rapport innan den skickas.",
  "diag_invite_look": "Visa",
- "diag_invite_later": "Inte nu"
+ "diag_invite_later": "Inte nu",
+ "floor_order_hint": "Ändrar bara våningarnas ordning i listan och på våningsbilderna. Var en våning ligger i 3D-huset bestäms av dess ”höjd över marken”.",
+ "roof_turn": "Vridning",
+ "roof_turn_hint": "Vrider den här takdelen i planen (medurs), t.ex. för en flygel i vinkel. Takkupor och tvärgavlar på den vrids med. 0° = som tidigare."
 }

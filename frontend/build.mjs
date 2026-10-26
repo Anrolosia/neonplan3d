@@ -125,9 +125,11 @@ function copyFonts() {
 // main 692 KB on 2026-10-24 (was 688): the panel microphone asks locating first and flies into the rooms of the answer; presence zones place people at furniture and doors
 // locate 160 KB on 2026-10-24 (was 140): the locating setup carries its texts in 18 languages, the key helper, the Android transmitter hints and the fly switch (it only loads when an admin opens it)
 // main 694 KB on 2026-10-25 (was 692): people without a tracker in Home Assistant still show where they are located (#744)
+// main 696 KB on 2026-10-26 (was 694): roof windows find their room, the card checks the current floor (2.0.5)
+// main 698 KB, editor 932 KB on 2026-10-26: turning roof parts (#634, #724) and its texts
 // card editor 268 KB on 2026-10-25 (was 267): the texts of the invitation to the usage reports
 // 3D 816 KB on 2026-10-25 (was 812): free walls drawn as outer walls find their outside (blinds, glass), pets walk on at their own pace on tablets, door glass on both faces
-const BUDGET = { "neonplan3d.js": 694 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 160 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 816 * 1024, "neonplan3d-editor.js": 930 * 1024, "neonplan3d-card-editor.js": 268 * 1024 };
+const BUDGET = { "neonplan3d.js": 698 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 160 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 816 * 1024, "neonplan3d-editor.js": 932 * 1024, "neonplan3d-card-editor.js": 268 * 1024 };
 
 copyFonts();
 if (watch) {

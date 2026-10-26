@@ -27,7 +27,7 @@ import { screenName, setScreenName, setVoiceHere, setVoicePipeline, voiceOnHere,
 import { doorbellCamera, doorbellEntities, directorOnHere, HOLD_DEFAULT, HOLD_MAX, HOLD_MIN, setDirectorHere, type DirectorSettings } from "../director.ts";
 import { deviceSensors, energySummary, flowSegments, gridPoint, powerSensorFor, proposeEnergySensors, type EnergyPrefs, type FlowSegment, proposeMeters } from "../energy.ts";
 import { CLIMATE_ATTRS, isPulseDrive, isStatusSensor, robotRoomSensor, TOGGLE_KINDS } from "../devices.ts";
-import { activeSections, sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionAbove, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, wallTopUnder } from "../roof-sections.ts";
+import { activeSections, sectionFloor, dormerParent, effectiveDormer, proposeDormer, sectionGeometry, floorOutline, polygonBox, headroomLines, ridgeHeight, sectionAbove, sectionCutsBelow, roofSectionsFromRooms, sectionFrame, sectionTurn, turnSectionAbout, wallTopUnder } from "../roof-sections.ts";
 import { bestFace, clampField, faceAt, faceCompass, fieldFace, fieldModules, GROUND, moveField, pointOnFace, proposeField, proposeGroundField, proposeWindow, proposeWallField, roofFaces, rowCounts, turnGroundField, fieldCenter, wallFaces, windowAsField, windowCorners, onFace, onField, rayOnFace, type RoofFace } from "../solar.ts";
 import type { SurfaceGrab, SurfaceRay } from "../viewer/viewer3d.ts";
 import { storedImageIds } from "../transfer.ts";
@@ -202,6 +202,11 @@ interface Guides {
 const EDIT_DRAGS = new Set(["vertex", "room", "device", "opening", "furniture", "furnset", "rotate", "resize", "outdoor", "roofmove", "roofcorner", "roofvertex", "outvertex", "outbox", "pipept", "poolport", "pooldev", "pooljoint", "solarmove", "solarturn", "cablept", "holopt", "bgmove", "bgscale", "bgrotate"]);
 
 const HISTORY = 100;
+/** An angle turned on by `d` degrees, kept between -180 and 180. */
+const turnBy = (a: number, d: number): number => {
+  const v = (((a + d) % 360) + 360) % 360;
+  return v > 180 ? v - 360 : v;
+};
 
 /** Topics of the ⚙ settings menu (everything that belongs to the whole plan). */
 type SettingsTopic = "house" | "weather" | "director" | "voice" | "locate" | "favorites" | "backdrop" | "terrain" | "backup" | "modules" | "diagnostics";
@@ -1128,6 +1133,7 @@ export class Fp3dEditor extends LitElement {
       ${this.render3dBar()}
       <fp3d-view3d
               .walkable=${false}
+        .pivotMark=${true}
         .hass=${this.hass}
         .building=${this._doc3d}
         .floorId=${this.houseTool ? null : this._floorId}
@@ -1985,6 +1991,7 @@ export class Fp3dEditor extends LitElement {
             const sec = doc.settings.roof.sections?.find((x) => x.id === drag.id);
             if (!sec) return;
             Object.assign(sec, { x0: round(src.x0 + dx), x1: round(src.x1 + dx), z0: round(src.z0 + dz), z1: round(src.z1 + dz) });
+            if (src.pivot) sec.pivot = [round(src.pivot[0] + dx), round(src.pivot[1] + dz)];
             if (src.points) sec.points = src.points.map(([x, z]) => [round(x + dx), round(z + dz)] as Vec2);
           },
           drag.base,
@@ -3175,6 +3182,26 @@ export class Fp3dEditor extends LitElement {
     });
   }
 
+  /** Turn the selected section to `angle` degrees (clockwise in the plan); its dormers and cross gables come along (#634, #724). */
+  private turnRoofSection(angle: number): void {
+    const id = this._roofId;
+    if (!id || !this.isAdmin) return;
+    this.change((doc) => {
+      const sections = doc.settings.roof.sections ?? [];
+      const sec = sections.find((x) => x.id === id);
+      if (!sec || (sec.points && sec.points.length >= 3)) return;
+      const delta = angle - (sec.rotation ?? 0);
+      if (!delta) return;
+      const p: Vec2 = sec.pivot ?? [round((sec.x0 + sec.x1) / 2), round((sec.z0 + sec.z1) / 2)];
+      const along = new Set(sections.filter((d) => d !== sec && dormerParent(sections, d) === sec).map((d) => d.id));
+      doc.settings.roof.sections = sections.map((x) => {
+        if (x !== sec && !along.has(x.id)) return x;
+        const t = turnSectionAbout(x, delta, p);
+        return { ...t, x0: round(t.x0), x1: round(t.x1), z0: round(t.z0), z1: round(t.z1), pivot: t.pivot && ([round(t.pivot[0]), round(t.pivot[1])] as Vec2), rotation: round(t.rotation ?? 0) };
+      });
+    });
+  }
+
   private deleteRoofSection(): void {
     const id = this._roofId;
     if (!id || !this.isAdmin) return;
@@ -3186,6 +3213,7 @@ export class Fp3dEditor extends LitElement {
     const sec = this.roofSection;
     if (!sec || !this.isAdmin) return;
     const copy = { ...structuredClone(sec), id: uid("roof"), x0: round(sec.x0 + 1), x1: round(sec.x1 + 1), z0: round(sec.z0 + 1), z1: round(sec.z1 + 1) };
+    if (sec.pivot) copy.pivot = [round(sec.pivot[0] + 1), round(sec.pivot[1] + 1)];
     this.change((doc) => (doc.settings.roof.sections = [...(doc.settings.roof.sections ?? []), copy]));
     this._roofId = copy.id;
   }
@@ -3222,7 +3250,7 @@ export class Fp3dEditor extends LitElement {
               return svg`<g class="fp3d-vertex" data-roof-vertex=${`${sec.id}:${k}`}><circle cx=${x} cy=${y} r="16" class="fp3d-hit" /><circle cx=${x} cy=${y} r="6" /></g>`;
             })
           : nothing}
-        ${sel && this.isAdmin && !this.roofFixed(sec) && !shape
+        ${sel && this.isAdmin && !this.roofFixed(sec) && !shape && !sectionTurn(sec)
           ? ([[0, 0], [1, 0], [1, 1], [0, 1]] as const).map(([kx, kz]) => {
               const [x, y] = this.toScreen([kx ? Math.max(sec.x0, sec.x1) : Math.min(sec.x0, sec.x1), kz ? Math.max(sec.z0, sec.z1) : Math.min(sec.z0, sec.z1)]);
               return svg`<g class="fp3d-vertex" data-roof-corner=${`${sec.id}:${kx}:${kz}`}><circle cx=${x} cy=${y} r="16" class="fp3d-hit" /><circle cx=${x} cy=${y} r="6" /></g>`;
@@ -4288,6 +4316,17 @@ export class Fp3dEditor extends LitElement {
               <button aria-pressed=${sec.axis === "x"} ?disabled=${!admin} @click=${() => set({ axis: "x" })}>${this.t("roof_axis_x")}</button>
               <button aria-pressed=${sec.axis === "z"} ?disabled=${!admin} @click=${() => set({ axis: "z" })}>${this.t("roof_axis_z")}</button>
             </div>`}
+        ${sec.points || sec.dormer
+          ? nothing
+          : html`<div class="fp3d-form" title=${this.t("roof_turn_hint")}>
+              ${this.num(`${this.t("roof_turn")} (°)`, sec.rotation ?? 0, (v) => this.turnRoofSection(Math.max(-180, Math.min(180, round(v)))), 1)}
+              ${admin && !this.roofFixed(sec)
+                ? html`<div class="fp3d-actions">
+                    <button class="fp3d-btn" @click=${() => this.turnRoofSection(turnBy(sec.rotation ?? 0, -15))}>↺ 15°</button>
+                    <button class="fp3d-btn" @click=${() => this.turnRoofSection(turnBy(sec.rotation ?? 0, 15))}>↻ 15°</button>
+                  </div>`
+                : nothing}
+            </div>`}
         ${sec.shape === "gable" || sec.shape === "hip" || sec.shape === "halfhip"
           ? html`<div class="fp3d-form" title=${this.t("roof_end_hint")}>
               ${([0, 1] as const).map((end) => {
@@ -4728,11 +4767,28 @@ export class Fp3dEditor extends LitElement {
   private deviceToFurniture(pl: Placement, type: string): void {
     if (!this.isAdmin) return;
     const [w, d, h] = furnitureSize(type);
-    const item: Furniture = { id: uid("furniture"), type, x: pl.x, z: pl.z, rotation: pl.rotation ?? 0, w, d, h, variant: null, entity: pl.entity_id, name: pl.name ?? null, ...(pl.locked ? { locked: true } : {}) };
+    // a camera keeps its pin with everything set there (field of view, wedge, Kamera-Cockpit): the model only joins
+    // it as its look (#779)
+    const camera = pl.entity_id.startsWith("camera.");
+    const item: Furniture = {
+      id: uid("furniture"),
+      type,
+      x: pl.x,
+      z: pl.z,
+      rotation: pl.rotation ?? 0,
+      w,
+      d,
+      h,
+      variant: null,
+      ...(camera ? { entity: "none" } : { entity: pl.entity_id }),
+      name: pl.name ?? null,
+      ...(pl.locked ? { locked: true } : {}),
+    };
     this.change((_, f) => {
-      f.placements = f.placements.filter((p) => p.entity_id !== pl.entity_id);
+      if (!camera) f.placements = f.placements.filter((p) => p.entity_id !== pl.entity_id);
       f.furniture.push(item);
     });
+    if (camera) return;
     this._deviceId = null;
     this.selectItem("furniture", item.id);
   }
@@ -5131,6 +5187,7 @@ export class Fp3dEditor extends LitElement {
       s.z0 = Math.min(...corners.map((c) => c[1]));
       s.z1 = Math.max(...corners.map((c) => c[1]));
       if (s.points) s.points = s.points.map(mv);
+      if (s.pivot) s.pivot = mv(s.pivot);
     }
     for (const c of doc.settings.roof.cables ?? []) c.points = c.points.map(mv);
     if (doc.energy.meter) [doc.energy.meter.x, doc.energy.meter.z] = mv([doc.energy.meter.x, doc.energy.meter.z]);
@@ -10347,8 +10404,8 @@ export class Fp3dEditor extends LitElement {
                 : nothing}
               ${admin
                 ? html`<div class="fp3d-actions fp3d-wide">
-                    <button class="fp3d-btn" @click=${() => this.moveFloor(1)}>${this.t("move_up")}</button>
-                    <button class="fp3d-btn" @click=${() => this.moveFloor(-1)}>${this.t("move_down")}</button>
+                    <button class="fp3d-btn" title=${this.t("floor_order_hint")} @click=${() => this.moveFloor(1)}>${this.t("move_up")}</button>
+                    <button class="fp3d-btn" title=${this.t("floor_order_hint")} @click=${() => this.moveFloor(-1)}>${this.t("move_down")}</button>
                     <button class="fp3d-btn fp3d-danger" @click=${() => this.deleteFloor()}>${this.t("delete_floor")}</button>
                   </div>
                   <div class="fp3d-actions fp3d-wide">

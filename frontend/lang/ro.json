@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Transformă în loc de parcare",
  "vehicle_to_spot_hint": "Un vehicul ca simplu mobilier stă mereu acolo. Ca loc de parcare apare doar cât timp un senzor raportează mașina, iar acolo se configurează Auto Pro (încărcare, autonomie, încuiere, climatizare).",
  "as_furniture": "Arată ca mobilier",
- "as_furniture_hint": "Înlocuiește marcajul cu o piesă de mobilier în același loc, legată de acest dispozitiv – o boxă pentru un media player, o lampă pentru o lumină. Ctrl+Z anulează.",
+ "as_furniture_hint": "Înlocuiește marcajul cu o piesă de mobilier în același loc, legată de acest dispozitiv – o boxă pentru un media player, o lampă pentru o lumină. Ctrl+Z anulează. O cameră își păstrează marcajul cu toate setările; modelul doar se adaugă.",
  "as_furniture_pick": "Alege mobilierul …",
  "as_device": "Înapoi la un marcaj de dispozitiv",
  "as_device_hint": "Înlocuiește mobilierul cu marcajul simplu al dispozitivului lui în același loc.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Index contor (m³ sau litri)",
  "diag_invite": "Rapoartele anonime arată pe ce tablete și browsere NeonPlan se mișcă greu și ce erori apar la tine – astfel fiecare actualizare se îmbunătățește exact acolo. Opțional, fără nume sau plan, și poți vedea fiecare raport înainte de trimitere.",
  "diag_invite_look": "Vezi",
- "diag_invite_later": "Nu acum"
+ "diag_invite_later": "Nu acum",
+ "floor_order_hint": "Schimbă doar ordinea etajelor în listă și în miniaturi. Locul unui etaj în casa 3D vine din „înălțimea deasupra solului”.",
+ "roof_turn": "Rotire",
+ "roof_turn_hint": "Rotește această parte a acoperișului în plan (în sens orar), de ex. pentru o aripă în unghi. Lucarnele și frontoanele de pe ea se rotesc odată cu ea. 0° = ca înainte."
 }

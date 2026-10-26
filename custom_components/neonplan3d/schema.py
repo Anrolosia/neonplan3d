@@ -559,6 +559,9 @@ ROOF_SECTION_SCHEMA = vol.Schema(
         # gable, hip and half-hip: how the ridge ends at either end (None = as the shape, #466)
         vol.Optional("end_u0", default=None): vol.Any(None, vol.In(["gable", "hip", "halfhip"])),
         vol.Optional("end_u1", default=None): vol.Any(None, vol.In(["gable", "hip", "halfhip"])),
+        # turned (degrees, clockwise in the plan) about a pivot point: a wing at an angle (#634, #724)
+        vol.Optional("rotation", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=-360, max=360))),
+        vol.Optional("pivot", default=None): vol.Any(None, _POINT),
     },
     extra=vol.ALLOW_EXTRA,
 )

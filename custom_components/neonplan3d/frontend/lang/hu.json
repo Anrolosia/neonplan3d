@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Parkolóhellyé alakítás",
  "vehicle_to_spot_hint": "Parkolóhelyként csak akkor jelenik meg, ha egy érzékelő jelzi az autót; ott állítható az Auto Pro.",
  "as_furniture": "Megjelenítés bútorként",
- "as_furniture_hint": "A jelölőt ugyanott egy összekapcsolt bútorra cseréli. Ctrl+Z visszavonja.",
+ "as_furniture_hint": "A jelölőt ugyanott egy összekapcsolt bútorra cseréli. Ctrl+Z visszavonja. Egy kamera megtartja a jelölőjét az összes beállításával; a modell csak hozzáadódik.",
  "as_furniture_pick": "Bútor választása …",
  "as_device": "Vissza jelölőnek",
  "as_device_hint": "A bútort az eszköz jelölőjére cseréli.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Mérőállás (m³ vagy liter)",
  "diag_invite": "A névtelen jelentések megmutatják, mely tableteken és böngészőkben akad a NeonPlan, és milyen hibák fordulnak elő nálad – így minden frissítés pontosan ott javul. Önkéntes, nevek és alaprajz nélkül, és minden jelentést megnézhetsz küldés előtt.",
  "diag_invite_look": "Megnézem",
- "diag_invite_later": "Most nem"
+ "diag_invite_later": "Most nem",
+ "floor_order_hint": "Csak a szintek sorrendjét változtatja a listában és a szintképeken. Hogy egy szint hol van a 3D-s házban, azt a „talaj feletti magasság” határozza meg.",
+ "roof_turn": "Elforgatás",
+ "roof_turn_hint": "Elforgatja ezt a tetőrészt az alaprajzon (az óramutató járásával egyezően), pl. ferde szárnyhoz. A rajta lévő tetőablakok és keresztoromzatok vele fordulnak. 0° = mint eddig."
 }

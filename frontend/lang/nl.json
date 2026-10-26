@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Omzetten naar parkeerplaats",
  "vehicle_to_spot_hint": "Als parkeerplaats verschijnt het alleen als een sensor de auto meldt; daar stel je Auto Pro in.",
  "as_furniture": "Als meubel tonen",
- "as_furniture_hint": "Vervangt de pin door een gekoppeld meubel op dezelfde plek. Ctrl+Z maakt het ongedaan.",
+ "as_furniture_hint": "Vervangt de pin door een gekoppeld meubel op dezelfde plek. Ctrl+Z maakt het ongedaan. Een camera houdt zijn pin met alle camera-instellingen; het model komt er alleen bij.",
  "as_furniture_pick": "Meubel kiezen …",
  "as_device": "Terug naar pin",
  "as_device_hint": "Vervangt het meubel door de pin van het apparaat.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Meterstand (m³ of liter)",
  "diag_invite": "Anonieme rapporten laten zien op welke tablets en browsers NeonPlan hapert en welke fouten bij jou optreden – zo wordt elke update precies daar beter. Vrijwillig, zonder namen of plattegrond, en je kunt elk rapport bekijken voordat het wordt verstuurd.",
  "diag_invite_look": "Bekijken",
- "diag_invite_later": "Niet nu"
+ "diag_invite_later": "Niet nu",
+ "floor_order_hint": "Verandert alleen de volgorde van de verdiepingen in de lijst en de verdiepingsplaatjes. Waar een verdieping in het 3D-huis ligt, bepaalt haar „hoogte boven de grond”.",
+ "roof_turn": "Draaiing",
+ "roof_turn_hint": "Draait dit dakdeel in de plattegrond (met de klok mee), bijv. voor een aanbouw onder een hoek. Dakkapellen en dwarskappen erop draaien mee. 0° = zoals voorheen."
 }

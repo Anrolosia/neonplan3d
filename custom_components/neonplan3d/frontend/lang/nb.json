@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Gjør om til parkeringsplass",
  "vehicle_to_spot_hint": "Et kjøretøy som vanlig møbel står alltid der. Som parkeringsplass vises det bare når en sensor melder at bilen er der, og det er der du setter opp Bil Pro (lading, rekkevidde, lås, klima).",
  "as_furniture": "Vis som møbel",
- "as_furniture_hint": "Erstatter nålen med et møbel på samme sted, koblet til denne enheten – en høyttaler for en mediespiller, en lampe for et lys. Ctrl+Z angrer.",
+ "as_furniture_hint": "Erstatter nålen med et møbel på samme sted, koblet til denne enheten – en høyttaler for en mediespiller, en lampe for et lys. Ctrl+Z angrer. Et kamera beholder markøren med alle kamerainnstillinger; modellen kommer bare i tillegg.",
  "as_furniture_pick": "Velg møbel …",
  "as_device": "Tilbake til enhetsnål",
  "as_device_hint": "Erstatter møbelet med enhetens vanlige nål på samme sted.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Målerstand (m³ eller liter)",
  "diag_invite": "Anonyme rapporter viser på hvilke nettbrett og nettlesere NeonPlan hakker, og hvilke feil som oppstår hos deg – slik blir hver oppdatering bedre akkurat der. Frivillig, uten navn eller plantegning, og du kan se hver rapport før den sendes.",
  "diag_invite_look": "Se nærmere",
- "diag_invite_later": "Ikke nå"
+ "diag_invite_later": "Ikke nå",
+ "floor_order_hint": "Endrer bare rekkefølgen på etasjene i listen og på etasjebildene. Hvor en etasje ligger i 3D-huset, bestemmes av «høyde over bakken».",
+ "roof_turn": "Dreiing",
+ "roof_turn_hint": "Dreier denne takdelen i planen (med klokka), f.eks. for et tilbygg i vinkel. Arker og kryssgavler på den dreies med. 0° = som før."
 }

@@ -32,12 +32,13 @@ import { carState, type CarState, heatSensorOn, roomClimateValue,
   fanSpeed,
   apOnline,
   isPulseDrive,
+  entityAreaId,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
 import { applianceIdle, binColors, binDue, binNext, binOut, binOutToggleable, binTagsShown, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, groupTags, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, servicesDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type HouseholdTag, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
-import { fieldFace, fieldSize } from "../solar.ts";
+import { fieldFace, fieldSize, roofFaces, roofWindowRoom } from "../solar.ts";
 import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, lockAlong, type PoolPipe, type RoofWindow, type SolarField, uid } from "../model.ts";
 
 /** A hologram card: the house's balance on the main plant, one plant (a balcony plant) on its own, or a device. */
@@ -248,6 +249,7 @@ export class Fp3dView3d extends LitElement {
     _find: { state: true },
     _walk: { state: true },
     walkable: { attribute: false },
+    pivotMark: { attribute: false },
     petsOn: { attribute: false },
     ghostOn: { attribute: false },
     _central: { state: true },
@@ -517,6 +519,8 @@ export class Fp3dView3d extends LitElement {
   declare central: boolean;
   /** Offer the walk through the house at eye height (card option walk; default on). */
   declare walkable: boolean;
+  /** The editor's 3D pane: a small cross marks the point the view turns about (it is always the middle, #733). */
+  declare pivotMark: boolean;
   /** The card can leave the pets out (card option "pets: false"); the panel always shows them. */
   declare petsOn: boolean;
   /** The card can leave the Halloween ghost out (card option "ghost: false"). */
@@ -650,6 +654,7 @@ export class Fp3dView3d extends LitElement {
     this._armed = null;
     this.central = true;
     this.walkable = true;
+    this.pivotMark = false;
     this.petsOn = true;
     this.ghostOn = true;
     this._walk = false;
@@ -4546,14 +4551,25 @@ export class Fp3dView3d extends LitElement {
         }
       }
     }
-    for (const w of b.settings.roof?.windows ?? []) {
+    const windows = b.settings.roof?.windows ?? [];
+    const faces = windows.length ? new Map(roofFaces(b).map((f) => [f.key, f])) : null;
+    for (const w of windows) {
       // the same state as the 3D view: a window motor opens it too (#712 – motor roof windows counted as shut)
       const s = roofWindowState(hass, w);
       const open = s.open > 0.02;
       const tilted = !open && s.tilt > 0.02;
-      for (const id of [w.window, w.contact, w.cover, w.tilt]) {
-        if (id && id !== "none") out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null, open, tilted });
-      }
+      const ids = [w.window, w.contact, w.cover, w.tilt].filter((id): id is string => !!id && id !== "none");
+      // its room: the area of its sensor in Home Assistant, else the room under it (a roof over two floors put every
+      // roof window on the top floor without a room, #783, #712)
+      const byArea = ids
+        .map((id) => entityAreaId(hass, id))
+        .filter((a): a is string => !!a)
+        .map((a) => b.floors.flatMap((f) => f.rooms.filter((r) => r.area_id === a).map((r) => ({ floor: f, room: r }))))
+        .find((hits) => hits.length === 1)?.[0];
+      const under = byArea ? null : roofWindowRoom(b, faces?.get(w.face), w);
+      const floor = byArea?.floor ?? under?.floor ?? b.floors[b.floors.length - 1];
+      const room = byArea?.room ?? (under ? floor?.rooms.find((r) => r.id === under.roomId) : undefined);
+      for (const id of ids) out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: room?.name ?? "", floorId: floor?.id ?? "", roomId: room?.id ?? null, open, tilted });
     }
     return out;
   }
@@ -5171,6 +5187,7 @@ export class Fp3dView3d extends LitElement {
       ${this.renderClock()} ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderGangMenu()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
       ${this.renderMic()}
+      ${this.pivotMark && !this._walk ? html`<span class="fp3d-pivot" aria-hidden="true"></span>` : nothing}
       ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
@@ -5316,11 +5333,45 @@ export class Fp3dView3d extends LitElement {
       .fp3d-gang-menu small {
         opacity: 0.7;
       }
+      .fp3d-pivot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 22px;
+        height: 22px;
+        margin: -11px 0 0 -11px;
+        border: 1.5px solid color-mix(in srgb, var(--fp3d-accent, #37e0ff) 75%, transparent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .fp3d-pivot::before,
+      .fp3d-pivot::after {
+        content: "";
+        position: absolute;
+        background: color-mix(in srgb, var(--fp3d-accent, #37e0ff) 75%, transparent);
+      }
+      .fp3d-pivot::before {
+        left: 50%;
+        top: -6px;
+        bottom: -6px;
+        width: 1.5px;
+        margin-left: -0.75px;
+      }
+      .fp3d-pivot::after {
+        top: 50%;
+        left: -6px;
+        right: -6px;
+        height: 1.5px;
+        margin-top: -0.75px;
+      }
       .fp3d-bin-info {
         display: flex;
         flex-direction: column;
         gap: 2px;
         cursor: pointer;
+        /* the info bubbles let taps through to the house; this one has a button (#793) */
+        pointer-events: auto;
       }
       .fp3d-bin-info small {
         opacity: 0.7;

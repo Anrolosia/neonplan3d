@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Změnit na parkovací místo",
  "vehicle_to_spot_hint": "Vozidlo jako obyčejný nábytek tam stojí vždy. Jako parkovací místo se objeví jen tehdy, když senzor hlásí auto, a právě tam se nastavuje Auto Pro (nabití, dojezd, zámek, klimatizace).",
  "as_furniture": "Zobrazit jako nábytek",
- "as_furniture_hint": "Nahradí špendlík kusem nábytku na stejném místě, propojeným s tímto zařízením – reproduktor pro přehrávač médií, lampa pro světlo. Ctrl+Z to vrátí.",
+ "as_furniture_hint": "Nahradí špendlík kusem nábytku na stejném místě, propojeným s tímto zařízením – reproduktor pro přehrávač médií, lampa pro světlo. Ctrl+Z to vrátí. Kamera si ponechá svůj špendlík se všemi nastaveními; model se jen přidá.",
  "as_furniture_pick": "Vybrat nábytek …",
  "as_device": "Zpět na špendlík zařízení",
  "as_device_hint": "Nahradí nábytek obyčejným špendlíkem jeho zařízení na stejném místě.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Stav měřidla (m³ nebo litry)",
  "diag_invite": "Anonymní hlášení ukazují, na kterých tabletech a prohlížečích NeonPlan trhá a jaké chyby se u vás objevují – tak se každá aktualizace zlepší přesně tam. Dobrovolné, bez jmen a půdorysu, a každé hlášení si můžete před odesláním prohlédnout.",
  "diag_invite_look": "Zobrazit",
- "diag_invite_later": "Teď ne"
+ "diag_invite_later": "Teď ne",
+ "floor_order_hint": "Mění jen pořadí podlaží v seznamu a v náhledech. Kde podlaží leží ve 3D domě, určuje jeho „výška nad terénem“.",
+ "roof_turn": "Otočení",
+ "roof_turn_hint": "Otočí tuto část střechy v plánu (po směru hodinových ručiček), např. pro křídlo pod úhlem. Vikýře a příčné štíty na ní se otočí s ní. 0° = jako dosud."
 }

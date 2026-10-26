@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Spremeni v parkirno mesto",
  "vehicle_to_spot_hint": "Vozilo kot navadno pohištvo vedno stoji tam. Kot parkirno mesto se pojavi le, ko senzor javlja avto, in tam se nastavi Avto Pro (napolnjenost, doseg, zaklep, klima).",
  "as_furniture": "Prikaži kot pohištvo",
- "as_furniture_hint": "Zamenja oznako s kosom pohištva na istem mestu, povezanim s to napravo – zvočnik za predvajalnik, svetilko za luč. Ctrl+Z razveljavi.",
+ "as_furniture_hint": "Zamenja oznako s kosom pohištva na istem mestu, povezanim s to napravo – zvočnik za predvajalnik, svetilko za luč. Ctrl+Z razveljavi. Kamera obdrži svojo oznako z vsemi nastavitvami; model se le doda.",
  "as_furniture_pick": "Izberi pohištvo …",
  "as_device": "Nazaj na oznako naprave",
  "as_device_hint": "Zamenja pohištvo s preprosto oznako njegove naprave na istem mestu.",
@@ -2075,5 +2075,8 @@
  "furn_meter_reading": "Stanje števca (m³ ali litri)",
  "diag_invite": "Anonimna poročila pokažejo, na katerih tablicah in brskalnikih NeonPlan zatika in katere napake se pojavljajo pri vas – tako se vsaka posodobitev izboljša prav tam. Prostovoljno, brez imen ali tlorisa, in vsako poročilo si lahko ogledate pred pošiljanjem.",
  "diag_invite_look": "Poglej",
- "diag_invite_later": "Ne zdaj"
+ "diag_invite_later": "Ne zdaj",
+ "floor_order_hint": "Spremeni le vrstni red nadstropij na seznamu in na sličicah. Kje leži nadstropje v 3D-hiši, določa njegova »višina nad tlemi«.",
+ "roof_turn": "Zasuk",
+ "roof_turn_hint": "Zasuka ta del strehe v tlorisu (v smeri urinega kazalca), npr. za prizidek pod kotom. Frčade in prečni zatrepi na njem se zasučejo z njim. 0° = kot doslej."
 }

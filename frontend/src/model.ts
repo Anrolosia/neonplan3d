@@ -452,6 +452,13 @@ export interface RoofSection {
    */
   end_u0?: RoofEnd | null;
   end_u1?: RoofEnd | null;
+  /**
+   * Turned (degrees, clockwise as the plan shows it) about `pivot`: a wing at an angle (#634, #724). x0 … z1 and
+   * the axis describe the section before the turn; null or 0 = not turned (every roof drawn so far).
+   */
+  rotation?: number | null;
+  /** The point it turns about, set with the first turn and moved with the section; null = the rectangle's middle. */
+  pivot?: Vec2 | null;
 }
 
 export interface RoofSettings {
