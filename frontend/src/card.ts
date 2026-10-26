@@ -298,6 +298,13 @@ clearTimeout(this.cleanTimer);
   }
 
   /** One level up: room -> floor -> house. */
+  /** The floor shown now: the one chosen, else the configured one; a single floor is always shown. */
+  private currentFloor(): string | null {
+    const b = this.data.building;
+    const chosen = this._floorId === undefined ? (this._config?.floor ?? null) : this._floorId;
+    return b && b.floors.length === 1 ? b.floors[0].id : b?.floors.some((f) => f.id === chosen) ? chosen : null;
+  }
+
   private back(): void {
     if (this._roomId) this._roomId = null;
     else if (this.canSwitch) this._floorId = null;
@@ -314,8 +321,7 @@ clearTimeout(this.cleanTimer);
       if (b.floors.some((f) => zonesOf(f).some((r) => r.id === c.room))) this._roomId = c.room;
     }
     // the configured floor is where the card starts; with floor pictures the user can switch
-    const chosen = this._floorId === undefined ? (c?.floor ?? null) : this._floorId;
-    const floorId = b && b.floors.length === 1 ? b.floors[0].id : b?.floors.some((f) => f.id === chosen) ? chosen : null;
+    const floorId = this.currentFloor();
     // the floor pictures have a house button of their own; a room with its panel has a close button
     const canGoBack =
       (!!this._roomId && c?.room_panel === false) || (!this.thumbs && this.canSwitch && !this._roomId && !!floorId && (b?.floors.length ?? 0) > 1);
@@ -403,8 +409,10 @@ clearTimeout(this.cleanTimer);
               .startView=${c?.start_view ?? null}
               style=${tt ? `--fp3d-bottom-inset: ${bar ? "calc(52px + var(--fp3d-tt-h))" : "var(--fp3d-tt-h)"}` : bar ? "--fp3d-bottom-inset: 52px" : ""}
               @room-tap=${(e: CustomEvent<{ floorId: string; roomId: string | null }>) => {
-                // in the house view (or on another floor) a tap first opens the whole floor
-                if (this.canSwitch && (b?.floors.length ?? 0) > 1 && e.detail.floorId && floorId !== e.detail.floorId) {
+                // in the house view (or on another floor) a tap first opens the whole floor; the floor as it is now,
+                // not as rendered: a jump switches the floor and opens the room 60 ms later, before a slow tablet
+                // has drawn again (#784)
+                if (this.canSwitch && (b?.floors.length ?? 0) > 1 && e.detail.floorId && this.currentFloor() !== e.detail.floorId) {
                   this._floorId = e.detail.floorId;
                   this._roomId = null;
                   return;
