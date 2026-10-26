@@ -12,7 +12,7 @@ All notable changes to NeonPlan 3D. The full notes in German and English are on 
 
 ### Fixed
 
-- **Cameras shown as furniture keep their camera pin (#779):** the furniture item no longer takes over the camera, so tapping it opens the camera picture as before. Thanks to @EduK85!
+- **Cameras shown as furniture keep their camera pin (#779):** the camera keeps its pin with all its settings (field of view, view wedge, Camera Cockpit); the furniture model only joins it instead of taking the camera over. Thanks to @EduK85!
 - **Roof windows find their floor and room (#783, #712):** for the window watch and the spoken answers a roof window is counted in the room of its sensor's area, or in the room beneath it, instead of always on the top floor without a room. Thanks to @sjess and @frops83!
 - **Jumping to a warning on slow tablets (#784):** the room of the warning now opens even when the floor takes a moment to draw. Thanks to @sjess!
 - **"Mark as put out" on bins (#793):** the button in a bin's bubble takes the tap again. Thanks to @246tbwpjzk-cell!
