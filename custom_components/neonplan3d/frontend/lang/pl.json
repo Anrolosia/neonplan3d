@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Zamień w miejsce parkingowe",
  "vehicle_to_spot_hint": "Pojazd jako zwykły mebel stoi tam zawsze. Jako miejsce parkingowe pojawia się tylko wtedy, gdy czujnik zgłasza samochód, i tam też konfiguruje się Auto Pro (naładowanie, zasięg, zamek, klimatyzacja).",
  "as_furniture": "Pokaż jako mebel",
- "as_furniture_hint": "Zastępuje pinezkę meblem w tym samym miejscu, połączonym z tym urządzeniem – głośnikiem dla odtwarzacza multimediów, lampą dla światła. Ctrl+Z cofa.",
+ "as_furniture_hint": "Zastępuje pinezkę meblem w tym samym miejscu, połączonym z tym urządzeniem – głośnikiem dla odtwarzacza multimediów, lampą dla światła. Ctrl+Z cofa. Kamera zachowuje swoją pinezkę ze wszystkimi ustawieniami; model jest tylko dodawany.",
  "as_furniture_pick": "Wybierz mebel …",
  "as_device": "Wróć do pinezki urządzenia",
  "as_device_hint": "Zastępuje mebel zwykłą pinezką jego urządzenia w tym samym miejscu.",

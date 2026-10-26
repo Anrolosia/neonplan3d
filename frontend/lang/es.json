@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Convertir en plaza de aparcamiento",
  "vehicle_to_spot_hint": "Como plaza aparece solo cuando un sensor detecta el coche; allí se configura Auto Pro.",
  "as_furniture": "Mostrar como mueble",
- "as_furniture_hint": "Sustituye el pin por un mueble vinculado en el mismo sitio. Ctrl+Z lo deshace.",
+ "as_furniture_hint": "Sustituye el pin por un mueble vinculado en el mismo sitio. Ctrl+Z lo deshace. Una cámara conserva su marcador con todos sus ajustes; el modelo solo se añade.",
  "as_furniture_pick": "Elegir mueble …",
  "as_device": "Volver a pin",
  "as_device_hint": "Sustituye el mueble por el pin de su dispositivo.",

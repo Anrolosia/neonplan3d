@@ -4728,11 +4728,28 @@ export class Fp3dEditor extends LitElement {
   private deviceToFurniture(pl: Placement, type: string): void {
     if (!this.isAdmin) return;
     const [w, d, h] = furnitureSize(type);
-    const item: Furniture = { id: uid("furniture"), type, x: pl.x, z: pl.z, rotation: pl.rotation ?? 0, w, d, h, variant: null, entity: pl.entity_id, name: pl.name ?? null, ...(pl.locked ? { locked: true } : {}) };
+    // a camera keeps its pin with everything set there (field of view, wedge, Kamera-Cockpit): the model only joins
+    // it as its look (#779)
+    const camera = pl.entity_id.startsWith("camera.");
+    const item: Furniture = {
+      id: uid("furniture"),
+      type,
+      x: pl.x,
+      z: pl.z,
+      rotation: pl.rotation ?? 0,
+      w,
+      d,
+      h,
+      variant: null,
+      ...(camera ? { entity: "none" } : { entity: pl.entity_id }),
+      name: pl.name ?? null,
+      ...(pl.locked ? { locked: true } : {}),
+    };
     this.change((_, f) => {
-      f.placements = f.placements.filter((p) => p.entity_id !== pl.entity_id);
+      if (!camera) f.placements = f.placements.filter((p) => p.entity_id !== pl.entity_id);
       f.furniture.push(item);
     });
+    if (camera) return;
     this._deviceId = null;
     this.selectItem("furniture", item.id);
   }

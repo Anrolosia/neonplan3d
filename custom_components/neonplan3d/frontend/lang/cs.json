@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Změnit na parkovací místo",
  "vehicle_to_spot_hint": "Vozidlo jako obyčejný nábytek tam stojí vždy. Jako parkovací místo se objeví jen tehdy, když senzor hlásí auto, a právě tam se nastavuje Auto Pro (nabití, dojezd, zámek, klimatizace).",
  "as_furniture": "Zobrazit jako nábytek",
- "as_furniture_hint": "Nahradí špendlík kusem nábytku na stejném místě, propojeným s tímto zařízením – reproduktor pro přehrávač médií, lampa pro světlo. Ctrl+Z to vrátí.",
+ "as_furniture_hint": "Nahradí špendlík kusem nábytku na stejném místě, propojeným s tímto zařízením – reproduktor pro přehrávač médií, lampa pro světlo. Ctrl+Z to vrátí. Kamera si ponechá svůj špendlík se všemi nastaveními; model se jen přidá.",
  "as_furniture_pick": "Vybrat nábytek …",
  "as_device": "Zpět na špendlík zařízení",
  "as_device_hint": "Nahradí nábytek obyčejným špendlíkem jeho zařízení na stejném místě.",

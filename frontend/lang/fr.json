@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Transformer en place de parking",
  "vehicle_to_spot_hint": "En place de parking, il n'apparaît que si un capteur signale la voiture ; Auto Pro s'y règle.",
  "as_furniture": "Afficher comme meuble",
- "as_furniture_hint": "Remplace le repère par un meuble lié au même endroit. Ctrl+Z annule.",
+ "as_furniture_hint": "Remplace le repère par un meuble lié au même endroit. Ctrl+Z annule. Une caméra garde son repère avec tous ses réglages ; le modèle s'y ajoute seulement.",
  "as_furniture_pick": "Choisir un meuble …",
  "as_device": "Revenir au repère",
  "as_device_hint": "Remplace le meuble par le repère de son appareil.",

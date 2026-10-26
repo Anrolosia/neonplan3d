@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Transformar em lugar de estacionamento",
  "vehicle_to_spot_hint": "Um veículo como simples móvel está sempre lá. Como lugar de estacionamento só aparece enquanto um sensor indicar o carro, e é aí que se configura o Car Pro (carga, autonomia, fecho, climatização).",
  "as_furniture": "Mostrar como móvel",
- "as_furniture_hint": "Substitui o marcador por um móvel no mesmo lugar, ligado a este dispositivo – uma coluna para um leitor multimédia, um candeeiro para uma luz. Ctrl+Z desfaz.",
+ "as_furniture_hint": "Substitui o marcador por um móvel no mesmo lugar, ligado a este dispositivo – uma coluna para um leitor multimédia, um candeeiro para uma luz. Ctrl+Z desfaz. Uma câmara mantém o seu marcador com todas as definições; o modelo apenas se junta.",
  "as_furniture_pick": "Escolher móvel …",
  "as_device": "Voltar a marcador de dispositivo",
  "as_device_hint": "Substitui o móvel pelo marcador simples do seu dispositivo no mesmo lugar.",

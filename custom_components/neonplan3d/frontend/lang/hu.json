@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Parkolóhellyé alakítás",
  "vehicle_to_spot_hint": "Parkolóhelyként csak akkor jelenik meg, ha egy érzékelő jelzi az autót; ott állítható az Auto Pro.",
  "as_furniture": "Megjelenítés bútorként",
- "as_furniture_hint": "A jelölőt ugyanott egy összekapcsolt bútorra cseréli. Ctrl+Z visszavonja.",
+ "as_furniture_hint": "A jelölőt ugyanott egy összekapcsolt bútorra cseréli. Ctrl+Z visszavonja. Egy kamera megtartja a jelölőjét az összes beállításával; a modell csak hozzáadódik.",
  "as_furniture_pick": "Bútor választása …",
  "as_device": "Vissza jelölőnek",
  "as_device_hint": "A bútort az eszköz jelölőjére cseréli.",

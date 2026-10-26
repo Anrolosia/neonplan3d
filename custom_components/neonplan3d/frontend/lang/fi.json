@@ -386,7 +386,7 @@
  "vehicle_to_spot": "Muuta pysäköintipaikaksi",
  "vehicle_to_spot_hint": "Ajoneuvo pelkkänä huonekaluna on aina paikalla. Pysäköintipaikkana se näkyy vain, kun anturi ilmoittaa auton, ja juuri siellä Auto Pro määritetään (lataustaso, toimintamatka, lukitus, ilmastointi).",
  "as_furniture": "Näytä huonekaluna",
- "as_furniture_hint": "Korvaa nastan huonekalulla samassa paikassa, linkitettynä tähän laitteeseen – kaiutin mediasoittimelle, valaisin valolle. Ctrl+Z peruu.",
+ "as_furniture_hint": "Korvaa nastan huonekalulla samassa paikassa, linkitettynä tähän laitteeseen – kaiutin mediasoittimelle, valaisin valolle. Ctrl+Z peruu. Kamera säilyttää merkkinsä kaikkine asetuksineen; malli vain lisätään.",
  "as_furniture_pick": "Valitse huonekalu …",
  "as_device": "Takaisin laitenastaksi",
  "as_device_hint": "Korvaa huonekalun sen laitteen pelkällä nastalla samassa paikassa.",
