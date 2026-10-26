@@ -1100,6 +1100,7 @@ var ii=globalThis,si=ii.ShadowRoot&&(ii.ShadyCSS===void 0||ii.ShadyCSS.nativeSha
       ${this.render3dBar()}
       <fp3d-view3d
               .walkable=${!1}
+        .pivotMark=${!0}
         .hass=${this.hass}
         .building=${this._doc3d}
         .floorId=${this.houseTool?null:this._floorId}

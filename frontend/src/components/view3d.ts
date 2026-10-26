@@ -249,6 +249,7 @@ export class Fp3dView3d extends LitElement {
     _find: { state: true },
     _walk: { state: true },
     walkable: { attribute: false },
+    pivotMark: { attribute: false },
     petsOn: { attribute: false },
     ghostOn: { attribute: false },
     _central: { state: true },
@@ -518,6 +519,8 @@ export class Fp3dView3d extends LitElement {
   declare central: boolean;
   /** Offer the walk through the house at eye height (card option walk; default on). */
   declare walkable: boolean;
+  /** The editor's 3D pane: a small cross marks the point the view turns about (it is always the middle, #733). */
+  declare pivotMark: boolean;
   /** The card can leave the pets out (card option "pets: false"); the panel always shows them. */
   declare petsOn: boolean;
   /** The card can leave the Halloween ghost out (card option "ghost: false"). */
@@ -651,6 +654,7 @@ export class Fp3dView3d extends LitElement {
     this._armed = null;
     this.central = true;
     this.walkable = true;
+    this.pivotMark = false;
     this.petsOn = true;
     this.ghostOn = true;
     this._walk = false;
@@ -5183,6 +5187,7 @@ export class Fp3dView3d extends LitElement {
       ${this.renderClock()} ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderGangMenu()} ${this.renderThrough()} ${this.renderCameraWall()}
       ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()}
       ${this.renderMic()}
+      ${this.pivotMark && !this._walk ? html`<span class="fp3d-pivot" aria-hidden="true"></span>` : nothing}
       ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${this.building} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
       ${this.showStats && this._stats
         ? html`<span class="fp3d-stats"
@@ -5327,6 +5332,38 @@ export class Fp3dView3d extends LitElement {
       }
       .fp3d-gang-menu small {
         opacity: 0.7;
+      }
+      .fp3d-pivot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 22px;
+        height: 22px;
+        margin: -11px 0 0 -11px;
+        border: 1.5px solid color-mix(in srgb, var(--fp3d-accent, #37e0ff) 75%, transparent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 2;
+      }
+      .fp3d-pivot::before,
+      .fp3d-pivot::after {
+        content: "";
+        position: absolute;
+        background: color-mix(in srgb, var(--fp3d-accent, #37e0ff) 75%, transparent);
+      }
+      .fp3d-pivot::before {
+        left: 50%;
+        top: -6px;
+        bottom: -6px;
+        width: 1.5px;
+        margin-left: -0.75px;
+      }
+      .fp3d-pivot::after {
+        top: 50%;
+        left: -6px;
+        right: -6px;
+        height: 1.5px;
+        margin-top: -0.75px;
       }
       .fp3d-bin-info {
         display: flex;

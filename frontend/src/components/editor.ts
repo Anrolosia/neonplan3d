@@ -1128,6 +1128,7 @@ export class Fp3dEditor extends LitElement {
       ${this.render3dBar()}
       <fp3d-view3d
               .walkable=${false}
+        .pivotMark=${true}
         .hass=${this.hass}
         .building=${this._doc3d}
         .floorId=${this.houseTool ? null : this._floorId}
