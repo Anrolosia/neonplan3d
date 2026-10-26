@@ -120,6 +120,11 @@ export interface Opening {
   tilt_invert?: boolean;
   /** Door: drawn closed when no sensor says otherwise (default: half open, so the door is seen). */
   shut?: boolean;
+  /**
+   * Door: how far the leaf stands open, in degrees – without a sensor always, with one while it reports open.
+   * null (default) = as before: half open (about 43°) without a sensor, fully open (about 86°) with one.
+   */
+  open_angle?: number | null;
   /** The contact sensors report the other way round (on = closed, #329). */
   contact_invert?: boolean;
   /** Windows: no rain warning for this one (it may stay open in the rain, under a canopy, D328). */

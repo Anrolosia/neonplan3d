@@ -2078,5 +2078,8 @@
  "diag_invite_later": "Ikke nå",
  "floor_order_hint": "Endrer bare rekkefølgen på etasjene i listen og på etasjebildene. Hvor en etasje ligger i 3D-huset, bestemmes av «høyde over bakken».",
  "roof_turn": "Dreiing",
- "roof_turn_hint": "Dreier denne takdelen i planen (med klokka), f.eks. for et tilbygg i vinkel. Arker og kryssgavler på den dreies med. 0° = som før."
+ "roof_turn_hint": "Dreier denne takdelen i planen (med klokka), f.eks. for et tilbygg i vinkel. Arker og kryssgavler på den dreies med. 0° = som før.",
+ "door_angle": "Åpningsvinkel",
+ "door_angle_hint": "Hvor langt døren står åpen i 3D: uten sensor alltid, med sensor så snart den melder åpen. Standard: halvåpen uten sensor, helt åpen med sensor.",
+ "door_angle_default": "Standard"
 }

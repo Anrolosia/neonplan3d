@@ -167,6 +167,7 @@ OPENING_SCHEMA = vol.Schema(
         vol.Optional("tilt_invert", default=False): bool,
         # a door without a sensor is drawn closed instead of half open
         vol.Optional("shut", default=False): bool,
+        vol.Optional("open_angle", default=None): vol.Any(None, vol.All(vol.Coerce(float), vol.Range(min=0, max=180))),
         # the contact sensors report the other way round (on = closed)
         vol.Optional("contact_invert", default=False): bool,
         # no rain warning for this window
