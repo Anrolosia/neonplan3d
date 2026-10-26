@@ -32,12 +32,13 @@ import { carState, type CarState, heatSensorOn, roomClimateValue,
   fanSpeed,
   apOnline,
   isPulseDrive,
+  entityAreaId,
 } from "../devices.ts";
 import { alertColor, alertEntities, alertSources, alertText, findAlerts, isOutage, type Alert, type AlertSources } from "../alerts.ts";
 import { iconPath, iconSvg, mdiIcon } from "../icons.ts";
 import { applianceIdle, binColors, binDue, binNext, binOut, binOutToggleable, binTagsShown, doorsOf, fetchPickups, FinishedMemory, fridgeOpenTooLong, groupTags, hassCountry, isFinishedState, mailboxPost, nextFridgeCheck, plantThirsty, remainingMinutes, remainingText, servicesDue, setHouseholdCountry, wasteCalendars, isPackPlant, type HouseholdItem, type HouseholdTag, type Pickup } from "../household.ts";
 import { deviceSensors, energySummary, fetchSolarRows, fetchTodayChange, fieldLevels, fieldPowers, findConsumers, flowColor, flowSegments, gridPoint, powerSensorFor, readPower, solarCurvePath, solarDayFromStats, type Consumer, type EnergySummary, type StatRow } from "../energy.ts";
-import { fieldFace, fieldSize } from "../solar.ts";
+import { fieldFace, fieldSize, roofFaces, roofWindowRoom } from "../solar.ts";
 import { type CustomButton, type EntityRef, DEFAULT_HOLOGRAM, lockAlong, type PoolPipe, type RoofWindow, type SolarField, uid } from "../model.ts";
 
 /** A hologram card: the house's balance on the main plant, one plant (a balcony plant) on its own, or a device. */
@@ -4546,14 +4547,25 @@ export class Fp3dView3d extends LitElement {
         }
       }
     }
-    for (const w of b.settings.roof?.windows ?? []) {
+    const windows = b.settings.roof?.windows ?? [];
+    const faces = windows.length ? new Map(roofFaces(b).map((f) => [f.key, f])) : null;
+    for (const w of windows) {
       // the same state as the 3D view: a window motor opens it too (#712 – motor roof windows counted as shut)
       const s = roofWindowState(hass, w);
       const open = s.open > 0.02;
       const tilted = !open && s.tilt > 0.02;
-      for (const id of [w.window, w.contact, w.cover, w.tilt]) {
-        if (id && id !== "none") out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: "", floorId: b.floors[b.floors.length - 1]?.id ?? "", roomId: null, open, tilted });
-      }
+      const ids = [w.window, w.contact, w.cover, w.tilt].filter((id): id is string => !!id && id !== "none");
+      // its room: the area of its sensor in Home Assistant, else the room under it (a roof over two floors put every
+      // roof window on the top floor without a room, #783, #712)
+      const byArea = ids
+        .map((id) => entityAreaId(hass, id))
+        .filter((a): a is string => !!a)
+        .map((a) => b.floors.flatMap((f) => f.rooms.filter((r) => r.area_id === a).map((r) => ({ floor: f, room: r }))))
+        .find((hits) => hits.length === 1)?.[0];
+      const under = byArea ? null : roofWindowRoom(b, faces?.get(w.face), w);
+      const floor = byArea?.floor ?? under?.floor ?? b.floors[b.floors.length - 1];
+      const room = byArea?.room ?? (under ? floor?.rooms.find((r) => r.id === under.roomId) : undefined);
+      for (const id of ids) out.push({ id: w.id, entity: id, kind: "roof_window", name: w.name || t("roof_window"), room: room?.name ?? "", floorId: floor?.id ?? "", roomId: room?.id ?? null, open, tilted });
     }
     return out;
   }
