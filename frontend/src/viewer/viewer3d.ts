@@ -56,7 +56,7 @@ import { buildFloorGeometry, SLAB, stairHoleParts, type FloorGeometry } from "./
 import { OrbitControls, type OrbitView } from "./controls.ts";
 import { makeFoldable, type FoldMasks } from "./fold.ts";
 import { CameraProjections, PROJECTION_LAYER, type ProjectionSurface, type ProjectorPose } from "./projection.ts";
-import { packGlowCentre, pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, pushFridgeDoors, setLightLook, hasFixedColors } from "./furniture.ts";
+import { packGlowCentre, pushAwning, pushCameraModel, pushPackGlow, pushPackRobot, pushPackLamp, pushPackMotion, screenRect, screenPictureSize, pushFridgeDoors, setLightLook, hasFixedColors } from "./furniture.ts";
 import { pushPipeTube, type PipeTube } from "./pipes.ts";
 // the walk through the house at eye height (lives with the viewer it drives)
 export { FloorMap, WalkCamera, type WalkState } from "./walk.ts";
@@ -3571,11 +3571,8 @@ export class FloorplanViewer {
   private placeScreenPicture(mesh: Mesh, f: Furniture, r: { x0: number; x1: number; y0: number; y1: number; z: number }, tex: Texture): void {
     const img = tex.image as { width?: number; height?: number } | undefined;
     const aspect = img?.width && img?.height ? img.width / img.height : 16 / 9;
-    const sw = r.x1 - r.x0 - 0.04;
-    const sh = r.y1 - r.y0 - 0.04;
     // contain: the whole picture is visible, letterboxed by the dark screen around it
-    const w = Math.min(sw, sh * aspect);
-    const h = w / aspect;
+    const { w, h } = screenPictureSize(r.x1 - r.x0, r.y1 - r.y0, aspect);
     const a = f.rotation * DEG;
     const cx = (r.x0 + r.x1) / 2;
     const z = r.z + 0.008;
