@@ -718,6 +718,11 @@ export interface BuildingSettings {
   rain_entity?: string | null;
   /** Warnings name the device after the room (default on); off = only "Room · Smoke" when the warning has a room (#374). */
   alert_names?: boolean;
+  /**
+   * Warn when a window or door contact has been unavailable for 10 minutes (an empty battery, out of radio reach):
+   * the window would look shut although nobody knows. Off by default.
+   */
+  alert_unavailable?: boolean;
   /** An entity that reports a power outage (a grid or UPS sensor); null = no outage warning (#214). */
   outage_entity?: string | null;
   /** Sunlight falls through the windows as patches on the floor (default on, #266). */

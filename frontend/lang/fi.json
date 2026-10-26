@@ -2081,5 +2081,9 @@
  "roof_turn_hint": "Kääntää tätä katon osaa pohjapiirroksessa (myötäpäivään), esim. vinossa olevaa siipeä varten. Sen kattoikkunat ja poikkipäädyt kääntyvät mukana. 0° = kuten ennen.",
  "door_angle": "Avautumiskulma",
  "door_angle_hint": "Kuinka auki ovi on 3D:ssä: ilman anturia aina, anturin kanssa heti kun se ilmoittaa auki. Oletus: ilman anturia puoliksi auki, anturin kanssa kokonaan auki.",
- "door_angle_default": "Oletus"
+ "door_angle_default": "Oletus",
+ "alert_contact_unavailable": "Kosketin ei käytettävissä: {name}",
+ "alert_short_contact_unavailable": "Kosketin ei käytettävissä",
+ "alert_unavailable": "Varoita, kun ikkunan tai oven kosketin ei ole käytettävissä",
+ "alert_unavailable_hint": "Jos kosketin on ollut ”ei käytettävissä” 10 minuuttia (tyhjä paristo, kantaman ulkopuolella), ikkuna näyttää 3D:ssä suljetulta, vaikka kukaan ei tiedä. Silloin näytetään varoitus."
 }

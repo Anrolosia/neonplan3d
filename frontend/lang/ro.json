@@ -2081,5 +2081,9 @@
  "roof_turn_hint": "Rotește această parte a acoperișului în plan (în sens orar), de ex. pentru o aripă în unghi. Lucarnele și frontoanele de pe ea se rotesc odată cu ea. 0° = ca înainte.",
  "door_angle": "Unghi de deschidere",
  "door_angle_hint": "Cât de deschisă este ușa în 3D: fără senzor mereu, cu senzor imediat ce raportează deschis. Implicit: întredeschisă fără senzor, complet deschisă cu senzor.",
- "door_angle_default": "Implicit"
+ "door_angle_default": "Implicit",
+ "alert_contact_unavailable": "Contact indisponibil: {name}",
+ "alert_short_contact_unavailable": "Contact indisponibil",
+ "alert_unavailable": "Avertizează când un contact de fereastră sau ușă este indisponibil",
+ "alert_unavailable_hint": "Dacă un contact este „indisponibil” de 10 minute (baterie descărcată, în afara razei), fereastra pare închisă în 3D deși nimeni nu știe. Atunci apare un avertisment."
 }

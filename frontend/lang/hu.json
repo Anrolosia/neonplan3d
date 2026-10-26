@@ -2081,5 +2081,9 @@
  "roof_turn_hint": "Elforgatja ezt a tetőrészt az alaprajzon (az óramutató járásával egyezően), pl. ferde szárnyhoz. A rajta lévő tetőablakok és keresztoromzatok vele fordulnak. 0° = mint eddig.",
  "door_angle": "Nyitási szög",
  "door_angle_hint": "Mennyire áll nyitva az ajtó 3D-ben: érzékelő nélkül mindig, érzékelővel, amint nyitottat jelez. Alapértelmezés: érzékelő nélkül félig nyitva, érzékelővel teljesen nyitva.",
- "door_angle_default": "Alapértelmezett"
+ "door_angle_default": "Alapértelmezett",
+ "alert_contact_unavailable": "Érintkező nem elérhető: {name}",
+ "alert_short_contact_unavailable": "Érintkező nem elérhető",
+ "alert_unavailable": "Figyelmeztetés, ha egy ablak- vagy ajtóérintkező nem elérhető",
+ "alert_unavailable_hint": "Ha egy érintkező 10 perce „nem elérhető” (lemerült elem, hatótávon kívül), az ablak 3D-ben zártnak látszik, pedig senki sem tudja. Ekkor figyelmeztetés jelenik meg."
 }

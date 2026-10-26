@@ -787,6 +787,7 @@ SETTINGS_SCHEMA = vol.Schema(
         vol.Optional("rain_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # warnings name the device after the room
         vol.Optional("alert_names", default=True): bool,
+        vol.Optional("alert_unavailable", default=False): bool,
         # an entity that reports a power outage (None = no outage warning)
         vol.Optional("outage_entity", default=None): vol.Any(None, vol.All(str, vol.Length(max=255))),
         # sunlight through the windows as patches on the floor
