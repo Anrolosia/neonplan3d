@@ -4,6 +4,7 @@ import "./polyfills.ts";
 import { registerFonts } from "./fonts.ts";
 import "./panel.ts";
 import "./card.ts";
+import "./static-card.ts";
 import { micProbeAsked } from "./load-voice.ts";
 
 registerFonts();

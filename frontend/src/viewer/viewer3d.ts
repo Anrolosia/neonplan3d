@@ -4379,6 +4379,60 @@ export class FloorplanViewer {
     return out;
   }
 
+  /**
+   * Static export: the view as it stands, as RGBA pixels at the canvas size (rows from the top), and the pins it
+   * shows (where they sit in 0..1 of the width and height, their icon and name; pins outside the picture are left out).
+   */
+  capture(): { width: number; height: number; pixels: Uint8Array; pins: { id: string; x: number; y: number; icon: string; name: string; hidden: boolean }[] } {
+    // drawn on the screen canvas and copied in the same task, so tone mapping and antialiasing are those of the
+    // view (a render target skips tone mapping: the lights' glow came out orange instead of warm white)
+    const canvas = this.renderer.domElement;
+    const w = canvas.width;
+    const h = canvas.height;
+    this.renderer.render(this.scene, this.camera);
+    const copy = document.createElement("canvas");
+    copy.width = w;
+    copy.height = h;
+    const ctx = copy.getContext("2d")!;
+    ctx.drawImage(canvas, 0, 0);
+    const pixels = new Uint8Array(ctx.getImageData(0, 0, w, h).data.buffer);
+    // a device without a pin (a lamp tapped in the scene itself) comes along as hidden: the static card taps it there
+    const pins: { id: string; x: number; y: number; icon: string; name: string; hidden: boolean }[] = [];
+    const v = new Vector3();
+    for (const d of this.devices) {
+      const fv = this.floors.find((f) => f.floor.id === d.floorId);
+      if (!fv?.group.visible) continue;
+      v.set(d.x, fv.floor.elevation + fv.y + d.y, d.z).project(this.camera);
+      if (v.z > 1 || Math.abs(v.x) > 1 || Math.abs(v.y) > 1) continue;
+      pins.push({ id: d.id, x: (v.x + 1) / 2, y: (1 - v.y) / 2, icon: d.icon, name: d.name, hidden: d.pin === false });
+    }
+    return { width: w, height: h, pixels, pins };
+  }
+
+  /** Static export: the same view with the house hidden (the backdrop alone), to find where the house sits. */
+  captureEmpty(): Uint8Array {
+    const saved = this.floors.map((fv) => [fv, fv.group.visible] as const);
+    const roof = this.roof?.group.visible ?? false;
+    try {
+      for (const [fv] of saved) fv.group.visible = false;
+      if (this.roof) this.roof.group.visible = false;
+      return this.capture().pixels;
+    } finally {
+      for (const [fv, visible] of saved) fv.group.visible = visible;
+      if (this.roof) this.roof.group.visible = roof;
+    }
+  }
+
+  private exportRatio: number | null = null;
+
+  /** Static export: draw `factor` times as many pixels as now (null: back to normal). */
+  exportScale(factor: number | null): void {
+    this.exportRatio ??= this.renderer.getPixelRatio();
+    this.renderer.setPixelRatio(this.exportRatio * (factor ?? 1));
+    if (factor === null) this.exportRatio = null;
+    this.invalidate();
+  }
+
   /** Robot vacuums and their states; robots that clean drive lanes through their room. */
   setRobots(list: RobotInfo[]): void {
     const seen = new Set<string>();

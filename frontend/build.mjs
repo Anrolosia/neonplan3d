@@ -129,7 +129,8 @@ function copyFonts() {
 // main 698 KB, editor 932 KB on 2026-10-26: turning roof parts (#634, #724) and its texts
 // card editor 268 KB on 2026-10-25 (was 267): the texts of the invitation to the usage reports
 // 3D 816 KB on 2026-10-25 (was 812): free walls drawn as outer walls find their outside (blinds, glass), pets walk on at their own pace on tablets, door glass on both faces
-const BUDGET = { "neonplan3d.js": 698 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 160 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 816 * 1024, "neonplan3d-editor.js": 932 * 1024, "neonplan3d-card-editor.js": 268 * 1024 };
+// static export PoC: +6 KB for the static card in the main bundle
+const BUDGET = { "neonplan3d.js": 704 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 160 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 816 * 1024, "neonplan3d-editor.js": 932 * 1024, "neonplan3d-card-editor.js": 268 * 1024 };
 
 copyFonts();
 if (watch) {

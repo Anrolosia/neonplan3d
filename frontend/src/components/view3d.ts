@@ -130,6 +130,7 @@ import { lowSyncDelay } from "../viewer/pace.ts";
 import { floorCounts, floorInfoText, locatedPersons, personLook, personsInRooms, personsShown } from "../presence.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HassEntity, HomeAssistant } from "../types.ts";
+import { crop, diffBox, toDataUrl, type Box, type StaticLayer, type StaticManifest, type StaticPin } from "../static-export.ts";
 import { countView, diagnosticsActive, recordFrame, watchDiagnostics } from "../diagnostics.ts";
 import type { DeviceMarker, FloorplanViewer, FloorStack, RobotInfo, Quality, ScreenState, SoundSource, SurfaceGrab, ViewerStats, WallMode } from "../viewer/viewer3d.ts";
 import { wallLayout } from "../camera-wall.ts";
@@ -714,6 +715,7 @@ export class Fp3dView3d extends LitElement {
     }
     document.addEventListener("visibilitychange", this.onVisible);
     this.watchAsk();
+    (window as unknown as { neonplanExportStatic?: () => Promise<void> }).neonplanExportStatic = () => this.exportStatic();
   }
 
   /** Listens to the sentences Assist and the service `neonplan3d.ask` hand to the views (once the connection is there). */
@@ -745,6 +747,109 @@ export class Fp3dView3d extends LitElement {
   private onVisible = (): void => {
     if (!document.hidden) this.holoRefetch?.();
   };
+
+  /** Static export: while set, the view shows these invented states instead of the live ones. */
+  private exportHass: HomeAssistant | null = null;
+
+  /**
+   * Static export (proof of concept, from the browser console: `neonplanExportStatic()`): the floor on screen, seen
+   * as it stands, with every light off and every door closed, then once per light on and per door open. Downloads
+   * one JSON file with the pictures inside, for `custom:neonplan3d-static-card`. Turn idle orbit and weather off first.
+   */
+  private async exportStatic(): Promise<void> {
+    const v = this.viewer;
+    const b = this.building;
+    const live = this.hass;
+    const floorId = this.floorId;
+    const floor = b?.floors.find((f) => f.id === floorId);
+    if (!v || !b || !live || !floor || this.exportHass) return;
+    const markers = [...buildMarkers(live, b), ...this.furnitureMarkers(live, b, new Set(), new Set()).markers];
+    // lamps on a plug count too; one that changes nothing in the picture gets no layer
+    const lights = [...new Set(markers.filter((m) => m.floorId === floor.id && /^(light|switch)\./.test(m.id) && live.states[m.id]).map((m) => m.id))];
+    const doors = [
+      ...new Set(
+        floor.openings.flatMap((o) => {
+          const e = this.openingLinks?.get(o.id);
+          return [e?.cover, e?.contact, e?.contact2].filter((id): id is string => !!id && !!live.states[id]);
+        }),
+      ),
+    ];
+    const cover = (id: string, state: string, position: number) => ({ state, attributes: { ...live.states[id].attributes, current_position: position } });
+    const base: Record<string, Partial<HassEntity>> = Object.fromEntries([
+      ...lights.map((id) => [id, { state: "off" }]),
+      ...doors.map((id) => [id, id.startsWith("cover.") ? cover(id, "closed", 0) : { state: "off" }]),
+    ]);
+    const fake = (over: Record<string, Partial<HassEntity>>): HomeAssistant => {
+      const states = { ...live.states };
+      for (const [id, s] of Object.entries({ ...base, ...over })) states[id] = { ...live.states[id], ...s };
+      return { ...live, states };
+    };
+    // every picture is cut to the house (what differs from the backdrop alone, plus a small margin)
+    let frame: Box | null = null;
+    const shot = async (hass: HomeAssistant) => {
+      this.exportHass = hass;
+      this.syncDevices(true);
+      // ponytail: fixed wait for glows and doors to settle; a "viewer at rest" signal if it proves flaky
+      await new Promise((ok) => setTimeout(ok, 800));
+      const s = v.capture();
+      const f = frame ?? { x: 0, y: 0, w: s.width, h: s.height };
+      const pins = s.pins
+        .map((p) => ({ ...p, x: (p.x * s.width - f.x) / f.w, y: (p.y * s.height - f.y) / f.h }))
+        .filter((p) => p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1);
+      return { width: f.w, height: f.h, pixels: frame ? new Uint8Array(crop(s.pixels, s.pixels, s.width, f, false).buffer) : s.pixels, pins };
+    };
+    const frameOf = async (): Promise<Box> => {
+      frame = null;
+      const s = await shot(fake({}));
+      const box = diffBox(v.captureEmpty(), s.pixels, s.width, s.height) ?? { x: 0, y: 0, w: s.width, h: s.height };
+      const m = Math.round(Math.max(box.w, box.h) * 0.02);
+      const x = Math.max(0, box.x - m);
+      const y = Math.max(0, box.y - m);
+      return { x, y, w: Math.min(s.width, box.x + box.w + m) - x, h: Math.min(s.height, box.y + box.h + m) - y };
+    };
+    try {
+      // the house about 2400 px wide (sharp on a wall tablet), at most three times the screen's own pixels
+      v.exportScale(Math.min(3, Math.max(1, 2400 / (await frameOf()).w)));
+      frame = await frameOf();
+      const off = await shot(fake({}));
+      const { width, height } = off;
+      const layers: StaticLayer[] = [];
+      const iconOn = new Map<string, string>();
+      const add = async (entity: string, states: string[], blend: StaticLayer["blend"], over: Partial<HassEntity>) => {
+        const on = await shot(fake({ [entity]: over }));
+        const icon = on.pins.find((p) => p.id === entity)?.icon;
+        if (icon) iconOn.set(entity, icon);
+        const box = diffBox(off.pixels, on.pixels, width, height);
+        if (!box) return;
+        const src = toDataUrl(crop(off.pixels, on.pixels, width, box, blend === "normal"), box.w, box.h);
+        layers.push({ entity, states, blend, x: box.x / width, y: box.y / height, w: box.w / width, h: box.h / height, src });
+      };
+      // an off light carries no colour: warm white at full brightness, the card dims it by the live brightness
+      const lit = (id: string) => ({ color_mode: "color_temp", color_temp_kelvin: 3000, ...live.states[id].attributes, brightness: 255 });
+      for (const id of lights) await add(id, ["on"], "lighten", id.startsWith("light.") ? { state: "on", attributes: lit(id) } : { state: "on" });
+      for (const id of doors) {
+        if (id.startsWith("cover.")) await add(id, ["open", "opening", "closing"], "normal", cover(id, "open", 100));
+        else await add(id, ["on"], "normal", { state: "on" });
+      }
+      // pins of entities only (furniture groups such as multi-switches have no single entity to tap)
+      const pins: StaticPin[] = off.pins
+        .filter((p) => p.id.includes("."))
+        .map(({ hidden, ...p }) => {
+          const on = iconOn.get(p.id);
+          return { ...p, ...(on && on !== p.icon ? { iconOn: on } : {}), ...(this.confirmSet.has(p.id) ? { confirm: true } : {}), ...(hidden ? { hidden } : {}) };
+        });
+      const manifest: StaticManifest = { version: 1, floor: floor.id, width, height, base: toDataUrl(off.pixels, width, height), layers, pins };
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/json" }));
+      a.download = `neonplan3d-static-${floor.id}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    } finally {
+      v.exportScale(null);
+      this.exportHass = null;
+      this.syncDevices(true);
+    }
+  }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
@@ -999,8 +1104,8 @@ export class Fp3dView3d extends LitElement {
   private syncDevices(force: boolean, timed = false): void {
     const v = this.viewer;
     const b = this.building;
-    if (!v || !b || !this.hass) return;
-    const hass = this.hass;
+    const hass = this.exportHass ?? this.hass;
+    if (!v || !b || !hass) return;
     if (force || !this.openingLinks || this.linkedRegistry !== hass.entities) {
       this.openingLinks = openingEntities(hass, b.floors);
       this.furnitureLinks = furnitureEntities(hass, b.floors);
@@ -1032,7 +1137,7 @@ export class Fp3dView3d extends LitElement {
       }
     }
     // time travel: after a jump doors and blinds stand at once instead of swinging there
-    const jump = !!this.replay && this.replay.seek !== this.seenSeek;
+    const jump = !!this.exportHass || (!!this.replay && this.replay.seek !== this.seenSeek);
     this.seenSeek = this.replay?.seek ?? 0;
     this.seenT = this.replay?.t ?? 0;
     if (!changed) return;
