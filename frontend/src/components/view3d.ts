@@ -838,7 +838,9 @@ export class Fp3dView3d extends LitElement {
           const on = iconOn.get(p.id);
           return { ...p, ...(on && on !== p.icon ? { iconOn: on } : {}), ...(this.confirmSet.has(p.id) ? { confirm: true } : {}), ...(hidden ? { hidden } : {}) };
         });
-      const manifest: StaticManifest = { version: 1, floor: floor.id, width, height, base: toDataUrl(off.pixels, width, height), layers, pins };
+      const stage = this.renderRoot.querySelector(".fp3d-stage");
+      const background = stage ? getComputedStyle(stage).backgroundImage : undefined;
+      const manifest: StaticManifest = { version: 1, floor: floor.id, width, height, base: toDataUrl(off.pixels, width, height), ...(background && background !== "none" ? { background } : {}), layers, pins };
       const a = document.createElement("a");
       a.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/json" }));
       a.download = `neonplan3d-static-${floor.id}.json`;

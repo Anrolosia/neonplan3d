@@ -56,7 +56,7 @@ class NeonplanStaticCard extends LitElement {
     const layers = [...m.layers.filter((l) => l.blend === "normal"), ...m.layers.filter((l) => l.blend === "lighten")];
     const pct = (v: number) => `${(v * 100).toFixed(3)}%`;
     return html`<ha-card>
-      <div class="stage" style="aspect-ratio: ${m.width} / ${m.height}">
+      <div class="stage" style="aspect-ratio: ${m.width} / ${m.height}; background-image: ${m.background ?? "none"}">
         <img src=${m.base} alt="" />
         ${layers.map((l) => {
           if (!this.shown(l)) return nothing;

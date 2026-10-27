@@ -35,6 +35,8 @@ export interface StaticManifest {
   width: number;
   height: number;
   base: string;
+  /** The stage's CSS background behind the transparent canvas (the sky gradient) at the time of the export. */
+  background?: string;
   layers: StaticLayer[];
   pins: StaticPin[];
 }
